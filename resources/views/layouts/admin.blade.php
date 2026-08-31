@@ -15,9 +15,7 @@
     <!-- CSS / JS (Tailwind + Alpine) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Rich Text Editor - Quill -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
 
     <style>
         body {
@@ -85,15 +83,27 @@
                         </a>
 
                         <a href="{{ url('/admin/packages') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/packages') }}">
-                            Packages
+                            Vendor Bundles
                         </a>
 
                         <a href="{{ url('/admin/coupons') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/coupons') }}">
                             Coupons
                         </a>
 
-                        <a href="{{ url('/admin/blog') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/blog') }}">
+                        <a href="{{ url('/admin/blog') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ request()->is('admin/blog*') && !request()->is('admin/blog-comments*') && !request()->is('admin/blog-subscribers*') ? 'bg-gray-800 text-orange border-l-4 border-orange' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
                             Blog Posts
+                        </a>
+
+                        <a href="{{ url('/admin/blog-comments') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/blog-comments') }}">
+                            Blog Comments
+                        </a>
+
+                        <a href="{{ url('/admin/blog-subscribers') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/blog-subscribers') }}">
+                            Blog Subscribers
+                        </a>
+
+                        <a href="{{ url('/admin/media') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/media') }}">
+                            Media Gallery
                         </a>
 
                         <a href="{{ url('/admin/settings') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/settings') }}">
@@ -177,6 +187,18 @@
                         <a href="{{ url('/admin/subscriptions') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Subscriptions</a>
                         <a href="{{ url('/admin/coupons') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Coupons</a>
                         <a href="{{ url('/admin/blog') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Blog Posts</a>
+                        
+                        <!-- Vendors -->
+                        <a href="{{ route('admin.vendors.index') }}" class="{{ request()->routeIs('admin.vendors.*') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            Vendors
+                        </a>
+
+                        <!-- Certifications -->
+                        <a href="{{ route('admin.certifications.index') }}" class="{{ request()->routeIs('admin.certifications.*') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            Certifications
+                        </a>
+
+                        <a href="{{ url('/admin/media') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Media Gallery</a>
                         <a href="{{ url('/admin/settings') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Settings</a>
                     </nav>
                 </div>

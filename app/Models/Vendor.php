@@ -59,4 +59,14 @@ class Vendor extends Model
     {
         return $this->hasMany(Exam::class)->orderBy('sort_order');
     }
+
+    public function packages()
+    {
+        return $this->hasMany(Package::class);
+    }
+
+    public function certifications()
+    {
+        return $this->hasMany(Certification::class)->orderBy('sort_order');
+    }
 }

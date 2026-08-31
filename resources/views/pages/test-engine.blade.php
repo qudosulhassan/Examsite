@@ -4,26 +4,26 @@
 @section('meta_description', 'Experience the ExamsNinja interactive timed test engine. Practice with real exam scenarios, exam simulation, immediate response grading, and detailed explanations.')
 
 @section('content')
-<!-- Hero Section -->
-<section class="bg-navy text-white pt-16 pb-20 relative overflow-hidden">
-    <div class="absolute right-0 top-0 opacity-10 transform translate-x-1/4 -translate-y-1/4 select-none pointer-events-none">
-        <svg class="h-96 w-96 text-cyan" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2L14.5 9.5H22L16 14L18.5 21.5L12 17L5.5 21.5L8 14L2 9.5H9.5L12 2Z" />
-        </svg>
-    </div>
+<!-- Hero Section (Premium Deep Space) -->
+<section class="bg-gradient-to-br from-[#07101E] via-navy to-[#0F172A] text-white pt-24 pb-32 relative overflow-hidden">
+    <!-- Abstract glowing orbs -->
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-cyan rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
+    <!-- Abstract Tech Lines -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px); background-size: 64px 64px;"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             <!-- Left Side Text -->
             <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
-                <div class="inline-flex items-center space-x-1 bg-gray-800 text-cyan text-xs font-semibold px-3 py-1.5 rounded-full border border-gray-700 shadow">
-                    <span class="bg-cyan h-2 w-2 rounded-full animate-ping mr-1"></span>
-                    <span>Interactive Practice Software</span>
+                <div class="inline-flex items-center space-x-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-2 shadow">
+                    <span class="bg-cyan h-2 w-2 rounded-full animate-ping"></span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-gray-300">Interactive Practice Software</span>
                 </div>
                 
-                <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-                    The Ultimate <span class="text-cyan">Exam Simulator</span> & Test Engine
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+                    The Ultimate <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan to-blue-500">Simulator</span>
                 </h1>
                 
                 <p class="text-lg text-gray-300 max-w-lg mx-auto lg:mx-0">
@@ -46,47 +46,47 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
-                    <a href="{{ route('pricing') }}" class="w-full sm:w-auto bg-cyan hover-bg-cyan text-navy px-8 py-3.5 rounded-md font-bold text-center shadow transition transform hover:-translate-y-0.5">
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
+                    <a href="{{ route('vendors.index') }}" class="w-full sm:w-auto bg-navy hover:bg-gradient-to-r hover:from-cyan hover:to-blue-500 text-white px-8 py-4 rounded-xl font-black text-center shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_30px_rgba(0,212,170,0.3)] transition-all duration-300">
                         Get All-Access Pass
                     </a>
-                    <a href="#demo-simulator" class="w-full sm:w-auto bg-gray-850 hover:bg-gray-800 text-white border border-gray-700 px-8 py-3.5 rounded-md font-semibold text-center transition">
+                    <a href="#demo-simulator" class="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-4 rounded-xl font-bold text-center transition-all duration-300">
                         Try Live Demo Below
                     </a>
                 </div>
             </div>
 
-            <!-- Right Side Live Demo Mock Widget (Alpine.js) -->
+            <!-- Right Side Live Demo Mock Widget -->
             <div class="lg:col-span-6" id="demo-simulator">
-                <div class="bg-gray-900 border border-gray-700 rounded-xl p-8 shadow-2xl relative overflow-hidden">
+                <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative overflow-hidden transform hover:-translate-y-2 transition-all duration-500">
                     <div class="absolute top-0 right-0 p-4 opacity-10">
-                        <svg class="h-32 w-32 text-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L14.5 9.5H22L16 14L18.5 21.5L12 17L5.5 21.5L8 14L2 9.5H9.5L12 2Z" /></svg>
+                        <svg class="h-40 w-40 text-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L14.5 9.5H22L16 14L18.5 21.5L12 17L5.5 21.5L8 14L2 9.5H9.5L12 2Z" /></svg>
                     </div>
                     
-                    <h3 class="text-2xl font-extrabold text-white mb-2">Experience the Real Engine</h3>
-                    <p class="text-sm text-gray-400 mb-8">Access 10 free demo questions in our fully functional, interactive testing environment. No signup required.</p>
+                    <h3 class="text-2xl font-black text-white mb-2 relative z-10">Experience the Engine</h3>
+                    <p class="text-sm font-medium text-gray-300 mb-8 relative z-10">Access 10 free demo questions in our fully functional, interactive testing environment. No signup required.</p>
                     
                     <div class="space-y-4 relative z-10">
                         @foreach($compatibleExams->take(3) as $exam)
-                            <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="block bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-cyan rounded-lg p-4 transition duration-200 group">
+                            <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="block bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan/50 rounded-2xl p-5 transition-all duration-300 group">
                                 <div class="flex justify-between items-center">
                                     <div>
-                                        <div class="flex items-center space-x-2 mb-1">
-                                            <span class="bg-gray-950 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded border border-gray-800">{{ $exam->vendor->name }}</span>
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <span class="bg-black/30 text-gray-300 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md border border-white/5">{{ $exam->vendor->name }}</span>
                                         </div>
-                                        <h4 class="font-bold text-white group-hover:text-cyan transition">{{ $exam->exam_code }}</h4>
-                                        <p class="text-xs text-gray-400 truncate max-w-[250px] sm:max-w-xs">{{ $exam->exam_name }}</p>
+                                        <h4 class="font-black text-white group-hover:text-cyan transition-colors text-lg">{{ $exam->exam_code }}</h4>
+                                        <p class="text-xs font-medium text-gray-400 truncate max-w-[250px] sm:max-w-xs">{{ $exam->exam_name }}</p>
                                     </div>
-                                    <div class="h-10 w-10 rounded-full bg-cyan/10 text-cyan flex items-center justify-center group-hover:bg-cyan group-hover:text-navy transition">
-                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                    <div class="h-12 w-12 rounded-xl bg-cyan/10 text-cyan flex items-center justify-center group-hover:bg-cyan group-hover:text-navy transition-all duration-300 shadow-[0_5px_15px_rgba(0,212,170,0.2)] group-hover:shadow-[0_10px_20px_rgba(0,212,170,0.4)]">
+                                        <svg class="h-5 w-5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                                     </div>
                                 </div>
                             </a>
                         @endforeach
                     </div>
                     
-                    <div class="mt-6 text-center">
-                        <a href="#compatible-exams" class="text-xs text-cyan hover:text-white transition underline">View all compatible exams &darr;</a>
+                    <div class="mt-8 text-center relative z-10">
+                        <a href="#compatible-exams" class="text-xs font-bold text-cyan hover:text-white transition-colors uppercase tracking-wider">View all compatible exams &darr;</a>
                     </div>
                 </div>
             </div>
@@ -108,42 +108,42 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-20 -mt-24">
             <!-- Practice Mode -->
-            <div class="bg-gray-50 p-8 rounded-xl border border-gray-200/60 shadow-sm hover:shadow-md transition">
-                <div class="h-12 w-12 rounded-lg bg-cyan/10 flex items-center justify-center text-cyan mb-6">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:-translate-y-2 transition-all duration-300">
+                <div class="h-14 w-14 rounded-2xl bg-cyan/10 flex items-center justify-center text-cyan mb-8 shadow-inner">
+                    <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-navy mb-3">1. Practice Mode</h3>
-                <p class="text-sm text-gray-600 leading-relaxed">
+                <h3 class="text-2xl font-black text-navy mb-4">Practice Mode</h3>
+                <p class="text-[13px] font-medium text-gray-500 leading-relaxed">
                     Study at your own pace. Reveal the correct answer and read detailed, step-by-step explanations immediately after submitting each question. Perfect for learning new concepts.
                 </p>
             </div>
 
             <!-- Exam Simulator -->
-            <div class="bg-gray-50 p-8 rounded-xl border border-gray-200/60 shadow-sm hover:shadow-md transition">
-                <div class="h-12 w-12 rounded-lg bg-orange/10 flex items-center justify-center text-orange mb-6">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:-translate-y-2 transition-all duration-300">
+                <div class="h-14 w-14 rounded-2xl bg-orange/10 flex items-center justify-center text-orange mb-8 shadow-inner">
+                    <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-navy mb-3">2. Exam Simulator Mode</h3>
-                <p class="text-sm text-gray-600 leading-relaxed">
+                <h3 class="text-2xl font-black text-navy mb-4">Exam Simulator</h3>
+                <p class="text-[13px] font-medium text-gray-500 leading-relaxed">
                     Test yourself under realistic conditions. Features strict time limits and randomized questions. Explanations and overall score results are locked until you submit the entire attempt.
                 </p>
             </div>
 
             <!-- Review Mode -->
-            <div class="bg-gray-50 p-8 rounded-xl border border-gray-200/60 shadow-sm hover:shadow-md transition">
-                <div class="h-12 w-12 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-650 mb-6">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:-translate-y-2 transition-all duration-300">
+                <div class="h-14 w-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 mb-8 shadow-inner">
+                    <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-navy mb-3">3. Focused Review Mode</h3>
-                <p class="text-sm text-gray-600 leading-relaxed">
+                <h3 class="text-2xl font-black text-navy mb-4">Focused Review</h3>
+                <p class="text-[13px] font-medium text-gray-500 leading-relaxed">
                     Study smarter, not longer. Adaptive logic filters and presents only questions you previously flagged or answered incorrectly in your last attempt. Drill down on weak spots.
                 </p>
             </div>
@@ -173,24 +173,24 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($compatibleExams as $exam)
-                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow transition">
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 group">
                     <div>
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-1 rounded">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="bg-gray-50 border border-gray-200 text-gray-600 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-md">
                                 {{ $exam->vendor->name }}
                             </span>
-                            <span class="text-xs text-gray-500 font-mono">
-                                {{ $exam->questions_count ?? $exam->questions()->count() }} Questions
+                            <span class="text-xs font-bold text-cyan bg-cyan/10 px-3 py-1.5 rounded-md">
+                                {{ $exam->questions_count ?? $exam->questions()->count() }} Qs
                             </span>
                         </div>
-                        <h3 class="text-lg font-bold text-navy mb-1">{{ $exam->exam_code }}</h3>
-                        <p class="text-sm text-gray-600 mb-6 truncate">{{ $exam->exam_name }}</p>
+                        <h3 class="text-xl font-black text-navy mb-2 group-hover:text-cyan transition-colors">{{ $exam->exam_code }}</h3>
+                        <p class="text-[13px] font-medium text-gray-500 mb-8 truncate">{{ $exam->exam_name }}</p>
                     </div>
                     
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <span class="text-xs text-gray-500">Passing Score: <strong class="text-navy">{{ $exam->passing_score }}%</strong></span>
-                        <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="bg-navy hover:bg-gray-800 text-white text-xs font-semibold px-4 py-2 rounded transition">
-                            Start Free Demo
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Score: <strong class="text-navy text-sm">{{ $exam->passing_score }}%</strong></span>
+                        <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="bg-gray-100 hover:bg-navy text-navy hover:text-white text-[11px] font-black uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all duration-300">
+                            Demo
                         </a>
                     </div>
                 </div>
@@ -213,7 +213,7 @@
             Get unlimited access to ALL certification test engines by choosing one of our membership plans, or buy single exam simulator keys today.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
-            <a href="{{ route('pricing') }}" class="w-full sm:w-auto bg-cyan hover-bg-cyan text-navy px-8 py-3.5 rounded-md font-bold transition shadow-lg">
+            <a href="{{ route('vendors.index') }}" class="w-full sm:w-auto bg-cyan hover-bg-cyan text-navy px-8 py-3.5 rounded-md font-bold transition shadow-lg">
                 View Pricing Plans
             </a>
             @guest

@@ -36,6 +36,7 @@ class BlogPost extends Model
 
     protected $fillable = [
         'user_id',
+        'category_id',
         'title',
         'slug',
         'excerpt',
@@ -46,10 +47,17 @@ class BlogPost extends Model
         'meta_keywords',
         'status',
         'published_at',
+        'views_count',
+        'is_featured',
+        'reading_time',
+        'related_exam_id',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'is_featured' => 'boolean',
+        'views_count' => 'integer',
+        'reading_time' => 'integer',
     ];
 
     /**
@@ -58,5 +66,37 @@ class BlogPost extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the category of the blog post.
+     */
+    public function category()
+    {
+        return $this->belongsTo(BlogCategory::class);
+    }
+
+    /**
+     * Get the tags for the blog post.
+     */
+    public function tags()
+    {
+        return $this->belongsToMany(BlogTag::class, 'blog_post_tag');
+    }
+
+    /**
+     * Get the related exam.
+     */
+    public function exam()
+    {
+        return $this->belongsTo(Exam::class, 'related_exam_id');
+    }
+
+    /**
+     * Get the comments for the blog post.
+     */
+    public function comments()
+    {
+        return $this->hasMany(BlogComment::class);
     }
 }

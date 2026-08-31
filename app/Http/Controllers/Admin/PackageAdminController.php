@@ -24,17 +24,21 @@ class PackageAdminController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'vendor_id' => 'nullable|exists:vendors,id',
-            'type' => 'required|in:subscription,bundle',
+            'vendor_id' => 'required|exists:vendors,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price_monthly' => 'nullable|numeric|min:0',
-            'price_annual' => 'nullable|numeric|min:0',
             'price_lifetime' => 'nullable|numeric|min:0',
-            'access_days' => 'nullable|integer|min:1',
+            'update_price_3_months' => 'nullable|numeric|min:0',
+            'update_price_6_months' => 'nullable|numeric|min:0',
+            'update_price_12_months' => 'nullable|numeric|min:0',
+            'license_price_individual' => 'nullable|numeric|min:0',
+            'license_price_corporate' => 'nullable|numeric|min:0',
+            'license_price_trainer' => 'nullable|numeric|min:0',
             'features' => 'nullable|array',
             'sort_order' => 'required|integer',
         ]);
+
+        $validated['type'] = 'bundle';
 
         $validated['slug'] = Str::slug($validated['name']) . '-' . rand(100, 999);
         $validated['is_popular'] = $request->has('is_popular');
@@ -63,17 +67,21 @@ class PackageAdminController extends Controller
     public function update(Request $request, Package $package)
     {
         $validated = $request->validate([
-            'vendor_id' => 'nullable|exists:vendors,id',
-            'type' => 'required|in:subscription,bundle',
+            'vendor_id' => 'required|exists:vendors,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price_monthly' => 'nullable|numeric|min:0',
-            'price_annual' => 'nullable|numeric|min:0',
             'price_lifetime' => 'nullable|numeric|min:0',
-            'access_days' => 'nullable|integer|min:1',
+            'update_price_3_months' => 'nullable|numeric|min:0',
+            'update_price_6_months' => 'nullable|numeric|min:0',
+            'update_price_12_months' => 'nullable|numeric|min:0',
+            'license_price_individual' => 'nullable|numeric|min:0',
+            'license_price_corporate' => 'nullable|numeric|min:0',
+            'license_price_trainer' => 'nullable|numeric|min:0',
             'features' => 'nullable|array',
             'sort_order' => 'required|integer',
         ]);
+
+        $validated['type'] = 'bundle';
 
         $validated['is_popular'] = $request->has('is_popular');
         $validated['is_active'] = $request->has('is_active');

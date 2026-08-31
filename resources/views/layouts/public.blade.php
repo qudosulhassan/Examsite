@@ -78,6 +78,20 @@
 <body class="antialiased min-h-screen flex flex-col">
     <!-- Header -->
     <header class="bg-navy text-white sticky top-0 z-50 shadow-md" x-data="{ mobileMenuOpen: false }">
+        <!-- Promotional Banner -->
+        <div x-data="countdownTimer()" x-show="show" x-cloak class="bg-gradient-to-r from-orange to-red-500 text-white py-2.5 px-4 text-center text-sm shadow-md relative z-[60] flex items-center justify-center flex-wrap gap-2">
+            <span class="font-bold tracking-wide">🔥 FLASH SALE! Use coupon <span class="bg-white text-orange px-2 py-0.5 rounded font-mono font-black mx-1">NINJA50</span> for 50% off all Vendor Bundles!</span>
+            <span class="inline-flex items-center space-x-1 font-mono font-bold bg-black/20 px-3 py-1 rounded-full text-xs">
+                <span>Ends in:</span>
+                <span><span x-text="hours">00</span>h</span>
+                <span><span x-text="minutes">00</span>m</span>
+                <span><span x-text="seconds">00</span>s</span>
+            </span>
+            <button @click="show = false" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/80 hover:text-white transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
@@ -94,11 +108,12 @@
                 <!-- Navigation Links (Desktop) -->
                 <nav class="hidden md:flex space-x-8 text-sm font-medium">
                     <a href="{{ url('/vendors') }}" class="text-gray-300 hover:text-cyan transition">Browse Vendors</a>
+                    <a href="{{ url('/certifications') }}" class="text-gray-300 hover:text-cyan transition">Certifications</a>
                     <a href="{{ url('/test-engine') }}" class="text-gray-300 hover:text-cyan transition flex items-center space-x-1">
                         <span>Test Engine</span>
                         <span class="bg-cyan text-navy font-extrabold text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-wide">New</span>
                     </a>
-                    <a href="{{ url('/pricing') }}" class="text-gray-300 hover:text-cyan transition">Pricing</a>
+
                     <a href="{{ url('/free-demo') }}" class="text-gray-300 hover:text-cyan transition font-semibold text-cyan">Free Demo</a>
                     <a href="{{ url('/blog') }}" class="text-gray-300 hover:text-cyan transition">Blog</a>
                     <a href="{{ url('/faq') }}" class="text-gray-300 hover:text-cyan transition">FAQ</a>
@@ -166,11 +181,12 @@
         <div x-show="mobileMenuOpen" class="md:hidden bg-navy border-t border-gray-800" style="display: none;">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="{{ url('/vendors') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Browse Vendors</a>
+                <a href="{{ url('/certifications') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Certifications</a>
                 <a href="{{ url('/test-engine') }}" class="block px-3 py-2 rounded-md text-base font-medium text-cyan hover:bg-gray-800 flex items-center justify-between">
                     <span>Test Engine</span>
                     <span class="bg-cyan text-navy font-extrabold text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-wide">New</span>
                 </a>
-                <a href="{{ url('/pricing') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Pricing</a>
+
                 <a href="{{ url('/free-demo') }}" class="block px-3 py-2 rounded-md text-base font-medium text-cyan hover:bg-gray-800">Free Demo</a>
                 <a href="{{ url('/blog') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Blog</a>
                 <a href="{{ url('/faq') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">FAQ</a>
@@ -199,60 +215,115 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-navy text-gray-400 pt-16 pb-8 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-            <!-- Branding -->
-            <div class="space-y-4">
-                <div class="flex items-center space-x-2">
-                    <svg class="h-8 w-8 text-cyan" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2L14.5 9.5H22L16 14L18.5 21.5L12 17L5.5 21.5L8 14L2 9.5H9.5L12 2Z" />
-                    </svg>
-                    <span class="text-xl font-bold text-white">Exams<span class="text-cyan">Ninja</span></span>
+    <footer class="relative bg-[#07101E] pt-20 pb-10 overflow-hidden border-t border-white/5">
+        <!-- Background Elements -->
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan rounded-full mix-blend-screen filter blur-[150px] opacity-5 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600 rounded-full mix-blend-screen filter blur-[150px] opacity-5 pointer-events-none"></div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
+                <!-- Branding -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan to-blue-500 p-2 flex items-center justify-center shadow-[0_5px_15px_rgba(0,212,170,0.3)]">
+                            <svg class="w-full h-full text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L14.5 9.5H22L16 14L18.5 21.5L12 17L5.5 21.5L8 14L2 9.5H9.5L12 2Z" />
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-black text-white tracking-tight">Exams<span class="text-cyan">Ninja</span></span>
+                    </div>
+                    <p class="text-gray-400 text-sm font-medium leading-relaxed max-w-xs">
+                        Pass your IT Certification Exam on the first attempt with our premium study guides, verified questions, and interactive practice engine.
+                    </p>
+                    <div class="flex items-center space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-cyan hover:text-white hover:border-cyan transition-all duration-300">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-cyan hover:text-white hover:border-cyan transition-all duration-300">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                    </div>
                 </div>
-                <p class="text-sm">Pass your IT Certification Exam on the first attempt with our premium study guides, verified questions, and interactive practice engine.</p>
-                <p class="text-xs text-gray-500">&copy; {{ date('Y') }} ExamsNinja. All rights reserved.</p>
-            </div>
 
-            <!-- Top Vendors -->
-            <div>
-                <h3 class="text-white font-semibold mb-4">Top Vendors</h3>
-                <ul class="space-y-2 text-sm grid grid-cols-2 gap-x-4">
-                    @foreach(App\Models\Vendor::where('is_active', true)->orderBy('name')->take(10)->get() as $footerVendor)
-                        <li><a href="{{ route('vendors.show', $footerVendor->slug) }}" class="hover:text-cyan transition">{{ $footerVendor->name }}</a></li>
-                    @endforeach
-                </ul>
-            </div>
-
-            <!-- Quick Links -->
-            <div>
-                <h3 class="text-white font-semibold mb-4">Support & Company</h3>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="{{ url('/test-engine') }}" class="hover:text-cyan transition flex items-center space-x-1"><span>Test Engine</span> <span class="bg-cyan text-navy font-extrabold text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-wide">New</span></a></li>
-                    <li><a href="{{ url('/pricing') }}" class="hover:text-cyan transition">Pricing Plans</a></li>
-                    <li><a href="{{ url('/free-demo') }}" class="hover:text-cyan transition font-semibold text-cyan">Free Demo Guides</a></li>
-                    <li><a href="{{ url('/blog') }}" class="hover:text-cyan transition">Industry Blog</a></li>
-                    <li><a href="{{ url('/faq') }}" class="hover:text-cyan transition">FAQ & Support</a></li>
-                    <li><a href="{{ url('/about') }}" class="hover:text-cyan transition">About Us</a></li>
-                    <li><a href="{{ url('/contact') }}" class="hover:text-cyan transition">Contact Support</a></li>
-                </ul>
-            </div>
-
-            <!-- Trust / Guarantee -->
-            <div class="space-y-4">
-                <h3 class="text-white font-semibold">100% Satisfaction</h3>
-                <div class="bg-gray-800 p-4 rounded-md border border-gray-700 text-xs">
-                    <p class="font-bold text-white mb-1">30-Day Money Back Guarantee</p>
-                    <p>If you purchase any exam dump guide and fail the exam within 30 days of purchase, we offer a full 100% refund immediately.</p>
+                <!-- Top Vendors -->
+                <div class="lg:col-span-3">
+                    <h3 class="text-white font-bold text-lg mb-6">Top Vendors</h3>
+                    <ul class="grid grid-cols-1 gap-y-3">
+                        @foreach(App\Models\Vendor::where('is_active', true)->orderBy('name')->take(5)->get() as $footerVendor)
+                            <li>
+                                <a href="{{ route('vendors.show', $footerVendor->slug) }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
+                                    {{ $footerVendor->name }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="flex space-x-2">
-                    <span class="bg-gray-800 text-cyan text-xs font-semibold px-2.5 py-0.5 rounded border border-gray-700">SSL SECURE</span>
-                    <span class="bg-gray-800 text-cyan text-xs font-semibold px-2.5 py-0.5 rounded border border-gray-700">PCI COMPLIANT</span>
+
+                <!-- Quick Links -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-white font-bold text-lg mb-6">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="{{ url('/test-engine') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
+                                Test Engine <span class="ml-2 bg-cyan/10 text-cyan text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest border border-cyan/20">New</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url('/free-demo') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
+                                Free Demo
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('/blog') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
+                                Blog
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('/contact') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
+                                Contact
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Trust / Guarantee -->
+                <div class="lg:col-span-3">
+                    <h3 class="text-white font-bold text-lg mb-6">100% Satisfaction</h3>
+                    <div class="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm shadow-xl">
+                        <div class="flex items-start mb-3">
+                            <div class="w-8 h-8 rounded-full bg-cyan/20 flex items-center justify-center text-cyan mr-3 flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm mb-1">Money Back Guarantee</h4>
+                                <p class="text-[13px] text-gray-400 font-medium leading-relaxed">Full 100% refund immediately if you fail within 30 days of purchase.</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2 pt-3 border-t border-white/10 mt-3">
+                            <span class="bg-white/5 text-gray-300 text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-widest border border-white/10 flex items-center">
+                                <svg class="w-3 h-3 text-cyan mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                SSL Secure
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-800 mt-12 pt-8 text-center text-xs text-gray-500">
-            <p>Disclaimer: ExamsNinja.com is an independent provider of practice test materials. All trademarks, service marks, and brand names (such as Microsoft, AWS, Cisco, CompTIA, GCP) are the property of their respective owners. Their use does not imply any affiliation or endorsement.</p>
+            <!-- Bottom Bar -->
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-xs font-medium text-gray-500">
+                    &copy; {{ date('Y') }} ExamsNinja. All rights reserved.
+                </p>
+                <div class="text-xs font-medium text-gray-500 max-w-2xl text-center md:text-right">
+                    Disclaimer: ExamsNinja is an independent provider of practice test materials. All trademarks and brand names are property of their respective owners.
+                </div>
+            </div>
         </div>
     </footer>
 

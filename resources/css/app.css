@@ -1,3 +1,34 @@
+
+@import 'tom-select/dist/css/tom-select.default.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Tiptap Editor Styles */
+.tiptap {
+  outline: none;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.tiptap img {
+  display: block;
+  height: auto;
+  margin: 1.5rem 0;
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+.tiptap a {
+  color: #00D4AA;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+[x-cloak] {
+  display: none !important;
+}

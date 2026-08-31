@@ -1,6 +1,4 @@
 <div class="flex flex-col lg:flex-row gap-6 items-start" x-data="{ 
-    type: '{{ old('type', $package->type ?? 'subscription') }}',
-    scope: '{{ old('vendor_id', $package->vendor_id ?? '') ? 'vendor' : 'global' }}',
     features: {{ json_encode(old('features', $package->features ?? [''])) }},
     addFeature() { this.features.push(''); },
     removeFeature(index) { this.features.splice(index, 1); if (this.features.length === 0) this.addFeature(); },
@@ -20,28 +18,9 @@
                 </h3>
             </div>
             <div class="p-6 space-y-5">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Package Type</label>
-                        <select name="type" x-model="type" class="w-full border-gray-250 rounded-lg shadow-sm focus:ring-cyan focus:border-cyan text-sm">
-                            <option value="subscription">Subscription</option>
-                            <option value="bundle">One-Time Bundle</option>
-                        </select>
-                        @error('type')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Target Scope</label>
-                        <select x-model="scope" class="w-full border-gray-250 rounded-lg shadow-sm focus:ring-cyan focus:border-cyan text-sm">
-                            <option value="global">Global (Site-Wide)</option>
-                            <option value="vendor">Specific Vendor</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div x-show="scope === 'vendor'" x-transition>
+                <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Select Vendor</label>
-                    <select name="vendor_id" class="w-full border-gray-250 rounded-lg shadow-sm focus:ring-cyan focus:border-cyan text-sm">
+                    <select name="vendor_id" class="w-full border-gray-250 rounded-lg shadow-sm focus:ring-cyan focus:border-cyan text-sm" required>
                         <option value="">-- Choose Vendor --</option>
                         @foreach($vendors as $vendor)
                             <option value="{{ $vendor->id }}" {{ old('vendor_id', $package->vendor_id ?? '') == $vendor->id ? 'selected' : '' }}>
@@ -53,7 +32,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Name</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Bundle Name</label>
                     <input type="text" name="name" value="{{ old('name', $package->name ?? '') }}" placeholder="e.g., Ultimate Pro" class="w-full border-gray-250 rounded-lg shadow-sm focus:ring-cyan focus:border-cyan text-sm placeholder-gray-300" required>
                     @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
@@ -75,33 +54,8 @@
                 </h3>
             </div>
             <div class="p-6">
-                <!-- Subscription Pricing -->
-                <div x-show="type === 'subscription'" class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="relative">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Monthly Price</label>
-                        <div class="relative rounded-lg shadow-sm">
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <span class="text-gray-400 sm:text-sm">$</span>
-                            </div>
-                            <input type="number" step="0.01" name="price_monthly" value="{{ old('price_monthly', $package->price_monthly ?? '') }}" placeholder="0.00" class="w-full border-gray-250 rounded-lg pl-7 focus:ring-cyan focus:border-cyan text-sm">
-                        </div>
-                        @error('price_monthly')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-
-                    <div class="relative">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Annual Price</label>
-                        <div class="relative rounded-lg shadow-sm">
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <span class="text-gray-400 sm:text-sm">$</span>
-                            </div>
-                            <input type="number" step="0.01" name="price_annual" value="{{ old('price_annual', $package->price_annual ?? '') }}" placeholder="0.00" class="w-full border-gray-250 rounded-lg pl-7 focus:ring-cyan focus:border-cyan text-sm">
-                        </div>
-                        @error('price_annual')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-                </div>
-
                 <!-- Bundle Pricing -->
-                <div x-show="type === 'bundle'" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 gap-5 max-w-sm">
                     <div class="relative">
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">Lifetime Price</label>
                         <div class="relative rounded-lg shadow-sm">
@@ -112,11 +66,72 @@
                         </div>
                         @error('price_lifetime')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="relative">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Access Duration (Days)</label>
-                        <input type="number" name="access_days" value="{{ old('access_days', $package->access_days ?? '') }}" placeholder="Leave blank for Lifetime" class="w-full border-gray-250 rounded-lg shadow-sm focus:ring-cyan focus:border-cyan text-sm">
-                        @error('access_days')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        <!-- Additional Pricing Options (Update Period & License Type) -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                <h3 class="text-base font-bold text-gray-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    Additional Options Pricing
+                </h3>
+            </div>
+            <div class="p-6 space-y-6">
+                <!-- Update Period Prices -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-800 mb-3 border-b pb-2">Update Period Extra Cost</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="relative">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">3 Months (+)</label>
+                            <div class="relative rounded-lg shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><span class="text-gray-400 sm:text-sm">$</span></div>
+                                <input type="number" step="0.01" name="update_price_3_months" value="{{ old('update_price_3_months', $package->update_price_3_months ?? '') }}" class="w-full border-gray-250 rounded-lg pl-7 focus:ring-cyan focus:border-cyan text-sm">
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">6 Months (+)</label>
+                            <div class="relative rounded-lg shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><span class="text-gray-400 sm:text-sm">$</span></div>
+                                <input type="number" step="0.01" name="update_price_6_months" value="{{ old('update_price_6_months', $package->update_price_6_months ?? '') }}" class="w-full border-gray-250 rounded-lg pl-7 focus:ring-cyan focus:border-cyan text-sm">
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">12 Months (+)</label>
+                            <div class="relative rounded-lg shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><span class="text-gray-400 sm:text-sm">$</span></div>
+                                <input type="number" step="0.01" name="update_price_12_months" value="{{ old('update_price_12_months', $package->update_price_12_months ?? '') }}" class="w-full border-gray-250 rounded-lg pl-7 focus:ring-cyan focus:border-cyan text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- License Type Prices -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-800 mb-3 border-b pb-2">License Type Extra Cost</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="relative">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Individual 2 PCs (+)</label>
+                            <div class="relative rounded-lg shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><span class="text-gray-400 sm:text-sm">$</span></div>
+                                <input type="number" step="0.01" name="license_price_individual" value="{{ old('license_price_individual', $package->license_price_individual ?? '') }}" class="w-full border-gray-250 rounded-lg pl-7 focus:ring-cyan focus:border-cyan text-sm">
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Corporate 10 PCs (+)</label>
+                            <div class="relative rounded-lg shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><span class="text-gray-400 sm:text-sm">$</span></div>
+                                <input type="number" step="0.01" name="license_price_corporate" value="{{ old('license_price_corporate', $package->license_price_corporate ?? '') }}" class="w-full border-gray-250 rounded-lg pl-7 focus:ring-cyan focus:border-cyan text-sm">
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Trainer 25 PCs (+)</label>
+                            <div class="relative rounded-lg shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><span class="text-gray-400 sm:text-sm">$</span></div>
+                                <input type="number" step="0.01" name="license_price_trainer" value="{{ old('license_price_trainer', $package->license_price_trainer ?? '') }}" class="w-full border-gray-250 rounded-lg pl-7 focus:ring-cyan focus:border-cyan text-sm">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -182,6 +197,7 @@
                     <label class="flex items-center justify-between cursor-pointer group">
                         <span class="text-sm font-bold text-gray-700 group-hover:text-navy transition">Includes PDF</span>
                         <div class="relative">
+                            <input type="hidden" name="includes_pdf" value="0">
                             <input type="checkbox" name="includes_pdf" value="1" class="sr-only peer" {{ old('includes_pdf', $package->includes_pdf ?? true) ? 'checked' : '' }}>
                             <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan"></div>
                         </div>
@@ -190,6 +206,7 @@
                     <label class="flex items-center justify-between cursor-pointer group">
                         <span class="text-sm font-bold text-gray-700 group-hover:text-navy transition">Includes Test Engine</span>
                         <div class="relative">
+                            <input type="hidden" name="includes_te" value="0">
                             <input type="checkbox" name="includes_te" value="1" class="sr-only peer" {{ old('includes_te', $package->includes_te ?? false) ? 'checked' : '' }}>
                             <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan"></div>
                         </div>
@@ -203,6 +220,7 @@
                     <label class="flex items-center justify-between cursor-pointer group">
                         <span class="text-sm font-bold text-gray-700 group-hover:text-navy transition">Active / Published</span>
                         <div class="relative">
+                            <input type="hidden" name="is_active" value="0">
                             <input type="checkbox" name="is_active" value="1" class="sr-only peer" {{ old('is_active', $package->is_active ?? true) ? 'checked' : '' }}>
                             <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
                         </div>
@@ -211,6 +229,7 @@
                     <label class="flex items-center justify-between cursor-pointer group">
                         <span class="text-sm font-bold text-gray-700 group-hover:text-navy transition">Highlight as Popular</span>
                         <div class="relative">
+                            <input type="hidden" name="is_popular" value="0">
                             <input type="checkbox" name="is_popular" value="1" class="sr-only peer" {{ old('is_popular', $package->is_popular ?? false) ? 'checked' : '' }}>
                             <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange"></div>
                         </div>

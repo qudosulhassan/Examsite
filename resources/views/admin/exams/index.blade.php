@@ -2,11 +2,37 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h1 class="text-2xl font-bold text-gray-800">Manage Certification Exams</h1>
-        <a href="{{ route('admin.exams.create') }}" class="bg-navy hover:bg-opacity-95 text-white text-xs font-bold py-2 px-4 rounded shadow transition">
-            + Create New Exam
-        </a>
+        <div class="flex items-center space-x-4">
+            <div x-data="examSearch()" class="relative" @click.away="isOpen = false">
+                <form action="{{ route('admin.exams.index') }}" method="GET" class="relative">
+                    <input type="text" name="search" x-model="query" @input.debounce.300ms="fetchSuggestions" @focus="fetchSuggestions" placeholder="Search code or name..." class="w-64 border-gray-250 rounded-lg pl-3 pr-10 py-2 text-sm focus:ring-cyan focus:border-cyan shadow-sm" autocomplete="off">
+                    <button type="submit" class="absolute right-0 top-0 mt-2 mr-3 text-gray-400 hover:text-cyan">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </form>
+                
+                <!-- Suggestions Dropdown -->
+                <div x-show="isOpen && suggestions.length > 0" x-transition x-cloak class="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                    <ul class="max-h-60 overflow-y-auto">
+                        <template x-for="exam in suggestions" :key="exam.id">
+                            <li>
+                                <a :href="`/admin/exams/${exam.id}/edit`" class="block px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-0">
+                                    <div class="text-sm font-bold text-navy" x-text="exam.exam_code"></div>
+                                    <div class="text-xs text-gray-500 truncate" x-text="exam.exam_name"></div>
+                                </a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+            <a href="{{ route('admin.exams.create') }}" class="bg-navy hover:bg-opacity-95 text-white text-xs font-bold py-2.5 px-4 rounded shadow transition whitespace-nowrap">
+                + Create New Exam
+            </a>
+        </div>
     </div>
 
     <!-- Exams Table -->
@@ -71,4 +97,28 @@
         @endif
     </div>
 </div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('examSearch', () => ({
+        query: '{{ addslashes(request('search', '')) }}',
+        suggestions: [],
+        isOpen: false,
+        fetchSuggestions() {
+            if (this.query.length < 2) {
+                this.suggestions = [];
+                this.isOpen = false;
+                return;
+            }
+            fetch(`/admin/exams/search-suggestions?query=${encodeURIComponent(this.query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    this.suggestions = data;
+                    this.isOpen = data.length > 0;
+                })
+                .catch(err => console.error(err));
+        }
+    }));
+});
+</script>
 @endsection

@@ -3,9 +3,9 @@
 @section('content')
 <div class="space-y-6">
     <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-800">Manage Pricing Packages</h1>
+        <h1 class="text-2xl font-bold text-gray-800">Manage Vendor Bundles</h1>
         <a href="{{ route('admin.packages.create') }}" class="bg-navy hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
-            Create New Package
+            Create New Bundle
         </a>
     </div>
 
@@ -15,7 +15,7 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Order</th>
-                    <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Name / Type</th>
+                    <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Name / Vendor</th>
                     <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pricing</th>
                     <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Features</th>
                     <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
@@ -35,15 +35,10 @@
                                     <span class="bg-orange text-white text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider">Popular</span>
                                 @endif
                             </div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mt-1">{{ $package->type }}</div>
+                            <div class="text-[10px] text-gray-400 font-bold tracking-wider mt-1">{{ $package->vendor ? $package->vendor->name : 'N/A' }}</div>
                         </td>
                         <td class="px-6 py-4 text-gray-600 font-semibold space-y-1">
-                            @if($package->type === 'subscription')
-                                <div><span class="text-gray-400 text-[10px]">Monthly:</span> ${{ number_format($package->price_monthly, 2) }}</div>
-                                <div><span class="text-gray-400 text-[10px]">Annual:</span> ${{ number_format($package->price_annual, 2) }}</div>
-                            @else
-                                <div><span class="text-gray-400 text-[10px]">Lifetime:</span> ${{ number_format($package->price_lifetime, 2) }}</div>
-                            @endif
+                            <div><span class="text-gray-400 text-[10px]">Lifetime:</span> ${{ number_format($package->price_lifetime, 2) }}</div>
                         </td>
                         <td class="px-6 py-4 text-gray-500">
                             {{ count($package->features ?? []) }} Features
@@ -55,7 +50,7 @@
                         </td>
                         <td class="px-6 py-4 text-right font-bold space-x-2">
                             <a href="{{ route('admin.packages.edit', $package->id) }}" class="text-cyan hover:underline">Edit</a>
-                            <form action="{{ route('admin.packages.destroy', $package->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this package?')">
+                            <form action="{{ route('admin.packages.destroy', $package->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this vendor bundle?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-500 hover:underline">Delete</button>
@@ -65,7 +60,7 @@
                 @empty
                     <tr>
                         <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                            No packages found. <a href="{{ route('admin.packages.create') }}" class="text-cyan hover:underline font-bold">Create one</a>
+                            No vendor bundles found. <a href="{{ route('admin.packages.create') }}" class="text-cyan hover:underline font-bold">Create one</a>
                         </td>
                     </tr>
                 @endforelse

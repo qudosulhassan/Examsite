@@ -60,7 +60,7 @@ class CartController extends Controller
         $planName = $request->input('plan_name');
         $billingCycle = $request->input('billing_cycle', $request->input('billing'));
 
-        if ($type === 'pdf' || $type === 'engine_single') {
+        if ($type === 'pdf' || $type === 'engine_single' || $type === 'combo') {
             if (empty($examId)) {
                 return back()->with('error', 'Exam reference is required.');
             }
@@ -70,10 +70,21 @@ class CartController extends Controller
 
             // Check if user already owns this PDF guide or single engine
             if (auth()->check()) {
-                $owns = auth()->user()->userExams()
-                    ->where('exam_id', $exam->id)
-                    ->where('access_type', $type === 'pdf' ? 'pdf' : 'engine')
-                    ->exists();
+                $checkType = $type === 'pdf' ? 'pdf' : ($type === 'combo' ? 'combo' : 'engine');
+                
+                // If it's a combo, they might own one or the other. For simplicity, just check if they own both or if they bought the combo.
+                $owns = false;
+                if ($checkType === 'combo') {
+                    $ownsPdf = auth()->user()->userExams()->where('exam_id', $exam->id)->where('access_type', 'pdf')->exists();
+                    $ownsEngine = auth()->user()->userExams()->where('exam_id', $exam->id)->where('access_type', 'engine')->exists();
+                    $owns = $ownsPdf && $ownsEngine;
+                } else {
+                    $owns = auth()->user()->userExams()
+                        ->where('exam_id', $exam->id)
+                        ->where('access_type', $checkType)
+                        ->exists();
+                }
+
                 if ($owns) {
                     return back()->with('error', 'You already own this item. Check your student dashboard.');
                 }
@@ -88,10 +99,34 @@ class CartController extends Controller
                 }
             }
 
-            $price = $type === 'pdf' ? (float)$exam->price_pdf : (float)$exam->price_engine;
-            $name = $type === 'pdf' 
-                ? $exam->vendor->name . ' ' . $exam->exam_code . ' Study Guide (PDF)'
-                : $exam->vendor->name . ' ' . $exam->exam_code . ' Test Engine Simulator';
+            $price = 0;
+            $name = '';
+            if ($type === 'pdf') {
+                $price = (float)$exam->price_pdf;
+                $name = $exam->vendor->name . ' ' . $exam->exam_code . ' Study Guide (PDF)';
+            } elseif ($type === 'engine_single') {
+                $price = (float)$exam->price_engine;
+                $name = $exam->vendor->name . ' ' . $exam->exam_code . ' Test Engine Simulator';
+            } elseif ($type === 'combo') {
+                $price = (float)$exam->price_pdf + (float)$exam->price_engine;
+                $price = round($price * 0.90, 2);
+                $name = $exam->vendor->name . ' ' . $exam->exam_code . ' PDF & Test Engine Combo';
+            }
+
+            // Handle Update Period Add-on
+            $updatePeriod = $request->input('update_period', '3');
+            $updatePrice = 0;
+            if ($updatePeriod === '6') {
+                $updatePrice = (float)($exam->update_price_6_months ?? 10);
+                $name .= ' (6 Months Updates)';
+            } elseif ($updatePeriod === '12') {
+                $updatePrice = (float)($exam->update_price_12_months ?? 20);
+                $name .= ' (12 Months Updates)';
+            } else {
+                $updatePrice = (float)($exam->update_price_3_months ?? 0);
+                $name .= ' (3 Months Updates)';
+            }
+            $price += $updatePrice;
 
             $cart[$cartKey] = [
                 'id' => $exam->id,
@@ -99,6 +134,7 @@ class CartController extends Controller
                 'name' => $name,
                 'code' => $exam->exam_code,
                 'type' => $type,
+                'update_period' => $updatePeriod,
                 'price' => $price,
             ];
 
@@ -176,6 +212,21 @@ class CartController extends Controller
             if ($package->type === 'subscription' && !$price) $price = $package->price_annual;
         }
 
+        // Add additional options pricing
+        $updatePeriod = $request->input('update_period', '6');
+        $licenseType = $request->input('license_type', 'trainer');
+        
+        $extraPrice = 0;
+        if ($updatePeriod === '3') $extraPrice += $package->update_price_3_months ?? 0;
+        elseif ($updatePeriod === '6') $extraPrice += $package->update_price_6_months ?? 0;
+        elseif ($updatePeriod === '12') $extraPrice += $package->update_price_12_months ?? 0;
+
+        if ($licenseType === 'individual') $extraPrice += $package->license_price_individual ?? 0;
+        elseif ($licenseType === 'corporate') $extraPrice += $package->license_price_corporate ?? 0;
+        elseif ($licenseType === 'trainer') $extraPrice += $package->license_price_trainer ?? 0;
+
+        $totalPrice = $price + $extraPrice;
+
         $cartKey = 'pkg_' . $package->id;
 
         $cart = session()->get('cart', []);
@@ -190,7 +241,9 @@ class CartController extends Controller
             'name' => $package->name,
             'type' => 'package',
             'package_type' => $package->type, // 'subscription' or 'bundle'
-            'price' => (float)$price,
+            'price' => (float)$totalPrice,
+            'update_period' => $updatePeriod,
+            'license_type' => $licenseType,
         ];
 
         session()->put('cart', $cart);

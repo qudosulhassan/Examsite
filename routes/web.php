@@ -8,6 +8,8 @@ use App\Http\Controllers\Public\VendorController;
 use App\Http\Controllers\Public\ExamController;
 use App\Http\Controllers\Public\SearchController;
 use App\Http\Controllers\Public\BlogController;
+use App\Http\Controllers\Public\BlogCommentController;
+use App\Http\Controllers\Public\BlogSubscriberController;
 use App\Http\Controllers\Public\DemoController;
 use App\Http\Controllers\Public\DemoTestEngineController;
 use App\Http\Controllers\Public\SitemapController;
@@ -18,7 +20,7 @@ use App\Http\Controllers\Dashboard\OrdersController;
 use App\Http\Controllers\Payment\CartController;
 use App\Http\Controllers\Payment\CheckoutController;
 use App\Http\Controllers\Webhook\StripeWebhookController;
-use App\Http\Controllers\PricingController;
+
 use App\Http\Controllers\Webhook\PayPalWebhookController;
 
 
@@ -29,10 +31,10 @@ use App\Http\Controllers\Webhook\PayPalWebhookController;
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/vendors', [VendorController::class, 'index'])->name('vendors.index');
-Route::get('/vendors/{slug}', [VendorController::class, 'show'])->name('vendors.show');
-Route::get('/exams/{slug}', [ExamController::class, 'show'])->name('exams.show');
-
-Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
+Route::get('/vendors/{slug}', [App\Http\Controllers\Public\VendorController::class, 'show'])->name('vendors.show');
+Route::get('/certifications', [App\Http\Controllers\Public\CertificationController::class, 'index'])->name('certifications.index');
+Route::get('/certifications/{slug}', [App\Http\Controllers\Public\CertificationController::class, 'show'])->name('certifications.show');
+Route::get('/exams/{slug}', [App\Http\Controllers\Public\ExamController::class, 'show'])->name('exams.show');
 
 Route::get('/free-demo', [DemoController::class, 'index'])->name('free-demo.index');
 Route::post('/free-demo', [DemoController::class, 'request'])->name('free-demo.request');
@@ -41,12 +43,30 @@ Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/api/search', [SearchController::class, 'liveSearch']);
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
-Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+// --- Blog ---
+Route::prefix('blog')->name('blog.')->group(function () {
+    Route::get('/', [BlogController::class, 'index'])->name('index');
+    Route::get('/rss.xml', [BlogController::class, 'rss'])->name('rss');
+    Route::get('/search', [BlogController::class, 'search'])->name('search');
+    Route::get('/category/{slug}', [BlogController::class, 'category'])->name('category');
+    Route::get('/tag/{slug}', [BlogController::class, 'tag'])->name('tag');
+    Route::get('/author/{slug}', [BlogController::class, 'author'])->name('author');
+    
+    // Comments & Subscribers
+    Route::post('/comments', [BlogCommentController::class, 'store'])->name('comments.store');
+    Route::post('/subscribe', [BlogSubscriberController::class, 'subscribe'])->name('subscribe');
+    Route::get('/unsubscribe', [BlogSubscriberController::class, 'unsubscribe'])->name('unsubscribe');
+
+    Route::get('/{slug}', [BlogController::class, 'show'])->name('show');
+});
 
 Route::get('/faq', function () {
     return view('pages.faq');
 })->name('faq');
+
+Route::get('/pricing', function () {
+    return redirect()->route('vendors.index');
+})->name('pricing');
 
 Route::get('/test-engine', [HomeController::class, 'testEngine'])->name('public.test-engine');
 
@@ -119,7 +139,7 @@ Route::post('/webhook/paypal', [PayPalWebhookController::class, 'handle'])->name
 | User Portal Dashboard Routes (Auth Required)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')->group(function () {
     // Overview
     Route::get('/', [DashboardController::class, 'index'])->name('index');
 
@@ -144,10 +164,10 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
 
 Route::get('/dashboard/home', function () {
     return redirect()->route('dashboard.index');
-})->name('dashboard')->middleware(['auth']);
+})->name('dashboard')->middleware(['auth', 'verified']);
 
 // Profile Settings (outside name group to match Breeze defaults but prefixed under dashboard)
-Route::middleware(['auth'])->prefix('dashboard/profile')->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('dashboard/profile')->group(function () {
     Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');

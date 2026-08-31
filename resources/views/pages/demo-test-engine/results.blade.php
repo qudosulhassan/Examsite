@@ -1,155 +1,202 @@
 @extends('layouts.public')
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-8 py-12 px-4 sm:px-6">
+<div class="max-w-4xl mx-auto space-y-10 py-16 px-4 sm:px-6 relative z-10">
     <!-- Breadcrumbs -->
-    <nav class="flex text-xs text-gray-400 space-x-2">
-        <a href="{{ url('/') }}" class="hover:text-cyan">Home</a>
-        <span>/</span>
-        <a href="{{ route('public.test-engine') }}" class="hover:text-cyan">Test Engine</a>
-        <span>/</span>
-        <span class="text-gray-500 font-semibold">Demo Results #{{ $attempt->id }}</span>
+    <nav class="flex text-[11px] font-black uppercase tracking-widest text-gray-400 space-x-3 mb-4">
+        <a href="{{ url('/') }}" class="hover:text-cyan transition-colors">Home</a>
+        <span class="text-gray-600">/</span>
+        <a href="{{ route('public.test-engine') }}" class="hover:text-cyan transition-colors">Test Engine</a>
+        <span class="text-gray-600">/</span>
+        <span class="text-cyan drop-shadow-[0_0_8px_rgba(0,212,170,0.5)]">Demo Results #{{ $attempt->id }}</span>
     </nav>
 
     <!-- Score Overview Banner -->
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 shadow-sm text-center space-y-6">
-        <div>
+    <div class="bg-gradient-to-br from-[#07101E] via-navy to-[#0F172A] border border-white/10 rounded-3xl p-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] text-center space-y-8 relative overflow-hidden">
+        <!-- Abstract light orbs -->
+        <div class="absolute -top-32 -left-32 w-64 h-64 bg-cyan/20 rounded-full mix-blend-screen filter blur-[80px] opacity-70"></div>
+        <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-blue-500/20 rounded-full mix-blend-screen filter blur-[80px] opacity-70"></div>
+        
+        <div class="relative z-10">
             @if($attempt->passed)
-                <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-green-100 text-green-600 mb-4 text-3xl font-bold">
+                <div class="inline-flex items-center justify-center h-24 w-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 text-white mb-6 text-4xl shadow-[0_0_30px_rgba(16,185,129,0.4)] border-4 border-green-200/20">
                     ✓
                 </div>
-                <h1 class="text-3xl font-extrabold text-green-600 dark:text-green-400">Congratulations! You Passed.</h1>
+                <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300 drop-shadow-sm uppercase tracking-tight">Congratulations! You Passed.</h1>
             @else
-                <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-red-100 text-red-600 mb-4 text-3xl font-bold">
+                <div class="inline-flex items-center justify-center h-24 w-24 rounded-full bg-gradient-to-br from-orange to-red-500 text-white mb-6 text-4xl shadow-[0_0_30px_rgba(249,115,22,0.4)] border-4 border-red-200/20">
                     ✗
                 </div>
-                <h1 class="text-3xl font-extrabold text-red-600 dark:text-red-400">Exam Failed. Try Again.</h1>
+                <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange to-red-400 drop-shadow-sm uppercase tracking-tight">Exam Failed. Try Again.</h1>
             @endif
-            <p class="text-sm text-gray-500 mt-2">{{ $exam->exam_code }} - {{ $exam->exam_name }} ({{ ucfirst($attempt->mode) }} Attempt)</p>
+            <p class="text-sm font-bold text-gray-400 mt-4 uppercase tracking-widest"><span class="text-cyan">{{ $exam->exam_code }}</span> - {{ $exam->exam_name }} ({{ ucfirst($attempt->mode) }} Attempt)</p>
         </div>
 
         <!-- Graphical Overview -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center max-w-4xl mx-auto pt-6 border-t border-gray-150 dark:border-gray-700">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 items-center max-w-4xl mx-auto pt-10 border-t border-white/10 relative z-10">
             
             <!-- Circular Chart -->
             <div class="flex justify-center md:col-span-1">
-                <div class="relative w-40 h-40">
+                <div class="relative w-48 h-48">
                     <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                         <!-- Background circle -->
-                        <circle cx="50" cy="50" r="40" fill="transparent" stroke="#e5e7eb" stroke-width="10" />
+                        <circle cx="50" cy="50" r="40" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="8" />
                         <!-- Progress circle -->
                         @php
                             $circumference = 2 * pi() * 40;
                             $offset = $circumference - ($attempt->score_percentage / 100) * $circumference;
-                            $strokeColor = $attempt->passed ? '#10B981' : '#EF4444'; // green-500 or red-500
+                            $strokeColor = $attempt->passed ? 'url(#greenGradient)' : 'url(#redGradient)';
                         @endphp
-                        <circle cx="50" cy="50" r="40" fill="transparent" stroke="{{ $strokeColor }}" stroke-width="10" 
-                                stroke-dasharray="{{ $circumference }}" stroke-dashoffset="{{ $offset }}" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;" />
+                        <defs>
+                            <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#34D399" />
+                                <stop offset="100%" stop-color="#059669" />
+                            </linearGradient>
+                            <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#FB923C" />
+                                <stop offset="100%" stop-color="#DC2626" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="transparent" stroke="{{ $strokeColor }}" stroke-width="8" 
+                                stroke-dasharray="{{ $circumference }}" stroke-dashoffset="{{ $offset }}" stroke-linecap="round" class="drop-shadow-[0_0_10px_rgba(0,212,170,0.5)]" style="transition: stroke-dashoffset 1.5s ease-out;" />
                     </svg>
                     <!-- Center text -->
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span class="text-3xl font-extrabold {{ $attempt->passed ? 'text-green-600' : 'text-red-600' }}">{{ number_format($attempt->score_percentage, 0) }}%</span>
-                        <span class="text-xs text-gray-400 font-semibold uppercase mt-1">Score</span>
+                        <span class="text-4xl font-black text-white drop-shadow-md">{{ number_format($attempt->score_percentage, 0) }}%</span>
+                        <span class="text-[10px] text-cyan font-black uppercase tracking-widest mt-1">Score</span>
                     </div>
                 </div>
             </div>
 
             <!-- Stats Grid -->
-            <div class="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4 text-left">
-                <div>
-                    <span class="block text-xs font-semibold text-gray-400 uppercase">Passing Score</span>
-                    <span class="text-2xl font-extrabold text-navy dark:text-white mt-1">{{ $exam->passing_score }}%</span>
+            <div class="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-y-8 gap-x-6 text-left">
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 shadow-inner">
+                    <span class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Passing Score</span>
+                    <span class="text-2xl font-black text-white mt-1 drop-shadow-sm">{{ $exam->passing_score }}%</span>
                 </div>
-                <div>
-                    <span class="block text-xs font-semibold text-gray-400 uppercase">Total Questions</span>
-                    <span class="text-2xl font-extrabold text-navy dark:text-white mt-1">{{ $attempt->total_questions }}</span>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 shadow-inner">
+                    <span class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Questions</span>
+                    <span class="text-2xl font-black text-white mt-1 drop-shadow-sm">{{ $attempt->total_questions }}</span>
                 </div>
-                <div>
-                    <span class="block text-xs font-semibold text-gray-400 uppercase">Time Spent</span>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 shadow-inner">
+                    <span class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Time Spent</span>
                     @php
                         $mins = floor($attempt->time_taken_seconds / 60);
                         $secs = $attempt->time_taken_seconds % 60;
                     @endphp
-                    <span class="text-2xl font-extrabold text-navy dark:text-white mt-1">{{ $mins }}m {{ $secs }}s</span>
+                    <span class="text-2xl font-black text-white mt-1 drop-shadow-sm">{{ $mins }}m {{ $secs }}s</span>
                 </div>
-                <div>
-                    <span class="block text-xs font-semibold text-green-500 uppercase">Correct</span>
-                    <span class="text-2xl font-extrabold text-green-600 mt-1">{{ $attempt->correct }}</span>
+                <div class="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                    <span class="block text-[10px] font-black text-green-400 uppercase tracking-widest">Correct</span>
+                    <span class="text-2xl font-black text-green-400 mt-1 drop-shadow-sm">{{ $attempt->correct }}</span>
                 </div>
-                <div>
-                    <span class="block text-xs font-semibold text-red-400 uppercase">Incorrect</span>
-                    <span class="text-2xl font-extrabold text-red-500 mt-1">{{ $attempt->total_questions - $attempt->correct - $attempt->skipped }}</span>
+                <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                    <span class="block text-[10px] font-black text-red-400 uppercase tracking-widest">Incorrect</span>
+                    <span class="text-2xl font-black text-red-400 mt-1 drop-shadow-sm">{{ $attempt->total_questions - $attempt->correct - $attempt->skipped }}</span>
                 </div>
-                <div>
-                    <span class="block text-xs font-semibold text-gray-400 uppercase">Skipped</span>
-                    <span class="text-2xl font-extrabold text-gray-500 mt-1">{{ $attempt->skipped }}</span>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 shadow-inner">
+                    <span class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Skipped</span>
+                    <span class="text-2xl font-black text-gray-400 mt-1 drop-shadow-sm">{{ $attempt->skipped }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Quick actions -->
-        <div class="pt-6 border-t border-gray-150 dark:border-gray-700 flex flex-wrap justify-center gap-4">
-            <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="bg-orange hover-bg-orange text-white text-sm font-bold py-2.5 px-6 rounded shadow transition">
+        <div class="pt-10 flex flex-wrap justify-center gap-6 relative z-10">
+            <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="bg-gradient-to-r from-orange to-red-500 hover:from-orange hover:to-red-600 text-white text-xs font-black uppercase tracking-widest py-3 px-8 rounded-xl shadow-[0_4px_15px_rgba(249,115,22,0.4)] transition-all transform hover:-translate-y-0.5">
                 Retake Demo Exam
             </a>
-            <a href="{{ route('public.test-engine') }}" class="border border-gray-300 text-navy hover:bg-gray-50 text-sm font-bold py-2.5 px-6 rounded transition">
+            <a href="{{ route('public.test-engine') }}" class="bg-white/10 border border-white/20 text-white hover:bg-white/20 text-xs font-black uppercase tracking-widest py-3 px-8 rounded-xl transition-all">
                 Choose Another Exam
             </a>
         </div>
     </div>
 
     <!-- Question Answers Review Panel -->
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm space-y-6">
-        <h3 class="text-lg font-bold text-navy dark:text-white border-b border-gray-150 dark:border-gray-700 pb-3">Detailed Answers Review</h3>
+    <div class="bg-white rounded-3xl p-8 md:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-100 space-y-8">
+        <h3 class="text-xl font-black text-navy border-b border-gray-100 pb-4 uppercase tracking-widest flex items-center space-x-3">
+            <span class="w-2 h-8 bg-cyan rounded-full block"></span>
+            <span>Detailed Answers Review</span>
+        </h3>
         
-        <div class="space-y-8 divide-y divide-gray-150 dark:divide-gray-700">
+        <div class="space-y-12">
             @foreach($answers as $index => $answer)
-                <div class="space-y-4 pt-6 first:pt-0">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="font-bold text-gray-400">QUESTION {{ $index + 1 }}</span>
-                        <span class="px-2 py-0.5 rounded font-bold uppercase tracking-wider 
-                            {{ $answer->is_correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                <div class="space-y-6 pt-6 {{ !$loop->first ? 'border-t border-gray-100' : '' }}">
+                    <div class="flex justify-between items-center">
+                        <span class="font-black text-navy uppercase tracking-widest text-lg">Question <span class="text-cyan">{{ $index + 1 }}</span></span>
+                        <span class="px-4 py-1.5 rounded-lg font-black uppercase tracking-widest text-[10px] border shadow-sm
+                            {{ $answer->is_correct ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700' }}">
                             {{ $answer->is_correct ? 'Correct' : 'Incorrect' }}
                         </span>
                     </div>
 
                     <!-- Question Text -->
-                    <p class="text-sm font-bold leading-relaxed">{!! $answer->question->question_text !!}</p>
+                    <div class="prose max-w-none">
+                        <p class="text-lg font-bold text-navy leading-relaxed">{!! $answer->question->question_text !!}</p>
+                    </div>
 
                     <!-- Choice Options list -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                        <div class="p-3 rounded border {{ $answer->selected_option === 'A' ? 'border-cyan bg-cyan bg-opacity-5' : 'border-gray-150' }} 
-                            {{ $answer->question->correct_option === 'A' ? 'bg-green-50 border-green-300 text-green-900 font-bold' : '' }}">
-                            <strong>A.</strong> {{ $answer->question->option_a }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Option A -->
+                        <div class="p-5 rounded-xl border-2 transition-colors flex items-start space-x-3 
+                            {{ $answer->selected_option === 'A' && $answer->question->correct_option !== 'A' ? 'border-red-300 bg-red-50' : '' }}
+                            {{ $answer->question->correct_option === 'A' ? 'border-green-400 bg-green-50 shadow-[0_4px_15px_rgba(16,185,129,0.1)]' : 'border-gray-100' }}
+                            {{ $answer->selected_option !== 'A' && $answer->question->correct_option !== 'A' ? 'bg-white' : '' }}">
+                            <div class="font-black {{ $answer->question->correct_option === 'A' ? 'text-green-600' : 'text-gray-400' }} text-sm mt-0.5">A.</div>
+                            <div class="text-navy font-medium">{{ $answer->question->option_a }}</div>
                         </div>
-                        <div class="p-3 rounded border {{ $answer->selected_option === 'B' ? 'border-cyan bg-cyan bg-opacity-5' : 'border-gray-150' }}
-                            {{ $answer->question->correct_option === 'B' ? 'bg-green-50 border-green-300 text-green-900 font-bold' : '' }}">
-                            <strong>B.</strong> {{ $answer->question->option_b }}
+
+                        <!-- Option B -->
+                        <div class="p-5 rounded-xl border-2 transition-colors flex items-start space-x-3 
+                            {{ $answer->selected_option === 'B' && $answer->question->correct_option !== 'B' ? 'border-red-300 bg-red-50' : '' }}
+                            {{ $answer->question->correct_option === 'B' ? 'border-green-400 bg-green-50 shadow-[0_4px_15px_rgba(16,185,129,0.1)]' : 'border-gray-100' }}
+                            {{ $answer->selected_option !== 'B' && $answer->question->correct_option !== 'B' ? 'bg-white' : '' }}">
+                            <div class="font-black {{ $answer->question->correct_option === 'B' ? 'text-green-600' : 'text-gray-400' }} text-sm mt-0.5">B.</div>
+                            <div class="text-navy font-medium">{{ $answer->question->option_b }}</div>
                         </div>
+
+                        <!-- Option C -->
                         @if(!empty($answer->question->option_c))
-                            <div class="p-3 rounded border {{ $answer->selected_option === 'C' ? 'border-cyan bg-cyan bg-opacity-5' : 'border-gray-150' }}
-                                {{ $answer->question->correct_option === 'C' ? 'bg-green-50 border-green-300 text-green-900 font-bold' : '' }}">
-                                <strong>C.</strong> {{ $answer->question->option_c }}
+                            <div class="p-5 rounded-xl border-2 transition-colors flex items-start space-x-3 
+                                {{ $answer->selected_option === 'C' && $answer->question->correct_option !== 'C' ? 'border-red-300 bg-red-50' : '' }}
+                                {{ $answer->question->correct_option === 'C' ? 'border-green-400 bg-green-50 shadow-[0_4px_15px_rgba(16,185,129,0.1)]' : 'border-gray-100' }}
+                                {{ $answer->selected_option !== 'C' && $answer->question->correct_option !== 'C' ? 'bg-white' : '' }}">
+                                <div class="font-black {{ $answer->question->correct_option === 'C' ? 'text-green-600' : 'text-gray-400' }} text-sm mt-0.5">C.</div>
+                                <div class="text-navy font-medium">{{ $answer->question->option_c }}</div>
                             </div>
                         @endif
+
+                        <!-- Option D -->
                         @if(!empty($answer->question->option_d))
-                            <div class="p-3 rounded border {{ $answer->selected_option === 'D' ? 'border-cyan bg-cyan bg-opacity-5' : 'border-gray-150' }}
-                                {{ $answer->question->correct_option === 'D' ? 'bg-green-50 border-green-300 text-green-900 font-bold' : '' }}">
-                                <strong>D.</strong> {{ $answer->question->option_d }}
+                            <div class="p-5 rounded-xl border-2 transition-colors flex items-start space-x-3 
+                                {{ $answer->selected_option === 'D' && $answer->question->correct_option !== 'D' ? 'border-red-300 bg-red-50' : '' }}
+                                {{ $answer->question->correct_option === 'D' ? 'border-green-400 bg-green-50 shadow-[0_4px_15px_rgba(16,185,129,0.1)]' : 'border-gray-100' }}
+                                {{ $answer->selected_option !== 'D' && $answer->question->correct_option !== 'D' ? 'bg-white' : '' }}">
+                                <div class="font-black {{ $answer->question->correct_option === 'D' ? 'text-green-600' : 'text-gray-400' }} text-sm mt-0.5">D.</div>
+                                <div class="text-navy font-medium">{{ $answer->question->option_d }}</div>
                             </div>
                         @endif
                     </div>
 
                     <!-- Selected choice vs Correct -->
-                    <div class="text-xs space-y-1">
-                        <p class="text-gray-500">Your choice: <span class="font-bold {{ $answer->is_correct ? 'text-green-600' : 'text-red-500' }}">{{ $answer->selected_option ?? 'Skipped' }}</span></p>
-                        <p class="text-gray-500">Correct option: <span class="font-bold text-green-600">{{ $answer->question->correct_option }}</span></p>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-8 space-y-2 sm:space-y-0 text-sm p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <div>
+                            <span class="font-black text-gray-500 uppercase tracking-widest text-[10px] mr-2">Your Choice:</span> 
+                            <span class="font-black text-lg {{ $answer->is_correct ? 'text-green-600' : 'text-red-500' }}">{{ $answer->selected_option ?? 'Skipped' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-black text-gray-500 uppercase tracking-widest text-[10px] mr-2">Correct Answer:</span> 
+                            <span class="font-black text-lg text-green-600">{{ $answer->question->correct_option }}</span>
+                        </div>
                     </div>
 
                     <!-- Explanation -->
-                    <div class="p-4 bg-gray-50 dark:bg-gray-750 border border-gray-200 dark:border-gray-700 rounded-lg text-xs leading-relaxed text-gray-600 dark:text-gray-300">
-                        <strong class="block text-navy dark:text-white mb-1">Explanation:</strong>
-                        {!! $answer->question->explanation !!}
+                    <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl text-sm leading-relaxed shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-green-500"></div>
+                        <strong class="block text-navy font-black uppercase tracking-widest text-[11px] mb-3">Explanation</strong>
+                        <div class="prose max-w-none text-gray-700 font-medium">
+                            {!! $answer->question->explanation !!}
+                        </div>
                     </div>
                 </div>
             @endforeach

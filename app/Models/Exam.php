@@ -46,6 +46,9 @@ class Exam extends Model
         'exam_type',
         'price_pdf',
         'price_engine',
+        'update_price_3_months',
+        'update_price_6_months',
+        'update_price_12_months',
         'demo_pdf_filename',
         'full_pdf_filename',
         'last_updated_at',
@@ -62,6 +65,9 @@ class Exam extends Model
         'last_updated_at' => 'datetime',
         'price_pdf' => 'decimal:2',
         'price_engine' => 'decimal:2',
+        'update_price_3_months' => 'decimal:2',
+        'update_price_6_months' => 'decimal:2',
+        'update_price_12_months' => 'decimal:2',
         'sort_order' => 'integer',
         'question_count' => 'integer',
         'passing_score' => 'integer',
@@ -73,6 +79,11 @@ class Exam extends Model
     public function vendor()
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function certifications()
+    {
+        return $this->belongsToMany(Certification::class);
     }
 
     /**

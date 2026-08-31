@@ -18,6 +18,12 @@ class Package extends Model
         'price_monthly',
         'price_annual',
         'price_lifetime',
+        'update_price_3_months',
+        'update_price_6_months',
+        'update_price_12_months',
+        'license_price_individual',
+        'license_price_corporate',
+        'license_price_trainer',
         'features',
         'includes_pdf',
         'includes_te',
@@ -25,6 +31,8 @@ class Package extends Model
         'is_popular',
         'sort_order',
         'is_active',
+        'exam_limit',
+        'seat_count',
     ];
 
     protected $casts = [
@@ -37,6 +45,8 @@ class Package extends Model
         'is_popular' => 'boolean',
         'is_active' => 'boolean',
         'access_days' => 'integer',
+        'exam_limit' => 'integer',
+        'seat_count' => 'integer',
     ];
 
     public function vendor()

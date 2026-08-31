@@ -84,7 +84,7 @@
             <p>If you changed your mind or cancelled by mistake, you can easily renew your subscription from the pricing page or your profile billing panel before the expiration date to keep your simulator progress logs.</p>
             
             <div style="text-align: center;">
-                <a href="{{ route('pricing') }}" class="btn" target="_blank">Re-subscribe to ExamsNinja</a>
+                <a href="{{ route('vendors.index') }}" class="btn" target="_blank">Re-subscribe to ExamsNinja</a>
             </div>
 
             <p>Thank you for using ExamsNinja to prepare. We wish you the best of luck on your upcoming exams!</p>

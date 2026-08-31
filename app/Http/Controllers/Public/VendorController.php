@@ -15,9 +15,6 @@ class VendorController extends Controller
     public function index(Request $request)
     {
         $vendorsQuery = Vendor::where('is_active', true)->orderBy('sort_order');
-        
-
-
         $vendors = $vendorsQuery->get();
 
         return view('pages.vendors.index', compact('vendors'));
@@ -28,7 +25,9 @@ class VendorController extends Controller
      */
     public function show(Request $request, string $slug)
     {
-        $vendor = Vendor::where('slug', $slug)->where('is_active', true)->firstOrFail();
+        $vendor = Vendor::with(['certifications' => function($q) {
+            $q->where('is_active', true)->orderBy('sort_order')->orderBy('name');
+        }])->where('slug', $slug)->where('is_active', true)->firstOrFail();
         
         $examsQuery = Exam::with('vendor')->where('vendor_id', $vendor->id)->where('is_active', true);
 
@@ -46,7 +45,7 @@ class VendorController extends Controller
         } elseif ($sortBy === 'updated') {
             $examsQuery->orderBy('last_updated_at', 'desc');
         } else {
-            $examsQuery->orderBy('sort_order')->orderBy('exam_code', 'asc');
+            $examsQuery->orderBy('exam_code', 'asc');
         }
 
         $exams = $examsQuery->get();
