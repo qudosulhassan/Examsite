@@ -92,16 +92,9 @@
                 <h4 class="text-xs font-bold text-navy uppercase tracking-wide">Answer Area</h4>
                 
                 <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6">
-                    <!-- Answer Area Image (e.g. 235.jpg) -->
-                    @if($ansAreaImage)
-                        <div class="border border-slate-300 rounded-xl p-3 bg-white text-center shadow-sm">
-                            <img src="{{ $ansAreaImage }}" alt="Answer Area Reference Diagram" class="max-h-96 mx-auto rounded">
-                        </div>
-                    @endif
-
                     <!-- Dropdown Selection Controls -->
                     @if(!empty($boxes))
-                        <div class="space-y-4 pt-2">
+                        <div class="space-y-4">
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Select the appropriate options in the answer area:</label>
                             
                             <div class="space-y-3">

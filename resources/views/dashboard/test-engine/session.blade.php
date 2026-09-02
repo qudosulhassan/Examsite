@@ -250,12 +250,6 @@
                                     @if($isHotspot)
                                         <!-- Hotspot Learner Area -->
                                         <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6">
-                                            @if($ansAreaImage)
-                                                <div class="border border-slate-300 rounded-xl p-3 bg-white text-center shadow-sm">
-                                                    <img src="{{ $ansAreaImage }}" alt="Answer Area Reference Diagram" class="max-h-96 mx-auto rounded">
-                                                </div>
-                                            @endif
-
                                             @if(!empty($boxes))
                                                 <div class="space-y-4">
                                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Select the appropriate options in the answer area:</label>
@@ -369,6 +363,12 @@
                                             <div x-show="answers[{{ $idx }}].revealed" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" class="mt-6 p-6 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl text-sm leading-relaxed shadow-sm relative overflow-hidden" style="display: none;">
                                                 <div class="absolute top-0 left-0 w-1.5 h-full bg-green-500"></div>
                                                 <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Answer: <span class="text-green-600 text-sm ml-1" x-text="answers[{{ $idx }}].correct"></span></p>
+                                                @if($ansAreaImage)
+                                                    <div class="my-4 border border-emerald-300 rounded-xl p-3 bg-white text-center shadow-sm">
+                                                        <span class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block mb-2">Solution Reference Diagram</span>
+                                                        <img src="{{ $ansAreaImage }}" alt="Solution Diagram" class="max-h-80 mx-auto rounded">
+                                                    </div>
+                                                @endif
                                                 <div class="prose max-w-none text-gray-700 font-medium">
                                                     {!! $ans->question->explanation !!}
                                                 </div>
