@@ -146,11 +146,10 @@ class Question extends Model
                     $optKey = trim((string)($opt['key'] ?? chr(65 + $index)));
                     $optText = trim((string)($opt['text'] ?? ''));
                     
-                    // Only save options that have a key and text
                     if ($optText !== '' || in_array($data['question_type'] ?? '', ['single_choice', 'multiple_choice', 'yes_no'])) {
                         $question->options()->create([
                             'option_key' => $optKey !== '' ? $optKey : chr(65 + $index),
-                            'option_text' => $optText,
+                            'option_text' => $optText !== '' ? $optText : ('Option ' . ($optKey !== '' ? $optKey : chr(65 + $index))),
                             'sort_order' => (int)($opt['sort_order'] ?? ($index + 1)),
                         ]);
                     }
@@ -161,10 +160,13 @@ class Question extends Model
             $question->answers()->delete();
             if (!empty($data['correct_answers'])) {
                 foreach ($data['correct_answers'] as $index => $ans) {
-                    $question->answers()->create([
-                        'answer_value' => $ans,
-                        'sort_order' => $index + 1,
-                    ]);
+                    $ansVal = trim((string)$ans);
+                    if ($ansVal !== '') {
+                        $question->answers()->create([
+                            'answer_value' => $ansVal,
+                            'sort_order' => (int)($index + 1),
+                        ]);
+                    }
                 }
             }
 
@@ -172,11 +174,16 @@ class Question extends Model
             $question->references()->delete();
             if (!empty($data['references'])) {
                 foreach ($data['references'] as $index => $ref) {
-                    $question->references()->create([
-                        'title' => $ref['title'] ?? '',
-                        'url' => $ref['url'] ?? null,
-                        'sort_order' => $ref['sort_order'] ?? ($index + 1),
-                    ]);
+                    $title = trim((string)($ref['title'] ?? ''));
+                    $url = trim((string)($ref['url'] ?? ''));
+                    
+                    if ($title !== '' || $url !== '') {
+                        $question->references()->create([
+                            'title' => $title !== '' ? $title : ($url !== '' ? $url : 'Reference'),
+                            'url' => $url !== '' ? $url : null,
+                            'sort_order' => (int)($ref['sort_order'] ?? ($index + 1)),
+                        ]);
+                    }
                 }
             }
 
@@ -184,13 +191,16 @@ class Question extends Model
             $question->media()->delete();
             if (!empty($data['media'])) {
                 foreach ($data['media'] as $index => $m) {
-                    $question->media()->create([
-                        'media_type' => $m['type'] ?? 'image',
-                        'media_url' => $m['url'] ?? '',
-                        'caption' => $m['caption'] ?? null,
-                        'alt_text' => $m['alt'] ?? null,
-                        'sort_order' => $m['sort_order'] ?? ($index + 1),
-                    ]);
+                    $mediaUrl = trim((string)($m['url'] ?? ''));
+                    if ($mediaUrl !== '') {
+                        $question->media()->create([
+                            'media_type' => !empty($m['type']) ? trim((string)$m['type']) : 'image',
+                            'media_url' => $mediaUrl,
+                            'caption' => !empty($m['caption']) ? trim((string)$m['caption']) : null,
+                            'alt_text' => !empty($m['alt']) ? trim((string)$m['alt']) : null,
+                            'sort_order' => (int)($m['sort_order'] ?? ($index + 1)),
+                        ]);
+                    }
                 }
             }
 
