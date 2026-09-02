@@ -202,11 +202,28 @@ class TestEngineController extends Controller
         // Check correctness (trim arrays to handle multi-select spacing)
         $isCorrect = false;
         if (!empty($selected)) {
-            $selectedArr = array_map('trim', explode(',', $selected));
-            $correctArr = array_map('trim', explode(',', $question->correct_option));
-            sort($selectedArr);
-            sort($correctArr);
-            $isCorrect = ($selectedArr === $correctArr);
+            if ($question->question_type === 'hotspot') {
+                $userBoxes = is_array($selected) ? $selected : json_decode($selected, true);
+                if (is_array($userBoxes)) {
+                    $allMatch = true;
+                    $qBoxes = $question->question_data['boxes'] ?? [];
+                    foreach ($qBoxes as $bIdx => $b) {
+                        $boxKey = 'box_' . ($bIdx + 1);
+                        $userVal = $userBoxes[$boxKey] ?? ($userBoxes[$b['label'] ?? ''] ?? null);
+                        if (trim((string)$userVal) !== trim((string)($b['correct_answer'] ?? ''))) {
+                            $allMatch = false;
+                            break;
+                        }
+                    }
+                    $isCorrect = $allMatch && count($qBoxes) > 0;
+                }
+            } else {
+                $selectedArr = array_map('trim', explode(',', $selected));
+                $correctArr = array_map('trim', explode(',', $question->correct_option));
+                sort($selectedArr);
+                sort($correctArr);
+                $isCorrect = ($selectedArr === $correctArr);
+            }
         }
 
         // Save progress

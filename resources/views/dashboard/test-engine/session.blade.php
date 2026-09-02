@@ -220,72 +220,140 @@
                             </p>
                         </div>
 
+                        <!-- Question Image / Diagram -->
+                        @foreach($answers as $idx => $ans)
+                            @php
+                                $qImage = $ans->question->media->firstWhere('media_type', 'question_image')?->media_url 
+                                          ?? ($ans->question->image_filename ? '/storage/questions/' . $ans->question->image_filename : null);
+                            @endphp
+                            @if($qImage)
+                                <div x-show="activeIndex == {{ $idx }}" class="my-4 text-center border border-gray-200 rounded-xl p-3 bg-gray-50">
+                                    <img src="{{ $qImage }}" alt="Question Diagram" class="max-h-80 mx-auto rounded shadow-sm">
+                                </div>
+                            @endif
+                        @endforeach
+
                         <!-- Answer Choice Options list -->
                         <div class="space-y-4 pt-2">
                             @foreach($answers as $idx => $ans)
+                                @php
+                                    $isHotspot = ($ans->question->question_type === 'hotspot');
+                                    $qData = $ans->question->question_data ?? [];
+                                    $ansAreaImage = $qData['answer_area_image'] ?? null;
+                                    if (!$ansAreaImage) {
+                                        $ansAreaImage = $ans->question->media->firstWhere('media_type', 'answer_area')?->media_url;
+                                    }
+                                    $boxes = $qData['boxes'] ?? $qData['hotspot_answers'] ?? [];
+                                @endphp
+
                                 <div x-show="activeIndex == {{ $idx }}" class="space-y-4">
-                                    <!-- Option A -->
-                                    <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-                                           :class="answers[{{ $idx }}].selected === 'A' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
-                                        <div class="pt-0.5">
-                                            <input type="radio" name="q_{{ $idx }}" value="A" @change="saveAnswer({{ $idx }}, 'A')" :checked="answers[{{ $idx }}].selected === 'A'" class="peer sr-only">
-                                            <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'A' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
-                                                <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'A' ? 'scale-100' : ''"></div>
-                                            </div>
-                                        </div>
-                                        <div class="flex-1">
-                                            <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'A' ? 'text-cyan' : ''">A.</span> 
-                                            <span class="text-navy font-medium leading-relaxed">{{ $ans->question->option_a }}</span>
-                                        </div>
-                                    </label>
+                                    @if($isHotspot)
+                                        <!-- Hotspot Learner Area -->
+                                        <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-6">
+                                            @if($ansAreaImage)
+                                                <div class="border border-slate-300 rounded-xl p-3 bg-white text-center shadow-sm">
+                                                    <img src="{{ $ansAreaImage }}" alt="Answer Area Reference Diagram" class="max-h-96 mx-auto rounded">
+                                                </div>
+                                            @endif
 
-                                    <!-- Option B -->
-                                    <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-                                           :class="answers[{{ $idx }}].selected === 'B' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
-                                        <div class="pt-0.5">
-                                            <input type="radio" name="q_{{ $idx }}" value="B" @change="saveAnswer({{ $idx }}, 'B')" :checked="answers[{{ $idx }}].selected === 'B'" class="peer sr-only">
-                                            <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'B' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
-                                                <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'B' ? 'scale-100' : ''"></div>
-                                            </div>
+                                            @if(!empty($boxes))
+                                                <div class="space-y-4">
+                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Select the appropriate options in the answer area:</label>
+                                                    
+                                                    <div class="space-y-3">
+                                                        @foreach($boxes as $bIdx => $box)
+                                                            @php
+                                                                $label = $box['label'] ?? ('Box ' . ($bIdx + 1));
+                                                                $choices = is_array($box['options'] ?? null) ? $box['options'] : array_map('trim', explode(',', $box['optionsText'] ?? ''));
+                                                                $boxKey = 'box_' . ($bIdx + 1);
+                                                            @endphp
+                                                            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-slate-200 rounded-xl gap-3 shadow-sm"
+                                                                 x-data="{ boxChoice: '' }">
+                                                                <span class="text-sm font-bold text-slate-800">{{ $label }}:</span>
+                                                                <select x-model="boxChoice"
+                                                                        @change="
+                                                                            let cur = {};
+                                                                            try { cur = JSON.parse(answers[{{ $idx }}].selected || '{}'); } catch(e) {}
+                                                                            if (typeof cur !== 'object' || cur === null) cur = {};
+                                                                            cur['{{ $boxKey }}'] = boxChoice;
+                                                                            saveAnswer({{ $idx }}, JSON.stringify(cur));
+                                                                        "
+                                                                        class="border-slate-300 rounded-lg text-sm px-4 py-2.5 focus:border-cyan focus:ring-cyan text-slate-800 font-semibold sm:w-64 bg-slate-50">
+                                                                    <option value="">[ Select ▼ ]</option>
+                                                                    @foreach($choices as $c)
+                                                                        <option value="{{ $c }}">{{ $c }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
-                                        <div class="flex-1">
-                                            <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'B' ? 'text-cyan' : ''">B.</span> 
-                                            <span class="text-navy font-medium leading-relaxed">{{ $ans->question->option_b }}</span>
-                                        </div>
-                                    </label>
-
-                                    <!-- Option C -->
-                                    @if(!empty($ans->question->option_c))
+                                    @else
+                                        <!-- Option A -->
                                         <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-                                               :class="answers[{{ $idx }}].selected === 'C' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
+                                               :class="answers[{{ $idx }}].selected === 'A' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
                                             <div class="pt-0.5">
-                                                <input type="radio" name="q_{{ $idx }}" value="C" @change="saveAnswer({{ $idx }}, 'C')" :checked="answers[{{ $idx }}].selected === 'C'" class="peer sr-only">
-                                                <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'C' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
-                                                    <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'C' ? 'scale-100' : ''"></div>
+                                                <input type="radio" name="q_{{ $idx }}" value="A" @change="saveAnswer({{ $idx }}, 'A')" :checked="answers[{{ $idx }}].selected === 'A'" class="peer sr-only">
+                                                <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'A' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
+                                                    <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'A' ? 'scale-100' : ''"></div>
                                                 </div>
                                             </div>
                                             <div class="flex-1">
-                                                <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'C' ? 'text-cyan' : ''">C.</span> 
-                                                <span class="text-navy font-medium leading-relaxed">{{ $ans->question->option_c }}</span>
+                                                <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'A' ? 'text-cyan' : ''">A.</span> 
+                                                <div class="text-navy font-medium leading-relaxed inline prose max-w-none">{!! $ans->question->option_a !!}</div>
                                             </div>
                                         </label>
-                                    @endif
 
-                                    <!-- Option D -->
-                                    @if(!empty($ans->question->option_d))
+                                        <!-- Option B -->
                                         <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-                                               :class="answers[{{ $idx }}].selected === 'D' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
+                                               :class="answers[{{ $idx }}].selected === 'B' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
                                             <div class="pt-0.5">
-                                                <input type="radio" name="q_{{ $idx }}" value="D" @change="saveAnswer({{ $idx }}, 'D')" :checked="answers[{{ $idx }}].selected === 'D'" class="peer sr-only">
-                                                <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'D' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
-                                                    <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'D' ? 'scale-100' : ''"></div>
+                                                <input type="radio" name="q_{{ $idx }}" value="B" @change="saveAnswer({{ $idx }}, 'B')" :checked="answers[{{ $idx }}].selected === 'B'" class="peer sr-only">
+                                                <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'B' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
+                                                    <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'B' ? 'scale-100' : ''"></div>
                                                 </div>
                                             </div>
                                             <div class="flex-1">
-                                                <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'D' ? 'text-cyan' : ''">D.</span> 
-                                                <span class="text-navy font-medium leading-relaxed">{{ $ans->question->option_d }}</span>
+                                                <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'B' ? 'text-cyan' : ''">B.</span> 
+                                                <div class="text-navy font-medium leading-relaxed inline prose max-w-none">{!! $ans->question->option_b !!}</div>
                                             </div>
                                         </label>
+
+                                        <!-- Option C -->
+                                        @if(!empty($ans->question->option_c))
+                                            <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
+                                                   :class="answers[{{ $idx }}].selected === 'C' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
+                                                <div class="pt-0.5">
+                                                    <input type="radio" name="q_{{ $idx }}" value="C" @change="saveAnswer({{ $idx }}, 'C')" :checked="answers[{{ $idx }}].selected === 'C'" class="peer sr-only">
+                                                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'C' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
+                                                        <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'C' ? 'scale-100' : ''"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'C' ? 'text-cyan' : ''">C.</span> 
+                                                    <div class="text-navy font-medium leading-relaxed inline prose max-w-none">{!! $ans->question->option_c !!}</div>
+                                                </div>
+                                            </label>
+                                        @endif
+
+                                        <!-- Option D -->
+                                        @if(!empty($ans->question->option_d))
+                                            <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
+                                                   :class="answers[{{ $idx }}].selected === 'D' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
+                                                <div class="pt-0.5">
+                                                    <input type="radio" name="q_{{ $idx }}" value="D" @change="saveAnswer({{ $idx }}, 'D')" :checked="answers[{{ $idx }}].selected === 'D'" class="peer sr-only">
+                                                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'D' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
+                                                        <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'D' ? 'scale-100' : ''"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'D' ? 'text-cyan' : ''">D.</span> 
+                                                    <div class="text-navy font-medium leading-relaxed inline prose max-w-none">{!! $ans->question->option_d !!}</div>
+                                                </div>
+                                            </label>
+                                        @endif
                                     @endif
 
                                     <!-- Show Explanation trigger (Practice Mode Only) -->
