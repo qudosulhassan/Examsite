@@ -156,8 +156,8 @@
                                     <!-- Single Choice Radio -->
                                     <template x-if="question.question_type === 'single_choice'">
                                         <input type="radio" name="correct_option" :value="opt.key"
-                                               :checked="question.correct_answers.includes(opt.key)"
-                                               @change="question.correct_answers = [opt.key]"
+                                               x-model="question.selected_correct"
+                                               @change="question.correct_answers = [question.selected_correct]"
                                                class="rounded-full border-gray-300 text-cyan focus:ring-cyan h-5 w-5 cursor-pointer">
                                     </template>
                                     <!-- Multiple Choice Checkbox -->
@@ -187,8 +187,8 @@
                                 <span class="text-sm font-bold text-gray-700" x-text="opt.text"></span>
                                 <div class="flex-grow"></div>
                                 <input type="radio" name="correct_option" :value="opt.key"
-                                       :checked="question.correct_answers.includes(opt.key)"
-                                       @change="question.correct_answers = [opt.key]" required
+                                       x-model="question.selected_correct"
+                                       @change="question.correct_answers = [question.selected_correct]" required
                                        class="rounded-full border-gray-300 text-cyan focus:ring-cyan h-5 w-5 cursor-pointer">
                             </div>
                         </template>
@@ -396,6 +396,7 @@ function createQuestionManager(config) {
                 { key: 'C', text: '' },
                 { key: 'D', text: '' }
             ],
+            selected_correct: 'A',
             correct_answers: ['A'],
             question_data: {
                 drag_items: [
@@ -547,11 +548,13 @@ function createQuestionManager(config) {
                     { key: 'A', text: 'Yes' },
                     { key: 'B', text: 'No' }
                 ];
+                this.question.selected_correct = 'A';
                 this.question.correct_answers = ['A'];
             } else if (this.question.question_type === 'single_choice') {
-                if (this.question.correct_answers.length > 1) {
-                    this.question.correct_answers = [this.question.correct_answers[0]];
+                if (!this.question.selected_correct) {
+                    this.question.selected_correct = 'A';
                 }
+                this.question.correct_answers = [this.question.selected_correct];
             }
         },
 
@@ -645,6 +648,12 @@ function createQuestionManager(config) {
         },
 
         submitForm(e) {
+            if (this.question.question_type === 'single_choice' || this.question.question_type === 'yes_no') {
+                if (this.question.selected_correct) {
+                    this.question.correct_answers = [this.question.selected_correct];
+                }
+            }
+
             if (!this.validateForm()) {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
