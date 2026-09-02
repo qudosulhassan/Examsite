@@ -306,14 +306,14 @@
                                 <!-- Box Label -->
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Dropdown Label *</label>
-                                    <input type="text" x-model="box.label" placeholder="e.g. Number of virtual networks"
+                                    <input type="text" :name="'boxes['+idx+'][label]'" x-model="box.label" placeholder="e.g. Number of virtual networks"
                                            class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2 focus:border-cyan focus:ring-cyan">
                                 </div>
 
                                 <!-- Available Choices -->
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Available Choices (Comma-Separated) *</label>
-                                    <input type="text" x-model="box.optionsText" @input="updateHotspotOptions(idx)" placeholder="1, 2, 3"
+                                    <input type="text" :name="'boxes['+idx+'][optionsText]'" x-model="box.optionsText" @input="updateHotspotOptions(idx)" placeholder="1, 2, 3"
                                            class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2 focus:border-cyan focus:ring-cyan">
                                     <p class="text-[10px] text-gray-400 mt-1">Choices the candidate can select in this dropdown.</p>
                                 </div>
@@ -323,7 +323,7 @@
                                 <!-- Correct Answer Selector -->
                                 <div>
                                     <label class="block text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">✓ Correct Answer (Used for Grading) *</label>
-                                    <select x-model="box.correct_answer" required
+                                    <select :name="'boxes['+idx+'][correct_answer]'" x-model="box.correct_answer" required
                                             class="w-full border-emerald-500 bg-emerald-50/80 rounded-lg text-sm px-3.5 py-2 focus:border-emerald-600 focus:ring-emerald-500 font-bold text-emerald-900">
                                         <option value="">-- Select Correct Answer --</option>
                                         <template x-for="choice in box.options" :key="choice">
@@ -335,7 +335,7 @@
                                 <!-- Points -->
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Points *</label>
-                                    <input type="number" x-model.number="box.points" min="1" max="10" required
+                                    <input type="number" :name="'boxes['+idx+'][points]'" x-model.number="box.points" min="1" max="10" required
                                            class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2 focus:border-cyan focus:ring-cyan">
                                 </div>
                             </div>
@@ -343,7 +343,7 @@
                             <!-- Per-Box Explanation -->
                             <div>
                                 <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Box Explanation (Optional Rationale)</label>
-                                <input type="text" x-model="box.explanation" placeholder="e.g. One virtual network for every tier."
+                                <input type="text" :name="'boxes['+idx+'][explanation]'" x-model="box.explanation" placeholder="e.g. One virtual network for every tier."
                                        class="w-full border-gray-300 rounded-lg text-xs px-3 py-2 focus:border-cyan focus:ring-cyan">
                             </div>
                         </div>

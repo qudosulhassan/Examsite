@@ -118,6 +118,35 @@ class Question extends Model
         return DB::transaction(function () use ($data, $existingQuestion) {
             $question = $existingQuestion ?? new Question();
 
+            $existingQData = $question->question_data ?? [];
+            if (!is_array($existingQData)) {
+                $existingQData = [];
+            }
+
+            $newBoxes = !empty($data['boxes']) ? $data['boxes'] : (!empty($data['hotspot_answers']) ? $data['hotspot_answers'] : ($existingQData['boxes'] ?? []));
+            foreach ($newBoxes as &$b) {
+                if (empty($b['options']) && !empty($b['optionsText'])) {
+                    $b['options'] = array_map('trim', explode(',', $b['optionsText']));
+                }
+            }
+            unset($b);
+
+            $mergedQData = array_merge($existingQData, [
+                'drag_items' => !empty($data['drag_items']) ? $data['drag_items'] : ($existingQData['drag_items'] ?? []),
+                'correct_order' => !empty($data['correct_order']) ? $data['correct_order'] : ($existingQData['correct_order'] ?? []),
+                'matching_pairs' => !empty($data['matching_pairs']) ? $data['matching_pairs'] : ($existingQData['matching_pairs'] ?? []),
+                'boxes' => $newBoxes,
+            ]);
+
+            if (isset($data['question_data']['answer_area_image'])) {
+                $mergedQData['answer_area_image'] = $data['question_data']['answer_area_image'];
+            }
+
+            // Auto-populate correct_answers for hotspot if not explicitly set
+            if (($data['question_type'] ?? '') === 'hotspot' && empty($data['correct_answers']) && !empty($newBoxes)) {
+                $data['correct_answers'] = array_filter(array_map(fn($b) => $b['correct_answer'] ?? '', $newBoxes));
+            }
+
             $question->fill([
                 'exam_id' => $data['exam_id'] ?? null,
                 'topic' => $data['topic'] ?? '',
@@ -129,12 +158,7 @@ class Question extends Model
                 'status' => $data['status'] ?? 'draft',
                 'source_type' => $data['source_type'] ?? 'manual',
                 'source_reference' => $data['source_reference'] ?? null,
-                'question_data' => [
-                    'drag_items' => $data['drag_items'] ?? [],
-                    'correct_order' => $data['correct_order'] ?? [],
-                    'matching_pairs' => $data['matching_pairs'] ?? [],
-                    'boxes' => $data['boxes'] ?? $data['hotspot_answers'] ?? [],
-                ],
+                'question_data' => $mergedQData,
             ]);
 
             $question->save();

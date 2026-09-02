@@ -127,6 +127,20 @@ class QuestionAdminController extends Controller
             }));
         }
 
+        if (!empty($input['boxes']) && is_array($input['boxes'])) {
+            $input['boxes'] = array_values($input['boxes']);
+            foreach ($input['boxes'] as $bIdx => &$b) {
+                $b['id'] = 'box_' . ($bIdx + 1);
+                if (empty($b['options']) && !empty($b['optionsText'])) {
+                    $b['options'] = array_map('trim', explode(',', $b['optionsText']));
+                }
+                if (isset($b['points'])) {
+                    $b['points'] = (int)$b['points'];
+                }
+            }
+            unset($b);
+        }
+
         $universalData = Question::convertToUniversalModel($input);
         Question::saveFromUniversalModel($universalData);
 
@@ -271,6 +285,20 @@ class QuestionAdminController extends Controller
             $input['references'] = array_values(array_filter($input['references'], function ($ref) {
                 return !empty($ref['title']) || !empty($ref['url']);
             }));
+        }
+
+        if (!empty($input['boxes']) && is_array($input['boxes'])) {
+            $input['boxes'] = array_values($input['boxes']);
+            foreach ($input['boxes'] as $bIdx => &$b) {
+                $b['id'] = 'box_' . ($bIdx + 1);
+                if (empty($b['options']) && !empty($b['optionsText'])) {
+                    $b['options'] = array_map('trim', explode(',', $b['optionsText']));
+                }
+                if (isset($b['points'])) {
+                    $b['points'] = (int)$b['points'];
+                }
+            }
+            unset($b);
         }
 
         $universalData = Question::convertToUniversalModel($input);
