@@ -23,9 +23,14 @@
              @foreach($answers as $index => $ans)
                  {{ $index }}: {
                      id: {{ $ans->question_id }},
+                     type: '{{ $ans->question->question_type }}',
                      selected: '{{ $ans->selected_option ?? '' }}',
                      flagged: {{ $ans->is_flagged ? 'true' : 'false' }},
                      correct: '{{ $ans->question->correct_option }}',
+                     options: @json($ans->question->options->map(fn($o) => ['key' => $o->option_key, 'text' => $o->option_text])),
+                     drag_items: @json($ans->question->question_data['drag_items'] ?? []),
+                     matching_pairs: @json($ans->question->question_data['matching_pairs'] ?? []),
+                     hotspot_answers: @json($ans->question->question_data['hotspot_answers'] ?? []),
                      revealed: false
                  },
              @endforeach
@@ -224,69 +229,119 @@
                         <div class="space-y-4 pt-2">
                             @foreach($answers as $idx => $ans)
                                 <div x-show="activeIndex == {{ $idx }}" class="space-y-4">
-                                    <!-- Option A -->
-                                    <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-                                           :class="answers[{{ $idx }}].selected === 'A' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
-                                        <div class="pt-0.5">
-                                            <input type="radio" name="q_{{ $idx }}" value="A" @change="saveAnswer({{ $idx }}, 'A')" :checked="answers[{{ $idx }}].selected === 'A'" class="peer sr-only">
-                                            <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'A' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
-                                                <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'A' ? 'scale-100' : ''"></div>
-                                            </div>
+                                    
+                                    <!-- 1. Single / Multiple Choice / Yes-No Rendering -->
+                                    <template x-if="answers[{{ $idx }}].type === 'single_choice' || answers[{{ $idx }}].type === 'multiple_choice' || answers[{{ $idx }}].type === 'yes_no'">
+                                        <div class="space-y-3">
+                                            <template x-for="opt in answers[{{ $idx }}].options" :key="opt.key">
+                                                <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
+                                                       :class="answers[{{ $idx }}].selected.split(',').includes(opt.key) ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
+                                                    <div class="pt-0.5">
+                                                        <template x-if="answers[{{ $idx }}].type === 'single_choice' || answers[{{ $idx }}].type === 'yes_no'">
+                                                            <input type="radio" :name="'q_' + {{ $idx }}" :value="opt.key" @change="saveAnswer({{ $idx }}, opt.key)" :checked="answers[{{ $idx }}].selected === opt.key" class="peer sr-only">
+                                                        </template>
+                                                        <template x-if="answers[{{ $idx }}].type === 'multiple_choice'">
+                                                            <input type="checkbox" :name="'q_' + {{ $idx }} + '[]'" :value="opt.key" @change="toggleCheckbox({{ $idx }}, opt.key)" :checked="answers[{{ $idx }}].selected.split(',').includes(opt.key)" class="peer sr-only">
+                                                        </template>
+                                                        <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected.split(',').includes(opt.key) ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
+                                                            <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected.split(',').includes(opt.key) ? 'scale-100' : ''"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected.split(',').includes(opt.key) ? 'text-cyan' : ''" x-text="opt.key + '.'"></span> 
+                                                        <span class="text-navy font-medium leading-relaxed" x-text="opt.text"></span>
+                                                    </div>
+                                                </label>
+                                            </template>
                                         </div>
-                                        <div class="flex-1">
-                                            <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'A' ? 'text-cyan' : ''">A.</span> 
-                                            <span class="text-navy font-medium leading-relaxed">{{ $ans->question->option_a }}</span>
-                                        </div>
-                                    </label>
+                                    </template>
 
-                                    <!-- Option B -->
-                                    <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-                                           :class="answers[{{ $idx }}].selected === 'B' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
-                                        <div class="pt-0.5">
-                                            <input type="radio" name="q_{{ $idx }}" value="B" @change="saveAnswer({{ $idx }}, 'B')" :checked="answers[{{ $idx }}].selected === 'B'" class="peer sr-only">
-                                            <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'B' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
-                                                <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'B' ? 'scale-100' : ''"></div>
+                                    <!-- 2. Drag & Drop (Ordering) Rendering -->
+                                    <template x-if="answers[{{ $idx }}].type === 'drag_drop'">
+                                        <div class="space-y-4">
+                                            <p class="text-xs font-bold text-gray-400 uppercase">Sequencing Items (Click arrows to reorder items to match correct sequence):</p>
+                                            <div class="space-y-2">
+                                                <template x-for="(item, itemIdx) in answers[{{ $idx }}].drag_items" :key="item.id">
+                                                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                                                        <div class="flex items-center space-x-3">
+                                                            <span class="bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded text-xs" x-text="itemIdx + 1"></span>
+                                                            <span class="text-navy font-semibold" x-text="item.text"></span>
+                                                        </div>
+                                                        <div class="flex space-x-1">
+                                                            <button type="button" 
+                                                                    @click="
+                                                                        if (itemIdx > 0) {
+                                                                            let temp = answers[{{ $idx }}].drag_items[itemIdx];
+                                                                            answers[{{ $idx }}].drag_items[itemIdx] = answers[{{ $idx }}].drag_items[itemIdx - 1];
+                                                                            answers[{{ $idx }}].drag_items[itemIdx - 1] = temp;
+                                                                            saveAnswer({{ $idx }}, answers[{{ $idx }}].drag_items.map(di => di.id).join(','));
+                                                                        }
+                                                                    "
+                                                                    x-show="itemIdx > 0"
+                                                                    class="text-gray-400 hover:text-navy px-2 py-1 text-xs bg-gray-50 rounded">▲</button>
+                                                            <button type="button" 
+                                                                    @click="
+                                                                        if (itemIdx < answers[{{ $idx }}].drag_items.length - 1) {
+                                                                            let temp = answers[{{ $idx }}].drag_items[itemIdx];
+                                                                            answers[{{ $idx }}].drag_items[itemIdx] = answers[{{ $idx }}].drag_items[itemIdx + 1];
+                                                                            answers[{{ $idx }}].drag_items[itemIdx + 1] = temp;
+                                                                            saveAnswer({{ $idx }}, answers[{{ $idx }}].drag_items.map(di => di.id).join(','));
+                                                                        }
+                                                                    "
+                                                                    x-show="itemIdx < answers[{{ $idx }}].drag_items.length - 1"
+                                                                    class="text-gray-400 hover:text-navy px-2 py-1 text-xs bg-gray-50 rounded">▼</button>
+                                                        </div>
+                                                    </div>
+                                                </template>
                                             </div>
                                         </div>
-                                        <div class="flex-1">
-                                            <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'B' ? 'text-cyan' : ''">B.</span> 
-                                            <span class="text-navy font-medium leading-relaxed">{{ $ans->question->option_b }}</span>
+                                    </template>
+
+                                    <!-- 3. Matching Pairs Rendering -->
+                                    <template x-if="answers[{{ $idx }}].type === 'matching'">
+                                        <div class="space-y-4">
+                                            <p class="text-xs font-bold text-gray-400 uppercase">Matching Definitions (Type corresponding match text):</p>
+                                            <div class="space-y-3">
+                                                <template x-for="(pair, pairIdx) in answers[{{ $idx }}].matching_pairs" :key="pairIdx">
+                                                    <div class="grid grid-cols-2 gap-4 items-center p-4 bg-white border border-gray-200 rounded-xl">
+                                                        <div class="text-navy font-bold" x-text="pair.left"></div>
+                                                        <input type="text" placeholder="Type correct match..."
+                                                               @input="
+                                                                   answers[{{ $idx }}].matching_pairs[pairIdx].input = $event.target.value;
+                                                                   let values = answers[{{ $idx }}].matching_pairs.map(p => p.input || '');
+                                                                   saveAnswer({{ $idx }}, values.join('||'));
+                                                               "
+                                                               class="border-gray-300 rounded text-sm px-3 py-1.5 focus:border-cyan focus:ring-cyan">
+                                                    </div>
+                                                </template>
+                                            </div>
                                         </div>
-                                    </label>
+                                    </template>
 
-                                    <!-- Option C -->
-                                    @if(!empty($ans->question->option_c))
-                                        <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-                                               :class="answers[{{ $idx }}].selected === 'C' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
-                                            <div class="pt-0.5">
-                                                <input type="radio" name="q_{{ $idx }}" value="C" @change="saveAnswer({{ $idx }}, 'C')" :checked="answers[{{ $idx }}].selected === 'C'" class="peer sr-only">
-                                                <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'C' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
-                                                    <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'C' ? 'scale-100' : ''"></div>
-                                                </div>
+                                    <!-- 4. Hotspot Selection Rendering -->
+                                    <template x-if="answers[{{ $idx }}].type === 'hotspot'">
+                                        <div class="space-y-4">
+                                            <p class="text-xs font-bold text-gray-400 uppercase">Complete configuration selectors:</p>
+                                            <div class="space-y-4">
+                                                <template x-for="(box, boxIdx) in answers[{{ $idx }}].hotspot_answers" :key="box.id">
+                                                    <div class="p-4 bg-white border border-gray-200 rounded-xl space-y-2">
+                                                        <label class="block text-xs font-bold text-navy" x-text="box.label"></label>
+                                                        <select @change="
+                                                                    box.selected = $event.target.value;
+                                                                    let vals = answers[{{ $idx }}].hotspot_answers.map(b => b.selected || '');
+                                                                    saveAnswer({{ $idx }}, vals.join(','));
+                                                                "
+                                                                class="w-full border-gray-300 rounded text-xs px-3 py-2 focus:border-cyan focus:ring-cyan">
+                                                            <option value="">Choose option...</option>
+                                                            <template x-for="optVal in box.options" :key="optVal">
+                                                                <option :value="optVal" x-text="optVal"></option>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                </template>
                                             </div>
-                                            <div class="flex-1">
-                                                <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'C' ? 'text-cyan' : ''">C.</span> 
-                                                <span class="text-navy font-medium leading-relaxed">{{ $ans->question->option_c }}</span>
-                                            </div>
-                                        </label>
-                                    @endif
-
-                                    <!-- Option D -->
-                                    @if(!empty($ans->question->option_d))
-                                        <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-                                               :class="answers[{{ $idx }}].selected === 'D' ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
-                                            <div class="pt-0.5">
-                                                <input type="radio" name="q_{{ $idx }}" value="D" @change="saveAnswer({{ $idx }}, 'D')" :checked="answers[{{ $idx }}].selected === 'D'" class="peer sr-only">
-                                                <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected === 'D' ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
-                                                    <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected === 'D' ? 'scale-100' : ''"></div>
-                                                </div>
-                                            </div>
-                                            <div class="flex-1">
-                                                <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected === 'D' ? 'text-cyan' : ''">D.</span> 
-                                                <span class="text-navy font-medium leading-relaxed">{{ $ans->question->option_d }}</span>
-                                            </div>
-                                        </label>
-                                    @endif
+                                        </div>
+                                    </template>
 
                                     <!-- Show Explanation trigger (Practice Mode Only) -->
                                     <template x-if="mode === 'practice'">
@@ -300,8 +355,32 @@
                                             <!-- Explanation Details -->
                                             <div x-show="answers[{{ $idx }}].revealed" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" class="mt-6 p-6 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl text-sm leading-relaxed shadow-sm relative overflow-hidden" style="display: none;">
                                                 <div class="absolute top-0 left-0 w-1.5 h-full bg-green-500"></div>
-                                                <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Answer: <span class="text-green-600 text-sm ml-1" x-text="answers[{{ $idx }}].correct"></span></p>
-                                                <div class="prose max-w-none text-gray-700 font-medium">
+                                                
+                                                <template x-if="answers[{{ $idx }}].type === 'single_choice' || answers[{{ $idx }}].type === 'multiple_choice' || answers[{{ $idx }}].type === 'yes_no'">
+                                                    <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Answer: <span class="text-green-600 text-sm ml-1" x-text="answers[{{ $idx }}].correct"></span></p>
+                                                </template>
+                                                
+                                                <template x-if="answers[{{ $idx }}].type === 'drag_drop'">
+                                                    <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Order: <span class="text-green-600 text-sm ml-1" x-text="answers[{{ $idx }}].correct"></span></p>
+                                                </template>
+
+                                                <template x-if="answers[{{ $idx }}].type === 'matching'">
+                                                    <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Matches: 
+                                                        <template x-for="p in answers[{{ $idx }}].matching_pairs">
+                                                            <span class="block text-green-600 text-xs ml-1 font-semibold" x-text="p.left + ' → ' + p.right"></span>
+                                                        </template>
+                                                    </p>
+                                                </template>
+
+                                                <template x-if="answers[{{ $idx }}].type === 'hotspot'">
+                                                    <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Configurations: 
+                                                        <template x-for="b in answers[{{ $idx }}].hotspot_answers">
+                                                            <span class="block text-green-600 text-xs ml-1 font-semibold" x-text="b.label + ': ' + b.correct_answer"></span>
+                                                        </template>
+                                                    </p>
+                                                </template>
+
+                                                <div class="prose max-w-none text-gray-700 font-medium mt-3">
                                                     {!! $ans->question->explanation !!}
                                                 </div>
                                             </div>

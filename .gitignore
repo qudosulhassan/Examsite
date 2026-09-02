@@ -22,3 +22,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+*.sqlite
+*.sqlite-journal
+database/*.sqlite
+database/*.sqlite-journal
+examsninja_local
+composer.phar

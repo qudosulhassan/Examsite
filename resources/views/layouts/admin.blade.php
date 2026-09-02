@@ -29,6 +29,7 @@
         .bg-cyan { background-color: #00D4AA; }
         .text-orange { color: #FF6B35; }
         .bg-orange { background-color: #FF6B35; }
+        [x-cloak] { display: none !important; }
     </style>
     @yield('styles')
 </head>
@@ -66,9 +67,32 @@
                             Exams
                         </a>
 
-                        <a href="{{ url('/admin/questions') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/questions') }}">
-                            Questions
-                        </a>
+                        <!-- Questions Submenu -->
+                        <div x-data="{ questionsOpen: {{ request()->is('admin/questions*') ? 'true' : 'false' }} }">
+                            <button type="button" @click="questionsOpen = !questionsOpen" class="w-full group flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/questions') }}">
+                                <span>Questions</span>
+                                <svg class="h-4 w-4 transform transition-transform" :class="questionsOpen ? 'rotate-180 text-orange' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div x-show="questionsOpen" class="pl-3 pr-1 py-1 space-y-1">
+                                <a href="{{ route('admin.questions.index') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.index') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    All Questions
+                                </a>
+                                <a href="{{ route('admin.questions.create') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.create') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    + Add Question
+                                </a>
+                                <a href="{{ route('admin.questions.import-form') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.import-form') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Import JSON
+                                </a>
+                                <a href="{{ route('admin.questions.import-pdf-form') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.import-pdf*') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Import PDF
+                                </a>
+                                <a href="{{ route('admin.questions.import-history') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.import-history') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Import History
+                                </a>
+                            </div>
+                        </div>
 
                         <a href="{{ url('/admin/users') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/users') }}">
                             Users
@@ -182,6 +206,12 @@
                         <a href="{{ url('/admin/vendors') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Vendors</a>
                         <a href="{{ url('/admin/exams') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Exams</a>
                         <a href="{{ url('/admin/questions') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Questions</a>
+                        <div class="pl-6 space-y-1">
+                            <a href="{{ route('admin.questions.create') }}" class="block text-xs text-gray-400 hover:text-white">+ Add Question</a>
+                            <a href="{{ route('admin.questions.import-form') }}" class="block text-xs text-gray-400 hover:text-white">Import JSON</a>
+                            <a href="{{ route('admin.questions.import-pdf-form') }}" class="block text-xs text-gray-400 hover:text-white">Import PDF</a>
+                            <a href="{{ route('admin.questions.import-history') }}" class="block text-xs text-gray-400 hover:text-white">Import History</a>
+                        </div>
                         <a href="{{ url('/admin/users') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Users</a>
                         <a href="{{ url('/admin/orders') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Orders</a>
                         <a href="{{ url('/admin/subscriptions') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Subscriptions</a>
