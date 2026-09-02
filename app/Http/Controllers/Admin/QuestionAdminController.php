@@ -74,6 +74,25 @@ class QuestionAdminController extends Controller
             ];
         }
 
+        if ($request->hasFile('answer_area_image')) {
+            $file = $request->file('answer_area_image');
+            $filename = time() . '_ans_area_' . $file->getClientOriginalName();
+            $file->move(public_path('storage/questions'), $filename);
+            $imgUrl = '/storage/questions/' . $filename;
+
+            $input['question_data'] = $input['question_data'] ?? [];
+            $input['question_data']['answer_area_image'] = $imgUrl;
+
+            $input['media'] = $input['media'] ?? [];
+            $input['media'][] = [
+                'type' => 'answer_area',
+                'url' => $imgUrl,
+                'caption' => 'Answer Area Image',
+                'alt' => 'Answer Area Image',
+                'sort_order' => 2,
+            ];
+        }
+
         if ($request->hasFile('media_file')) {
             $file = $request->file('media_file');
             $filename = time() . '_' . $file->getClientOriginalName();
@@ -186,6 +205,25 @@ class QuestionAdminController extends Controller
                 'caption' => 'Question Diagram',
                 'alt' => 'Question Diagram',
                 'sort_order' => 0,
+            ];
+        }
+
+        if ($request->hasFile('answer_area_image')) {
+            $file = $request->file('answer_area_image');
+            $filename = time() . '_ans_area_' . $file->getClientOriginalName();
+            $file->move(public_path('storage/questions'), $filename);
+            $imgUrl = '/storage/questions/' . $filename;
+
+            $input['question_data'] = $input['question_data'] ?? [];
+            $input['question_data']['answer_area_image'] = $imgUrl;
+
+            $input['media'] = $input['media'] ?? [];
+            $input['media'][] = [
+                'type' => 'answer_area',
+                'url' => $imgUrl,
+                'caption' => 'Answer Area Image',
+                'alt' => 'Answer Area Image',
+                'sort_order' => 2,
             ];
         }
 

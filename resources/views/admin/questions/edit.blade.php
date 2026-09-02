@@ -44,6 +44,12 @@
         if (!isset($b['correct_answer']) && !empty($b['options'])) {
             $b['correct_answer'] = $b['options'][0];
         }
+        if (!isset($b['points'])) {
+            $b['points'] = 1;
+        }
+        if (!isset($b['explanation'])) {
+            $b['explanation'] = '';
+        }
     }
     unset($b);
 
@@ -70,7 +76,7 @@
                 <span class="text-gray-700 font-bold">Edit Question #{{ $question->id }}</span>
             </div>
             <h1 class="text-2xl font-bold text-navy">Edit Exam Question #{{ $question->id }}</h1>
-            <p class="text-xs text-gray-500 mt-0.5">Modify question text, answer options, correct answer selections, or publishing status.</p>
+            <p class="text-xs text-gray-500 mt-0.5">Modify question text, images, answer options, correct answer selections, or publishing status.</p>
         </div>
         <div class="flex items-center space-x-3">
             <button type="button" @click="showPreview = !showPreview"
@@ -160,13 +166,13 @@
             </div>
         </div>
 
-        <!-- STEP 2 — QUESTION PROMPT -->
+        <!-- STEP 2 — QUESTION CONTENT -->
         <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-6">
             <div class="flex items-center space-x-3 pb-3 border-b border-gray-150">
                 <span class="w-8 h-8 rounded-full bg-navy text-white flex items-center justify-center text-xs font-extrabold shadow-sm">2</span>
                 <div>
-                    <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Question Prompt</h3>
-                    <p class="text-xs text-gray-500">Enter the primary question text and optional prompt image that candidates will see in the exam.</p>
+                    <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Question Content</h3>
+                    <p class="text-xs text-gray-500">Enter the primary textual question exactly as it should appear to the candidate.</p>
                 </div>
             </div>
 
@@ -176,18 +182,21 @@
                     <textarea name="question_text" id="question_text" rows="5" x-model="question.question_text" required
                               class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-3 focus:border-cyan focus:ring-cyan leading-relaxed font-sans"
                               :class="errors.question_text ? 'border-red-500 ring-1 ring-red-500' : ''"></textarea>
-                    <p class="text-[11px] text-gray-400 mt-1">This is the main question statement candidates will read in the test engine.</p>
+                    <p class="text-[11px] text-gray-400 mt-1">This is the question candidates will read in the exam session.</p>
                     <template x-if="errors.question_text">
                         <p class="text-red-500 text-xs mt-1 font-semibold" x-text="errors.question_text"></p>
                     </template>
                 </div>
 
-                <!-- Question Area Image Upload -->
-                <div class="bg-gray-50/70 p-4 border border-gray-200 rounded-lg space-y-3">
-                    <label for="question_image" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Upload Image / Diagram for Question Area (Optional)</label>
+                <!-- QUESTION IMAGE / DIAGRAM FIELD (e.g. 234.jpg) -->
+                <div class="bg-gray-50/70 p-4 border border-gray-200 rounded-lg space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-bold text-navy uppercase tracking-wider">Question Image / Diagram (Optional)</span>
+                        <span class="text-[10px] bg-navy/10 text-navy px-2 py-0.5 rounded font-semibold">e.g. 234.jpg</span>
+                    </div>
+                    <p class="text-xs text-gray-500">This image is displayed as part of the question prompt content.</p>
                     <input type="file" name="question_image" id="question_image" accept=".png,.jpg,.jpeg,.webp"
                            class="w-full border border-gray-300 rounded-lg text-sm px-3 py-1.5 focus:border-cyan focus:ring-cyan file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-navy file:text-white hover:file:bg-opacity-90">
-                    <p class="text-[11px] text-gray-500">Upload a new diagram or image to display directly within the question prompt.</p>
                 </div>
             </div>
         </div>
@@ -197,26 +206,47 @@
             <div class="flex items-center space-x-3 pb-3 border-b border-gray-150">
                 <span class="w-8 h-8 rounded-full bg-navy text-white flex items-center justify-center text-xs font-extrabold shadow-sm">3</span>
                 <div>
-                    <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Instructions (Optional)</h3>
-                    <p class="text-xs text-gray-500">Add instructions candidates should read before selecting their answer.</p>
+                    <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Question Instructions (Optional)</h3>
+                    <p class="text-xs text-gray-500">Add instructions candidates should read before answering.</p>
                 </div>
             </div>
 
             <div>
-                <label for="instructions" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Candidate Instructions</label>
-                <input type="text" name="instructions" id="instructions" x-model="question.instructions" placeholder="e.g. Select one answer."
+                <label for="instructions" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Instructions</label>
+                <input type="text" name="instructions" id="instructions" x-model="question.instructions" placeholder="e.g. NOTE: Each correct selection is worth one point."
                        class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2.5 focus:border-cyan focus:ring-cyan">
             </div>
         </div>
 
-        <!-- STEP 4 — ANSWER OPTIONS (PRIMARY / MOST IMPORTANT) -->
+        <!-- DEDICATED ANSWER AREA / HOTSPOT IMAGE SECTION (e.g. 235.jpg) -->
+        <div x-show="question.question_type === 'hotspot'" class="bg-white border border-cyan/30 rounded-xl p-6 shadow-sm space-y-4">
+            <div class="flex items-center space-x-3 pb-3 border-b border-gray-150">
+                <span class="w-8 h-8 rounded-full bg-cyan text-white flex items-center justify-center text-xs font-extrabold shadow-sm">🖼</span>
+                <div>
+                    <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Answer Area / Hotspot Image</h3>
+                    <p class="text-xs text-gray-500">This image contains the visual answer area where candidates make their selections (e.g. Image 235.jpg).</p>
+                </div>
+            </div>
+
+            <div class="bg-cyan/5 p-4 border border-cyan/20 rounded-lg space-y-2">
+                <div class="flex items-center space-x-2">
+                    <label for="answer_area_image" class="block text-xs font-bold text-navy uppercase tracking-wider">Upload Answer Area Image</label>
+                    <span class="text-[10px] bg-cyan/20 text-navy px-2 py-0.5 rounded font-semibold">e.g. 235.jpg</span>
+                </div>
+                <input type="file" name="answer_area_image" id="answer_area_image" accept=".png,.jpg,.jpeg,.webp"
+                       class="w-full border border-gray-300 rounded-lg text-sm px-3 py-1.5 focus:border-cyan focus:ring-cyan file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-cyan file:text-white hover:file:bg-opacity-90">
+                <p class="text-[11px] text-gray-500">This image represents the candidate interactive answer area diagram.</p>
+            </div>
+        </div>
+
+        <!-- STEP 4 — ANSWER OPTIONS / HOTSPOT BOX CONFIGURATION -->
         <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-6">
             <div class="flex justify-between items-start pb-3 border-b border-gray-150">
                 <div class="flex items-center space-x-3">
                     <span class="w-8 h-8 rounded-full bg-navy text-white flex items-center justify-center text-xs font-extrabold shadow-sm">4</span>
                     <div>
-                        <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Answer Options & Correct Answer</h3>
-                        <p class="text-xs text-gray-500">Configure the choices shown to candidates and mark which choice(s) are correct for grading.</p>
+                        <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Answer Options & Correct Answer Configuration</h3>
+                        <p class="text-xs text-gray-500">Configure the choices shown to candidates and define the exact correct answer used for grading.</p>
                     </div>
                 </div>
             </div>
@@ -234,9 +264,6 @@
                 <template x-if="errors.options">
                     <p class="text-red-500 text-xs font-semibold" x-text="errors.options"></p>
                 </template>
-                <template x-if="errors.correct_answers">
-                    <p class="text-red-500 text-xs font-semibold" x-text="errors.correct_answers"></p>
-                </template>
 
                 <div class="space-y-4">
                     <template x-for="(opt, idx) in question.options" :key="opt.key">
@@ -244,18 +271,14 @@
                              :class="isOptionCorrect(opt.key) ? 'border-emerald-500 bg-emerald-50/70 shadow-sm ring-1 ring-emerald-500' : 'border-gray-250 bg-white hover:border-gray-300'">
                             
                             <div class="flex items-center space-x-3">
-                                <!-- Option Letter Badge -->
                                 <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold shrink-0"
                                       :class="isOptionCorrect(opt.key) ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 border border-gray-300'"
                                       x-text="opt.key"></span>
 
                                 <input type="hidden" :name="'options['+idx+'][key]'" :value="opt.key">
-
-                                <!-- Option Text Input -->
                                 <input type="text" :name="'options['+idx+'][text]'" x-model="opt.text" placeholder="Enter option text..."
                                        class="flex-grow border-gray-300 rounded-lg text-sm px-3.5 py-2 focus:border-cyan focus:ring-cyan">
 
-                                <!-- Option Image Upload Button -->
                                 <div class="shrink-0">
                                     <label :for="'opt_img_' + idx" title="Upload image for option choice"
                                            class="cursor-pointer text-xs font-semibold text-gray-700 hover:text-navy flex items-center space-x-1.5 bg-white border border-gray-300 hover:bg-gray-100 rounded-lg px-3 py-2 transition shadow-sm">
@@ -264,7 +287,6 @@
                                     </label>
                                 </div>
 
-                                <!-- Correct Answer Radio/Checkbox Selector -->
                                 <div class="flex items-center pl-2 border-l border-gray-200">
                                     <template x-if="question.question_type === 'single_choice'">
                                         <label class="flex items-center space-x-2 cursor-pointer py-1 px-2.5 rounded-lg transition"
@@ -289,13 +311,11 @@
                                     </template>
                                 </div>
 
-                                <!-- Remove Option -->
                                 <button type="button" @click="removeOption(idx)" :disabled="question.options.length <= 2"
                                         :class="question.options.length <= 2 ? 'text-gray-300 cursor-not-allowed' : 'text-red-500 hover:text-red-700'"
                                         class="p-1 font-bold text-sm">✕</button>
                             </div>
 
-                            <!-- Option Image Indicator / Preview -->
                             <div x-show="opt.has_new_image" class="pl-11">
                                 <span class="text-xs font-bold text-emerald-600 flex items-center space-x-1 bg-emerald-100/60 px-2.5 py-1 rounded w-max">
                                     <span>✓</span>
@@ -307,117 +327,75 @@
                 </div>
             </div>
 
-            <!-- Yes / No Choice -->
-            <div x-show="question.question_type === 'yes_no'" class="space-y-4">
-                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Correct Response *</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <template x-for="(opt, idx) in question.options" :key="opt.key">
-                        <label class="flex items-center space-x-4 p-4 border rounded-xl cursor-pointer transition"
-                               :class="isOptionCorrect(opt.key) ? 'border-emerald-500 bg-emerald-50/70 ring-1 ring-emerald-500' : 'border-gray-200 bg-white hover:border-gray-300'">
-                            <input type="hidden" :name="'options['+idx+'][key]'" :value="opt.key">
-                            <input type="hidden" :name="'options['+idx+'][text]'" :value="opt.text">
-                            <input type="radio" name="correct_option" :value="opt.key"
-                                   x-model="question.selected_correct"
-                                   @change="question.correct_answers = [question.selected_correct]" required
-                                   class="rounded-full border-gray-300 text-emerald-600 focus:ring-emerald-500 h-5 w-5">
-                            <span class="text-base font-bold text-gray-800" x-text="opt.text"></span>
-                            <div class="flex-grow"></div>
-                            <span x-show="isOptionCorrect(opt.key)" class="text-xs font-extrabold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full uppercase">✓ Correct</span>
-                        </label>
-                    </template>
-                </div>
-            </div>
-
-            <!-- Drag & Drop (Ordering) -->
-            <div x-show="question.question_type === 'drag_drop'" class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Drag Items (Correct Sequence Order)</label>
-                    <button type="button" @click="addDragItem()" class="text-xs text-cyan font-bold hover:underline">+ Add Sequence Item</button>
-                </div>
-                <div class="space-y-3">
-                    <template x-for="(item, idx) in question.question_data.drag_items" :key="idx">
-                        <div class="flex items-center space-x-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                            <span class="text-xs font-bold text-gray-500 w-6 text-center" x-text="idx + 1"></span>
-                            <input type="text" x-model="item.text" @input="syncDragOrder()" placeholder="Item text..."
-                                   class="flex-grow border-gray-300 rounded text-sm px-3 py-1.5 focus:border-cyan focus:ring-cyan">
-                            <button type="button" @click="removeDragItem(idx)" class="text-red-500 hover:text-red-700 text-xs font-bold">✕</button>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <!-- Matching Pairs -->
-            <div x-show="question.question_type === 'matching'" class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Matching Pairs (Left Item ➔ Right Target)</label>
-                    <button type="button" @click="addMatchingPair()" class="text-xs text-cyan font-bold hover:underline">+ Add Matching Pair</button>
-                </div>
-                <div class="space-y-3">
-                    <template x-for="(pair, idx) in question.question_data.matching_pairs" :key="idx">
-                        <div class="flex items-center space-x-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                            <input type="text" x-model="pair.left" placeholder="Left Term / Prompt"
-                                   class="w-1/2 border-gray-300 rounded text-sm px-3 py-1.5 focus:border-cyan focus:ring-cyan">
-                            <span class="text-gray-400 font-bold">➔</span>
-                            <input type="text" x-model="pair.right" placeholder="Right Match / Definition"
-                                   class="w-1/2 border-gray-300 rounded text-sm px-3 py-1.5 focus:border-cyan focus:ring-cyan">
-                            <button type="button" @click="removeMatchingPair(idx)" class="text-red-500 hover:text-red-700 text-xs font-bold">✕</button>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <!-- HOTSPOT / MULTIPLE DROPDOWNS CONFIGURATION -->
-            <div x-show="question.question_type === 'hotspot'" class="space-y-5">
-                <div class="flex justify-between items-center">
+            <!-- HOTSPOT / MULTIPLE DROPDOWNS BOX CONFIGURATION -->
+            <div x-show="question.question_type === 'hotspot'" class="space-y-6">
+                <div class="flex justify-between items-center bg-cyan/5 p-4 rounded-xl border border-cyan/20">
                     <div>
-                        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Dropdown Selection Boxes Configuration</h4>
-                        <p class="text-xs text-gray-500">Create the dropdowns shown to candidates and define the correct choice for each dropdown.</p>
+                        <h4 class="text-xs font-bold text-navy uppercase tracking-wider">Answer Boxes Configuration</h4>
+                        <p class="text-xs text-gray-600">Configure each dropdown shown in the candidate answer area and define the exact correct choice for grading.</p>
                     </div>
-                    <button type="button" @click="addHotspotBox()" class="px-3 py-1.5 bg-navy text-white text-xs font-bold rounded-md hover:bg-opacity-90 shadow-sm">+ Add Dropdown Box</button>
+                    <button type="button" @click="addHotspotBox()" class="px-4 py-2 bg-navy text-white text-xs font-bold rounded-lg hover:bg-opacity-90 shadow-sm">+ Add Answer Box</button>
                 </div>
 
                 <template x-if="errors.hotspot">
                     <p class="text-red-500 text-xs font-semibold" x-text="errors.hotspot"></p>
                 </template>
 
-                <div class="space-y-4">
+                <div class="space-y-6">
                     <template x-for="(box, idx) in question.question_data.boxes" :key="idx">
-                        <div class="p-5 border border-gray-200 bg-gray-50/60 rounded-xl space-y-4 shadow-sm">
-                            <div class="flex justify-between items-center pb-2 border-b border-gray-200">
+                        <div class="p-5 border border-gray-300 bg-white rounded-2xl space-y-4 shadow-sm relative">
+                            <div class="flex justify-between items-center pb-3 border-b border-gray-200">
                                 <span class="text-xs font-extrabold uppercase text-navy flex items-center space-x-2">
-                                    <span class="w-6 h-6 rounded-full bg-navy text-white flex items-center justify-center text-[10px]" x-text="idx + 1"></span>
-                                    <span x-text="'Dropdown #' + (idx + 1)"></span>
+                                    <span class="w-7 h-7 rounded-full bg-navy text-white flex items-center justify-center text-xs" x-text="idx + 1"></span>
+                                    <span x-text="'ANSWER BOX ' + (idx + 1)"></span>
                                 </span>
                                 <button type="button" @click="removeHotspotBox(idx)" :disabled="question.question_data.boxes.length <= 1"
                                         class="text-xs text-red-500 hover:text-red-700 font-bold disabled:text-gray-300">Remove Box</button>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Box Label -->
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Dropdown Label *</label>
-                                    <input type="text" x-model="box.label" placeholder="e.g. Select Azure Service"
-                                           class="w-full border-gray-300 rounded-lg text-sm px-3 py-2 focus:border-cyan focus:ring-cyan">
+                                    <input type="text" x-model="box.label" placeholder="e.g. Number of virtual networks"
+                                           class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2 focus:border-cyan focus:ring-cyan">
                                 </div>
 
                                 <!-- Available Choices -->
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Available Choices (Comma-Separated) *</label>
-                                    <input type="text" x-model="box.optionsText" @input="updateHotspotOptions(idx)" placeholder="Option 1, Option 2, Option 3"
-                                           class="w-full border-gray-300 rounded-lg text-sm px-3 py-2 focus:border-cyan focus:ring-cyan">
+                                    <input type="text" x-model="box.optionsText" @input="updateHotspotOptions(idx)" placeholder="1, 2, 3"
+                                           class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2 focus:border-cyan focus:ring-cyan">
+                                    <p class="text-[10px] text-gray-400 mt-1">Choices the candidate can select in this dropdown.</p>
                                 </div>
+                            </div>
 
-                                <!-- CORRECT ANSWER SELECTOR (CLEAR & PROMINENT) -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-150">
+                                <!-- Correct Answer Selector -->
                                 <div>
-                                    <label class="block text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">✓ Correct Answer *</label>
+                                    <label class="block text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">✓ Correct Answer (Used for Grading) *</label>
                                     <select x-model="box.correct_answer" required
-                                            class="w-full border-emerald-500 bg-emerald-50/80 rounded-lg text-sm px-3 py-2 focus:border-emerald-600 focus:ring-emerald-500 font-bold text-emerald-900">
+                                            class="w-full border-emerald-500 bg-emerald-50/80 rounded-lg text-sm px-3.5 py-2 focus:border-emerald-600 focus:ring-emerald-500 font-bold text-emerald-900">
                                         <option value="">-- Select Correct Answer --</option>
                                         <template x-for="choice in box.options" :key="choice">
                                             <option :value="choice" x-text="choice"></option>
                                         </template>
                                     </select>
                                 </div>
+
+                                <!-- Points -->
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Points *</label>
+                                    <input type="number" x-model.number="box.points" min="1" max="10" required
+                                           class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2 focus:border-cyan focus:ring-cyan">
+                                </div>
+                            </div>
+
+                            <!-- Per-Box Explanation -->
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Box Explanation (Optional Rationale)</label>
+                                <input type="text" x-model="box.explanation" placeholder="e.g. One virtual network for every tier."
+                                       class="w-full border-gray-300 rounded-lg text-xs px-3 py-2 focus:border-cyan focus:ring-cyan">
                             </div>
                         </div>
                     </template>
@@ -431,13 +409,13 @@
                 <span class="w-8 h-8 rounded-full bg-navy text-white flex items-center justify-center text-xs font-extrabold shadow-sm">5</span>
                 <div>
                     <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Answer Explanation</h3>
-                    <p class="text-xs text-gray-500">Explain why the correct answer is correct. This detailed rationale is shown to candidates after answering.</p>
+                    <p class="text-xs text-gray-500">Explain why the selected answers are correct. This rationale is shown to candidates after answering.</p>
                 </div>
             </div>
 
             <div>
                 <textarea name="explanation" id="explanation" rows="4" x-model="question.explanation"
-                          placeholder="Reference guide documentation explanation, architectural principles, and rationale..."
+                          placeholder="Box 1: 3 — One virtual network for every tier.&#10;Box 2: 1 — Only one subnet for each tier..."
                           class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-3 focus:border-cyan focus:ring-cyan leading-relaxed"></textarea>
             </div>
         </div>
@@ -454,10 +432,6 @@
                 </div>
                 <button type="button" @click="addReference()" class="text-xs text-cyan hover:underline font-bold">+ Add Reference</button>
             </div>
-
-            <template x-if="errors.references">
-                <p class="text-red-500 text-xs font-semibold" x-text="errors.references"></p>
-            </template>
 
             <div class="space-y-3">
                 <template x-for="(ref, idx) in question.references" :key="idx">
@@ -484,7 +458,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="media_file" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Upload Exhibit File</label>
+                    <label for="media_file" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Upload Supplementary Exhibit File</label>
                     <input type="file" name="media_file" id="media_file" accept=".png,.jpg,.jpeg,.webp"
                            class="w-full border border-gray-300 rounded-lg text-sm px-3 py-1.5 focus:border-cyan focus:ring-cyan file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-navy hover:file:bg-gray-200">
                 </div>
@@ -529,38 +503,17 @@
                      x-text="question.question_text || 'Your question prompt will appear here...'"></div>
             </div>
 
-            <!-- Preview Instructions -->
-            <div x-show="question.instructions" class="text-xs italic text-amber-300/90 bg-amber-950/40 p-3 rounded-lg border border-amber-800/40">
-                <span>📌 Instructions: </span>
-                <span x-text="question.instructions"></span>
-            </div>
-
-            <!-- Preview Answer Choices -->
-            <div class="space-y-3">
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide">Answer Choices</h4>
-                
-                <div x-show="question.question_type === 'single_choice' || question.question_type === 'multiple_choice' || question.question_type === 'yes_no'" class="space-y-2.5">
-                    <template x-for="opt in question.options" :key="opt.key">
-                        <div class="flex items-center space-x-3 p-3.5 rounded-xl border transition"
-                             :class="isOptionCorrect(opt.key) ? 'border-emerald-500 bg-emerald-950/40 text-emerald-200' : 'border-slate-800 bg-slate-800/50 text-slate-300'">
-                            <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold"
-                                  :class="isOptionCorrect(opt.key) ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'"
-                                  x-text="opt.key"></span>
-                            <span class="text-sm font-medium flex-grow" x-text="opt.text || ('Option ' + opt.key)"></span>
-                            <span x-show="isOptionCorrect(opt.key)" class="text-xs font-extrabold text-emerald-400 bg-emerald-900/60 px-2.5 py-1 rounded-full uppercase">✓ Correct Answer</span>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Hotspot Preview -->
-                <div x-show="question.question_type === 'hotspot'" class="space-y-3">
+            <!-- Hotspot Candidate Answer Area Preview -->
+            <div x-show="question.question_type === 'hotspot'" class="space-y-4 pt-2">
+                <h4 class="text-xs font-bold text-cyan uppercase tracking-wide">Answer Area Preview</h4>
+                <div class="p-4 bg-slate-800 rounded-xl border border-slate-700 space-y-4">
                     <template x-for="(box, bIdx) in question.question_data.boxes" :key="bIdx">
-                        <div class="p-4 bg-slate-800/80 border border-slate-700 rounded-xl space-y-2">
-                            <span class="text-xs font-bold text-cyan block" x-text="box.label || ('Dropdown #' + (bIdx + 1))"></span>
+                        <div class="flex items-center justify-between p-3 bg-slate-900/80 rounded-lg border border-slate-700">
+                            <span class="text-xs font-bold text-slate-200" x-text="box.label || ('Dropdown #' + (bIdx + 1))"></span>
                             <div class="flex items-center space-x-3">
-                                <span class="text-xs text-slate-400">Selected Answer:</span>
+                                <span class="text-xs text-slate-400">Correct Choice:</span>
                                 <span class="text-xs font-extrabold px-3 py-1 bg-emerald-900/80 text-emerald-300 border border-emerald-700 rounded-md"
-                                      x-text="box.correct_answer || 'No correct answer selected yet'"></span>
+                                      x-text="box.correct_answer || 'None'"></span>
                             </div>
                         </div>
                     </template>
@@ -630,9 +583,6 @@ function editQuestionManager() {
 
         initComponent() {
             this.$watch('question.question_type', () => this.watchType());
-            if (this.question.question_data.drag_items && this.question.question_data.drag_items.length) {
-                this.syncDragOrder();
-            }
         },
 
         isOptionCorrect(key) {
@@ -679,24 +629,6 @@ function editQuestionManager() {
             }
         },
 
-        addDragItem() {
-            const nextId = 'item_' + (this.question.question_data.drag_items.length + 1);
-            this.question.question_data.drag_items.push({ id: nextId, text: '' });
-            this.syncDragOrder();
-        },
-
-        removeDragItem(index) {
-            if (this.question.question_data.drag_items.length <= 2) {
-                return;
-            }
-            this.question.question_data.drag_items.splice(index, 1);
-            this.syncDragOrder();
-        },
-
-        syncDragOrder() {
-            this.question.question_data.correct_order = this.question.question_data.drag_items.map(i => i.id);
-        },
-
         addHotspotBox() {
             const nextIndex = (this.question.question_data.boxes ? this.question.question_data.boxes.length : 0) + 1;
             if (!this.question.question_data.boxes) {
@@ -705,9 +637,11 @@ function editQuestionManager() {
             this.question.question_data.boxes.push({
                 id: 'box_' + nextIndex,
                 label: 'Box ' + nextIndex,
-                optionsText: 'Option 1, Option 2',
-                options: ['Option 1', 'Option 2'],
-                correct_answer: 'Option 1'
+                optionsText: '1, 2, 3',
+                options: ['1', '2', '3'],
+                correct_answer: '1',
+                points: 1,
+                explanation: ''
             });
         },
 
@@ -724,17 +658,6 @@ function editQuestionManager() {
             if (!box.options.includes(box.correct_answer)) {
                 box.correct_answer = box.options[0] || '';
             }
-        },
-
-        addMatchingPair() {
-            this.question.question_data.matching_pairs.push({ left: '', right: '' });
-        },
-
-        removeMatchingPair(index) {
-            if (this.question.question_data.matching_pairs.length <= 1) {
-                return;
-            }
-            this.question.question_data.matching_pairs.splice(index, 1);
         },
 
         addReference() {
@@ -803,27 +726,20 @@ function editQuestionManager() {
                 }
             } else if (this.question.question_type === 'hotspot') {
                 for (let b of this.question.question_data.boxes) {
-                    if (!b.label.trim()) {
-                        this.errors.hotspot = 'All dropdown boxes must have a label.';
+                    if (!b.label || !b.label.trim()) {
+                        this.errors.hotspot = 'All answer boxes must have a label.';
                         break;
                     }
-                    if (b.options.length < 1) {
-                        this.errors.hotspot = 'Each dropdown box must have choices provided.';
+                    if (!b.options || b.options.length < 1) {
+                        this.errors.hotspot = 'Each answer box must have at least one choice provided.';
                         break;
                     }
                     if (!b.correct_answer) {
-                        this.errors.hotspot = 'Each dropdown box must have a selected correct answer.';
+                        this.errors.hotspot = 'Each answer box must have a selected correct answer.';
                         break;
                     }
-                }
-            }
-
-            for (let ref of this.question.references) {
-                if (ref.url && ref.url.trim()) {
-                    try {
-                        new URL(ref.url.trim());
-                    } catch (_) {
-                        this.errors.references = 'Invalid reference URL format: ' + ref.url;
+                    if (!b.options.includes(b.correct_answer)) {
+                        this.errors.hotspot = 'The selected correct answer must exist in the available choices.';
                         break;
                     }
                 }
