@@ -31,18 +31,53 @@ class HomeController extends Controller
     /**
      * Display the public Test Engine marketing page.
      */
-    public function testEngine()
+    public function testEngine(\Illuminate\Http\Request $request)
     {
         $totalExams = Exam::where('is_active', true)->count();
         $totalQuestions = \App\Models\Question::where('is_active', true)->count();
         
-        $compatibleExams = Exam::where('is_active', true)
+        $searchQuery = trim($request->get('q', ''));
+        $vendorFilter = trim($request->get('vendor', ''));
+
+        $query = Exam::where('is_active', true)
             ->whereHas('questions')
-            ->with('vendor')
-            ->orderBy('exam_code')
-            ->limit(6)
+            ->with('vendor');
+
+        if (!empty($searchQuery)) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('exam_code', 'like', "%{$searchQuery}%")
+                  ->orWhere('exam_name', 'like', "%{$searchQuery}%")
+                  ->orWhereHas('vendor', function($v) use ($searchQuery) {
+                      $v->where('name', 'like', "%{$searchQuery}%");
+                  });
+            });
+        }
+
+        if (!empty($vendorFilter)) {
+            $query->whereHas('vendor', function($v) use ($vendorFilter) {
+                $v->where('slug', $vendorFilter);
+            });
+        }
+
+        $compatibleExams = $query->orderBy('exam_code')
+            ->paginate(12)
+            ->appends($request->all());
+
+        // Get top vendors with compatible exams for filter pills
+        $vendors = Vendor::where('is_active', true)
+            ->whereHas('exams', function($e) {
+                $e->whereHas('questions');
+            })
+            ->limit(8)
             ->get();
 
-        return view('pages.test-engine', compact('totalExams', 'totalQuestions', 'compatibleExams'));
+        return view('pages.test-engine', compact(
+            'totalExams',
+            'totalQuestions',
+            'compatibleExams',
+            'searchQuery',
+            'vendorFilter',
+            'vendors'
+        ));
     }
 }

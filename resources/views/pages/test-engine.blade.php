@@ -15,7 +15,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
-            <!-- Left Side Text -->
+            <!-- Left Side Text & Search -->
             <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
                 <div class="inline-flex items-center space-x-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-2 shadow">
                     <span class="bg-cyan h-2 w-2 rounded-full animate-ping"></span>
@@ -29,6 +29,76 @@
                 <p class="text-lg text-gray-300 max-w-lg mx-auto lg:mx-0">
                     Prepare for certification success under real exam conditions. Our browser-based software simulates actual testing environments for AWS, Cisco, CompTIA, Microsoft, and more.
                 </p>
+
+                <!-- Interactive Hero Test Engine Search Bar -->
+                <div class="pt-2" x-data="{
+                    query: '{{ $searchQuery }}',
+                    results: [],
+                    loading: false,
+                    showDropdown: false,
+                    search() {
+                        if (this.query.length < 2) {
+                            this.results = [];
+                            this.showDropdown = false;
+                            return;
+                        }
+                        this.loading = true;
+                        fetch('/api/search?q=' + encodeURIComponent(this.query))
+                            .then(res => res.json())
+                            .then(data => {
+                                this.results = data.exams || [];
+                                this.showDropdown = true;
+                                this.loading = false;
+                            }).catch(() => { this.loading = false; });
+                    }
+                }" @click.outside="showDropdown = false">
+                    <form action="{{ route('public.test-engine') }}#compatible-exams" method="GET" class="relative max-w-lg mx-auto lg:mx-0">
+                        <div class="relative flex items-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] p-1.5 focus-within:border-cyan transition-all duration-300">
+                            <div class="pl-4 text-cyan">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <input 
+                                type="text" 
+                                name="q" 
+                                x-model="query" 
+                                @input.debounce.250ms="search()" 
+                                @focus="if(results.length) showDropdown = true"
+                                value="{{ $searchQuery }}"
+                                placeholder="Search test engine exams (e.g., 200-301, AWS, Cisco)..." 
+                                class="w-full bg-transparent text-white placeholder-gray-400 border-none focus:outline-none focus:ring-0 text-sm sm:text-base font-medium px-4 py-2"
+                                autocomplete="off"
+                            >
+                            <button type="submit" class="bg-gradient-to-r from-cyan to-blue-500 hover:from-cyan/90 hover:to-blue-600 text-navy font-black text-xs uppercase tracking-wider px-5 py-3 rounded-xl transition-all duration-300 shadow-md flex items-center space-x-1.5 whitespace-nowrap">
+                                <span>Search</span>
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Live Search Auto-Complete Dropdown -->
+                        <div x-show="showDropdown && results.length > 0" x-transition class="absolute left-0 right-0 top-full mt-2 bg-[#0E1726] border border-white/15 rounded-2xl shadow-2xl z-50 overflow-hidden text-left divide-y divide-white/5">
+                            <div class="p-3 bg-white/5 text-[11px] font-bold uppercase tracking-wider text-cyan flex justify-between items-center">
+                                <span>Matching Test Engine Exams</span>
+                                <span class="text-gray-400 font-normal" x-text="results.length + ' found'"></span>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                <template x-for="item in results" :key="item.code">
+                                    <a :href="item.url" class="flex items-center justify-between p-3.5 hover:bg-white/10 transition-colors group">
+                                        <div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="text-xs font-black text-white group-hover:text-cyan transition-colors" x-text="item.code"></span>
+                                                <span class="text-[10px] font-bold text-gray-400 uppercase bg-white/10 px-2 py-0.5 rounded" x-text="item.vendor"></span>
+                                            </div>
+                                            <div class="text-xs text-gray-300 truncate max-w-xs" x-text="item.name"></div>
+                                        </div>
+                                        <span class="text-[10px] font-black uppercase text-cyan bg-cyan/10 px-2.5 py-1 rounded-lg border border-cyan/20 group-hover:bg-cyan group-hover:text-navy transition-all">Demo &rarr;</span>
+                                    </a>
+                                </template>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-3 gap-4 pt-4 max-w-md mx-auto lg:mx-0">
@@ -46,7 +116,7 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
                     <a href="{{ route('vendors.index') }}" class="w-full sm:w-auto bg-navy hover:bg-gradient-to-r hover:from-cyan hover:to-blue-500 text-white px-8 py-4 rounded-xl font-black text-center shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_30px_rgba(0,212,170,0.3)] transition-all duration-300">
                         Get All-Access Pass
                     </a>
@@ -64,7 +134,7 @@
                     </div>
                     
                     <h3 class="text-2xl font-black text-white mb-2 relative z-10">Experience the Engine</h3>
-                    <p class="text-sm font-medium text-gray-300 mb-8 relative z-10">Access 10 free demo questions in our fully functional, interactive testing environment. No signup required.</p>
+                    <p class="text-sm font-medium text-gray-300 mb-8 relative z-10">Access free demo questions in our fully functional, interactive testing environment. No signup required.</p>
                     
                     <div class="space-y-4 relative z-10">
                         @foreach($compatibleExams->take(3) as $exam)
@@ -152,25 +222,98 @@
     </div>
 </section>
 
-<!-- Compatible Exams Section -->
+<!-- Compatible Exams Section with Search & Filter Controls -->
 <section id="compatible-exams" class="py-20 bg-gray-50 border-t border-b border-gray-200/50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+        <!-- Section Header -->
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-6">
             <div>
                 <h2 class="text-3xl font-extrabold text-navy mb-2">Compatible Practice Tests</h2>
-                <p class="text-gray-655 max-w-lg">
-                    These certifications are fully mapped and populated with active question banks in our online test engine:
+                <p class="text-gray-600 max-w-lg">
+                    Find and search any exam in our interactive test engine database:
                 </p>
             </div>
-            <div class="mt-4 md:mt-0">
-                <a href="{{ route('vendors.index') }}" class="text-cyan font-bold hover:underline inline-flex items-center space-x-1">
-                    <span>Browse All Compatibility List</span>
+            
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('vendors.index') }}" class="text-cyan font-bold hover:underline inline-flex items-center space-x-1 text-sm">
+                    <span>Browse All Vendors</span>
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                 </a>
             </div>
         </div>
 
+        <!-- Search & Filter Controls Area -->
+        <div class="bg-white p-6 rounded-3xl border border-gray-200/80 shadow-sm mb-10 space-y-6">
+            
+            <form action="{{ route('public.test-engine') }}#compatible-exams" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                <!-- Search Field -->
+                <div class="md:col-span-8 relative">
+                    <div class="relative flex items-center">
+                        <div class="absolute left-4 text-gray-400 pointer-events-none">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input 
+                            type="text" 
+                            name="q" 
+                            value="{{ $searchQuery }}"
+                            placeholder="Filter test engine exams by code or title..." 
+                            class="w-full bg-gray-50 border border-gray-200 rounded-2xl pl-12 pr-10 py-3.5 text-sm font-medium text-navy focus:bg-white focus:border-cyan focus:ring-2 focus:ring-cyan/20 transition-all duration-200"
+                        >
+                        @if($searchQuery)
+                            <a href="{{ route('public.test-engine') }}#compatible-exams" class="absolute right-3 text-gray-400 hover:text-gray-600 p-1">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="md:col-span-4 flex items-center space-x-2">
+                    <button type="submit" class="flex-1 bg-navy hover:bg-navy/90 text-white font-bold text-sm px-6 py-3.5 rounded-2xl transition-all shadow-sm flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4 text-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <span>Filter Engine</span>
+                    </button>
+                    @if($searchQuery || $vendorFilter)
+                        <a href="{{ route('public.test-engine') }}#compatible-exams" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs px-4 py-3.5 rounded-2xl transition-all">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+            </form>
+
+            <!-- Quick Vendor Filter Pills -->
+            <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Top Vendors:</span>
+                
+                <a href="{{ route('public.test-engine', array_merge(request()->query(), ['vendor' => null])) }}#compatible-exams" 
+                   class="text-xs font-bold px-3 py-1.5 rounded-xl border transition-all {{ empty($vendorFilter) ? 'bg-navy text-white border-navy shadow-sm' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100' }}">
+                    All
+                </a>
+
+                @foreach($vendors as $vendorItem)
+                    <a href="{{ route('public.test-engine', array_merge(request()->query(), ['vendor' => $vendorItem->slug])) }}#compatible-exams" 
+                       class="text-xs font-bold px-3 py-1.5 rounded-xl border transition-all {{ $vendorFilter === $vendorItem->slug ? 'bg-cyan text-navy border-cyan font-black shadow-sm' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100' }}">
+                        {{ $vendorItem->name }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Search Status Notice -->
+        @if($searchQuery || $vendorFilter)
+            <div class="flex items-center justify-between bg-cyan/10 border border-cyan/20 p-4 rounded-2xl mb-8">
+                <div class="flex items-center space-x-2 text-sm text-navy font-bold">
+                    <svg class="w-5 h-5 text-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Found {{ $compatibleExams->total() }} practice test(s) matching your criteria.</span>
+                </div>
+                <a href="{{ route('public.test-engine') }}#compatible-exams" class="text-xs font-black text-cyan hover:underline uppercase">Clear Filters &times;</a>
+            </div>
+        @endif
+
+        <!-- Exam Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($compatibleExams as $exam)
                 <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 group">
@@ -188,18 +331,35 @@
                     </div>
                     
                     <div class="flex items-center justify-between pt-6 border-t border-gray-100">
-                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Score: <strong class="text-navy text-sm">{{ $exam->passing_score }}%</strong></span>
-                        <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="bg-gray-100 hover:bg-navy text-navy hover:text-white text-[11px] font-black uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all duration-300">
-                            Demo
+                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Passing: <strong class="text-navy text-sm">{{ $exam->passing_score }}%</strong></span>
+                        <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="bg-gray-100 hover:bg-navy text-navy hover:text-white text-[11px] font-black uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center space-x-1">
+                            <span>Launch Demo</span>
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     </div>
                 </div>
             @empty
-                <div class="col-span-3 text-center py-8 text-gray-500">
-                    No compatible exams found. Let's upload questions in the Admin panel!
+                <div class="col-span-3 bg-white p-12 rounded-3xl text-center border border-gray-200/80 shadow-sm space-y-4">
+                    <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-navy">No practice tests matched your search</h3>
+                    <p class="text-sm text-gray-500 max-w-md mx-auto">Try searching for a different exam code (e.g. 200-301, AZ-900) or clear your filter settings.</p>
+                    <div class="pt-2">
+                        <a href="{{ route('public.test-engine') }}#compatible-exams" class="inline-flex items-center space-x-2 bg-navy text-white px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">
+                            <span>Reset Search</span>
+                        </a>
+                    </div>
                 </div>
             @endforelse
         </div>
+
+        <!-- Pagination -->
+        @if($compatibleExams->hasPages())
+            <div class="mt-12">
+                {{ $compatibleExams->links() }}
+            </div>
+        @endif
 
     </div>
 </section>
