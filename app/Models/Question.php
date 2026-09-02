@@ -143,11 +143,17 @@ class Question extends Model
             $question->options()->delete();
             if (!empty($data['options'])) {
                 foreach ($data['options'] as $index => $opt) {
-                    $question->options()->create([
-                        'option_key' => $opt['key'] ?? '',
-                        'option_text' => $opt['text'] ?? '',
-                        'sort_order' => $opt['sort_order'] ?? ($index + 1),
-                    ]);
+                    $optKey = trim((string)($opt['key'] ?? chr(65 + $index)));
+                    $optText = trim((string)($opt['text'] ?? ''));
+                    
+                    // Only save options that have a key and text
+                    if ($optText !== '' || in_array($data['question_type'] ?? '', ['single_choice', 'multiple_choice', 'yes_no'])) {
+                        $question->options()->create([
+                            'option_key' => $optKey !== '' ? $optKey : chr(65 + $index),
+                            'option_text' => $optText,
+                            'sort_order' => (int)($opt['sort_order'] ?? ($index + 1)),
+                        ]);
+                    }
                 }
             }
 
@@ -247,20 +253,22 @@ class Question extends Model
             ];
             $sortOrder = 1;
             foreach ($optionsMap as $key => $text) {
-                if ($text !== null && $text !== '') {
+                if ($text !== null && trim((string)$text) !== '') {
                     $universal['options'][] = [
                         'key' => $key,
-                        'text' => $text,
+                        'text' => trim((string)$text),
                         'sort_order' => $sortOrder++,
                     ];
                 }
             }
         } else {
             foreach ($input['options'] as $index => $opt) {
+                $key = trim((string)($opt['key'] ?? chr(65 + $index)));
+                $text = trim((string)($opt['text'] ?? ''));
                 $universal['options'][] = [
-                    'key' => $opt['key'] ?? '',
-                    'text' => $opt['text'] ?? '',
-                    'sort_order' => $opt['sort_order'] ?? ($index + 1),
+                    'key' => $key !== '' ? $key : chr(65 + $index),
+                    'text' => $text,
+                    'sort_order' => (int)($opt['sort_order'] ?? ($index + 1)),
                 ];
             }
         }
