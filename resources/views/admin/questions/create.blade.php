@@ -100,18 +100,28 @@
             <!-- SECTION B — QUESTION CONTENT -->
             <div class="border-b border-gray-150 pb-6">
                 <h3 class="text-sm font-bold text-gray-700 uppercase mb-4">Section B: Question Content</h3>
-                <div>
-                    <label for="question_text" class="block text-xs font-bold text-gray-400 uppercase mb-2">Question Text *</label>
-                    <textarea name="question_text" id="question_text" rows="5" x-model="question.question_text" required
-                              placeholder="Enter question description (Markdown, code, and HTML tags are preserved)..."
-                              class="w-full border-gray-300 rounded text-sm px-3 py-2 focus:border-cyan focus:ring-cyan"
-                              :class="errors.question_text ? 'border-red-500 ring-1 ring-red-500' : ''"></textarea>
-                    <template x-if="errors.question_text">
-                        <p class="text-red-500 text-xs mt-1 font-semibold" x-text="errors.question_text"></p>
-                    </template>
-                    @error('question_text')
-                        <p class="text-red-500 text-xs mt-1 font-semibold">{{ $message }}</p>
-                    @enderror
+                <div class="space-y-4">
+                    <div>
+                        <label for="question_text" class="block text-xs font-bold text-gray-400 uppercase mb-2">Question Text *</label>
+                        <textarea name="question_text" id="question_text" rows="5" x-model="question.question_text" required
+                                  placeholder="Enter question description (Markdown, code, and HTML tags are preserved)..."
+                                  class="w-full border-gray-300 rounded text-sm px-3 py-2 focus:border-cyan focus:ring-cyan"
+                                  :class="errors.question_text ? 'border-red-500 ring-1 ring-red-500' : ''"></textarea>
+                        <template x-if="errors.question_text">
+                            <p class="text-red-500 text-xs mt-1 font-semibold" x-text="errors.question_text"></p>
+                        </template>
+                        @error('question_text')
+                            <p class="text-red-500 text-xs mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Question Area Image / Diagram -->
+                    <div>
+                        <label for="question_image" class="block text-xs font-bold text-gray-400 uppercase mb-2">Upload Image / Diagram for Question Area (Optional)</label>
+                        <input type="file" name="question_image" id="question_image" accept=".png,.jpg,.jpeg,.webp"
+                               class="w-full border border-gray-300 rounded text-sm px-3 py-1.5 focus:border-cyan focus:ring-cyan file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-navy hover:file:bg-gray-200">
+                        <p class="text-[11px] text-gray-400 mt-1">Upload a diagram or image to display directly within the question prompt.</p>
+                    </div>
                 </div>
             </div>
 
@@ -132,7 +142,7 @@
                 <!-- Single / Multiple Choice Dynamic Fields -->
                 <div x-show="question.question_type === 'single_choice' || question.question_type === 'multiple_choice'" class="space-y-4">
                     <div class="flex justify-between items-center mb-2">
-                        <label class="block text-xs font-bold text-gray-400 uppercase">Answer Choices (Mark correct answer)</label>
+                        <label class="block text-xs font-bold text-gray-400 uppercase">Answer Choices (Mark correct answer & optional option image)</label>
                         <button type="button" @click="addOption()" class="text-xs text-cyan hover:underline font-bold">+ Add Option</button>
                     </div>
                     
@@ -145,11 +155,20 @@
 
                     <div class="space-y-3">
                         <template x-for="(opt, idx) in question.options" :key="opt.key">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-sm font-bold text-gray-500 w-5 text-center" x-text="opt.key"></span>
+                            <div class="flex items-center space-x-3 bg-gray-50/50 p-2 border border-gray-200 rounded-lg">
+                                <span class="text-sm font-bold text-gray-600 w-6 text-center" x-text="opt.key"></span>
                                 <input type="hidden" :name="'options['+idx+'][key]'" :value="opt.key">
-                                <input type="text" :name="'options['+idx+'][text]'" x-model="opt.text" required placeholder="Option Choice"
+                                <input type="text" :name="'options['+idx+'][text]'" x-model="opt.text" placeholder="Option Choice text"
                                        class="flex-grow border-gray-300 rounded text-sm px-3 py-1.5 focus:border-cyan focus:ring-cyan">
+                                
+                                <!-- Option Image Upload -->
+                                <div class="flex items-center space-x-1 shrink-0">
+                                    <label :for="'opt_img_' + idx" title="Upload image for this option" class="cursor-pointer text-xs font-semibold text-gray-600 hover:text-navy flex items-center space-x-1 bg-white border border-gray-300 hover:bg-gray-100 rounded px-2.5 py-1.5 transition shadow-sm">
+                                        <span>📷 Add Image</span>
+                                        <input type="file" :id="'opt_img_' + idx" :name="'option_image_' + idx" accept=".png,.jpg,.jpeg,.webp" class="hidden" @change="opt.has_new_image = true">
+                                    </label>
+                                    <span x-show="opt.has_new_image" class="text-[10px] text-emerald-600 font-bold px-1">Selected</span>
+                                </div>
                                 
                                 <!-- Correct Selector -->
                                 <div class="flex items-center pl-2">

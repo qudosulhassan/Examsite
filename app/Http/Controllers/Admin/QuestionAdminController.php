@@ -59,19 +59,47 @@ class QuestionAdminController extends Controller
         $input['is_active'] = $request->has('is_active') ? true : false;
         $input['status'] = $request->input('status', 'draft');
 
+        if ($request->hasFile('question_image')) {
+            $file = $request->file('question_image');
+            $filename = time() . '_q_' . $file->getClientOriginalName();
+            $file->move(public_path('storage/questions'), $filename);
+            $input['image_filename'] = $filename;
+            $input['media'] = $input['media'] ?? [];
+            $input['media'][] = [
+                'type' => 'question_image',
+                'url' => '/storage/questions/' . $filename,
+                'caption' => 'Question Diagram',
+                'alt' => 'Question Diagram',
+                'sort_order' => 0,
+            ];
+        }
+
         if ($request->hasFile('media_file')) {
             $file = $request->file('media_file');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('storage/questions'), $filename);
-            $input['media'] = [
-                [
-                    'type' => 'image',
-                    'url' => '/storage/questions/' . $filename,
-                    'caption' => $request->media_caption ?? 'Exhibit',
-                    'alt' => $request->media_caption ?? 'Exhibit',
-                    'sort_order' => 1,
-                ]
+            $input['media'] = $input['media'] ?? [];
+            $input['media'][] = [
+                'type' => 'image',
+                'url' => '/storage/questions/' . $filename,
+                'caption' => $request->media_caption ?? 'Exhibit',
+                'alt' => $request->media_caption ?? 'Exhibit',
+                'sort_order' => 1,
             ];
+        }
+
+        // Process Option Images Upload (Section D)
+        if (!empty($input['options']) && is_array($input['options'])) {
+            foreach ($input['options'] as $idx => &$opt) {
+                if ($request->hasFile("option_image_{$idx}")) {
+                    $file = $request->file("option_image_{$idx}");
+                    $filename = time() . '_opt_' . $idx . '_' . $file->getClientOriginalName();
+                    $file->move(public_path('storage/questions'), $filename);
+                    $imgUrl = '/storage/questions/' . $filename;
+                    $opt['text'] = trim(($opt['text'] ?? '') . "\n" . '<img src="' . $imgUrl . '" alt="Option Image" class="max-h-48 rounded my-2 block shadow-sm">');
+                }
+            }
+            unset($opt);
         }
 
         if (!empty($input['references']) && is_array($input['references'])) {
@@ -146,20 +174,34 @@ class QuestionAdminController extends Controller
         $input['is_active'] = $request->has('is_active') ? true : false;
         $input['status'] = $request->input('status', 'draft');
 
+        if ($request->hasFile('question_image')) {
+            $file = $request->file('question_image');
+            $filename = time() . '_q_' . $file->getClientOriginalName();
+            $file->move(public_path('storage/questions'), $filename);
+            $input['image_filename'] = $filename;
+            $input['media'] = $input['media'] ?? [];
+            $input['media'][] = [
+                'type' => 'question_image',
+                'url' => '/storage/questions/' . $filename,
+                'caption' => 'Question Diagram',
+                'alt' => 'Question Diagram',
+                'sort_order' => 0,
+            ];
+        }
+
         if ($request->hasFile('media_file')) {
             $file = $request->file('media_file');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('storage/questions'), $filename);
-            $input['media'] = [
-                [
-                    'type' => 'image',
-                    'url' => '/storage/questions/' . $filename,
-                    'caption' => $request->media_caption ?? 'Exhibit',
-                    'alt' => $request->media_caption ?? 'Exhibit',
-                    'sort_order' => 1,
-                ]
+            $input['media'] = $input['media'] ?? [];
+            $input['media'][] = [
+                'type' => 'image',
+                'url' => '/storage/questions/' . $filename,
+                'caption' => $request->media_caption ?? 'Exhibit',
+                'alt' => $request->media_caption ?? 'Exhibit',
+                'sort_order' => 1,
             ];
-        } else {
+        } else if (empty($input['media'])) {
             // Preserve existing media
             $existingMedia = $question->media;
             if ($existingMedia->isNotEmpty()) {
@@ -171,6 +213,20 @@ class QuestionAdminController extends Controller
                     'sort_order' => $m->sort_order,
                 ])->toArray();
             }
+        }
+
+        // Process Option Images Upload (Section D)
+        if (!empty($input['options']) && is_array($input['options'])) {
+            foreach ($input['options'] as $idx => &$opt) {
+                if ($request->hasFile("option_image_{$idx}")) {
+                    $file = $request->file("option_image_{$idx}");
+                    $filename = time() . '_opt_' . $idx . '_' . $file->getClientOriginalName();
+                    $file->move(public_path('storage/questions'), $filename);
+                    $imgUrl = '/storage/questions/' . $filename;
+                    $opt['text'] = trim(($opt['text'] ?? '') . "\n" . '<img src="' . $imgUrl . '" alt="Option Image" class="max-h-48 rounded my-2 block shadow-sm">');
+                }
+            }
+            unset($opt);
         }
 
         if (!empty($input['references']) && is_array($input['references'])) {
