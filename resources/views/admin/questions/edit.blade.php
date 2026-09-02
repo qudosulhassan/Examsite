@@ -160,24 +160,24 @@
                                 
                                 <!-- Correct Selector -->
                                 <div class="flex items-center pl-2">
-                                    <!-- Single Choice Radio -->
-                                    <template x-if="question.question_type === 'single_choice'">
-                                        <input type="radio" name="correct_answers[]" :value="opt.key"
-                                               :checked="question.correct_answers.includes(opt.key)"
-                                               @change="question.correct_answers = [opt.key]"
-                                               class="rounded-full border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
-                                    </template>
-                                    <!-- Multiple Choice Checkbox -->
-                                    <template x-if="question.question_type === 'multiple_choice'">
-                                        <input type="checkbox" name="correct_answers[]" :value="opt.key"
-                                               :checked="question.correct_answers.includes(opt.key)"
-                                               @change="if ($event.target.checked) { if (!question.correct_answers.includes(opt.key)) question.correct_answers.push(opt.key) } else { question.correct_answers = question.correct_answers.filter(k => k !== opt.key) }"
-                                               class="rounded border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
-                                    </template>
-                                </div>
-                                <button type="button" @click="removeOption(idx)" :disabled="question.options.length <= 2"
-                                        :class="question.options.length <= 2 ? 'text-gray-300 cursor-not-allowed' : 'text-red-500 hover:text-red-700'"
-                                        class="text-sm px-1 font-bold">✕</button>
+                                     <!-- Single Choice Radio -->
+                                     <template x-if="question.question_type === 'single_choice'">
+                                         <input type="radio" name="correct_option" :value="opt.key"
+                                                :checked="question.correct_answers.includes(opt.key)"
+                                                @change="question.correct_answers = [opt.key]"
+                                                class="rounded-full border-gray-300 text-cyan focus:ring-cyan h-5 w-5 cursor-pointer">
+                                     </template>
+                                     <!-- Multiple Choice Checkbox -->
+                                     <template x-if="question.question_type === 'multiple_choice'">
+                                         <input type="checkbox" name="correct_answers[]" :value="opt.key"
+                                                :checked="question.correct_answers.includes(opt.key)"
+                                                @change="if ($event.target.checked) { if (!question.correct_answers.includes(opt.key)) question.correct_answers.push(opt.key) } else { question.correct_answers = question.correct_answers.filter(k => k !== opt.key) }"
+                                                class="rounded border-gray-300 text-cyan focus:ring-cyan h-5 w-5 cursor-pointer">
+                                     </template>
+                                 </div>
+                                 <button type="button" @click="removeOption(idx)" :disabled="question.options.length <= 2"
+                                         :class="question.options.length <= 2 ? 'text-gray-300 cursor-not-allowed' : 'text-red-500 hover:text-red-700'"
+                                         class="text-sm px-1 font-bold">✕</button>
                             </div>
                         </template>
                     </div>
@@ -193,10 +193,10 @@
                                 <input type="hidden" :name="'options['+idx+'][text]'" :value="opt.text">
                                 <span class="text-sm font-bold text-gray-700" x-text="opt.text"></span>
                                 <div class="flex-grow"></div>
-                                <input type="radio" name="correct_answers[]" :value="opt.key"
+                                <input type="radio" name="correct_option" :value="opt.key"
                                        :checked="question.correct_answers.includes(opt.key)"
                                        @change="question.correct_answers = [opt.key]" required
-                                       class="rounded-full border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
+                                       class="rounded-full border-gray-300 text-cyan focus:ring-cyan h-5 w-5 cursor-pointer">
                             </div>
                         </template>
                     </div>
