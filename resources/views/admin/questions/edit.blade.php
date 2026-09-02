@@ -162,12 +162,16 @@
                                 <div class="flex items-center pl-2">
                                     <!-- Single Choice Radio -->
                                     <template x-if="question.question_type === 'single_choice'">
-                                        <input type="radio" name="correct_answers[]" :value="opt.key" x-model="question.correct_answers[0]"
+                                        <input type="radio" name="correct_answers[]" :value="opt.key"
+                                               :checked="question.correct_answers.includes(opt.key)"
+                                               @change="question.correct_answers = [opt.key]"
                                                class="rounded-full border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
                                     </template>
                                     <!-- Multiple Choice Checkbox -->
                                     <template x-if="question.question_type === 'multiple_choice'">
-                                        <input type="checkbox" name="correct_answers[]" :value="opt.key" x-model="question.correct_answers"
+                                        <input type="checkbox" name="correct_answers[]" :value="opt.key"
+                                               :checked="question.correct_answers.includes(opt.key)"
+                                               @change="if ($event.target.checked) { if (!question.correct_answers.includes(opt.key)) question.correct_answers.push(opt.key) } else { question.correct_answers = question.correct_answers.filter(k => k !== opt.key) }"
                                                class="rounded border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
                                     </template>
                                 </div>
@@ -189,7 +193,9 @@
                                 <input type="hidden" :name="'options['+idx+'][text]'" :value="opt.text">
                                 <span class="text-sm font-bold text-gray-700" x-text="opt.text"></span>
                                 <div class="flex-grow"></div>
-                                <input type="radio" name="correct_answers[]" :value="opt.key" x-model="question.correct_answers[0]" required
+                                <input type="radio" name="correct_answers[]" :value="opt.key"
+                                       :checked="question.correct_answers.includes(opt.key)"
+                                       @change="question.correct_answers = [opt.key]" required
                                        class="rounded-full border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
                             </div>
                         </template>
