@@ -176,45 +176,65 @@ class CheckoutController extends Controller
         ]);
 
         foreach ($cart as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'package']) ? $item['id'] : null,
-                'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : null,
-                'item_type' => $item['type'],
-                'price' => 0.00,
-            ]);
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'package', 'combo']) ? $item['id'] : null,
+                    'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : null,
+                    'item_type' => $item['type'],
+                    'price' => $item['price'] ?? 0.00,
+                ]);
 
-            if ($item['type'] === 'pdf') {
-                UserExam::create([
-                    'user_id' => $user->id,
-                    'exam_id' => $item['id'],
-                    'order_id' => $order->id,
-                    'access_type' => 'pdf',
-                    'download_count' => 0,
-                    'max_downloads' => 3,
-                    'purchased_at' => now(),
-                ]);
-            } elseif ($item['type'] === 'engine_single') {
-                UserExam::create([
-                    'user_id' => $user->id,
-                    'exam_id' => $item['id'],
-                    'order_id' => $order->id,
-                    'access_type' => 'engine',
-                    'download_count' => 0,
-                    'max_downloads' => 0,
-                    'purchased_at' => now(),
-                ]);
-            } elseif ($item['type'] === 'package') {
-                $pkg = \App\Models\Package::find($item['id']);
-                \App\Models\UserPackage::create([
-                    'user_id' => $user->id,
-                    'package_id' => $item['id'],
-                    'order_id' => $order->id,
-                    'status' => 'active',
-                    'purchased_at' => now(),
-                    'expires_at' => ($pkg && $pkg->access_days) ? now()->addDays($pkg->access_days) : null,
-                ]);
-            }
+                if ($item['type'] === 'pdf') {
+                    UserExam::create([
+                        'user_id' => $user->id,
+                        'exam_id' => $item['id'],
+                        'order_id' => $order->id,
+                        'access_type' => 'pdf',
+                        'download_count' => 0,
+                        'max_downloads' => 3,
+                        'purchased_at' => now(),
+                    ]);
+                } elseif ($item['type'] === 'engine_single') {
+                    UserExam::create([
+                        'user_id' => $user->id,
+                        'exam_id' => $item['id'],
+                        'order_id' => $order->id,
+                        'access_type' => 'engine',
+                        'download_count' => 0,
+                        'max_downloads' => 0,
+                        'purchased_at' => now(),
+                    ]);
+                } elseif ($item['type'] === 'combo') {
+                    UserExam::create([
+                        'user_id' => $user->id,
+                        'exam_id' => $item['id'],
+                        'order_id' => $order->id,
+                        'access_type' => 'pdf',
+                        'download_count' => 0,
+                        'max_downloads' => 3,
+                        'purchased_at' => now(),
+                    ]);
+
+                    UserExam::create([
+                        'user_id' => $user->id,
+                        'exam_id' => $item['id'],
+                        'order_id' => $order->id,
+                        'access_type' => 'engine',
+                        'download_count' => 0,
+                        'max_downloads' => 0,
+                        'purchased_at' => now(),
+                    ]);
+                } elseif ($item['type'] === 'package') {
+                    $pkg = \App\Models\Package::find($item['id']);
+                    \App\Models\UserPackage::create([
+                        'user_id' => $user->id,
+                        'package_id' => $item['id'],
+                        'order_id' => $order->id,
+                        'status' => 'active',
+                        'purchased_at' => now(),
+                        'expires_at' => ($pkg && $pkg->access_days) ? now()->addDays($pkg->access_days) : null,
+                    ]);
+                }
         }
 
         // Increment coupon use count
@@ -326,7 +346,7 @@ class CheckoutController extends Controller
                 foreach ($cart as $item) {
                     OrderItem::create([
                         'order_id' => $order->id,
-                        'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'package']) ? $item['id'] : null,
+                        'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'package', 'combo']) ? $item['id'] : null,
                         'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : null,
                         'item_type' => $item['type'],
                         'price' => $item['price'],
@@ -343,6 +363,26 @@ class CheckoutController extends Controller
                             'purchased_at' => now(),
                         ]);
                     } elseif ($item['type'] === 'engine_single') {
+                        UserExam::create([
+                            'user_id' => $user->id,
+                            'exam_id' => $item['id'],
+                            'order_id' => $order->id,
+                            'access_type' => 'engine',
+                            'download_count' => 0,
+                            'max_downloads' => 0,
+                            'purchased_at' => now(),
+                        ]);
+                    } elseif ($item['type'] === 'combo') {
+                        UserExam::create([
+                            'user_id' => $user->id,
+                            'exam_id' => $item['id'],
+                            'order_id' => $order->id,
+                            'access_type' => 'pdf',
+                            'download_count' => 0,
+                            'max_downloads' => 3,
+                            'purchased_at' => now(),
+                        ]);
+
                         UserExam::create([
                             'user_id' => $user->id,
                             'exam_id' => $item['id'],
@@ -470,7 +510,7 @@ class CheckoutController extends Controller
                     foreach ($cart as $item) {
                         OrderItem::create([
                             'order_id' => $order->id,
-                            'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'package']) ? $item['id'] : null,
+                            'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'package', 'combo']) ? $item['id'] : null,
                             'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : null,
                             'item_type' => $item['type'],
                             'price' => $item['price'],
@@ -487,6 +527,26 @@ class CheckoutController extends Controller
                                 'purchased_at' => now(),
                             ]);
                         } elseif ($item['type'] === 'engine_single') {
+                            UserExam::create([
+                                'user_id' => $user->id,
+                                'exam_id' => $item['id'],
+                                'order_id' => $order->id,
+                                'access_type' => 'engine',
+                                'download_count' => 0,
+                                'max_downloads' => 0,
+                                'purchased_at' => now(),
+                            ]);
+                        } elseif ($item['type'] === 'combo') {
+                            UserExam::create([
+                                'user_id' => $user->id,
+                                'exam_id' => $item['id'],
+                                'order_id' => $order->id,
+                                'access_type' => 'pdf',
+                                'download_count' => 0,
+                                'max_downloads' => 3,
+                                'purchased_at' => now(),
+                            ]);
+
                             UserExam::create([
                                 'user_id' => $user->id,
                                 'exam_id' => $item['id'],

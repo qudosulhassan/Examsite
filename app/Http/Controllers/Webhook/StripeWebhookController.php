@@ -131,6 +131,28 @@ class StripeWebhookController extends Controller
                             'max_downloads' => 0,
                             'purchased_at' => now(),
                         ]);
+                    } elseif ($item->item_type === 'combo') {
+                        UserExam::firstOrCreate([
+                            'user_id' => $order->user_id,
+                            'exam_id' => $item->exam_id,
+                            'order_id' => $order->id,
+                            'access_type' => 'pdf',
+                        ], [
+                            'download_count' => 0,
+                            'max_downloads' => 3,
+                            'purchased_at' => now(),
+                        ]);
+
+                        UserExam::firstOrCreate([
+                            'user_id' => $order->user_id,
+                            'exam_id' => $item->exam_id,
+                            'order_id' => $order->id,
+                            'access_type' => 'engine',
+                        ], [
+                            'download_count' => 0,
+                            'max_downloads' => 0,
+                            'purchased_at' => now(),
+                        ]);
                     } elseif ($item->item_type === 'package') {
                         $pkg = \App\Models\Package::find($item->exam_id);
                         if ($pkg) {
