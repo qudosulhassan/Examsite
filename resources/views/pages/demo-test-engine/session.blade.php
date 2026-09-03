@@ -24,6 +24,7 @@
                 drag_items: @json($ans->question->question_data['drag_items'] ?? []),
                 matching_pairs: @json($ans->question->question_data['matching_pairs'] ?? []),
                 hotspot_answers: @json($ans->question->question_data['hotspot_answers'] ?? []),
+                selection_limit: @json($ans->question->question_data['selection_limit'] ?? 1),
                 checked: false,
                 is_correct: false,
                 revealed: false

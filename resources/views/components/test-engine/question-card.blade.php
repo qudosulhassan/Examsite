@@ -10,6 +10,8 @@
     $qType = $question->question_type ?? 'single_choice';
     $qData = $question->question_data ?? [];
     $scenario = $qData['scenario'] ?? null;
+    $instructions = $question->instructions ?: ($qData['instructions'] ?? null);
+    $selectionLimit = $qData['selection_limit'] ?? 1;
     $boxes = $qData['boxes'] ?? $qData['hotspot_answers'] ?? [];
     $dragItems = $qData['drag_items'] ?? [];
     $matchingPairs = $qData['matching_pairs'] ?? [];
@@ -33,7 +35,7 @@
         $badgeLabel = 'Matching';
     } elseif ($qType === 'multiple_choice') {
         $badgeClass = 'multiple-choice';
-        $badgeLabel = 'Multiple Answer';
+        $badgeLabel = $selectionLimit > 1 ? "Select {$selectionLimit}" : "Multiple Answer";
     } elseif ($qType === 'yes_no') {
         $badgeClass = 'yes-no';
         $badgeLabel = 'Yes / No';
@@ -75,6 +77,14 @@
             {!! $question->question_text !!}
         </div>
 
+        <!-- Instruction / Note Banner (If present) -->
+        @if($instructions)
+            <div class="my-3 p-3 bg-amber-50/90 border border-amber-200 rounded-xl flex items-start space-x-2.5 text-xs text-amber-900 font-semibold shadow-sm">
+                <span class="text-amber-600 font-extrabold text-sm">ℹ</span>
+                <div class="leading-relaxed">{{ $instructions }}</div>
+            </div>
+        @endif
+
         <!-- Exhibits / Figure Images -->
         @if($qImage || $mediaItems->count() > 0)
             <div class="exhibits">
@@ -101,19 +111,28 @@
         
         <!-- 1. Single Choice / Multiple Response / Yes-No -->
         <template x-if="answers[{{ $index }}].type === 'single_choice' || answers[{{ $index }}].type === 'multiple_choice' || answers[{{ $index }}].type === 'yes_no'">
-            <div class="options">
-                <template x-for="opt in answers[{{ $index }}].options" :key="opt.key">
-                    <label class="option" :class="(answers[{{ $index }}].selected || '').split(',').includes(opt.key) ? 'border-accent bg-blue-50/50' : ''">
-                        <template x-if="answers[{{ $index }}].type === 'single_choice' || answers[{{ $index }}].type === 'yes_no'">
-                            <input type="radio" :name="'q_' + {{ $index }}" :value="opt.key" @change="saveAnswer({{ $index }}, opt.key)" :checked="answers[{{ $index }}].selected === opt.key">
-                        </template>
-                        <template x-if="answers[{{ $index }}].type === 'multiple_choice'">
-                            <input type="checkbox" :name="'q_' + {{ $index }} + '[]'" :value="opt.key" @change="toggleCheckbox({{ $index }}, opt.key)" :checked="(answers[{{ $index }}].selected || '').split(',').includes(opt.key)">
-                        </template>
-                        <span class="option-letter" x-text="opt.key"></span>
-                        <span class="option-text text-sm font-medium text-navy leading-relaxed" x-text="opt.text"></span>
-                    </label>
+            <div class="space-y-2">
+                <template x-if="answers[{{ $index }}].type === 'multiple_choice'">
+                    <div class="text-xs font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg inline-flex items-center space-x-1 mb-2">
+                        <span>✓</span>
+                        <span x-text="answers[{{ $index }}].selection_limit > 1 ? ('Select ' + answers[{{ $index }}].selection_limit + ' options') : 'Select all that apply'"></span>
+                    </div>
                 </template>
+
+                <div class="options">
+                    <template x-for="opt in answers[{{ $index }}].options" :key="opt.key">
+                        <label class="option" :class="(answers[{{ $index }}].selected || '').split(',').map(s => s.trim()).includes(opt.key) ? 'border-accent bg-blue-50/50' : ''">
+                            <template x-if="answers[{{ $index }}].type === 'single_choice' || answers[{{ $index }}].type === 'yes_no'">
+                                <input type="radio" :name="'q_' + {{ $index }}" :value="opt.key" @change="saveAnswer({{ $index }}, opt.key)" :checked="answers[{{ $index }}].selected === opt.key">
+                            </template>
+                            <template x-if="answers[{{ $index }}].type === 'multiple_choice'">
+                                <input type="checkbox" :name="'q_' + {{ $index }} + '[]'" :value="opt.key" @change="toggleCheckbox({{ $index }}, opt.key)" :checked="(answers[{{ $index }}].selected || '').split(',').map(s => s.trim()).includes(opt.key)">
+                            </template>
+                            <span class="option-letter" x-text="opt.key"></span>
+                            <span class="option-text text-sm font-medium text-navy leading-relaxed" x-text="opt.text"></span>
+                        </label>
+                    </template>
+                </div>
             </div>
         </template>
 

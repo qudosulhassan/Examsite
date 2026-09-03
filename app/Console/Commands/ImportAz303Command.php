@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class ImportAz303Command extends Command
 {
     protected $signature = 'import:az303 {file? : Absolute path to the AZ-303 html file}';
-    protected $description = 'Import AZ-303 exam and all 220 questions from HTML file into live database';
+    protected $description = 'Import AZ-303 exam and all 220 questions from HTML file with canonical structure, note filtering, and accurate selection limits';
 
     public function handle()
     {
@@ -24,7 +24,7 @@ class ImportAz303Command extends Command
         }
 
         $this->info("Reading HTML file from {$filePath}...");
-        $htmlContent = file_get_encoding($filePath);
+        $htmlContent = file_get_contents($filePath);
 
         // 1. Resolve or Create Microsoft Vendor
         $vendor = Vendor::firstOrCreate(
@@ -55,6 +55,10 @@ class ImportAz303Command extends Command
 
         $this->info("Target Exam: [ID {$exam->id}] {$exam->exam_code} - {$exam->exam_name}");
 
+        // Clear existing questions for AZ-303 to avoid duplicates
+        $deletedCount = Question::where('exam_id', $exam->id)->delete();
+        $this->info("Cleared {$deletedCount} existing questions for AZ-303 before fresh import.");
+
         // Use DOMDocument & DOMXPath to parse HTML cards
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -67,54 +71,62 @@ class ImportAz303Command extends Command
         $this->info("Found {$cards->length} question cards in HTML.");
 
         $importedCount = 0;
-        $updatedCount = 0;
 
         foreach ($cards as $index => $card) {
             $qNum = $card->getAttribute('data-number') ?: ($index + 1);
 
-            // Determine type badge
+            // Type badge
             $badgeNodes = $xpath->query('.//span[contains(@class, "type-badge")]', $card);
             $badgeText = ($badgeNodes->length > 0) ? trim($badgeNodes->item(0)->nodeValue) : 'Multiple Choice';
 
-            $questionType = 'single_choice';
-            if (stripos($badgeText, 'Hotspot') !== false) {
-                $questionType = 'hotspot';
-            } elseif (stripos($badgeText, 'Drag') !== false) {
-                $questionType = 'drag_drop';
-            } elseif (stripos($badgeText, 'Multiple Answer') !== false) {
-                $questionType = 'multiple_choice';
-            }
+            // Checkbox vs Radio input nodes
+            $checkboxNodes = $xpath->query('.//div[contains(@class, "options")]//input[@type="checkbox"]', $card);
+            $selectNodes = $xpath->query('.//select', $card);
 
             // Extract question content paragraphs
             $pNodes = $xpath->query('.//div[contains(@class, "question-content")]/p', $card);
             $pTexts = [];
+            $extractedInstructions = [];
+
             foreach ($pNodes as $p) {
-                $html = $dom->saveHTML($p);
-                $pTexts[] = trim(strip_tags($html, '<b><i><code><pre><span><br><p><table><tr><td><th><ul><li>'));
+                $rawP = trim($p->nodeValue);
+                if (preg_match('/note:|instructions:|each correct selection is worth|you may select|OTE:/i', $rawP)) {
+                    $extractedInstructions[] = $rawP;
+                } else {
+                    $html = $dom->saveHTML($p);
+                    $pTexts[] = trim(strip_tags($html, '<b><i><code><pre><span><br><p><table><tr><td><th><ul><li>'));
+                }
             }
             $questionText = implode("<br>", array_filter($pTexts));
             if (empty($questionText)) {
                 $questionText = "Question {$qNum}";
             }
 
-            // Extract options
+            // Extract options and filter out notes inside options
             $options = [];
             $optionNodes = $xpath->query('.//div[contains(@class, "options")]//label[contains(@class, "option")]', $card);
             foreach ($optionNodes as $optIdx => $optNode) {
+                $textNodes = $xpath->query('.//span[contains(@class, "option-text")]', $optNode);
+                $optText = ($textNodes->length > 0) ? trim($textNodes->item(0)->nodeValue) : trim($optNode->nodeValue);
+                
+                // Filter out instructional notes that were placed inside option labels in source HTML
+                if (preg_match('/note:|instructions:|each correct selection is worth|you may select|OTE:/i', $optText)) {
+                    $extractedInstructions[] = preg_replace('/^[A-Z](\.|\s*)/i', '', $optText);
+                    continue; // Skip adding this as an option!
+                }
+
+                $cleanText = preg_replace('/^[A-Z](\.|\s*)/i', '', $optText);
+                $cleanText = trim($cleanText);
+
                 $inpNodes = $xpath->query('.//input', $optNode);
                 $optKey = ($inpNodes->length > 0 && $inpNodes->item(0)->getAttribute('value')) 
                     ? trim($inpNodes->item(0)->getAttribute('value')) 
-                    : chr(65 + $optIdx);
-
-                $textNodes = $xpath->query('.//span[contains(@class, "option-text")]', $optNode);
-                $optText = ($textNodes->length > 0) ? trim($textNodes->item(0)->nodeValue) : trim($optNode->nodeValue);
-                // Clean leading option letter e.g. "A. "
-                $optText = preg_replace('/^[A-Z]\.\s*/i', '', $optText);
+                    : chr(65 + count($options));
 
                 $options[] = [
                     'key' => $optKey,
-                    'text' => $optText,
-                    'sort_order' => $optIdx + 1,
+                    'text' => $cleanText,
+                    'sort_order' => count($options) + 1,
                 ];
             }
 
@@ -123,8 +135,30 @@ class ImportAz303Command extends Command
             $correctAnswerRaw = ($ansNodes->length > 0) ? trim($ansNodes->item(0)->nodeValue) : '';
             $correctAnswers = array_filter(array_map('trim', explode(',', $correctAnswerRaw)));
 
-            if (count($correctAnswers) > 1 && $questionType === 'single_choice') {
-                $questionType = 'multiple_choice';
+            // Determine question type & selection limit
+            $questionType = 'single_choice';
+            $selectionLimit = 1;
+
+            if (stripos($badgeText, 'Hotspot') !== false || $selectNodes->length > 0) {
+                $questionType = 'hotspot';
+            } elseif (stripos($badgeText, 'Drag') !== false) {
+                $questionType = 'drag_drop';
+            } else {
+                $combinedText = $questionText . ' ' . implode(' ', $extractedInstructions);
+                
+                if (preg_match('/which two|select two|select 2/i', $combinedText)) {
+                    $selectionLimit = 2;
+                    $questionType = 'multiple_choice';
+                } elseif (preg_match('/which three|select three|select 3/i', $combinedText)) {
+                    $selectionLimit = 3;
+                    $questionType = 'multiple_choice';
+                } elseif (preg_match('/which four|select four|select 4/i', $combinedText)) {
+                    $selectionLimit = 4;
+                    $questionType = 'multiple_choice';
+                } elseif ($checkboxNodes->length > 0 || count($correctAnswers) > 1 || stripos($badgeText, 'multiple answer') !== false || preg_match('/each correct selection is worth/i', $combinedText)) {
+                    $selectionLimit = max(count($correctAnswers), 2);
+                    $questionType = 'multiple_choice';
+                }
             }
 
             // Extract explanation
@@ -141,7 +175,6 @@ class ImportAz303Command extends Command
             foreach ($imgNodes as $imgIdx => $imgNode) {
                 $src = $imgNode->getAttribute('src');
                 if ($src) {
-                    // Check if base64 data URI
                     if (str_starts_with($src, 'data:image/')) {
                         preg_match('/data:image\/(\w+);base64,(.*)/', $src, $matches);
                         if (!empty($matches[2])) {
@@ -167,26 +200,58 @@ class ImportAz303Command extends Command
                 }
             }
 
+            // Prepare question data JSON
+            $questionData = [
+                'instructions' => implode(' ', array_unique($extractedInstructions)),
+                'selection_limit' => $selectionLimit,
+                'drag_items' => [],
+                'hotspot_answers' => [],
+            ];
+
+            // If Hotspot, extract select boxes
+            if ($questionType === 'hotspot' && $selectNodes->length > 0) {
+                $boxes = [];
+                foreach ($selectNodes as $bIdx => $sel) {
+                    $boxOptions = [];
+                    $optElements = $xpath->query('.//option', $sel);
+                    foreach ($optElements as $oEl) {
+                        $oVal = trim($oEl->nodeValue);
+                        if ($oVal !== '' && stripos($oVal, 'select') === false) {
+                            $boxOptions[] = $oVal;
+                        }
+                    }
+                    $boxes[] = [
+                        'id' => 'box_' . ($bIdx + 1),
+                        'label' => 'Answer Area Dropdown ' . ($bIdx + 1),
+                        'options' => $boxOptions,
+                        'correct_answer' => $correctAnswers[$bIdx] ?? ($boxOptions[0] ?? ''),
+                    ];
+                }
+                $questionData['boxes'] = $boxes;
+                $questionData['hotspot_answers'] = $boxes;
+            }
+
             // Prepare universal model array
             $universalData = [
                 'exam_id' => $exam->id,
                 'topic' => 'Azure Architecture',
                 'question_type' => $questionType,
                 'question_text' => $questionText,
-                'instructions' => 'Select the best response to fulfill the scenario requirements.',
+                'instructions' => implode(' ', array_unique($extractedInstructions)),
                 'explanation' => $explanation,
                 'is_active' => true,
                 'status' => 'published',
                 'options' => $options,
                 'correct_answers' => $correctAnswers,
                 'media' => $media,
+                'question_data' => $questionData,
             ];
 
             // Save question using universal importer
-            $question = Question::saveFromUniversalModel($universalData);
+            Question::saveFromUniversalModel($universalData);
             $importedCount++;
 
-            if ($importedCount % 20 === 0 || $importedCount === $cards->length) {
+            if ($importedCount % 40 === 0 || $importedCount === $cards->length) {
                 $this->info("Imported {$importedCount} / {$cards->length} questions...");
             }
         }
@@ -197,11 +262,7 @@ class ImportAz303Command extends Command
             'last_updated_at' => now(),
         ]);
 
-        $this->info("SUCCESS! Successfully imported all {$importedCount} questions for Exam {$exam->exam_code}!");
+        $this->info("SUCCESS! Successfully re-imported all {$importedCount} questions for Exam {$exam->exam_code} with canonical note filtering and selection limits!");
         return 0;
     }
-}
-
-function file_get_encoding($path) {
-    return file_get_contents($path);
 }
