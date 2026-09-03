@@ -394,10 +394,10 @@
         <div class="absolute top-[40%] -left-[10%] w-[30%] h-[50%] rounded-full bg-blue-500/5 blur-[120px]"></div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <!-- Main Content Area -->
-            <div class="lg:col-span-8 space-y-16">
+            <div class="lg:col-span-7 space-y-16">
                 
                 <!-- Description -->
                 <div class="bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
@@ -737,7 +737,7 @@
             </div>
             
             <!-- lg right column placeholder to keep grid layout intact -->
-            <div class="hidden lg:block lg:col-span-4"></div>
+            <div class="hidden lg:block lg:col-span-5"></div>
         </div>
     </div>
 </section>
@@ -754,7 +754,7 @@
 
 @if($relatedExams->count() > 0)
 <section class="py-24 bg-white border-t border-gray-100 overflow-hidden relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
             <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Frequently Bought Together</h2>
             <div class="w-24 h-1.5 bg-gradient-to-r from-cyan to-blue-500 mx-auto mt-6 rounded-full"></div>
@@ -797,7 +797,7 @@
 <section class="py-24 bg-gray-50 border-t border-gray-200 relative overflow-hidden">
     <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
             <div>
                 <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-3 inline-block">Learn More</span>
