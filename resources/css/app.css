@@ -1,9 +1,32 @@
-
 @import 'tom-select/dist/css/tom-select.default.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  /* Global Layout Container */
+  .container-custom {
+    width: 100%;
+    max-width: 1380px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* 16px on mobile */
+    padding-right: 1rem;
+  }
+  @media (min-width: 640px) {
+    .container-custom {
+      padding-left: 1.5rem; /* 24px on tablet/sm */
+      padding-right: 1.5rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container-custom {
+      padding-left: 2rem; /* 32px on desktop/lg */
+      padding-right: 2rem;
+    }
+  }
+}
 
 /* Tiptap Editor Styles */
 .tiptap {

@@ -32,7 +32,7 @@
         </svg>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+    <div class="container-custom relative z-10 text-center">
         <!-- Premium Badge -->
         <div class="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-cyan/30 text-cyan text-xs font-bold px-4 py-2 rounded-full mb-8 shadow-[0_0_20px_rgba(0,212,170,0.2)]">
             <span class="flex h-2.5 w-2.5 relative">

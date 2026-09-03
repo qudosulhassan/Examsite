@@ -38,7 +38,7 @@
     <!-- Abstract Tech Lines -->
     <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px); background-size: 40px 40px;"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="container-custom relative z-10">
         <!-- Breadcrumbs -->
         <div class="mb-10 relative z-20">
             <nav class="flex" aria-label="Breadcrumb">
@@ -394,7 +394,7 @@
         <div class="absolute top-[40%] -left-[10%] w-[30%] h-[50%] rounded-full bg-blue-500/5 blur-[120px]"></div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="container-custom relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <!-- Main Content Area -->
             <div class="lg:col-span-8 space-y-16">
@@ -754,7 +754,7 @@
 
 @if($relatedExams->count() > 0)
 <section class="py-24 bg-white border-t border-gray-100 overflow-hidden relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="container-custom relative z-10">
         <div class="text-center mb-16">
             <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Frequently Bought Together</h2>
             <div class="w-24 h-1.5 bg-gradient-to-r from-cyan to-blue-500 mx-auto mt-6 rounded-full"></div>
@@ -797,7 +797,7 @@
 <section class="py-24 bg-gray-50 border-t border-gray-200 relative overflow-hidden">
     <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="container-custom relative z-10">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
             <div>
                 <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-3 inline-block">Learn More</span>

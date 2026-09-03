@@ -11,7 +11,7 @@
     <!-- Abstract Tech Lines -->
     <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px); background-size: 64px 64px;"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+    <div class="container-custom relative z-10 text-center">
         <!-- H1 / H2 -->
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
             Browse IT Certification <span class="text-cyan">Providers</span>
@@ -49,7 +49,7 @@
         });
     }
 }">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="container-custom">
         
         <!-- Interactive Search Bar -->
         <div class="max-w-3xl mx-auto mb-20 relative transform -translate-y-8">
