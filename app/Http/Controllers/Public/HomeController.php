@@ -71,6 +71,18 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
+        if ($request->ajax() || $request->wantsJson() || $request->has('ajax')) {
+            $gridHtml = view('pages.partials.test-engine-grid', compact('compatibleExams', 'searchQuery', 'vendorFilter'))->render();
+            return response()->json([
+                'success' => true,
+                'html' => $gridHtml,
+                'total' => $compatibleExams->total(),
+                'has_filters' => !empty($searchQuery) || !empty($vendorFilter),
+                'search_query' => $searchQuery,
+                'vendor_filter' => $vendorFilter,
+            ]);
+        }
+
         return view('pages.test-engine', compact(
             'totalExams',
             'totalQuestions',

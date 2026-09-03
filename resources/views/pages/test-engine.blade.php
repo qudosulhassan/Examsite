@@ -152,8 +152,10 @@
     </div>
 </section>
 
-<!-- Compatible Exams Section with Single Unified Search Control -->
-<section id="compatible-exams" class="py-20 bg-gray-50 border-t border-b border-gray-200/50">
+<!-- Compatible Exams Section with Single Unified Search Control & Smooth Vendor Tabs -->
+<section id="compatible-exams" class="py-20 bg-gray-50 border-t border-b border-gray-200/50"
+         x-data="testEngineManager()"
+         x-init="initComponent()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Section Title & Intro -->
@@ -168,30 +170,9 @@
             </p>
         </div>
 
-        <!-- Single Sleek Search Bar Box -->
-        <div class="max-w-4xl mx-auto mb-12" x-data="{
-            query: '{{ $searchQuery }}',
-            results: [],
-            loading: false,
-            showDropdown: false,
-            liveSearch() {
-                if (this.query.length < 2) {
-                    this.results = [];
-                    this.showDropdown = false;
-                    return;
-                }
-                this.loading = true;
-                fetch('/api/search?q=' + encodeURIComponent(this.query) + '&context=test-engine')
-                    .then(res => res.json())
-                    .then(data => {
-                        this.results = data.exams || [];
-                        this.showDropdown = true;
-                        this.loading = false;
-                    }).catch(() => { this.loading = false; });
-            }
-        }" @click.outside="showDropdown = false">
-            
-            <form action="{{ route('public.test-engine') }}#compatible-exams" method="GET" class="relative">
+        <!-- Single Sleek Search Bar Box & Vendor Tabs -->
+        <div class="max-w-4xl mx-auto mb-12" @click.outside="showDropdown = false">
+            <form @submit.prevent="submitSearch()" class="relative">
                 <div class="bg-white p-2 sm:p-2.5 rounded-3xl border border-gray-200/90 shadow-[0_15px_35px_rgba(0,0,0,0.06)] flex items-center transition-all duration-300 focus-within:border-cyan focus-within:ring-4 focus-within:ring-cyan/10">
                     <div class="pl-4 pr-2 text-cyan">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -205,17 +186,16 @@
                         x-model="query"
                         @input.debounce.250ms="liveSearch()"
                         @focus="if(results.length) showDropdown = true"
-                        value="{{ $searchQuery }}"
                         placeholder="Search exam code, title or vendor (e.g. 200-301, AWS, CompTIA, Cisco)..." 
                         class="w-full bg-transparent border-none text-navy placeholder-gray-400 text-sm sm:text-base font-semibold focus:outline-none focus:ring-0 py-2.5 px-2"
                         autocomplete="off"
                     >
 
-                    @if($searchQuery || $vendorFilter)
-                        <a href="{{ route('public.test-engine') }}#compatible-exams" class="text-gray-400 hover:text-gray-600 px-3 py-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap">
+                    <template x-if="query || activeVendor">
+                        <button type="button" @click="resetFilters()" class="text-gray-400 hover:text-gray-600 px-3 py-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap">
                             Clear
-                        </a>
-                    @endif
+                        </button>
+                    </template>
 
                     <button type="submit" class="bg-navy hover:bg-gradient-to-r hover:from-cyan hover:to-blue-500 text-white font-black text-xs sm:text-sm uppercase tracking-wider px-6 sm:px-8 py-3.5 rounded-2xl transition-all duration-300 shadow-md flex items-center space-x-2 whitespace-nowrap">
                         <svg class="w-4 h-4 text-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -246,93 +226,131 @@
                 </div>
             </form>
 
-            <!-- Quick Vendor Filter Pills -->
+            <!-- Quick Vendor Filter Pills (Smooth Tab Switching) -->
             <div class="flex flex-wrap items-center justify-center gap-2 pt-6">
                 <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Top Vendors:</span>
                 
-                <a href="{{ route('public.test-engine', array_merge(request()->query(), ['vendor' => null])) }}#compatible-exams" 
-                   class="text-xs font-bold px-4 py-2 rounded-xl border transition-all shadow-sm {{ empty($vendorFilter) ? 'bg-navy text-white border-navy' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50' }}">
+                <button type="button" 
+                        @click="setVendor('')"
+                        class="text-xs font-bold px-4 py-2 rounded-xl border transition-all duration-200 shadow-sm cursor-pointer"
+                        :class="!activeVendor ? 'bg-navy text-white border-navy font-black shadow-md scale-[1.02]' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-navy'">
                     All Vendors
-                </a>
+                </button>
 
                 @foreach($vendors as $vendorItem)
-                    <a href="{{ route('public.test-engine', array_merge(request()->query(), ['vendor' => $vendorItem->slug])) }}#compatible-exams" 
-                       class="text-xs font-bold px-4 py-2 rounded-xl border transition-all shadow-sm {{ $vendorFilter === $vendorItem->slug ? 'bg-cyan text-navy border-cyan font-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50' }}">
+                    <button type="button" 
+                            @click="setVendor('{{ $vendorItem->slug }}')"
+                            class="text-xs font-bold px-4 py-2 rounded-xl border transition-all duration-200 shadow-sm cursor-pointer"
+                            :class="activeVendor === '{{ $vendorItem->slug }}' ? 'bg-cyan text-navy border-cyan font-black shadow-md scale-[1.02]' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-navy'">
                         {{ $vendorItem->name }}
-                    </a>
+                    </button>
                 @endforeach
             </div>
         </div>
 
-        <!-- Search Status Notice -->
-        @if($searchQuery || $vendorFilter)
-            <div class="max-w-4xl mx-auto flex items-center justify-between bg-cyan/10 border border-cyan/20 p-4 rounded-2xl mb-8">
-                <div class="flex items-center space-x-2 text-sm text-navy font-bold">
-                    <svg class="w-5 h-5 text-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>Found {{ $compatibleExams->total() }} practice test(s) matching your search.</span>
-                </div>
-                <a href="{{ route('public.test-engine') }}#compatible-exams" class="text-xs font-black text-cyan hover:underline uppercase">Clear Filters &times;</a>
-            </div>
-        @endif
-
-        <!-- Exam Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse($compatibleExams as $exam)
-                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.04)] flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 group">
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <span class="bg-gray-50 border border-gray-200 text-gray-600 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-md">
-                                {{ $exam->vendor->name }}
-                            </span>
-                            <span class="text-xs font-bold text-cyan bg-cyan/10 px-3 py-1.5 rounded-md">
-                                {{ $exam->questions_count ?? $exam->questions()->count() }} Qs
-                            </span>
-                        </div>
-                        <h3 class="text-xl font-black text-navy mb-2 group-hover:text-cyan transition-colors">
-                            <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}">
-                                {{ $exam->exam_code }}
-                            </a>
-                        </h3>
-                        <p class="text-[13px] font-medium text-gray-500 mb-8 truncate">
-                            <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="hover:underline">
-                                {{ $exam->exam_name }}
-                            </a>
-                        </p>
-                    </div>
-                    
-                    <div class="flex items-center justify-between pt-6 border-t border-gray-100">
-                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Passing: <strong class="text-navy text-sm">{{ $exam->passing_score }}%</strong></span>
-                        <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="bg-gray-100 hover:bg-navy text-navy hover:text-white text-[11px] font-black uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center space-x-1">
-                            <span>Launch Demo</span>
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </a>
-                    </div>
-                </div>
-            @empty
-                <div class="col-span-3 bg-white p-12 rounded-3xl text-center border border-gray-200/80 shadow-sm space-y-4">
-                    <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto">
-                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-navy">No practice tests matched your search</h3>
-                    <p class="text-sm text-gray-500 max-w-md mx-auto">Try searching for a different exam code (e.g. 200-301, AZ-900) or clear your filter settings.</p>
-                    <div class="pt-2">
-                        <a href="{{ route('public.test-engine') }}#compatible-exams" class="inline-flex items-center space-x-2 bg-navy text-white px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">
-                            <span>Reset Search</span>
-                        </a>
-                    </div>
-                </div>
-            @endforelse
+        <!-- Dynamic Grid Container (AJAX Target) -->
+        <div id="compatible-exams-grid" class="relative min-h-[300px] transition-opacity duration-300" :class="loadingGrid ? 'opacity-50 pointer-events-none' : 'opacity-100'">
+            @include('pages.partials.test-engine-grid', ['compatibleExams' => $compatibleExams, 'searchQuery' => $searchQuery, 'vendorFilter' => $vendorFilter])
         </div>
-
-        <!-- Pagination -->
-        @if($compatibleExams->hasPages())
-            <div class="mt-12">
-                {{ $compatibleExams->links() }}
-            </div>
-        @endif
 
     </div>
 </section>
+
+<script>
+function testEngineManager() {
+    return {
+        query: '{{ addslashes($searchQuery) }}',
+        activeVendor: '{{ addslashes($vendorFilter) }}',
+        results: [],
+        loadingResults: false,
+        loadingGrid: false,
+        showDropdown: false,
+
+        initComponent() {
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('.ajax-pagination a');
+                if (link && link.href) {
+                    e.preventDefault();
+                    this.fetchGrid(link.href);
+                }
+            });
+        },
+
+        liveSearch() {
+            if (this.query.length < 2) {
+                this.results = [];
+                this.showDropdown = false;
+                return;
+            }
+            this.loadingResults = true;
+            fetch('/api/search?q=' + encodeURIComponent(this.query) + '&context=test-engine')
+                .then(res => res.json())
+                .then(data => {
+                    this.results = data.exams || [];
+                    this.showDropdown = true;
+                    this.loadingResults = false;
+                }).catch(() => { this.loadingResults = false; });
+        },
+
+        setVendor(vendorSlug) {
+            this.activeVendor = vendorSlug || '';
+            this.updateUrlAndFetch();
+        },
+
+        submitSearch() {
+            this.showDropdown = false;
+            this.updateUrlAndFetch();
+        },
+
+        resetFilters() {
+            this.query = '';
+            this.activeVendor = '';
+            this.updateUrlAndFetch();
+        },
+
+        updateUrlAndFetch() {
+            const params = new URLSearchParams();
+            if (this.query.trim()) {
+                params.set('q', this.query.trim());
+            }
+            if (this.activeVendor.trim()) {
+                params.set('vendor', this.activeVendor.trim());
+            }
+
+            const queryString = params.toString();
+            const cleanUrl = window.location.pathname + (queryString ? '?' + queryString : '');
+
+            window.history.pushState({}, '', cleanUrl);
+
+            const fetchUrl = '/test-engine?' + queryString + (queryString ? '&ajax=1' : 'ajax=1');
+            this.fetchGrid(fetchUrl);
+        },
+
+        fetchGrid(url) {
+            this.loadingGrid = true;
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.html) {
+                    const gridContainer = document.getElementById('compatible-exams-grid');
+                    if (gridContainer) {
+                        gridContainer.innerHTML = data.html;
+                    }
+                }
+                this.loadingGrid = false;
+            })
+            .catch(() => {
+                this.loadingGrid = false;
+            });
+        }
+    };
+}
+</script>
 
 <!-- Call to Action Section -->
 <section class="py-16 bg-navy text-white text-center relative overflow-hidden">
