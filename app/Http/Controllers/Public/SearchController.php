@@ -15,6 +15,7 @@ class SearchController extends Controller
     public function liveSearch(Request $request)
     {
         $query = $request->get('q', '');
+        $context = $request->get('context', '');
 
         if (strlen($query) < 2) {
             return response()->json(['exams' => [], 'vendors' => []]);
@@ -37,11 +38,15 @@ class SearchController extends Controller
             ->get(['id', 'name', 'slug', 'logo_path']);
 
         return response()->json([
-            'exams' => $exams->map(function($exam) {
+            'exams' => $exams->map(function($exam) use ($context) {
+                $demoUrl = route('public.demo-test-engine.lobby', $exam->slug);
+                $productUrl = url('/exams/' . $exam->slug);
                 return [
                     'code' => $exam->exam_code,
                     'name' => $exam->exam_name,
-                    'url' => url('/exams/' . $exam->slug),
+                    'url' => ($context === 'test-engine' || $context === 'demo') ? $demoUrl : $productUrl,
+                    'demo_url' => $demoUrl,
+                    'product_url' => $productUrl,
                     'vendor' => $exam->vendor ? $exam->vendor->name : '',
                 ];
             }),

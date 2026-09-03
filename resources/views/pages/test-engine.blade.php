@@ -181,7 +181,7 @@
                     return;
                 }
                 this.loading = true;
-                fetch('/api/search?q=' + encodeURIComponent(this.query))
+                fetch('/api/search?q=' + encodeURIComponent(this.query) + '&context=test-engine')
                     .then(res => res.json())
                     .then(data => {
                         this.results = data.exams || [];
@@ -231,7 +231,7 @@
                     </div>
                     <div class="max-h-72 overflow-y-auto">
                         <template x-for="item in results" :key="item.code">
-                            <a :href="item.url" class="flex items-center justify-between p-4 hover:bg-cyan/5 transition-colors group">
+                            <a :href="item.demo_url || item.url" class="flex items-center justify-between p-4 hover:bg-cyan/5 transition-colors group">
                                 <div>
                                     <div class="flex items-center space-x-2 mb-1">
                                         <span class="text-sm font-black text-navy group-hover:text-cyan transition-colors" x-text="item.code"></span>
@@ -239,7 +239,7 @@
                                     </div>
                                     <div class="text-xs text-gray-500 truncate max-w-sm" x-text="item.name"></div>
                                 </div>
-                                <span class="text-xs font-black uppercase text-navy bg-gray-100 group-hover:bg-cyan group-hover:text-navy px-3 py-1.5 rounded-xl transition-all">Demo &rarr;</span>
+                                <span class="text-xs font-black uppercase text-navy bg-gray-100 group-hover:bg-cyan group-hover:text-navy px-3 py-1.5 rounded-xl transition-all">Launch Demo &rarr;</span>
                             </a>
                         </template>
                     </div>
@@ -288,8 +288,16 @@
                                 {{ $exam->questions_count ?? $exam->questions()->count() }} Qs
                             </span>
                         </div>
-                        <h3 class="text-xl font-black text-navy mb-2 group-hover:text-cyan transition-colors">{{ $exam->exam_code }}</h3>
-                        <p class="text-[13px] font-medium text-gray-500 mb-8 truncate">{{ $exam->exam_name }}</p>
+                        <h3 class="text-xl font-black text-navy mb-2 group-hover:text-cyan transition-colors">
+                            <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}">
+                                {{ $exam->exam_code }}
+                            </a>
+                        </h3>
+                        <p class="text-[13px] font-medium text-gray-500 mb-8 truncate">
+                            <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="hover:underline">
+                                {{ $exam->exam_name }}
+                            </a>
+                        </p>
                     </div>
                     
                     <div class="flex items-center justify-between pt-6 border-t border-gray-100">
