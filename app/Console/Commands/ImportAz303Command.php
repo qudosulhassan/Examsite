@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class ImportAz303Command extends Command
 {
     protected $signature = 'import:az303 {file? : Absolute path to the AZ-303 html file}';
-    protected $description = 'Import AZ-303 exam and all 220 questions from HTML file with canonical structure, note filtering, and accurate selection limits';
+    protected $description = 'Import AZ-303 exam and all 220 questions from HTML file with deterministic image scoping, note filtering, and selection limits';
 
     public function handle()
     {
@@ -83,7 +83,7 @@ class ImportAz303Command extends Command
             $checkboxNodes = $xpath->query('.//div[contains(@class, "options")]//input[@type="checkbox"]', $card);
             $selectNodes = $xpath->query('.//select', $card);
 
-            // Extract question content paragraphs
+            // Extract question content paragraphs (STRIP INLINE IMAGES to prevent double rendering)
             $pNodes = $xpath->query('.//div[contains(@class, "question-content")]/p', $card);
             $pTexts = [];
             $extractedInstructions = [];
@@ -94,6 +94,7 @@ class ImportAz303Command extends Command
                     $extractedInstructions[] = $rawP;
                 } else {
                     $html = $dom->saveHTML($p);
+                    // STRIP <img> tags from question text so images render ONLY in exhibit figure cards!
                     $pTexts[] = trim(strip_tags($html, '<b><i><code><pre><span><br><p><table><tr><td><th><ul><li>'));
                 }
             }
@@ -116,7 +117,7 @@ class ImportAz303Command extends Command
                 }
 
                 $cleanText = preg_replace('/^[A-Z](\.|\s*)/i', '', $optText);
-                $cleanText = trim($cleanText);
+                $cleanText = trim(strip_tags($cleanText, '<b><i><code><pre><span><br>'));
 
                 $inpNodes = $xpath->query('.//input', $optNode);
                 $optKey = ($inpNodes->length > 0 && $inpNodes->item(0)->getAttribute('value')) 
@@ -169,35 +170,45 @@ class ImportAz303Command extends Command
                 $explanation = trim(preg_replace('/^<div[^>]*>|<\/div>$/i', '', $expHtml));
             }
 
-            // Extract exhibits / images
+            // Extract ALL unique images for this question card
             $media = [];
-            $imgNodes = $xpath->query('.//div[contains(@class, "exhibits")]//img', $card);
+            $seenSrcHashes = [];
+            $imgNodes = $xpath->query('.//img', $card);
+
             foreach ($imgNodes as $imgIdx => $imgNode) {
                 $src = $imgNode->getAttribute('src');
-                if ($src) {
-                    if (str_starts_with($src, 'data:image/')) {
-                        preg_match('/data:image\/(\w+);base64,(.*)/', $src, $matches);
-                        if (!empty($matches[2])) {
-                            $ext = $matches[1] ?: 'png';
-                            $filename = "az303_q{$qNum}_img" . ($imgIdx + 1) . ".{$ext}";
-                            $storedPath = "questions/{$filename}";
-                            Storage::disk('public')->put($storedPath, base64_decode($matches[2]));
-                            $mediaUrl = "/storage/{$storedPath}";
-                        } else {
-                            $mediaUrl = $src;
-                        }
+                if (!$src) continue;
+
+                // De-duplicate identical image src strings within the same question card
+                $srcHash = md5($src);
+                if (in_array($srcHash, $seenSrcHashes)) {
+                    continue;
+                }
+                $seenSrcHashes[] = $srcHash;
+
+                if (str_starts_with($src, 'data:image/')) {
+                    preg_match('/data:image\/(\w+);base64,(.*)/', $src, $matches);
+                    if (!empty($matches[2])) {
+                        $ext = $matches[1] ?: 'png';
+                        if ($ext === 'jpeg') $ext = 'jpg';
+                        $filename = "az303_q{$qNum}_img" . (count($media) + 1) . ".{$ext}";
+                        $storedPath = "questions/{$filename}";
+                        Storage::disk('public')->put($storedPath, base64_decode($matches[2]));
+                        $mediaUrl = "/storage/{$storedPath}";
                     } else {
                         $mediaUrl = $src;
                     }
-
-                    $media[] = [
-                        'type' => 'image',
-                        'url' => $mediaUrl,
-                        'caption' => "Exhibit for Question {$qNum}",
-                        'alt' => "Exhibit for Question {$qNum}",
-                        'sort_order' => $imgIdx + 1,
-                    ];
+                } else {
+                    $mediaUrl = $src;
                 }
+
+                $media[] = [
+                    'type' => 'image',
+                    'url' => $mediaUrl,
+                    'caption' => "Exhibit for Question {$qNum}",
+                    'alt' => "Exhibit for Question {$qNum}",
+                    'sort_order' => count($media) + 1,
+                ];
             }
 
             // Prepare question data JSON
@@ -262,7 +273,7 @@ class ImportAz303Command extends Command
             'last_updated_at' => now(),
         ]);
 
-        $this->info("SUCCESS! Successfully re-imported all {$importedCount} questions for Exam {$exam->exam_code} with canonical note filtering and selection limits!");
+        $this->info("SUCCESS! Successfully re-imported all {$importedCount} questions for Exam {$exam->exam_code} with deterministic image scoping!");
         return 0;
     }
 }
