@@ -11,6 +11,20 @@
 @endsection
 
 @section('content')
+<script>
+    window.dashboardTestEngineAnswers = {
+        @foreach($answers as $index => $ans)
+            {{ $index }}: {
+                id: {{ $ans->question_id }},
+                selected: @json($ans->selected_option ?? ''),
+                flagged: {{ $ans->is_flagged ? 'true' : 'false' }},
+                correct: @json($ans->question->correct_option),
+                revealed: false
+            },
+        @endforeach
+    };
+</script>
+
 <div class="h-screen flex flex-col justify-between" 
      x-data="{
          activeIndex: 0,
@@ -19,17 +33,7 @@
          timeRemaining: {{ $attempt->mode === 'exam' ? ($attempt->total_questions * 120) : 999999 }}, // 2 minutes per question in exam mode
          timerString: '00:00:00',
          timerVisible: true,
-         answers: {
-             @foreach($answers as $index => $ans)
-                 {{ $index }}: {
-                     id: {{ $ans->question_id }},
-                     selected: '{{ $ans->selected_option ?? '' }}',
-                     flagged: {{ $ans->is_flagged ? 'true' : 'false' }},
-                     correct: '{{ $ans->question->correct_option }}',
-                     revealed: false
-                 },
-             @endforeach
-         },
+         answers: window.dashboardTestEngineAnswers,
          init() {
              if (this.mode === 'exam') {
                  this.startTimer();
@@ -62,7 +66,7 @@
              this.ajaxSave(index);
          },
          toggleCheckbox(index, option) {
-             let current = this.answers[index].selected ? this.answers[index].selected.split(',') : [];
+             let current = (this.answers[index].selected || '').split(',');
              current = current.map(c => c.trim()).filter(Boolean);
              
              let pos = current.indexOf(option);
@@ -198,7 +202,7 @@
                         <!-- Heading -->
                         <div class="flex justify-between items-start pb-6 border-b border-gray-100">
                             <div>
-                                <span class="bg-cyan/10 text-cyan font-black text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-widest border border-cyan/20" x-text="'Topic: ' + answers[index].correct.slice(0, 15)"></span>
+                                <span class="bg-cyan/10 text-cyan font-black text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-widest border border-cyan/20" x-text="'Topic: ' + (answers[index].correct || '').slice(0, 15)"></span>
                             </div>
                             <!-- Flag trigger -->
                             <button @click="toggleFlag(index)" 

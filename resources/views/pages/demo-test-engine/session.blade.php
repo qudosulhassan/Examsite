@@ -11,6 +11,25 @@
 @endsection
 
 @section('content')
+<script>
+    window.demoTestEngineAnswers = {
+        @foreach($answers as $index => $ans)
+            {{ $index }}: {
+                id: {{ $ans->question_id }},
+                type: @json($ans->question->question_type),
+                selected: @json($ans->selected_option ?? ''),
+                flagged: {{ $ans->is_flagged ? 'true' : 'false' }},
+                correct: @json($ans->question->correct_option),
+                options: @json($ans->question->options->map(fn($o) => ['key' => $o->option_key, 'text' => $o->option_text])),
+                drag_items: @json($ans->question->question_data['drag_items'] ?? []),
+                matching_pairs: @json($ans->question->question_data['matching_pairs'] ?? []),
+                hotspot_answers: @json($ans->question->question_data['hotspot_answers'] ?? []),
+                revealed: false
+            },
+        @endforeach
+    };
+</script>
+
 <div class="h-screen flex flex-col justify-between" 
      x-data="{
          activeIndex: 0,
@@ -19,22 +38,7 @@
          timeRemaining: {{ $attempt->mode === 'exam' ? ($attempt->total_questions * 120) : 999999 }}, // 2 minutes per question in exam mode
          timerString: '00:00:00',
          timerVisible: true,
-         answers: {
-             @foreach($answers as $index => $ans)
-                 {{ $index }}: {
-                     id: {{ $ans->question_id }},
-                     type: '{{ $ans->question->question_type }}',
-                     selected: '{{ $ans->selected_option ?? '' }}',
-                     flagged: {{ $ans->is_flagged ? 'true' : 'false' }},
-                     correct: '{{ $ans->question->correct_option }}',
-                     options: @json($ans->question->options->map(fn($o) => ['key' => $o->option_key, 'text' => $o->option_text])),
-                     drag_items: @json($ans->question->question_data['drag_items'] ?? []),
-                     matching_pairs: @json($ans->question->question_data['matching_pairs'] ?? []),
-                     hotspot_answers: @json($ans->question->question_data['hotspot_answers'] ?? []),
-                     revealed: false
-                 },
-             @endforeach
-         },
+         answers: window.demoTestEngineAnswers,
          init() {
              if (this.mode === 'exam') {
                  this.startTimer();
@@ -67,7 +71,7 @@
              this.ajaxSave(index);
          },
          toggleCheckbox(index, option) {
-             let current = this.answers[index].selected ? this.answers[index].selected.split(',') : [];
+             let current = (this.answers[index].selected || '').split(',');
              current = current.map(c => c.trim()).filter(Boolean);
              
              let pos = current.indexOf(option);
@@ -203,7 +207,7 @@
                         <!-- Heading -->
                         <div class="flex justify-between items-start pb-6 border-b border-gray-100">
                             <div>
-                                <span class="bg-cyan/10 text-cyan font-black text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-widest border border-cyan/20" x-text="'Topic: ' + answers[index].correct.slice(0, 15)"></span>
+                                <span class="bg-cyan/10 text-cyan font-black text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-widest border border-cyan/20" x-text="'Topic: ' + (answers[index].correct || '').slice(0, 15)"></span>
                             </div>
                             <!-- Flag trigger -->
                             <button @click="toggleFlag(index)" 
@@ -235,20 +239,20 @@
                                         <div class="space-y-3">
                                             <template x-for="opt in answers[{{ $idx }}].options" :key="opt.key">
                                                 <label class="group relative flex items-start space-x-4 p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-                                                       :class="answers[{{ $idx }}].selected.split(',').includes(opt.key) ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
+                                                       :class="(answers[{{ $idx }}].selected || '').split(',').includes(opt.key) ? 'border-cyan bg-cyan/5 shadow-[0_4px_15px_rgba(0,212,170,0.1)]' : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'">
                                                     <div class="pt-0.5">
                                                         <template x-if="answers[{{ $idx }}].type === 'single_choice' || answers[{{ $idx }}].type === 'yes_no'">
                                                             <input type="radio" :name="'q_' + {{ $idx }}" :value="opt.key" @change="saveAnswer({{ $idx }}, opt.key)" :checked="answers[{{ $idx }}].selected === opt.key" class="peer sr-only">
                                                         </template>
                                                         <template x-if="answers[{{ $idx }}].type === 'multiple_choice'">
-                                                            <input type="checkbox" :name="'q_' + {{ $idx }} + '[]'" :value="opt.key" @change="toggleCheckbox({{ $idx }}, opt.key)" :checked="answers[{{ $idx }}].selected.split(',').includes(opt.key)" class="peer sr-only">
+                                                            <input type="checkbox" :name="'q_' + {{ $idx }} + '[]'" :value="opt.key" @change="toggleCheckbox({{ $idx }}, opt.key)" :checked="(answers[{{ $idx }}].selected || '').split(',').includes(opt.key)" class="peer sr-only">
                                                         </template>
-                                                        <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="answers[{{ $idx }}].selected.split(',').includes(opt.key) ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
-                                                            <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="answers[{{ $idx }}].selected.split(',').includes(opt.key) ? 'scale-100' : ''"></div>
+                                                        <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors" :class="(answers[{{ $idx }}].selected || '').split(',').includes(opt.key) ? 'border-cyan' : 'border-gray-300 group-hover:border-gray-400'">
+                                                            <div class="w-3 h-3 rounded-full bg-cyan transition-transform transform scale-0" :class="(answers[{{ $idx }}].selected || '').split(',').includes(opt.key) ? 'scale-100' : ''"></div>
                                                         </div>
                                                     </div>
                                                     <div class="flex-1">
-                                                        <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="answers[{{ $idx }}].selected.split(',').includes(opt.key) ? 'text-cyan' : ''" x-text="opt.key + '.'"></span> 
+                                                        <span class="font-black text-gray-400 mr-2 uppercase tracking-widest text-sm" :class="(answers[{{ $idx }}].selected || '').split(',').includes(opt.key) ? 'text-cyan' : ''" x-text="opt.key + '.'"></span> 
                                                         <span class="text-navy font-medium leading-relaxed" x-text="opt.text"></span>
                                                     </div>
                                                 </label>
@@ -261,7 +265,7 @@
                                         <div class="space-y-4">
                                             <p class="text-xs font-bold text-gray-400 uppercase">Sequencing Items (Click arrows to reorder items to match correct sequence):</p>
                                             <div class="space-y-2">
-                                                <template x-for="(item, itemIdx) in answers[{{ $idx }}].drag_items" :key="item.id">
+                                                <template x-for="(item, itemIdx) in (answers[{{ $idx }}].drag_items || [])" :key="item.id">
                                                     <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
                                                         <div class="flex items-center space-x-3">
                                                             <span class="bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded text-xs" x-text="itemIdx + 1"></span>
@@ -302,7 +306,7 @@
                                         <div class="space-y-4">
                                             <p class="text-xs font-bold text-gray-400 uppercase">Matching Definitions (Type corresponding match text):</p>
                                             <div class="space-y-3">
-                                                <template x-for="(pair, pairIdx) in answers[{{ $idx }}].matching_pairs" :key="pairIdx">
+                                                <template x-for="(pair, pairIdx) in (answers[{{ $idx }}].matching_pairs || [])" :key="pairIdx">
                                                     <div class="grid grid-cols-2 gap-4 items-center p-4 bg-white border border-gray-200 rounded-xl">
                                                         <div class="text-navy font-bold" x-text="pair.left"></div>
                                                         <input type="text" placeholder="Type correct match..."
@@ -323,7 +327,7 @@
                                         <div class="space-y-4">
                                             <p class="text-xs font-bold text-gray-400 uppercase">Complete configuration selectors:</p>
                                             <div class="space-y-4">
-                                                <template x-for="(box, boxIdx) in answers[{{ $idx }}].hotspot_answers" :key="box.id">
+                                                <template x-for="(box, boxIdx) in (answers[{{ $idx }}].hotspot_answers || [])" :key="box.id">
                                                     <div class="p-4 bg-white border border-gray-200 rounded-xl space-y-2">
                                                         <label class="block text-xs font-bold text-navy" x-text="box.label"></label>
                                                         <select @change="
@@ -366,7 +370,7 @@
 
                                                 <template x-if="answers[{{ $idx }}].type === 'matching'">
                                                     <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Matches: 
-                                                        <template x-for="p in answers[{{ $idx }}].matching_pairs">
+                                                        <template x-for="p in (answers[{{ $idx }}].matching_pairs || [])">
                                                             <span class="block text-green-600 text-xs ml-1 font-semibold" x-text="p.left + ' → ' + p.right"></span>
                                                         </template>
                                                     </p>
@@ -374,7 +378,7 @@
 
                                                 <template x-if="answers[{{ $idx }}].type === 'hotspot'">
                                                     <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Configurations: 
-                                                        <template x-for="b in answers[{{ $idx }}].hotspot_answers">
+                                                        <template x-for="b in (answers[{{ $idx }}].hotspot_answers || [])">
                                                             <span class="block text-green-600 text-xs ml-1 font-semibold" x-text="b.label + ': ' + b.correct_answer"></span>
                                                         </template>
                                                     </p>
