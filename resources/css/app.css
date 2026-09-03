@@ -28,6 +28,330 @@
   }
 }
 
+/* Master Exam Engine Variables & Component Styles */
+:root {
+  --bg: #f4f7fb;
+  --surface: #fff;
+  --surface2: #eef3f8;
+  --text: #172033;
+  --muted: #667085;
+  --border: #d9e1ea;
+  --accent: #0078d4;
+  --accent2: #005a9e;
+  --good: #16803c;
+  --bad: #c62828;
+  --shadow: 0 8px 28px rgba(20,40,70,.08);
+  --radius: 16px;
+}
+
+.engine-btn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 9px 13px;
+  cursor: pointer;
+  transition: .15s;
+  font-weight: 600;
+  font-size: 13px;
+}
+.engine-btn:hover {
+  transform: translateY(-1px);
+  border-color: #b7c5d6;
+}
+.engine-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.engine-btn.primary:hover {
+  background: var(--accent2);
+}
+.engine-btn.ghost {
+  background: transparent;
+}
+
+.engine-layout {
+  max-width: 1500px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 270px minmax(0,1fr);
+  gap: 22px;
+  padding: 22px 20px 60px;
+}
+
+.engine-sidebar {
+  position: sticky;
+  top: 84px;
+  height: calc(100vh - 105px);
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 15px;
+}
+
+.engine-sidebar h3 {
+  margin: 4px 6px 12px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.engine-search {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 11px;
+  outline: none;
+  font-size: 13px;
+}
+.engine-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,120,212,.12);
+}
+
+.qnav {
+  display: grid;
+  grid-template-columns: repeat(5,1fr);
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.qnav button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 7px 2px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.qnav button:hover {
+  border-color: var(--accent);
+}
+.qnav button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+.qnav button.correct {
+  background: #dff5e7;
+  border-color: #9bd1aa;
+  color: var(--good);
+}
+.qnav button.wrong {
+  background: #fdeaea;
+  border-color: #efb0b0;
+  color: var(--bad);
+}
+.qnav button.flagged {
+  background: #fff4db;
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+.question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px;
+  margin-bottom: 18px;
+  scroll-margin-top: 95px;
+}
+
+.question-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 13px;
+  margin-bottom: 17px;
+}
+
+.question-number {
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.type-badge {
+  display: inline-flex;
+  margin-left: 7px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  background: #eaf2fa;
+  color: #31526f;
+}
+.type-badge.hotspot {
+  background: #fff4db;
+  color: #805c0b;
+}
+.type-badge.drag-drop {
+  background: #f1eafd;
+  color: #6243a4;
+}
+
+.status {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.question-content p {
+  margin: 0 0 11px;
+}
+
+.options {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: .15s;
+}
+.option:hover {
+  border-color: #9eb5ca;
+  background: #f8fbfe;
+}
+.option:has(input:checked) {
+  border-color: var(--accent);
+  background: #eef7ff;
+}
+.option input {
+  margin-top: 4px;
+}
+.option-letter {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--surface2);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.exhibits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+  gap: 12px;
+  margin: 17px 0;
+}
+figure {
+  margin: 0;
+  padding: 8px;
+  background: #fafbfd;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 560px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+}
+figcaption {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 5px 2px 0;
+}
+
+.special-answer {
+  margin-top: 18px;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px dashed #b8c6d4;
+  border-radius: 12px;
+}
+.special-title {
+  font-weight: 800;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.question-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.next-question-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.next-question-btn {
+  min-width: 150px;
+}
+
+.feedback {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-weight: 650;
+}
+.feedback.good {
+  background: #eaf7ee;
+  color: #176b35;
+  border: 1px solid #bde1c8;
+}
+.feedback.bad {
+  background: #fff0f0;
+  color: #a51f1f;
+  border: 1px solid #efbcbc;
+}
+
+.answer-panel {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f7fbff;
+  border: 1px solid #cfe2f3;
+}
+.answer-heading, .explanation-heading {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 800;
+  color: var(--muted);
+}
+.answer-value {
+  margin: 5px 0 15px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent2);
+}
+.explanation p {
+  margin: 0 0 9px;
+}
+
+@media(max-width:900px){
+  .engine-layout{grid-template-columns:1fr}
+  .engine-sidebar{position:static;height:auto}
+  .qnav{grid-template-columns:repeat(10,1fr);max-height:190px;overflow:auto}
+}
+@media(max-width:600px){
+  .qnav{grid-template-columns:repeat(8,1fr)}
+  .engine-btn{padding:9px 11px}
+}
+
 /* Tiptap Editor Styles */
 .tiptap {
   outline: none;
