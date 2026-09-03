@@ -14,7 +14,8 @@
     <meta name="description" content="@yield('meta_description', config('seo.defaults.description'))">
     <meta name="keywords" content="@yield('meta_keywords', config('seo.defaults.keywords'))">
     <link rel="canonical" href="@yield('canonical_url', url()->current())">
-    <meta name="robots" content="@yield('robots', config('seo.defaults.robots'))">
+    <meta name="robots" content="@yield('robots', config('seo.defaults.robots', 'noindex, nofollow'))">
+    <meta name="googlebot" content="@yield('googlebot', config('seo.defaults.robots', 'noindex, nofollow'))">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', config('seo.defaults.og_type'))">

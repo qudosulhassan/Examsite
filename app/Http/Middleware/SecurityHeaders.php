@@ -23,6 +23,10 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'microphone=(), camera=(), geolocation=()');
         
+        if ($robots = config('seo.defaults.robots')) {
+            $response->headers->set('X-Robots-Tag', $robots);
+        }
+        
         if (app()->environment('production')) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
         }

@@ -22,7 +22,7 @@ return [
         'keywords' => 'IT certification, exam dumps, study guides, practice tests, exam engine',
         'og_image' => 'images/og-default.png',
         'og_type' => 'website',
-        'robots' => 'index, follow',
+        'robots' => env('SEO_ROBOTS', 'noindex, nofollow'),
     ],
 
     'social' => [
