@@ -394,10 +394,7 @@
         <div class="absolute top-[40%] -left-[10%] w-[30%] h-[50%] rounded-full bg-blue-500/5 blur-[120px]"></div>
     </div>
 
-    <div class="container-custom relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <!-- Main Content Area -->
-            <div class="lg:col-span-8 space-y-16">
+    <div class="container-custom relative z-10 space-y-16">
                 
                 <!-- Description -->
                 <div class="bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
@@ -733,12 +730,7 @@
                             <p class="text-gray-400 font-normal mt-1">Be the first to leave a review after your purchase!</p>
                         </div>
                     @endif
-                </div>
             </div>
-            
-            <!-- lg right column placeholder to keep grid layout intact -->
-            <div class="hidden lg:block lg:col-span-4"></div>
-        </div>
     </div>
 </section>
 
