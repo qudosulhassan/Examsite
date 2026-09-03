@@ -23,8 +23,17 @@
             <tbody class="bg-white divide-y divide-gray-150 text-xs">
                 @forelse($vendors as $vendor)
                     <tr>
-                        <td class="px-6 py-4 font-bold text-navy">
-                            {{ $vendor->name }}
+                        <td class="px-6 py-4 font-bold text-navy flex items-center space-x-3">
+                            @if($vendor->logo_url)
+                                <div class="w-8 h-8 rounded border border-gray-200 bg-white p-1 flex items-center justify-center shrink-0 shadow-xs">
+                                    <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
+                                </div>
+                            @else
+                                <div class="w-8 h-8 rounded border border-dashed border-gray-300 bg-gray-50 flex items-center justify-center shrink-0 text-gray-400 font-bold text-[10px]">
+                                    {{ strtoupper(substr($vendor->name, 0, 2)) }}
+                                </div>
+                            @endif
+                            <span>{{ $vendor->name }}</span>
                         </td>
                         <td class="px-6 py-4 text-gray-500 font-semibold">
                             {{ $vendor->sort_order }}

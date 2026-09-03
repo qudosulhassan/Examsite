@@ -108,9 +108,9 @@
                                 $style = $logoStyles[$vendor->slug] ?? ['bg' => 'bg-slate-100 border-gray-200', 'html' => '<span class="text-sm font-bold uppercase text-gray-700">' . substr($vendor->name, 0, 2) . '</span>'];
                             @endphp
                             
-                            @if($vendor->logo_path)
-                                <div class="h-16 w-16 rounded-2xl flex items-center justify-center bg-white border border-gray-100 p-2.5 shrink-0 shadow-[0_5px_15px_rgba(0,0,0,0.05)] group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500">
-                                    <img src="{{ $vendor->logo_path }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
+                            @if($vendor->logo_url)
+                                <div class="h-16 w-16 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 bg-white p-2.5 shrink-0">
+                                    <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
                                 </div>
                             @else
                                 <div class="h-16 w-16 rounded-2xl flex items-center justify-center border {{ $style['bg'] }} shrink-0 shadow-[0_5px_15px_rgba(0,0,0,0.05)] group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500">

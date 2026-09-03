@@ -150,9 +150,9 @@
                                 'html' => '<span class="text-sm font-bold uppercase text-gray-700">' . substr($vendor->name, 0, 2) . '</span>'
                             ];
                         @endphp
-                        @if($vendor->logo_path)
+                        @if($vendor->logo_url)
                             <div class="h-16 w-16 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 bg-white p-2.5 shrink-0">
-                                <img src="{{ $vendor->logo_path }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
+                                <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
                             </div>
                         @else
                             <div class="h-16 w-16 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 shrink-0 {{ $style['bg'] }}">

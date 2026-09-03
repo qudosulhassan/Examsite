@@ -24,6 +24,7 @@ class VendorAdminController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
             'description' => 'nullable|string',
             'sort_order' => 'required|integer',
             'meta_title' => 'nullable|string|max:255',
@@ -31,9 +32,16 @@ class VendorAdminController extends Controller
             'meta_keywords' => 'nullable|string|max:255',
         ]);
 
+        $logoPath = null;
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('vendors', 'public');
+            $logoPath = '/storage/' . $path;
+        }
+
         Vendor::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'logo_path' => $logoPath,
             'description' => $request->description,
             'sort_order' => $request->sort_order,
             'is_active' => $request->has('is_active'),
@@ -57,6 +65,7 @@ class VendorAdminController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
             'description' => 'nullable|string',
             'sort_order' => 'required|integer',
             'meta_title' => 'nullable|string|max:255',
@@ -64,7 +73,7 @@ class VendorAdminController extends Controller
             'meta_keywords' => 'nullable|string|max:255',
         ]);
 
-        $vendor->update([
+        $data = [
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'description' => $request->description,
@@ -73,7 +82,24 @@ class VendorAdminController extends Controller
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
             'meta_keywords' => $request->meta_keywords,
-        ]);
+        ];
+
+        if ($request->boolean('remove_logo')) {
+            if ($vendor->logo_path && str_starts_with($vendor->logo_path, '/storage/')) {
+                $storagePath = str_replace('/storage/', '', $vendor->logo_path);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($storagePath);
+            }
+            $data['logo_path'] = null;
+        } elseif ($request->hasFile('logo')) {
+            if ($vendor->logo_path && str_starts_with($vendor->logo_path, '/storage/')) {
+                $storagePath = str_replace('/storage/', '', $vendor->logo_path);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($storagePath);
+            }
+            $path = $request->file('logo')->store('vendors', 'public');
+            $data['logo_path'] = '/storage/' . $path;
+        }
+
+        $vendor->update($data);
 
         return redirect()->route('admin.vendors.index')->with('success', 'Vendor updated successfully.');
     }

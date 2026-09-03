@@ -11,7 +11,7 @@
 
     <!-- Edit Form -->
     <div class="bg-white border border-gray-250 rounded-lg p-6 shadow-sm">
-        <form action="{{ route('admin.vendors.update', $vendor->id) }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.vendors.update', $vendor->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
             
@@ -23,6 +23,70 @@
                 @error('name')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
+            </div>
+
+            <!-- Vendor Logo / Image -->
+            <div x-data="{
+                previewUrl: '{{ $vendor->logo_url ?? '' }}',
+                removeImage: false,
+                fileName: '',
+                fileChosen(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    this.fileName = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.previewUrl = e.target.result;
+                        this.removeImage = false;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }">
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Vendor Image / Logo</label>
+                
+                <div class="flex flex-col sm:flex-row items-start gap-5">
+                    <!-- Current / Live Preview Box -->
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-xl border-2 border-dashed border-gray-250 bg-gray-50 flex items-center justify-center p-3 relative overflow-hidden flex-shrink-0 shadow-inner">
+                        <template x-if="previewUrl && !removeImage">
+                            <img :src="previewUrl" alt="Vendor Logo" class="max-h-full max-w-full object-contain">
+                        </template>
+                        <template x-if="!previewUrl || removeImage">
+                            <div class="text-center text-gray-400">
+                                <svg class="w-8 h-8 mx-auto text-gray-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span class="text-[10px] font-bold uppercase tracking-wider block">No Image</span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Upload Controls -->
+                    <div class="flex-1 space-y-3 w-full">
+                        <div class="relative">
+                            <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+                                   @change="fileChosen($event)"
+                                   class="block w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-navy file:text-white hover:file:bg-opacity-90 file:cursor-pointer cursor-pointer border border-gray-300 rounded focus:outline-none focus:border-cyan">
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>PNG, JPG, SVG, WebP up to 4MB</span>
+                            <span x-show="fileName" x-text="fileName" class="text-cyan font-bold truncate max-w-[200px]"></span>
+                        </div>
+
+                        @if($vendor->logo_path)
+                            <div class="pt-1 flex items-center">
+                                <label class="inline-flex items-center text-xs text-red-600 font-semibold cursor-pointer">
+                                    <input type="checkbox" name="remove_logo" value="1" x-model="removeImage" class="rounded border-gray-300 text-red-600 focus:ring-red-500 mr-1.5 h-3.5 w-3.5">
+                                    Remove current image
+                                </label>
+                            </div>
+                        @endif
+
+                        @error('logo')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
             </div>
 
 

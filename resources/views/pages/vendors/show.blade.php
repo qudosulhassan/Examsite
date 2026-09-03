@@ -97,9 +97,9 @@
                         'html' => '<span class="text-white font-bold text-2xl uppercase">' . substr($vendor->name, 0, 2) . '</span>'
                     ];
                 @endphp
-                @if($vendor->logo_path)
+                @if($vendor->logo_url)
                     <div class="h-16 w-16 rounded-lg flex items-center justify-center bg-white border-gray-200 p-2">
-                        <img src="{{ $vendor->logo_path }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
+                        <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
                     </div>
                 @else
                     <div class="h-16 w-16 rounded-lg flex items-center justify-center border {{ $style['bg'] }}">

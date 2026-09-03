@@ -69,4 +69,25 @@ class Vendor extends Model
     {
         return $this->hasMany(Certification::class)->orderBy('sort_order');
     }
+
+    /**
+     * Get browser-accessible URL for vendor logo
+     */
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (!$this->logo_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->logo_path, 'http://') || str_starts_with($this->logo_path, 'https://')) {
+            return $this->logo_path;
+        }
+
+        if (str_starts_with($this->logo_path, '/storage/')) {
+            return asset($this->logo_path);
+        }
+
+        return asset('storage/' . ltrim($this->logo_path, '/'));
+    }
 }
+
