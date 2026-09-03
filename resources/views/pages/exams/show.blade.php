@@ -405,9 +405,9 @@
                         <svg class="w-8 h-8 text-cyan mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         About the Certification Exam
                     </h3>
-                    <div class="prose prose-base sm:prose-lg text-gray-600 max-w-none leading-relaxed font-medium">
-                        <p>{{ $exam->description }}</p>
-                        <p>Our expert certification guides include comprehensive questions and answers designed to mirror the actual exam environment. The full study package will prepare you for the variety of formats found on this test, including multiple choice, multi-select, and drag-and-drop questions.</p>
+                    <div class="prose prose-base sm:prose-lg text-gray-600 max-w-none leading-relaxed font-normal space-y-4">
+                        <p class="font-normal text-gray-600">{{ $exam->description }}</p>
+                        <p class="font-normal text-gray-600">Our expert certification guides include comprehensive questions and answers designed to mirror the actual exam environment. The full study package will prepare you for the variety of formats found on this test, including multiple choice, multi-select, and drag-and-drop questions.</p>
                     </div>
                 </div>
 
@@ -434,15 +434,15 @@
                         
                         <div class="absolute top-0 right-0 w-32 h-32 bg-cyan/5 rounded-bl-full pointer-events-none"></div>
 
-                        <p class="text-base font-medium text-gray-500 mb-8 relative z-10">The study guide addresses all core domains defined in the official vendor certification syllabus:</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 text-base font-bold text-navy relative z-10">
+                        <p class="text-base font-normal text-gray-600 mb-8 relative z-10">The study guide addresses all core domains defined in the official vendor certification syllabus:</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 text-base font-normal text-gray-700 relative z-10">
                             @if(is_array($exam->topics))
                                 @foreach($exam->topics as $topic)
                                     <div class="flex items-start space-x-3 group/topic">
                                         <div class="mt-1 w-5 h-5 rounded-full bg-cyan/10 flex items-center justify-center flex-shrink-0 group-hover/topic:bg-cyan transition-colors">
                                             <svg class="w-3 h-3 text-cyan group-hover/topic:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
                                         </div>
-                                        <span class="group-hover/topic:text-cyan transition-colors">{{ $topic }}</span>
+                                        <span class="group-hover/topic:text-cyan transition-colors font-normal">{{ $topic }}</span>
                                     </div>
                                 @endforeach
                             @else
@@ -450,7 +450,7 @@
                                     <div class="mt-1 w-5 h-5 rounded-full bg-cyan/10 flex items-center justify-center flex-shrink-0 group-hover/topic:bg-cyan transition-colors">
                                         <svg class="w-3 h-3 text-cyan group-hover/topic:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
                                     </div>
-                                    <span class="group-hover/topic:text-cyan transition-colors">General Exam Concepts</span>
+                                    <span class="group-hover/topic:text-cyan transition-colors font-normal">General Exam Concepts</span>
                                 </div>
                             @endif
                         </div>
@@ -462,7 +462,7 @@
                     <div class="text-center mb-12">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-4 inline-block">Free Trial</span>
                         <h3 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Interactive Sample Questions</h3>
-                        <p class="text-lg text-gray-500 font-medium max-w-2xl mx-auto">Try solving these actual questions from the latest {{ $exam->exam_code }} exam pool to test your knowledge.</p>
+                        <p class="text-lg text-gray-600 font-normal max-w-2xl mx-auto">Try solving these actual questions from the latest {{ $exam->exam_code }} exam pool to test your knowledge.</p>
                     </div>
                     
                     @foreach($sampleQuestions as $index => $question)
@@ -479,7 +479,7 @@
                             </div>
                             
                             <!-- Question Text -->
-                            <p class="text-lg sm:text-xl font-bold leading-relaxed text-gray-800">{!! $question->question_text !!}</p>
+                            <p class="text-base sm:text-lg font-normal leading-relaxed text-gray-800">{!! $question->question_text !!}</p>
                             
                             <!-- Options list styled -->
                             <div class="space-y-4">
@@ -487,11 +487,11 @@
                                 <button x-on:click="if(!checked) selectedOption = 'A'"
                                         class="w-full text-left p-5 rounded-2xl border-2 text-base transition-all flex items-center justify-between group/opt shadow-sm"
                                         :class="[
-                                            !checked && selectedOption === 'A' ? 'border-cyan bg-cyan/5 text-navy font-black shadow-[0_0_20px_rgba(0,212,170,0.15)] scale-[1.01]' : '',
-                                            !checked && selectedOption !== 'A' ? 'border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-600 font-bold' : '',
-                                            checked && 'A' === '{{ $question->correct_option }}' ? 'border-green-500 bg-green-50 text-green-800 font-black shadow-md' : '',
-                                            checked && selectedOption === 'A' && 'A' !== '{{ $question->correct_option }}' ? 'border-red-500 bg-red-50 text-red-800 font-black' : '',
-                                            checked && 'A' !== '{{ $question->correct_option }}' && selectedOption !== 'A' ? 'border-gray-50 opacity-40 text-gray-400 cursor-not-allowed' : ''
+                                            !checked && selectedOption === 'A' ? 'border-cyan bg-cyan/5 text-navy font-bold shadow-[0_0_20px_rgba(0,212,170,0.15)] scale-[1.01]' : '',
+                                            !checked && selectedOption !== 'A' ? 'border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-700 font-normal' : '',
+                                            checked && 'A' === '{{ $question->correct_option }}' ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-md' : '',
+                                            checked && selectedOption === 'A' && 'A' !== '{{ $question->correct_option }}' ? 'border-red-500 bg-red-50 text-red-800 font-bold' : '',
+                                            checked && 'A' !== '{{ $question->correct_option }}' && selectedOption !== 'A' ? 'border-gray-50 opacity-40 text-gray-400 cursor-not-allowed font-normal' : ''
                                         ]"
                                         :disabled="checked">
                                     <div class="flex items-center space-x-5 pr-4">
@@ -511,7 +511,7 @@
                                                     checked && selectedOption === 'A' && 'A' !== '{{ $question->correct_option }}' ? 'bg-white scale-100' : ''
                                                  ]"></div>
                                         </div>
-                                        <span class="leading-relaxed"><strong class="mr-2 text-lg">A.</strong> {{ $question->option_a }}</span>
+                                        <span class="leading-relaxed font-normal text-gray-700"><span class="mr-2 font-bold text-navy text-base">A.</span> {{ $question->option_a }}</span>
                                     </div>
                                     
                                     <!-- Status Icons -->
@@ -527,11 +527,11 @@
                                 <button x-on:click="if(!checked) selectedOption = 'B'"
                                         class="w-full text-left p-5 rounded-2xl border-2 text-base transition-all flex items-center justify-between group/opt shadow-sm"
                                         :class="[
-                                            !checked && selectedOption === 'B' ? 'border-cyan bg-cyan/5 text-navy font-black shadow-[0_0_20px_rgba(0,212,170,0.15)] scale-[1.01]' : '',
-                                            !checked && selectedOption !== 'B' ? 'border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-600 font-bold' : '',
-                                            checked && 'B' === '{{ $question->correct_option }}' ? 'border-green-500 bg-green-50 text-green-800 font-black shadow-md' : '',
-                                            checked && selectedOption === 'B' && 'B' !== '{{ $question->correct_option }}' ? 'border-red-500 bg-red-50 text-red-800 font-black' : '',
-                                            checked && 'B' !== '{{ $question->correct_option }}' && selectedOption !== 'B' ? 'border-gray-50 opacity-40 text-gray-400 cursor-not-allowed' : ''
+                                            !checked && selectedOption === 'B' ? 'border-cyan bg-cyan/5 text-navy font-bold shadow-[0_0_20px_rgba(0,212,170,0.15)] scale-[1.01]' : '',
+                                            !checked && selectedOption !== 'B' ? 'border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-700 font-normal' : '',
+                                            checked && 'B' === '{{ $question->correct_option }}' ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-md' : '',
+                                            checked && selectedOption === 'B' && 'B' !== '{{ $question->correct_option }}' ? 'border-red-500 bg-red-50 text-red-800 font-bold' : '',
+                                            checked && 'B' !== '{{ $question->correct_option }}' && selectedOption !== 'B' ? 'border-gray-50 opacity-40 text-gray-400 cursor-not-allowed font-normal' : ''
                                         ]"
                                         :disabled="checked">
                                     <div class="flex items-center space-x-5 pr-4">
@@ -550,7 +550,7 @@
                                                     checked && selectedOption === 'B' && 'B' !== '{{ $question->correct_option }}' ? 'bg-white scale-100' : ''
                                                  ]"></div>
                                         </div>
-                                        <span class="leading-relaxed"><strong class="mr-2 text-lg">B.</strong> {{ $question->option_b }}</span>
+                                        <span class="leading-relaxed font-normal text-gray-700"><span class="mr-2 font-bold text-navy text-base">B.</span> {{ $question->option_b }}</span>
                                     </div>
                                     <template x-if="checked && 'B' === '{{ $question->correct_option }}'">
                                         <svg class="h-8 w-8 text-green-500 flex-shrink-0 filter drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
@@ -565,11 +565,11 @@
                                     <button x-on:click="if(!checked) selectedOption = 'C'"
                                             class="w-full text-left p-5 rounded-2xl border-2 text-base transition-all flex items-center justify-between group/opt shadow-sm"
                                             :class="[
-                                                !checked && selectedOption === 'C' ? 'border-cyan bg-cyan/5 text-navy font-black shadow-[0_0_20px_rgba(0,212,170,0.15)] scale-[1.01]' : '',
-                                                !checked && selectedOption !== 'C' ? 'border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-600 font-bold' : '',
-                                                checked && 'C' === '{{ $question->correct_option }}' ? 'border-green-500 bg-green-50 text-green-800 font-black shadow-md' : '',
-                                                checked && selectedOption === 'C' && 'C' !== '{{ $question->correct_option }}' ? 'border-red-500 bg-red-50 text-red-800 font-black' : '',
-                                                checked && 'C' !== '{{ $question->correct_option }}' && selectedOption !== 'C' ? 'border-gray-50 opacity-40 text-gray-400 cursor-not-allowed' : ''
+                                                !checked && selectedOption === 'C' ? 'border-cyan bg-cyan/5 text-navy font-bold shadow-[0_0_20px_rgba(0,212,170,0.15)] scale-[1.01]' : '',
+                                                !checked && selectedOption !== 'C' ? 'border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-700 font-normal' : '',
+                                                checked && 'C' === '{{ $question->correct_option }}' ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-md' : '',
+                                                checked && selectedOption === 'C' && 'C' !== '{{ $question->correct_option }}' ? 'border-red-500 bg-red-50 text-red-800 font-bold' : '',
+                                                checked && 'C' !== '{{ $question->correct_option }}' && selectedOption !== 'C' ? 'border-gray-50 opacity-40 text-gray-400 cursor-not-allowed font-normal' : ''
                                             ]"
                                             :disabled="checked">
                                         <div class="flex items-center space-x-5 pr-4">
@@ -588,7 +588,7 @@
                                                         checked && selectedOption === 'C' && 'C' !== '{{ $question->correct_option }}' ? 'bg-white scale-100' : ''
                                                      ]"></div>
                                             </div>
-                                            <span class="leading-relaxed"><strong class="mr-2 text-lg">C.</strong> {{ $question->option_c }}</span>
+                                            <span class="leading-relaxed font-normal text-gray-700"><span class="mr-2 font-bold text-navy text-base">C.</span> {{ $question->option_c }}</span>
                                         </div>
                                         <template x-if="checked && 'C' === '{{ $question->correct_option }}'">
                                             <svg class="h-8 w-8 text-green-500 flex-shrink-0 filter drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
@@ -604,11 +604,11 @@
                                     <button x-on:click="if(!checked) selectedOption = 'D'"
                                             class="w-full text-left p-5 rounded-2xl border-2 text-base transition-all flex items-center justify-between group/opt shadow-sm"
                                             :class="[
-                                                !checked && selectedOption === 'D' ? 'border-cyan bg-cyan/5 text-navy font-black shadow-[0_0_20px_rgba(0,212,170,0.15)] scale-[1.01]' : '',
-                                                !checked && selectedOption !== 'D' ? 'border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-600 font-bold' : '',
-                                                checked && 'D' === '{{ $question->correct_option }}' ? 'border-green-500 bg-green-50 text-green-800 font-black shadow-md' : '',
-                                                checked && selectedOption === 'D' && 'D' !== '{{ $question->correct_option }}' ? 'border-red-500 bg-red-50 text-red-800 font-black' : '',
-                                                checked && 'D' !== '{{ $question->correct_option }}' && selectedOption !== 'D' ? 'border-gray-50 opacity-40 text-gray-400 cursor-not-allowed' : ''
+                                                !checked && selectedOption === 'D' ? 'border-cyan bg-cyan/5 text-navy font-bold shadow-[0_0_20px_rgba(0,212,170,0.15)] scale-[1.01]' : '',
+                                                !checked && selectedOption !== 'D' ? 'border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-700 font-normal' : '',
+                                                checked && 'D' === '{{ $question->correct_option }}' ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-md' : '',
+                                                checked && selectedOption === 'D' && 'D' !== '{{ $question->correct_option }}' ? 'border-red-500 bg-red-50 text-red-800 font-bold' : '',
+                                                checked && 'D' !== '{{ $question->correct_option }}' && selectedOption !== 'D' ? 'border-gray-50 opacity-40 text-gray-400 cursor-not-allowed font-normal' : ''
                                             ]"
                                             :disabled="checked">
                                         <div class="flex items-center space-x-5 pr-4">
@@ -627,7 +627,7 @@
                                                         checked && selectedOption === 'D' && 'D' !== '{{ $question->correct_option }}' ? 'bg-white scale-100' : ''
                                                      ]"></div>
                                             </div>
-                                            <span class="leading-relaxed"><strong class="mr-2 text-lg">D.</strong> {{ $question->option_d }}</span>
+                                            <span class="leading-relaxed font-normal text-gray-700"><span class="mr-2 font-bold text-navy text-base">D.</span> {{ $question->option_d }}</span>
                                         </div>
                                         <template x-if="checked && 'D' === '{{ $question->correct_option }}'">
                                             <svg class="h-8 w-8 text-green-500 flex-shrink-0 filter drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
@@ -672,7 +672,7 @@
                                     <svg class="w-4 h-4 mr-2 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                                     Expert Explanation
                                 </div>
-                                <p class="text-gray-600 leading-relaxed text-base font-medium relative z-10">{{ $question->explanation }}</p>
+                                <p class="text-gray-600 leading-relaxed text-base font-normal relative z-10">{{ $question->explanation }}</p>
                             </div>
                         </div>
                     @endforeach
@@ -684,7 +684,7 @@
                         <div class="absolute -left-20 -bottom-20 bg-yellow-400/20 w-60 h-60 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000 pointer-events-none"></div>
                         
                         <h4 class="text-3xl sm:text-4xl font-black text-white relative z-10 leading-tight">Ready to master all {{ $exam->question_count }} questions?</h4>
-                        <p class="text-lg text-white/90 font-medium max-w-2xl mx-auto relative z-10 leading-relaxed">Unlock full access to the timed Test Engine and downloadable PDF study guides. Practice under real exam conditions.</p>
+                        <p class="text-lg text-white/90 font-normal max-w-2xl mx-auto relative z-10 leading-relaxed">Unlock full access to the timed Test Engine and downloadable PDF study guides. Practice under real exam conditions.</p>
                         
                         <a href="#purchase-card" class="inline-block bg-white text-orange hover:bg-gray-50 hover:text-red-500 text-lg font-black py-5 px-12 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all transform hover:-translate-y-1 relative z-10 uppercase tracking-widest hover:shadow-[0_15px_40px_rgba(0,0,0,0.2)]">
                             Unlock Full Access Now
@@ -719,7 +719,7 @@
                                     </div>
                                     <div class="relative flex-grow">
                                         <svg class="absolute -top-2 -left-2 w-8 h-8 text-cyan/10 transform -scale-x-100" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"></path></svg>
-                                        <p class="text-base text-gray-600 font-medium leading-relaxed pl-6 relative z-10">{{ $review->review_text }}</p>
+                                        <p class="text-base text-gray-600 font-normal leading-relaxed pl-6 relative z-10">{{ $review->review_text }}</p>
                                     </div>
                                 </div>
                             @endforeach
@@ -730,7 +730,7 @@
                                 <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                             </div>
                             <p class="text-gray-500 font-bold text-lg">No reviews posted yet.</p>
-                            <p class="text-gray-400 font-medium mt-1">Be the first to leave a review after your purchase!</p>
+                            <p class="text-gray-400 font-normal mt-1">Be the first to leave a review after your purchase!</p>
                         </div>
                     @endif
                 </div>
@@ -802,7 +802,7 @@
             <div>
                 <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-3 inline-block">Learn More</span>
                 <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight mb-2">Related Articles</h2>
-                <p class="text-gray-500 font-medium text-lg">Read our latest guides and tips for the {{ $exam->exam_code }} exam.</p>
+                <p class="text-gray-600 font-normal text-lg">Read our latest guides and tips for the {{ $exam->exam_code }} exam.</p>
             </div>
             <a href="{{ route('blog.index') }}" class="inline-flex items-center justify-center space-x-2 bg-white hover:bg-navy hover:text-white text-navy font-black px-6 py-3.5 rounded-xl transition-all duration-300 border border-gray-200 shadow-sm group">
                 <span class="uppercase tracking-widest text-xs">View all articles</span>
@@ -835,7 +835,7 @@
                         <a href="{{ route('blog.show', $post->slug) }}" class="block mb-4 flex-1">
                             <h3 class="text-xl font-black text-navy group-hover:text-cyan transition-colors leading-snug">{{ $post->title }}</h3>
                         </a>
-                        <p class="text-sm text-gray-500 line-clamp-2 mb-6 font-medium leading-relaxed">{{ $post->excerpt }}</p>
+                        <p class="text-sm text-gray-600 line-clamp-2 mb-6 font-normal leading-relaxed">{{ $post->excerpt }}</p>
                         <div class="mt-auto flex items-center justify-between pt-6 border-t border-gray-100">
                             <div class="flex items-center space-x-3">
                                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan to-blue-500 flex items-center justify-center text-[11px] font-black text-white shadow-sm">{{ substr($post->user->name, 0, 1) }}</div>
