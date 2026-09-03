@@ -426,7 +426,7 @@
                     </div>
                     <div class="flex justify-between items-center pt-5 border-t border-gray-100 mt-auto">
                         <span class="text-lg font-black text-navy">${{ number_format($exam->price_pdf, 2) }}</span>
-                        <a href="{{ url('/exams/' . $exam->slug) }}" class="text-sm font-bold text-white bg-navy hover:bg-cyan px-4 py-2 rounded-lg transition-colors flex items-center space-x-1 shadow-md">
+                        <a href="{{ $exam->url }}" class="text-sm font-bold text-white bg-navy hover:bg-cyan px-4 py-2 rounded-lg transition-colors flex items-center space-x-1 shadow-md">
                             <span>Get Pack</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </a>

@@ -3,7 +3,7 @@
 @section('title', $exam->meta_title ?? "{$exam->exam_code} Exam Dumps & Study Guide | ExamsNinja")
 @section('meta_description', $exam->meta_description ?? "Get updated {$exam->exam_code} ({$exam->exam_name}) exam questions, answers, and study guides. Try our free demo or web-based test engine.")
 @section('meta_keywords', $exam->meta_keywords ?? "{$exam->exam_code}, {$exam->exam_code} exam dumps, {$exam->exam_code} practice test, {$exam->vendor->name} certification")
-@section('canonical_url', route('exams.show', $exam->slug))
+@section('canonical_url', $exam->url)
 @section('og_type', 'product')
 
 @section('seo_tags')
@@ -754,7 +754,7 @@
         
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             @foreach($relatedExams as $related)
-            <a href="{{ route('exams.show', $related->slug) }}" class="bg-gray-50 border border-gray-100 rounded-3xl p-6 hover:shadow-[0_15px_30px_rgba(0,0,0,0.06)] hover:border-cyan/30 hover:-translate-y-2 transition-all duration-300 flex flex-col h-full group relative overflow-hidden">
+            <a href="{{ $related->url }}" class="bg-gray-50 border border-gray-100 rounded-3xl p-6 hover:shadow-[0_15px_30px_rgba(0,0,0,0.06)] hover:border-cyan/30 hover:-translate-y-2 transition-all duration-300 flex flex-col h-full group relative overflow-hidden">
                 <!-- Hover Accent Line -->
                 <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan to-blue-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
 

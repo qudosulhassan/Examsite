@@ -89,7 +89,7 @@
             
             <h3 style="font-size: 14px; margin-top: 0; color: #0A1628;">Ready to Unlock the Full Version?</h3>
             <p>Our premium packages include all practice questions with verified answers, detailed explanations, and 90 days of free updates. You can also upgrade to our online timed testing engine to practice in a realistic exam simulator.</p>
-            <p><a href="{{ url('/exams/' . $exam->slug) }}" style="color: #00D4AA; font-weight: bold; text-decoration: none;">Get the Full Guide & Test Engine &rarr;</a></p>
+            <p><a href="{{ $exam->url }}" style="color: #00D4AA; font-weight: bold; text-decoration: none;">Get the Full Guide & Test Engine &rarr;</a></p>
         </div>
         <div class="footer">
             <p>Pass Your IT Certification Exam First Attempt. Guaranteed.</p>

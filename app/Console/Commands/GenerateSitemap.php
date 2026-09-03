@@ -46,8 +46,9 @@ class GenerateSitemap extends Command
 
         // 3. Exams
         $examSitemap = Sitemap::create();
-        Exam::where('is_active', true)->get()->each(function (Exam $exam) use ($examSitemap) {
-            $url = $exam->vendor ? "/exams/{$exam->slug}" : "/exams/{$exam->slug}";
+        Exam::where('is_active', true)->with('vendor')->get()->each(function (Exam $exam) use ($examSitemap) {
+            $vendorSlug = $exam->vendor ? $exam->vendor->slug : 'exam';
+            $url = "/exams/{$vendorSlug}/{$exam->slug}";
             $examSitemap->add(
                 Url::create($url)
                     ->setPriority(0.9)

@@ -40,7 +40,7 @@ class SearchController extends Controller
         return response()->json([
             'exams' => $exams->map(function($exam) use ($context) {
                 $demoUrl = route('public.demo-test-engine.lobby', $exam->slug);
-                $productUrl = url('/exams/' . $exam->slug);
+                $productUrl = $exam->url;
                 return [
                     'code' => $exam->exam_code,
                     'name' => $exam->exam_name,

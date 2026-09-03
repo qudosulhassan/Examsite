@@ -226,13 +226,55 @@
   border-color: #9eb5ca;
   background: #f8fbfe;
 }
-.option:has(input:checked) {
+.option:has(input:checked),
+.option.selected {
   border-color: var(--accent);
   background: #eef7ff;
 }
 .option input {
   margin-top: 4px;
 }
+
+.main { min-width: 0; }
+
+.hero {
+  background: linear-gradient(135deg, #0b3150, #0a5d96);
+  color: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+.hero h1 { margin: 0 0 7px; font-size: clamp(22px,3vw,34px); font-weight: 800; }
+.hero p  { margin: 0; opacity: .9; max-width: 850px; }
+
+.stats { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+.stat  {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 25px 10px;
+  font-size: 12px;
+}
+
+.test-complete {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 40px 28px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+.test-complete h2 { margin: 0 0 8px; font-size: 26px; font-weight: 800; }
+.test-complete p  { color: var(--muted); margin: 0 0 22px; }
 .option-letter {
   width: 28px;
   height: 28px;

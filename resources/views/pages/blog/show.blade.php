@@ -172,7 +172,7 @@
                         <span class="inline-block px-2 py-1 bg-orange text-navy text-xs font-bold rounded mb-3 uppercase tracking-wider">Recommended Tool</span>
                         <h3 class="text-xl font-bold mb-2">Prepare for {{ $post->exam->exam_code }}</h3>
                         <p class="text-sm text-gray-200 mb-5">Get the official study guide and practice test bundle to guarantee your success.</p>
-                        <a href="{{ route('exams.show', $post->exam->slug) }}" class="block text-center w-full bg-white text-navy hover:bg-gray-100 font-bold py-3 rounded-lg shadow transition">
+                        <a href="{{ $post->exam->url }}" class="block text-center w-full bg-white text-navy hover:bg-gray-100 font-bold py-3 rounded-lg shadow transition">
                             View Study Materials
                         </a>
                     </div>

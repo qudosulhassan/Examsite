@@ -15,9 +15,10 @@ class Exam extends Model
     {
         static::updating(function ($exam) {
             if ($exam->isDirty('slug')) {
+                $vendorSlug = $exam->vendor ? $exam->vendor->slug : 'exam';
                 Redirect::create([
-                    'old_url' => 'exams/' . $exam->getOriginal('slug'),
-                    'new_url' => 'exams/' . $exam->slug,
+                    'old_url' => 'exams/' . $vendorSlug . '/' . $exam->getOriginal('slug'),
+                    'new_url' => 'exams/' . $vendorSlug . '/' . $exam->slug,
                     'status_code' => 301,
                 ]);
             }
@@ -108,5 +109,14 @@ class Exam extends Model
     public function averageRating()
     {
         return $this->reviews()->where('is_approved', true)->avg('rating') ?: 5.0;
+    }
+
+    /**
+     * Get public canonical URL for the exam.
+     */
+    public function getUrlAttribute(): string
+    {
+        $vendorSlug = $this->vendor ? $this->vendor->slug : 'exam';
+        return route('exams.show', ['vendor' => $vendorSlug, 'slug' => $this->slug]);
     }
 }

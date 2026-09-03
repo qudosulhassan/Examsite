@@ -50,10 +50,10 @@ class SitemapController extends Controller
         }
 
         // Exam Pages
-        $exams = Exam::where('is_active', true)->get();
+        $exams = Exam::where('is_active', true)->with('vendor')->get();
         foreach ($exams as $exam) {
             $urls[] = [
-                'loc' => route('exams.show', $exam->slug),
+                'loc' => route('exams.show', ['vendor' => $exam->vendor ? $exam->vendor->slug : 'exam', 'slug' => $exam->slug]),
                 'priority' => '0.9',
                 'changefreq' => 'weekly',
                 'lastmod' => $exam->last_updated_at ? $exam->last_updated_at->format('Y-m-d') : $exam->updated_at->format('Y-m-d'),

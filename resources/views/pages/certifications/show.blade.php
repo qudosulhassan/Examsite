@@ -71,7 +71,7 @@
                                 <span class="text-2xl font-black text-navy group-hover:text-cyan transition-colors">${{ $exam->price_pdf }}</span>
                             </div>
                             <h3 class="text-xl font-black text-navy mb-4 line-clamp-2 group-hover:text-cyan transition-colors leading-tight">
-                                <a href="{{ route('exams.show', $exam->slug) }}" class="focus:outline-none focus:underline">{{ $exam->exam_name }}</a>
+                                <a href="{{ $exam->url }}" class="focus:outline-none focus:underline">{{ $exam->exam_name }}</a>
                             </h3>
                             <div class="flex items-center space-x-4 text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2">
                                 <span class="flex items-center bg-gray-50 px-2.5 py-1.5 rounded-md border border-gray-100">
@@ -81,7 +81,7 @@
                             </div>
                         </div>
                         <div class="px-8 py-6 bg-white border-t border-gray-100 mt-auto relative z-10 flex justify-center">
-                            <a href="{{ route('exams.show', $exam->slug) }}" class="w-full text-center bg-navy hover:bg-gradient-to-r hover:from-cyan hover:to-blue-500 text-white font-black text-[13px] uppercase tracking-widest py-3.5 rounded-xl transition-all duration-300 shadow-md group-hover:shadow-[0_5px_20px_rgba(0,212,170,0.3)]">
+                            <a href="{{ $exam->url }}" class="w-full text-center bg-navy hover:bg-gradient-to-r hover:from-cyan hover:to-blue-500 text-white font-black text-[13px] uppercase tracking-widest py-3.5 rounded-xl transition-all duration-300 shadow-md group-hover:shadow-[0_5px_20px_rgba(0,212,170,0.3)]">
                                 View Exam Details
                             </a>
                         </div>

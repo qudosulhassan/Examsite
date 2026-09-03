@@ -78,7 +78,7 @@
                                     <span class="text-[10px] text-gray-400 font-bold uppercase">{{ $exam->difficulty }}</span>
                                 </div>
                                 <h3 class="font-bold text-navy text-sm mb-2 line-clamp-2 h-10">
-                                    <a href="{{ url('/exams/' . $exam->slug) }}" class="hover:text-cyan transition">{{ $exam->exam_name }}</a>
+                                    <a href="{{ $exam->url }}" class="hover:text-cyan transition">{{ $exam->exam_name }}</a>
                                 </h3>
                                 <p class="text-xs text-gray-400 font-semibold mb-4">{{ $exam->vendor ? $exam->vendor->name : '' }}</p>
                             </div>
@@ -87,7 +87,7 @@
                                     <span class="block text-[8px] text-gray-400 font-bold uppercase">PDF Price</span>
                                     <span class="font-bold text-navy text-sm">${{ $exam->price_pdf }}</span>
                                 </div>
-                                <a href="{{ url('/exams/' . $exam->slug) }}" class="bg-orange hover-bg-orange text-white text-[10px] font-bold py-1.5 px-3 rounded shadow transition">
+                                <a href="{{ $exam->url }}" class="bg-orange hover-bg-orange text-white text-[10px] font-bold py-1.5 px-3 rounded shadow transition">
                                     Get Study Pack
                                 </a>
                             </div>
