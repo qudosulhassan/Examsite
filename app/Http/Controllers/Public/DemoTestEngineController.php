@@ -183,9 +183,9 @@ class DemoTestEngineController extends Controller
 
         return response()->json([
             'success' => true,
-            'is_correct' => $isCorrect,
-            'correct_option' => $question->correct_option,
-            'explanation' => $question->explanation,
+            'is_correct' => $attempt->mode === 'exam' ? null : $isCorrect,
+            'correct_option' => $attempt->mode === 'exam' ? null : $question->correct_option,
+            'explanation' => $attempt->mode === 'exam' ? null : $question->explanation,
         ]);
     }
 

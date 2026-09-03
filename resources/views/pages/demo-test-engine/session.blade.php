@@ -19,7 +19,7 @@
                 type: @json($ans->question->question_type),
                 selected: @json($ans->selected_option ?? ''),
                 flagged: {{ $ans->is_flagged ? 'true' : 'false' }},
-                correct: @json($ans->question->correct_option),
+                correct: @json($attempt->mode === 'exam' ? null : $ans->question->correct_option),
                 options: @json($ans->question->options->map(fn($o) => ['key' => $o->option_key, 'text' => $o->option_text])),
                 drag_items: @json($ans->question->question_data['drag_items'] ?? []),
                 matching_pairs: @json($ans->question->question_data['matching_pairs'] ?? []),
@@ -66,7 +66,6 @@
              tick();
          },
          saveAnswer(index, option) {
-             // For multi-select, option is handled in toggleCheckbox
              this.answers[index].selected = option;
              this.ajaxSave(index);
          },
@@ -110,7 +109,7 @@
                      attempt_id: {{ $attempt->id }},
                      question_id: this.answers[index].id,
                      selected_option: this.answers[index].selected,
-                     time_spent: 0 // Tracked on backend or simplified here
+                     time_spent: 0
                  })
              });
          }
@@ -139,7 +138,7 @@
         <!-- Submit Button -->
         <form id="submit-exam-form" action="{{ route('public.demo-test-engine.submit', $attempt->id) }}" method="POST">
             @csrf
-            <input type="hidden" name="time_taken" :value="(activeIndex * 10)"> <!-- Simulating duration -->
+            <input type="hidden" name="time_taken" :value="(activeIndex * 10)">
             <button type="submit" class="bg-gradient-to-r from-orange to-red-500 hover:from-orange hover:to-red-600 text-white text-[11px] font-black uppercase tracking-widest px-6 py-2.5 rounded-lg shadow-[0_4px_15px_rgba(249,115,22,0.4)] transition-all transform hover:-translate-y-0.5 focus:outline-none">
                 Submit Simulator Exam
             </button>
@@ -204,19 +203,32 @@
                         <!-- Decorative accent -->
                         <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-cyan to-blue-500"></div>
 
-                        <!-- Heading -->
+                        <!-- Heading & Flag Button -->
                         <div class="flex justify-between items-start pb-6 border-b border-gray-100">
                             <div>
-                                <span class="bg-cyan/10 text-cyan font-black text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-widest border border-cyan/20" x-text="'Topic: ' + (answers[index].correct || '').slice(0, 15)"></span>
+                                <span class="bg-cyan/10 text-cyan font-black text-[10px] px-3 py-1.5 rounded-lg uppercase tracking-widest border border-cyan/20" x-text="answers[index].type ? answers[index].type.replace('_', ' ').toUpperCase() : 'QUESTION'"></span>
                             </div>
                             <!-- Flag trigger -->
                             <button @click="toggleFlag(index)" 
                                     :class="answers[index].flagged ? 'text-orange font-bold bg-orange/10 border-orange/30' : 'text-gray-400 hover:text-navy hover:bg-gray-50 border-transparent'"
                                     class="text-[11px] font-black uppercase tracking-widest border px-3 py-1.5 rounded-lg transition-colors focus:outline-none flex items-center space-x-2">
                                 <span class="text-sm">⚑</span>
-                                <span x-text="answers[index].flagged ? 'Flagged' : 'Flag for Review'"></span>
+                                <span x-text="answers[index].flagged ? 'Flagged' : 'Mark for Review'"></span>
                             </button>
                         </div>
+
+                        <!-- Scenario Box (If present) -->
+                        @foreach($answers as $idx => $ans)
+                            @php
+                                $scenario = $ans->question->question_data['scenario'] ?? null;
+                            @endphp
+                            @if($scenario)
+                                <div x-show="activeIndex == {{ $idx }}" class="bg-slate-50 border-l-4 border-navy p-6 rounded-r-2xl space-y-2">
+                                    <span class="text-[11px] font-black text-navy uppercase tracking-widest block">Scenario Background</span>
+                                    <div class="prose max-w-none text-gray-700 text-sm leading-relaxed">{!! $scenario !!}</div>
+                                </div>
+                            @endif
+                        @endforeach
 
                         <!-- Question Text -->
                         <div class="prose max-w-none">
@@ -228,6 +240,19 @@
                                 @endif
                             </p>
                         </div>
+
+                        <!-- Question Exhibit Image (If present) -->
+                        @foreach($answers as $idx => $ans)
+                            @php
+                                $qImage = $ans->question->media->firstWhere('media_type', 'question_image')?->media_url 
+                                          ?? ($ans->question->image_filename ? '/storage/questions/' . $ans->question->image_filename : null);
+                            @endphp
+                            @if($qImage)
+                                <div x-show="activeIndex == {{ $idx }}" class="my-4 text-center border border-gray-200 rounded-xl p-3 bg-gray-50">
+                                    <img src="{{ $qImage }}" alt="Question Exhibit" class="max-h-96 mx-auto rounded shadow-sm">
+                                </div>
+                            @endif
+                        @endforeach
 
                         <!-- Answer Choice Options list -->
                         <div class="space-y-4 pt-2">
@@ -322,22 +347,22 @@
                                         </div>
                                     </template>
 
-                                    <!-- 4. Hotspot Selection Rendering -->
+                                    <!-- 4. Hotspot / Answer Boxes Selection Rendering -->
                                     <template x-if="answers[{{ $idx }}].type === 'hotspot'">
                                         <div class="space-y-4">
-                                            <p class="text-xs font-bold text-gray-400 uppercase">Complete configuration selectors:</p>
+                                            <p class="text-xs font-bold text-gray-400 uppercase">Complete configuration selectors in the answer area:</p>
                                             <div class="space-y-4">
-                                                <template x-for="(box, boxIdx) in (answers[{{ $idx }}].hotspot_answers || [])" :key="box.id">
+                                                <template x-for="(box, boxIdx) in (answers[{{ $idx }}].hotspot_answers || [])" :key="box.id || boxIdx">
                                                     <div class="p-4 bg-white border border-gray-200 rounded-xl space-y-2">
-                                                        <label class="block text-xs font-bold text-navy" x-text="box.label"></label>
+                                                        <label class="block text-xs font-bold text-navy" x-text="box.label || ('Box ' + (boxIdx + 1))"></label>
                                                         <select @change="
                                                                     box.selected = $event.target.value;
                                                                     let vals = answers[{{ $idx }}].hotspot_answers.map(b => b.selected || '');
                                                                     saveAnswer({{ $idx }}, vals.join(','));
                                                                 "
                                                                 class="w-full border-gray-300 rounded text-xs px-3 py-2 focus:border-cyan focus:ring-cyan">
-                                                            <option value="">Choose option...</option>
-                                                            <template x-for="optVal in box.options" :key="optVal">
+                                                            <option value="">[ Choose option... ]</option>
+                                                            <template x-for="optVal in (box.options || [])" :key="optVal">
                                                                 <option :value="optVal" x-text="optVal"></option>
                                                             </template>
                                                         </select>
@@ -346,6 +371,21 @@
                                             </div>
                                         </div>
                                     </template>
+
+                                    <!-- References Drawer (If present) -->
+                                    @if($ans->question->references && $ans->question->references->count() > 0)
+                                        <div class="pt-4 border-t border-gray-100 text-xs font-semibold text-gray-500">
+                                            <span class="font-black text-navy uppercase tracking-widest text-[10px] block mb-2">References & Study Links</span>
+                                            <div class="flex flex-wrap gap-2">
+                                                @foreach($ans->question->references as $ref)
+                                                    <a href="{{ $ref->url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-cyan hover:underline bg-cyan/5 border border-cyan/20 px-2.5 py-1 rounded-md">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                                        {{ $ref->title }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
 
                                     <!-- Show Explanation trigger (Practice Mode Only) -->
                                     <template x-if="mode === 'practice'">
@@ -362,26 +402,6 @@
                                                 
                                                 <template x-if="answers[{{ $idx }}].type === 'single_choice' || answers[{{ $idx }}].type === 'multiple_choice' || answers[{{ $idx }}].type === 'yes_no'">
                                                     <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Answer: <span class="text-green-600 text-sm ml-1" x-text="answers[{{ $idx }}].correct"></span></p>
-                                                </template>
-                                                
-                                                <template x-if="answers[{{ $idx }}].type === 'drag_drop'">
-                                                    <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Order: <span class="text-green-600 text-sm ml-1" x-text="answers[{{ $idx }}].correct"></span></p>
-                                                </template>
-
-                                                <template x-if="answers[{{ $idx }}].type === 'matching'">
-                                                    <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Matches: 
-                                                        <template x-for="p in (answers[{{ $idx }}].matching_pairs || [])">
-                                                            <span class="block text-green-600 text-xs ml-1 font-semibold" x-text="p.left + ' → ' + p.right"></span>
-                                                        </template>
-                                                    </p>
-                                                </template>
-
-                                                <template x-if="answers[{{ $idx }}].type === 'hotspot'">
-                                                    <p class="font-black text-navy mb-3 uppercase tracking-widest text-[11px]">Correct Configurations: 
-                                                        <template x-for="b in (answers[{{ $idx }}].hotspot_answers || [])">
-                                                            <span class="block text-green-600 text-xs ml-1 font-semibold" x-text="b.label + ': ' + b.correct_answer"></span>
-                                                        </template>
-                                                    </p>
                                                 </template>
 
                                                 <div class="prose max-w-none text-gray-700 font-medium mt-3">
