@@ -16,7 +16,29 @@ class DemoTestEngineController extends Controller
      */
     public function lobby(string $examSlug)
     {
-        $exam = Exam::where('slug', $examSlug)->where('is_active', true)->firstOrFail();
+        $exam = Exam::where('slug', $examSlug)->where('is_active', true)->first();
+
+        if (!$exam) {
+            $exam = Exam::where('exam_code', 'LIKE', $examSlug)->where('is_active', true)->first();
+        }
+
+        if (!$exam) {
+            $normalized = strtolower(str_replace(['-', ' '], '', $examSlug));
+            $exam = Exam::where('is_active', true)
+                ->get()
+                ->first(function($e) use ($normalized) {
+                    return strtolower(str_replace(['-', ' '], '', $e->exam_code)) === $normalized
+                        || strtolower(str_replace(['-', ' '], '', $e->slug)) === $normalized;
+                });
+        }
+
+        if (!$exam) {
+            abort(404);
+        }
+
+        if ($exam->slug !== $examSlug) {
+            return redirect()->route('public.demo-test-engine.lobby', $exam->slug);
+        }
         
         // Demo allows exactly 10 questions max, or whatever is available if < 10
         $availableCount = Question::where('exam_id', $exam->id)->where('is_active', true)->count();

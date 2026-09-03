@@ -70,6 +70,10 @@ Route::get('/pricing', function () {
 
 Route::get('/test-engine', [HomeController::class, 'testEngine'])->name('public.test-engine');
 
+Route::get('/demo-test-engine', function() {
+    return redirect()->route('public.test-engine');
+});
+
 // Public Demo Test Engine Flow
 Route::prefix('demo-test-engine')->name('public.demo-test-engine.')->group(function () {
     Route::get('/{exam}', [DemoTestEngineController::class, 'lobby'])->name('lobby');
