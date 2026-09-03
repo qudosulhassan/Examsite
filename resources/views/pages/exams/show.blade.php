@@ -38,14 +38,14 @@
     <!-- Abstract Tech Lines -->
     <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px); background-size: 40px 40px;"></div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <!-- Breadcrumbs -->
         <div class="mb-10 relative z-20">
             <nav class="flex" aria-label="Breadcrumb">
               <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-white/5 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 shadow-lg">
                 <li class="inline-flex items-center">
                   <a href="{{ url('/') }}" class="inline-flex items-center text-[13px] font-bold text-gray-400 hover:text-cyan transition-colors">
-                    <svg class="w-3.5 h-3.5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                    <svg class="w-3.5 h-3.5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 001 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
                     Home
                   </a>
                 </li>
@@ -74,7 +74,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
             <!-- Left Column: Details & Previews -->
-            <div class="lg:col-span-7 space-y-12">
+            <div class="lg:col-span-8 space-y-12">
                 
                 <!-- Exam Intro Header -->
                 <div class="space-y-10">
@@ -197,7 +197,7 @@
             </div>
 
             <!-- Right Column: Sticky Purchase Box -->
-            <div id="purchase-card" class="lg:col-span-5 lg:pl-6 space-y-6 lg:sticky lg:top-28 z-30"
+            <div id="purchase-card" class="lg:col-span-4 lg:pl-6 space-y-6 lg:sticky lg:top-28 z-30"
                  x-data="{ 
                     updatePeriodCombo: '3',
                     updatePeriodPdf: '3',
@@ -394,10 +394,10 @@
         <div class="absolute top-[40%] -left-[10%] w-[30%] h-[50%] rounded-full bg-blue-500/5 blur-[120px]"></div>
     </div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <!-- Main Content Area -->
-            <div class="lg:col-span-7 space-y-16">
+            <div class="lg:col-span-8 space-y-16">
                 
                 <!-- Description -->
                 <div class="bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
@@ -737,7 +737,7 @@
             </div>
             
             <!-- lg right column placeholder to keep grid layout intact -->
-            <div class="hidden lg:block lg:col-span-5"></div>
+            <div class="hidden lg:block lg:col-span-4"></div>
         </div>
     </div>
 </section>
@@ -754,7 +754,7 @@
 
 @if($relatedExams->count() > 0)
 <section class="py-24 bg-white border-t border-gray-100 overflow-hidden relative">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
             <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Frequently Bought Together</h2>
             <div class="w-24 h-1.5 bg-gradient-to-r from-cyan to-blue-500 mx-auto mt-6 rounded-full"></div>
