@@ -30,7 +30,22 @@ class CertificationController extends Controller
     {
         $certification = Certification::with(['vendor', 'exams' => function($q) {
             $q->where('is_active', true)->orderBy('exam_code');
-        }])->where('slug', $slug)->where('is_active', true)->firstOrFail();
+        }])
+        ->where('is_active', true)
+        ->where(function($q) use ($slug) {
+            $q->where('slug', $slug)
+              ->orWhere('slug', strtolower($slug))
+              ->orWhere('name', 'like', "%{$slug}%");
+        })
+        ->first();
+
+        if (!$certification) {
+            abort(404);
+        }
+
+        if ($slug !== $certification->slug) {
+            return redirect()->route('certifications.show', $certification->slug, 301);
+        }
 
         return view('pages.certifications.show', compact('certification'));
     }

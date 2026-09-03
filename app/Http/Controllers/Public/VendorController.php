@@ -27,7 +27,22 @@ class VendorController extends Controller
     {
         $vendor = Vendor::with(['certifications' => function($q) {
             $q->where('is_active', true)->orderBy('sort_order')->orderBy('name');
-        }])->where('slug', $slug)->where('is_active', true)->firstOrFail();
+        }])
+        ->where('is_active', true)
+        ->where(function($q) use ($slug) {
+            $q->where('slug', $slug)
+              ->orWhere('slug', strtolower($slug))
+              ->orWhere('name', 'like', "%{$slug}%");
+        })
+        ->first();
+        
+        if (!$vendor) {
+            abort(404);
+        }
+
+        if ($slug !== $vendor->slug) {
+            return redirect()->route('vendors.show', $vendor->slug, 301);
+        }
         
         $examsQuery = Exam::with('vendor')->where('vendor_id', $vendor->id)->where('is_active', true);
 

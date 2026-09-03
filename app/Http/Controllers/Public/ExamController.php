@@ -14,7 +14,35 @@ class ExamController extends Controller
      */
     public function show(string $slug)
     {
-        $exam = Exam::where('slug', $slug)->where('is_active', true)->with('vendor')->firstOrFail();
+        $exam = Exam::where('is_active', true)
+            ->where(function($q) use ($slug) {
+                $q->where('slug', $slug)
+                  ->orWhere('exam_code', $slug)
+                  ->orWhere('exam_code', strtoupper($slug))
+                  ->orWhere('slug', strtolower($slug));
+            })
+            ->with('vendor')
+            ->first();
+
+        if (!$exam) {
+            $slugClean = str_replace('-', '', strtolower($slug));
+            $exam = Exam::where('is_active', true)
+                ->where(function($q) use ($slugClean) {
+                    $q->whereRaw("LOWER(REPLACE(exam_code, '-', '')) = ?", [$slugClean])
+                      ->orWhereRaw("LOWER(REPLACE(slug, '-', '')) = ?", [$slugClean]);
+                })
+                ->with('vendor')
+                ->first();
+        }
+
+        if (!$exam) {
+            abort(404);
+        }
+
+        // Canonical URL redirect if slug doesn't match official slug
+        if ($slug !== $exam->slug) {
+            return redirect()->route('exams.show', $exam->slug, 301);
+        }
 
         // Get first 3 questions for preview without correct answers or explanations exposed
         $sampleQuestions = Question::where('exam_id', $exam->id)
