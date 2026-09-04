@@ -38,6 +38,7 @@ class Exam extends Model
         'vendor_id',
         'exam_code',
         'exam_name',
+        'header_title',
         'slug',
         'description',
         'topics',
@@ -47,6 +48,10 @@ class Exam extends Model
         'exam_type',
         'price_pdf',
         'price_engine',
+        'price_bundle',
+        'is_pdf_available',
+        'is_engine_available',
+        'is_bundle_available',
         'update_price_3_months',
         'update_price_6_months',
         'update_price_12_months',
@@ -54,7 +59,9 @@ class Exam extends Model
         'full_pdf_filename',
         'last_updated_at',
         'is_active',
+        'is_featured',
         'sort_order',
+        'admin_notes',
         'meta_title',
         'meta_description',
         'meta_keywords',
@@ -63,9 +70,14 @@ class Exam extends Model
     protected $casts = [
         'topics' => 'array',
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
+        'is_pdf_available' => 'boolean',
+        'is_engine_available' => 'boolean',
+        'is_bundle_available' => 'boolean',
         'last_updated_at' => 'datetime',
         'price_pdf' => 'decimal:2',
         'price_engine' => 'decimal:2',
+        'price_bundle' => 'decimal:2',
         'update_price_3_months' => 'decimal:2',
         'update_price_6_months' => 'decimal:2',
         'update_price_12_months' => 'decimal:2',
@@ -73,6 +85,18 @@ class Exam extends Model
         'question_count' => 'integer',
         'passing_score' => 'integer',
     ];
+
+    /**
+     * Get effective bundle price (explicit price_bundle or fallback 10% discount).
+     */
+    public function getEffectiveBundlePriceAttribute(): float
+    {
+        if ($this->price_bundle !== null && (float)$this->price_bundle > 0) {
+            return (float)$this->price_bundle;
+        }
+
+        return round(((float)$this->price_pdf + (float)$this->price_engine) * 0.90, 2);
+    }
 
     /**
      * Get the vendor that owns the exam.
@@ -118,5 +142,13 @@ class Exam extends Model
     {
         $vendorSlug = $this->vendor ? $this->vendor->slug : 'exam';
         return route('exams.show', ['vendor' => $vendorSlug, 'slug' => $this->slug]);
+    }
+
+    /**
+     * Get the count of real questions assigned to this exam.
+     */
+    public function getCalculatedQuestionCountAttribute(): int
+    {
+        return $this->questions()->count();
     }
 }

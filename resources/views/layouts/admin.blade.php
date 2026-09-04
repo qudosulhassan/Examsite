@@ -98,9 +98,29 @@
                             </div>
                         </div>
 
-                        <a href="{{ url('/admin/users') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/users') }}">
-                            Users
-                        </a>
+                        <!-- Users & RBAC Submenu -->
+                        <div x-data="{ usersOpen: {{ (request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/audit-logs*')) ? 'true' : 'false' }} }">
+                            <button type="button" @click="usersOpen = !usersOpen" class="w-full group flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-md transition {{ (request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/audit-logs*')) ? 'bg-gray-800 text-cyan border-l-4 border-cyan' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
+                                <span>Users</span>
+                                <svg class="h-4 w-4 transform transition-transform" :class="usersOpen ? 'rotate-180 text-cyan' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div x-show="usersOpen" class="pl-3 pr-1 py-1 space-y-1">
+                                <a href="{{ route('admin.users.index') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.users.index') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    All Users
+                                </a>
+                                <a href="{{ route('admin.users.create') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.users.create') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    + Add User
+                                </a>
+                                <a href="{{ route('admin.roles.index') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->is('admin/roles*') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Roles & Permissions
+                                </a>
+                                <a href="{{ route('admin.audit-logs.index') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.audit-logs.index') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Audit Logs
+                                </a>
+                            </div>
+                        </div>
 
                         <a href="{{ url('/admin/orders') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/orders') }}">
                             Orders
@@ -118,17 +138,53 @@
                             Coupons
                         </a>
 
-                        <a href="{{ url('/admin/blog') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ request()->is('admin/blog*') && !request()->is('admin/blog-comments*') && !request()->is('admin/blog-subscribers*') ? 'bg-gray-800 text-orange border-l-4 border-orange' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
-                            Blog Posts
-                        </a>
-
-                        <a href="{{ url('/admin/blog-comments') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/blog-comments') }}">
-                            Blog Comments
-                        </a>
-
-                        <a href="{{ url('/admin/blog-subscribers') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/blog-subscribers') }}">
-                            Blog Subscribers
-                        </a>
+                        <!-- Blog CMS Submenu -->
+                        <div x-data="{ blogOpen: {{ (request()->is('admin/blog*') || request()->is('admin/blog-categories*') || request()->is('admin/blog-tags*') || request()->is('admin/blog-comments*') || request()->is('admin/blog-subscribers*')) ? 'true' : 'false' }} }">
+                            <button type="button" @click="blogOpen = !blogOpen" class="w-full group flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-md transition {{ (request()->is('admin/blog*') || request()->is('admin/blog-categories*') || request()->is('admin/blog-tags*') || request()->is('admin/blog-comments*') || request()->is('admin/blog-subscribers*')) ? 'bg-gray-800 text-cyan border-l-4 border-cyan' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
+                                <div class="flex items-center space-x-2">
+                                    <span>Blog CMS</span>
+                                    @php
+                                        $pendingCommentsCount = \App\Models\BlogComment::where('status', 'pending')->count();
+                                    @endphp
+                                    @if($pendingCommentsCount > 0)
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400">
+                                            {{ $pendingCommentsCount }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <svg class="h-4 w-4 transform transition-transform" :class="blogOpen ? 'rotate-180 text-cyan' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div x-show="blogOpen" class="pl-3 pr-1 py-1 space-y-1">
+                                <a href="{{ route('admin.blog.dashboard') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.blog.dashboard') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Dashboard
+                                </a>
+                                <a href="{{ route('admin.blog.index') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.blog.index') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    All Posts
+                                </a>
+                                <a href="{{ route('admin.blog.create') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.blog.create') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    + New Post
+                                </a>
+                                <a href="{{ route('admin.blog-categories.index') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.blog-categories.*') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Categories
+                                </a>
+                                <a href="{{ route('admin.blog-tags.index') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.blog-tags.*') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Tags
+                                </a>
+                                <a href="{{ route('admin.blog-comments.index') }}" class="group flex items-center justify-between px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.blog-comments.*') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    <span>Comments</span>
+                                    @if($pendingCommentsCount > 0)
+                                        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-slate-900">
+                                            {{ $pendingCommentsCount }}
+                                        </span>
+                                    @endif
+                                </a>
+                                <a href="{{ route('admin.blog-subscribers.index') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.blog-subscribers.*') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Subscribers
+                                </a>
+                            </div>
+                        </div>
 
                         <a href="{{ url('/admin/media') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/media') }}">
                             Media Gallery
@@ -157,17 +213,32 @@
         <!-- Main Body -->
         <div class="md:pl-64 flex flex-col flex-1">
             <!-- Top bar -->
-            <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
-                <button type="button" @click="sidebarOpen = true" class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange md:hidden">
+            <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow-sm border-b border-gray-150">
+                <button type="button" @click="sidebarOpen = true" class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan md:hidden">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
-                <div class="flex-1 px-4 flex justify-between">
-                    <div class="flex-1 flex items-center">
-                        <h2 class="text-lg font-bold text-gray-800">Administrator Console</h2>
+                <div class="flex-1 px-4 sm:px-6 flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <h2 class="text-base sm:text-lg font-extrabold text-navy tracking-tight">ExamTopicsBase <span class="text-xs font-semibold text-gray-400 font-sans hidden sm:inline">| Admin Console</span></h2>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hidden md:inline-flex">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
+                            Live System
+                        </span>
                     </div>
-                    <div class="ml-4 flex items-center md:ml-6 space-x-4">
-                        <a href="{{ url('/') }}" class="text-sm font-medium text-gray-600 hover:text-navy transition">View Live Website</a>
-                        <a href="{{ url('/dashboard') }}" class="text-sm font-medium text-gray-600 hover:text-navy transition">User Dashboard</a>
+                    <div class="ml-4 flex items-center md:ml-6 space-x-3 sm:space-x-4">
+                        <a href="{{ url('/') }}" target="_blank" class="text-xs font-bold text-gray-600 hover:text-navy transition flex items-center gap-1">
+                            <span>Live Website</span>
+                            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                        <a href="{{ url('/dashboard') }}" class="text-xs font-bold text-gray-600 hover:text-navy transition hidden sm:inline">User Dashboard</a>
+
+                        <!-- Admin Profile Pill -->
+                        <div class="flex items-center space-x-2 pl-2 border-l border-gray-200">
+                            <div class="w-7 h-7 rounded-lg bg-navy/10 text-navy font-bold flex items-center justify-center text-xs uppercase">
+                                {{ strtoupper(substr(auth()->user()->name ?? 'AD', 0, 2)) }}
+                            </div>
+                            <span class="text-xs font-bold text-navy hidden md:inline">{{ auth()->user()->name }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -218,11 +289,40 @@
                             <a href="{{ route('admin.questions.import-pdf-form') }}" class="block text-xs text-gray-400 hover:text-white">Import PDF</a>
                             <a href="{{ route('admin.questions.import-history') }}" class="block text-xs text-gray-400 hover:text-white">Import History</a>
                         </div>
-                        <a href="{{ url('/admin/users') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Users</a>
+                        <div x-data="{ mUsersOpen: {{ (request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/audit-logs*')) ? 'true' : 'false' }} }">
+                            <button type="button" @click="mUsersOpen = !mUsersOpen" class="w-full group flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">
+                                <span>Users</span>
+                                <svg class="h-4 w-4 transform transition-transform" :class="mUsersOpen ? 'rotate-180 text-cyan' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div x-show="mUsersOpen" class="pl-6 space-y-1">
+                                <a href="{{ route('admin.users.index') }}" class="block text-xs text-gray-400 hover:text-white">All Users</a>
+                                <a href="{{ route('admin.users.create') }}" class="block text-xs text-gray-400 hover:text-white">+ Add User</a>
+                                <a href="{{ route('admin.roles.index') }}" class="block text-xs text-gray-400 hover:text-white">Roles & Permissions</a>
+                                <a href="{{ route('admin.audit-logs.index') }}" class="block text-xs text-gray-400 hover:text-white">Audit Logs</a>
+                            </div>
+                        </div>
                         <a href="{{ url('/admin/orders') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Orders</a>
                         <a href="{{ url('/admin/subscriptions') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Subscriptions</a>
                         <a href="{{ url('/admin/coupons') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Coupons</a>
-                        <a href="{{ url('/admin/blog') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Blog Posts</a>
+                        <div x-data="{ mBlogOpen: {{ (request()->is('admin/blog*') || request()->is('admin/blog-categories*') || request()->is('admin/blog-tags*') || request()->is('admin/blog-comments*') || request()->is('admin/blog-subscribers*')) ? 'true' : 'false' }} }">
+                            <button type="button" @click="mBlogOpen = !mBlogOpen" class="w-full group flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">
+                                <span>Blog CMS</span>
+                                <svg class="h-4 w-4 transform transition-transform" :class="mBlogOpen ? 'rotate-180 text-cyan' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div x-show="mBlogOpen" class="pl-6 space-y-1">
+                                <a href="{{ route('admin.blog.dashboard') }}" class="block text-xs text-gray-400 hover:text-white">Dashboard</a>
+                                <a href="{{ route('admin.blog.index') }}" class="block text-xs text-gray-400 hover:text-white">All Posts</a>
+                                <a href="{{ route('admin.blog.create') }}" class="block text-xs text-gray-400 hover:text-white">+ New Post</a>
+                                <a href="{{ route('admin.blog-categories.index') }}" class="block text-xs text-gray-400 hover:text-white">Categories</a>
+                                <a href="{{ route('admin.blog-tags.index') }}" class="block text-xs text-gray-400 hover:text-white">Tags</a>
+                                <a href="{{ route('admin.blog-comments.index') }}" class="block text-xs text-gray-400 hover:text-white">Comments</a>
+                                <a href="{{ route('admin.blog-subscribers.index') }}" class="block text-xs text-gray-400 hover:text-white">Subscribers</a>
+                            </div>
+                        </div>
                         
                         <!-- Vendors -->
                         <a href="{{ route('admin.vendors.index') }}" class="{{ request()->routeIs('admin.vendors.*') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">

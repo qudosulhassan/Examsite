@@ -23,6 +23,7 @@ Route::resource('packages', PackageAdminController::class);
 Route::resource('vendors', VendorAdminController::class);
 Route::resource('certifications', App\Http\Controllers\Admin\CertificationController::class);
 Route::get('exams/search-suggestions', [ExamAdminController::class, 'searchSuggestions'])->name('exams.search-suggestions');
+Route::get('exams/{exam}/download-pdf/{type}', [ExamAdminController::class, 'downloadPdf'])->name('exams.download-pdf');
 Route::resource('exams', ExamAdminController::class);
 
 use App\Http\Controllers\Admin\QuestionImportController;
@@ -58,15 +59,31 @@ Route::post('questions/import/confirm', [QuestionAdminController::class, 'confir
 Route::post('questions/import', [QuestionAdminController::class, 'importJson'])->name('questions.import');
 
 Route::resource('questions', QuestionAdminController::class);
-Route::resource('users', UserAdminController::class)->only(['index', 'show', 'edit', 'update']);
+// User Management & RBAC Routes
+Route::get('users/export', [UserAdminController::class, 'export'])->name('users.export');
+Route::post('users/bulk-action', [UserAdminController::class, 'bulkAction'])->name('users.bulk-action');
+Route::resource('users', UserAdminController::class);
 
-// Custom User actions
+// Custom User Exam Access actions
 Route::post('users/{user}/grant-access', [UserAdminController::class, 'grantAccess'])->name('users.grant-access');
 Route::post('users/{user}/revoke-access', [UserAdminController::class, 'revokeAccess'])->name('users.revoke-access');
 
+// Roles & Permissions Management
+Route::resource('roles', App\Http\Controllers\Admin\RolePermissionController::class);
+
+// Audit Logs
+Route::get('audit-logs', [App\Http\Controllers\Admin\AuditLogAdminController::class, 'index'])->name('audit-logs.index');
+
 // Orders
-Route::resource('orders', OrderAdminController::class)->only(['index', 'show']);
+Route::get('orders/export', [OrderAdminController::class, 'export'])->name('orders.export');
+Route::post('orders/bulk-action', [OrderAdminController::class, 'bulkAction'])->name('orders.bulk-action');
+Route::get('orders/{order}/invoice', [OrderAdminController::class, 'downloadInvoice'])->name('orders.invoice');
+Route::get('orders/{order}/print', [OrderAdminController::class, 'printInvoice'])->name('orders.print');
+Route::post('orders/{order}/status', [OrderAdminController::class, 'updateStatus'])->name('orders.status');
+Route::post('orders/{order}/notes', [OrderAdminController::class, 'updateNotes'])->name('orders.notes');
 Route::post('orders/{order}/refund', [OrderAdminController::class, 'refund'])->name('orders.refund');
+Route::post('orders/{order}/resend-confirmation', [OrderAdminController::class, 'resendConfirmation'])->name('orders.resend-confirmation');
+Route::resource('orders', OrderAdminController::class)->only(['index', 'show']);
 
 // Subscriptions
 Route::resource('subscriptions', SubscriptionAdminController::class)->only(['index', 'show', 'destroy']);
@@ -74,19 +91,36 @@ Route::resource('subscriptions', SubscriptionAdminController::class)->only(['ind
 // Coupons
 Route::resource('coupons', CouponAdminController::class);
 
-// Blog
+// Blog System
+Route::get('blog/dashboard', [App\Http\Controllers\Admin\BlogDashboardController::class, 'index'])->name('blog.dashboard');
+Route::post('blog/bulk-action', [BlogAdminController::class, 'bulkAction'])->name('blog.bulk-action');
+Route::post('blog/{id}/duplicate', [BlogAdminController::class, 'duplicate'])->name('blog.duplicate');
+Route::post('blog/{id}/restore', [BlogAdminController::class, 'restore'])->name('blog.restore');
+Route::delete('blog/{id}/force-delete', [BlogAdminController::class, 'forceDelete'])->name('blog.force-delete');
+Route::post('blog/quick-category', [BlogAdminController::class, 'quickCategory'])->name('blog.quick-category');
+Route::post('blog/quick-tag', [BlogAdminController::class, 'quickTag'])->name('blog.quick-tag');
 Route::resource('blog', BlogAdminController::class);
-// Route::resource('blog-categories', BlogCategoryController::class)->except(['show']);
-// Route::resource('blog-tags', BlogTagController::class)->except(['show']);
 
-// Blog Comments
+// Blog Categories & Tags
+Route::resource('blog-categories', App\Http\Controllers\Admin\BlogCategoryController::class)->except(['show', 'create', 'edit']);
+Route::resource('blog-tags', App\Http\Controllers\Admin\BlogTagController::class)->except(['show', 'create', 'edit']);
+
+// Blog Comments Moderation
 Route::get('blog-comments', [App\Http\Controllers\Admin\BlogCommentController::class, 'index'])->name('blog-comments.index');
-Route::patch('blog-comments/{comment}/approve', [App\Http\Controllers\Admin\BlogCommentController::class, 'approve'])->name('blog-comments.approve');
-Route::patch('blog-comments/{comment}/spam', [App\Http\Controllers\Admin\BlogCommentController::class, 'spam'])->name('blog-comments.spam');
-Route::delete('blog-comments/{comment}', [App\Http\Controllers\Admin\BlogCommentController::class, 'destroy'])->name('blog-comments.destroy');
+Route::patch('blog-comments/{id}/approve', [App\Http\Controllers\Admin\BlogCommentController::class, 'approve'])->name('blog-comments.approve');
+Route::patch('blog-comments/{id}/spam', [App\Http\Controllers\Admin\BlogCommentController::class, 'spam'])->name('blog-comments.spam');
+Route::patch('blog-comments/{id}/pending', [App\Http\Controllers\Admin\BlogCommentController::class, 'pending'])->name('blog-comments.pending');
+Route::post('blog-comments/{id}/reply', [App\Http\Controllers\Admin\BlogCommentController::class, 'reply'])->name('blog-comments.reply');
+Route::post('blog-comments/{id}/restore', [App\Http\Controllers\Admin\BlogCommentController::class, 'restore'])->name('blog-comments.restore');
+Route::delete('blog-comments/{id}/force-delete', [App\Http\Controllers\Admin\BlogCommentController::class, 'forceDelete'])->name('blog-comments.force-delete');
+Route::post('blog-comments/bulk-action', [App\Http\Controllers\Admin\BlogCommentController::class, 'bulkAction'])->name('blog-comments.bulk-action');
+Route::delete('blog-comments/{id}', [App\Http\Controllers\Admin\BlogCommentController::class, 'destroy'])->name('blog-comments.destroy');
 
 // Blog Subscribers
 Route::get('blog-subscribers', [App\Http\Controllers\Admin\BlogSubscriberController::class, 'index'])->name('blog-subscribers.index');
+Route::post('blog-subscribers/{id}/toggle', [App\Http\Controllers\Admin\BlogSubscriberController::class, 'toggleStatus'])->name('blog-subscribers.toggle');
+Route::delete('blog-subscribers/{id}', [App\Http\Controllers\Admin\BlogSubscriberController::class, 'destroy'])->name('blog-subscribers.destroy');
+Route::get('blog-subscribers/export/csv', [App\Http\Controllers\Admin\BlogSubscriberController::class, 'exportCsv'])->name('blog-subscribers.export');
 
 // Media Gallery
 Route::resource('media', App\Http\Controllers\Admin\MediaController::class)->only(['index', 'store', 'destroy']);

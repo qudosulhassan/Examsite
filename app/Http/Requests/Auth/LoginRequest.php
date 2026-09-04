@@ -50,6 +50,28 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $user = Auth::user();
+
+        // Check account status
+        if ($user->isSuspended()) {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => 'Your account has been suspended. Please contact customer support for assistance.',
+            ]);
+        }
+
+        if ($user->isDeactivated()) {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => 'This account has been deactivated. Please contact support to restore access.',
+            ]);
+        }
+
+        // Update last login timestamp
+        $user->updateQuietly(['last_login_at' => now()]);
+
         RateLimiter::clear($this->throttleKey());
     }
 

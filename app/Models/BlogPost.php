@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Redirect;
 
 class BlogPost extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected static function booted()
     {
@@ -42,9 +43,14 @@ class BlogPost extends Model
         'excerpt',
         'content',
         'featured_image',
+        'featured_image_alt',
         'meta_title',
         'meta_description',
         'meta_keywords',
+        'canonical_url',
+        'og_title',
+        'og_description',
+        'og_image',
         'status',
         'published_at',
         'views_count',

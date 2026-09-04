@@ -79,7 +79,7 @@
                 <!-- Exam Intro Header -->
                 <div class="space-y-10">
                     <h1 class="text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight leading-[1.1] text-white">
-                        <span class="block mb-2">{{ $exam->exam_name }}</span>
+                        <span class="block mb-2">{{ $exam->header_title ?: ($exam->vendor ? $exam->vendor->name . ' ' . $exam->exam_code : $exam->exam_code) }}</span>
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan via-blue-400 to-blue-500 inline-block drop-shadow-sm">Study Guide & Practice Questions</span>
                     </h1>
                     
@@ -197,12 +197,22 @@
             </div>
 
             <!-- Right Column: Sticky Purchase Box -->
+            @php
+                $isPdfActive = $exam->is_pdf_available ?? true;
+                $isEngineActive = $exam->is_engine_available ?? true;
+                $isBundleActive = $exam->is_bundle_available ?? true;
+                $bundlePrice = $exam->effective_bundle_price;
+                $originalCombined = (float)$exam->price_pdf + (float)$exam->price_engine;
+                $bundleSavePercent = $originalCombined > 0 && $bundlePrice < $originalCombined 
+                    ? max(0, round((1 - ($bundlePrice / $originalCombined)) * 100)) 
+                    : 0;
+            @endphp
             <div id="purchase-card" class="lg:col-span-4 lg:pl-6 space-y-6 lg:sticky lg:top-28 z-30"
                  x-data="{ 
                     updatePeriodCombo: '3',
                     updatePeriodPdf: '3',
                     updatePeriodEngine: '3',
-                    baseCombo: {{ ($exam->price_pdf + $exam->price_engine) * 0.90 }},
+                    baseCombo: {{ (float)$bundlePrice }},
                     basePdf: {{ (float)$exam->price_pdf }},
                     baseEngine: {{ (float)$exam->price_engine }},
                     extra3: {{ (float)($exam->update_price_3_months ?? 0) }},
@@ -233,15 +243,16 @@
 
                     <div class="relative z-10">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="text-[10px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-md border border-cyan/20">Full Access Package</span>
+                            <span class="text-[10px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-md border border-cyan/20">Available Study Options</span>
                             <!-- Rating -->
                             <div class="flex items-center space-x-1 text-yellow-400 text-xs drop-shadow-[0_0_5px_rgba(250,204,21,0.6)]">
                                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
                             </div>
                         </div>
-                        <h3 class="text-2xl font-black text-white leading-tight">{{ $exam->exam_code }} Ultimate Bundle</h3>
+                        <h3 class="text-2xl font-black text-white leading-tight">{{ $exam->exam_code }} Certification Prep</h3>
                     </div>
 
+                    @if($isBundleActive)
                     <!-- Premium Combo Package (Best Value) -->
                     <div class="relative group rounded-2xl p-[3px] transition-all duration-300 z-10 hover:scale-[1.03] hover:-translate-y-1">
                         <!-- Glowing Animated Border -->
@@ -250,18 +261,22 @@
                         
                         <!-- Inner Card -->
                         <div class="relative h-full bg-navy rounded-[14px] p-6 z-10 overflow-hidden shadow-inner">
+                            @if($bundleSavePercent > 0)
                             <!-- Discount Badge -->
                             <div class="absolute top-0 right-0 bg-gradient-to-l from-orange to-red-500 text-white text-[11px] font-black px-4 py-2 rounded-bl-xl uppercase tracking-widest shadow-[0_5px_15px_rgba(255,107,53,0.4)]">
-                                Save 10%
+                                Save {{ $bundleSavePercent }}%
                             </div>
+                            @endif
                             
                             <div class="flex justify-between items-start mb-6 pt-3">
                                 <div>
-                                    <h4 class="font-black text-xl text-white leading-tight">PDF + Engine</h4>
+                                    <h4 class="font-black text-xl text-white leading-tight">PDF + Test Engine Bundle</h4>
                                 </div>
                                 <div class="text-right pr-2">
-                                    <span class="block text-xs text-gray-400 line-through font-bold mb-1">${{ number_format($exam->price_pdf + $exam->price_engine, 2) }}</span>
-                                    <span class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan to-blue-400" x-text="`$${(baseCombo + extraPriceCombo).toFixed(2)}`">${{ number_format(($exam->price_pdf + $exam->price_engine) * 0.90 + ($exam->update_price_3_months ?? 0), 2) }}</span>
+                                    @if($originalCombined > $bundlePrice)
+                                    <span class="block text-xs text-gray-400 line-through font-bold mb-1">${{ number_format($originalCombined, 2) }}</span>
+                                    @endif
+                                    <span class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan to-blue-400" x-text="`$${(baseCombo + extraPriceCombo).toFixed(2)}`">${{ number_format($bundlePrice + ($exam->update_price_3_months ?? 0), 2) }}</span>
                                 </div>
                             </div>
                             
@@ -305,7 +320,7 @@
                                 <input type="hidden" name="type" value="combo">
                                 <input type="hidden" name="update_period" :value="updatePeriodCombo">
                                 <button type="submit" class="w-full relative overflow-hidden group/btn bg-gradient-to-r from-cyan via-blue-500 to-cyan bg-[length:200%_auto] hover:bg-[right_center] text-white font-black py-4 rounded-xl shadow-[0_0_30px_rgba(0,212,170,0.5)] transition-all duration-500 transform active:scale-95 flex items-center justify-center space-x-2">
-                                    <span class="text-sm uppercase tracking-widest text-white drop-shadow-md z-10">Add To Cart</span>
+                                    <span class="text-sm uppercase tracking-widest text-white drop-shadow-md z-10">Add Bundle To Cart</span>
                                     <svg class="w-5 h-5 text-white group-hover/btn:translate-x-1 transition-transform z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                                     <!-- Shine effect -->
                                     <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover/btn:animate-shine"></div>
@@ -313,8 +328,11 @@
                             </form>
                         </div>
                     </div>
+                    @endif
 
-                    <div class="grid grid-cols-2 gap-4 z-10 relative">
+                    @if($isPdfActive || $isEngineActive)
+                    <div class="grid {{ ($isPdfActive && $isEngineActive) ? 'grid-cols-2' : 'grid-cols-1' }} gap-4 z-10 relative">
+                        @if($isPdfActive)
                         <!-- Option 1: PDF Guide -->
                         <div class="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-5 hover:bg-gray-700/50 transition-colors group/opt">
                             <div class="mb-4 text-center">
@@ -338,7 +356,9 @@
                                 </button>
                             </form>
                         </div>
+                        @endif
 
+                        @if($isEngineActive)
                         <!-- Option 2: Test Engine -->
                         <div class="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-5 hover:bg-gray-700/50 transition-colors group/opt">
                             <div class="mb-4 text-center">
@@ -362,7 +382,9 @@
                                 </button>
                             </form>
                         </div>
+                        @endif
                     </div>
+                    @endif
 
                     <!-- Free Demo Button Link -->
                     <div class="pt-2">

@@ -3,6 +3,18 @@
 @section('title', $post->meta_title ?? $post->title)
 @section('meta_description', $post->meta_description ?? $post->excerpt)
 @section('meta_keywords', $post->meta_keywords)
+@if($post->canonical_url)
+    @section('canonical_url', $post->canonical_url)
+@endif
+@if($post->og_title)
+    @section('og_title', $post->og_title)
+@endif
+@if($post->og_description)
+    @section('og_description', $post->og_description)
+@endif
+@if($post->og_image || $post->featured_image)
+    @section('og_image', $post->og_image ?? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . $post->featured_image)))
+@endif
 
 @section('content')
 <!-- Blog Header -->
@@ -48,7 +60,7 @@
         <!-- Main Article Area -->
         <article class="lg:w-2/3 bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
             @if($post->featured_image)
-                <img src="{{ str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . $post->featured_image) }}" alt="{{ $post->title }}" class="w-full h-auto max-h-96 object-cover">
+                <img src="{{ str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . $post->featured_image) }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="w-full h-auto max-h-96 object-cover">
             @endif
             
             <div class="p-8 md:p-12">

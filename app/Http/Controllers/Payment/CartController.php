@@ -56,6 +56,9 @@ class CartController extends Controller
     {
         // Resolve parameters with fallbacks to support existing Blade templates
         $type = $request->input('item_type', $request->input('type'));
+        if ($type === 'engine') {
+            $type = 'engine_single';
+        }
         $examId = $request->input('exam_id');
         $planName = $request->input('plan_name');
         $billingCycle = $request->input('billing_cycle', $request->input('billing'));
@@ -99,6 +102,17 @@ class CartController extends Controller
                 }
             }
 
+            // Check product availability
+            if ($type === 'pdf' && isset($exam->is_pdf_available) && !$exam->is_pdf_available) {
+                return back()->with('error', 'The PDF study guide is currently not available for purchase.');
+            }
+            if ($type === 'engine_single' && isset($exam->is_engine_available) && !$exam->is_engine_available) {
+                return back()->with('error', 'The Test Engine simulator is currently not available for purchase.');
+            }
+            if ($type === 'combo' && isset($exam->is_bundle_available) && !$exam->is_bundle_available) {
+                return back()->with('error', 'The PDF + Test Engine Bundle is currently not available for purchase.');
+            }
+
             $price = 0;
             $name = '';
             if ($type === 'pdf') {
@@ -108,8 +122,11 @@ class CartController extends Controller
                 $price = (float)$exam->price_engine;
                 $name = $exam->vendor->name . ' ' . $exam->exam_code . ' Test Engine Simulator';
             } elseif ($type === 'combo') {
-                $price = (float)$exam->price_pdf + (float)$exam->price_engine;
-                $price = round($price * 0.90, 2);
+                if ($exam->price_bundle !== null && (float)$exam->price_bundle > 0) {
+                    $price = (float)$exam->price_bundle;
+                } else {
+                    $price = round(((float)$exam->price_pdf + (float)$exam->price_engine) * 0.90, 2);
+                }
                 $name = $exam->vendor->name . ' ' . $exam->exam_code . ' PDF & Test Engine Combo';
             }
 

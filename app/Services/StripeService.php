@@ -247,4 +247,45 @@ class StripeService
             return false;
         }
     }
+
+    /**
+     * Process a refund for a Stripe PaymentIntent.
+     */
+    public function refundPayment(string $paymentIntentId, float $amount, ?string $reason = null): array
+    {
+        if ($this->isMocked || str_starts_with($paymentIntentId, 'pi_mock_')) {
+            return [
+                'success' => true,
+                'refund_id' => 're_mock_' . bin2hex(random_bytes(8)),
+                'amount' => $amount,
+                'status' => 'completed',
+            ];
+        }
+
+        try {
+            $params = [
+                'payment_intent' => $paymentIntentId,
+                'amount' => (int)round($amount * 100), // In cents
+            ];
+
+            if ($reason && in_array($reason, ['duplicate', 'fraudulent', 'requested_by_customer'])) {
+                $params['reason'] = $reason;
+            }
+
+            $refund = $this->stripe->refunds->create($params);
+
+            return [
+                'success' => true,
+                'refund_id' => $refund->id,
+                'amount' => $refund->amount / 100,
+                'status' => $refund->status,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Stripe refund failed: ' . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
 }

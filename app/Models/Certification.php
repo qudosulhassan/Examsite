@@ -9,6 +9,7 @@ class Certification extends Model
     protected $fillable = [
         'vendor_id',
         'name',
+        'code',
         'slug',
         'description',
         'is_active',
