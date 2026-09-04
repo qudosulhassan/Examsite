@@ -164,7 +164,7 @@
                 @enderror
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 <!-- Price PDF -->
                 <div>
                     <label for="price_pdf" class="block text-xs font-bold text-gray-400 uppercase mb-2">PDF Price ($)</label>
@@ -191,6 +191,17 @@
                     <input type="number" name="passing_score" id="passing_score" required value="{{ old('passing_score', $exam->passing_score) }}" min="50" max="100"
                            class="w-full border-gray-300 rounded text-sm px-3 py-2 focus:border-cyan focus:ring-cyan">
                     @error('passing_score')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Total Questions -->
+                <div>
+                    <label for="question_count" class="block text-xs font-bold text-gray-400 uppercase mb-2">Total Questions</label>
+                    <input type="number" name="question_count" id="question_count" value="{{ old('question_count', $exam->question_count) }}" min="0"
+                           class="w-full border-gray-300 rounded text-sm px-3 py-2 focus:border-cyan focus:ring-cyan" placeholder="e.g. 150">
+                    <p class="text-[10px] text-gray-400 mt-1">Number of questions included in dump.</p>
+                    @error('question_count')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>

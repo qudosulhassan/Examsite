@@ -56,7 +56,10 @@
                             <span class="text-[10px] text-gray-400 font-semibold">{{ $exam->vendor->name }}</span>
                         </td>
                         <td class="px-6 py-4">
-                            <div class="font-bold text-gray-700">{{ $exam->exam_name }}</div>
+                            <div class="font-bold text-gray-700 flex items-center gap-2">
+                                <span>{{ $exam->exam_name }}</span>
+                                <span class="bg-navy/5 text-navy font-semibold px-2 py-0.5 rounded text-[10px] border border-navy/10">{{ $exam->question_count }} Q's</span>
+                            </div>
                             <div class="text-[10px] text-gray-400">{{ count($exam->topics ?: []) }} Topics | {{ $exam->difficulty }}</div>
                         </td>
                         <td class="px-6 py-4 font-semibold text-gray-700">
