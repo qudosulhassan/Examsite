@@ -12,13 +12,13 @@ return [
     |
     */
 
-    'site_name' => 'ExamsNinja',
+    'site_name' => 'Exam Topics Base',
     'tagline' => 'Pass Like a Ninja. First Attempt Guaranteed.',
     'title_separator' => '|',
     
     'defaults' => [
-        'title' => 'ExamsNinja - Pass Your IT Certification Exam First Attempt',
-        'description' => 'Prepare for any IT certification exam with ExamsNinja. Download verified PDF dumps or practice online with our test engine. 3,500+ exams. 99.6% pass rate.',
+        'title' => 'Exam Topics Base - Pass Your IT Certification Exam First Attempt',
+        'description' => 'Prepare for any IT certification exam with Exam Topics Base. Download verified PDF dumps or practice online with our test engine. 3,500+ exams. 99.6% pass rate.',
         'keywords' => 'IT certification, exam dumps, study guides, practice tests, exam engine',
         'og_image' => 'images/og-default.png',
         'og_type' => 'website',
@@ -26,7 +26,7 @@ return [
     ],
 
     'social' => [
-        'twitter_handle' => '@ExamsNinja',
+        'twitter_handle' => '@Exam Topics Base',
     ],
 
     'tracking' => [

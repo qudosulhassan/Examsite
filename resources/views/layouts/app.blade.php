@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'ExamsNinja') }} - Dashboard</title>
+    <title>{{ config('app.name', 'Exam Topics Base') }} - Dashboard</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,11 +36,8 @@
         <div class="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
             <div class="flex flex-col flex-grow bg-navy pt-5 overflow-y-auto">
                 <div class="flex items-center flex-shrink-0 px-4 mb-8">
-                    <a href="{{ url('/') }}" class="flex items-center space-x-2">
-                        <svg class="h-8 w-8 text-cyan animate-pulse" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L14.5 9.5H22L16 14L18.5 21.5L12 17L5.5 21.5L8 14L2 9.5H9.5L12 2Z" />
-                        </svg>
-                        <span class="text-xl font-bold tracking-tight text-white">Exams<span class="text-cyan">Ninja</span></span>
+                    <a href="{{ url('/') }}" class="flex items-center">
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-9 w-auto object-contain">
                     </a>
                 </div>
                 <div class="flex-grow flex flex-col">
@@ -151,7 +148,9 @@
                     </button>
                 </div>
                 <div class="flex-shrink-0 flex items-center px-4">
-                    <span class="text-xl font-bold tracking-tight text-white">Exams<span class="text-cyan">Ninja</span></span>
+                    <a href="{{ url('/') }}" class="flex items-center">
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-8 w-auto object-contain">
+                    </a>
                 </div>
                 <div class="mt-5 flex-1 h-0 overflow-y-auto">
                     <nav class="px-2 space-y-1">

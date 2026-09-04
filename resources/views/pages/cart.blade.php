@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Shopping Cart - ExamsNinja')
+@section('title', 'Shopping Cart - Exam Topics Base')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->

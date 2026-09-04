@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscription Cancelled - ExamsNinja</title>
+    <title>Subscription Cancelled - Exam Topics Base</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -84,15 +84,15 @@
             <p>If you changed your mind or cancelled by mistake, you can easily renew your subscription from the pricing page or your profile billing panel before the expiration date to keep your simulator progress logs.</p>
             
             <div style="text-align: center;">
-                <a href="{{ route('vendors.index') }}" class="btn" target="_blank">Re-subscribe to ExamsNinja</a>
+                <a href="{{ route('vendors.index') }}" class="btn" target="_blank">Re-subscribe to Exam Topics Base</a>
             </div>
 
-            <p>Thank you for using ExamsNinja to prepare. We wish you the best of luck on your upcoming exams!</p>
-            <p>Best regards,<br>The ExamsNinja Billing Team</p>
+            <p>Thank you for using Exam Topics Base to prepare. We wish you the best of luck on your upcoming exams!</p>
+            <p>Best regards,<br>The Exam Topics Base Billing Team</p>
         </div>
         <div class="footer">
             <p>Pass Your IT Certification Exam First Attempt. Guaranteed.</p>
-            <p>&copy; {{ date('Y') }} ExamsNinja.com. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Exam Topics Base.com. All rights reserved.</p>
         </div>
     </div>
 </body>

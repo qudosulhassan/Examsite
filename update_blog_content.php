@@ -51,7 +51,7 @@ $longContent2 = '
 </ul>
 
 <h3>3. The Power of Practice Exams</h3>
-<p>Practice exams are your best diagnostic tool. They help you identify weak areas, improve your time management, and get comfortable with the phrasing of the questions. Our ExamsNinja test engine is specifically designed to mirror the difficulty and format of the real exams.</p>
+<p>Practice exams are your best diagnostic tool. They help you identify weak areas, improve your time management, and get comfortable with the phrasing of the questions. Our Exam Topics Base test engine is specifically designed to mirror the difficulty and format of the real exams.</p>
 
 <blockquote>
     "Don\'t practice until you get it right. Practice until you can\'t get it wrong."

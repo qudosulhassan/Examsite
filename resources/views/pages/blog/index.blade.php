@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'ExamsNinja Blog - IT Certification News & Tips')
-@section('meta_description', 'Latest news, tips, and study guides for IT certifications. Stay updated with ExamsNinja blog.')
+@section('title', 'Exam Topics Base Blog - IT Certification News & Tips')
+@section('meta_description', 'Latest news, tips, and study guides for IT certifications. Stay updated with Exam Topics Base blog.')
 
 @section('content')
 <!-- Blog Header -->
@@ -9,7 +9,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center">
             <h1 class="text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">
-                ExamsNinja <span class="text-cyan">Blog</span>
+                Exam Topics Base <span class="text-cyan">Blog</span>
             </h1>
             <p class="mt-4 max-w-2xl text-xl text-gray-300 mx-auto">
                 Insights, updates, and expert advice to help you ace your IT certifications.

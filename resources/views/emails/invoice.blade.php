@@ -91,8 +91,8 @@
                     <table>
                         <tr>
                             <td>
-                                ExamsNinja.com Support<br>
-                                support@examsninja.com<br>
+                                Exam Topics Base.com Support<br>
+                                support@examtopicsbase.com<br>
                                 30-Day Guarantee Protected
                             </td>
                             <td>

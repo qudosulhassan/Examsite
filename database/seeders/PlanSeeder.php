@@ -42,10 +42,10 @@ class PlanSeeder extends Seeder
         Setting::set('subscription_plans', json_encode($plans));
 
         // Seed other general settings too as a senior developer move
-        Setting::set('site_name', 'ExamsNinja');
+        Setting::set('site_name', 'Exam Topics Base');
         Setting::set('site_tagline', 'Pass Like a Ninja. First Attempt Guaranteed.');
-        Setting::set('contact_email', 'contact@examsninja.com');
-        Setting::set('support_email', 'support@examsninja.com');
+        Setting::set('contact_email', 'contact@examtopicsbase.com');
+        Setting::set('support_email', 'support@examtopicsbase.com');
         Setting::set('maintenance_mode', 'false');
     }
 }

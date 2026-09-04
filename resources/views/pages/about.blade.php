@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'About Us - ExamsNinja')
+@section('title', 'About Us - Exam Topics Base')
 
 @section('content')
 <!-- Header Banner -->
@@ -20,7 +20,7 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div class="space-y-4">
             <h2 class="text-2xl font-bold text-navy">Pass Certification Exams with Confidence</h2>
-            <p class="text-sm text-gray-600 leading-relaxed">ExamsNinja was founded in 2022 by a group of senior cloud architects and network security engineers who noticed that many certification dumps online were outdated, filled with incorrect answers, and lacked proper technical explanations.</p>
+            <p class="text-sm text-gray-600 leading-relaxed">Exam Topics Base was founded in 2022 by a group of senior cloud architects and network security engineers who noticed that many certification dumps online were outdated, filled with incorrect answers, and lacked proper technical explanations.</p>
             <p class="text-sm text-gray-600 leading-relaxed">We set out to create a platform that provides verified, blazingly fast updates for IT exams, paired with a web-based testing engine that doesn't require downloading unsafe binaries. Our materials help students actually understand the reasoning behind questions, rather than relying on raw memorization.</p>
         </div>
 

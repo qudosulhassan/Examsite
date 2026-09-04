@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to ExamsNinja</title>
+    <title>Welcome to Exam Topics Base</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -76,7 +76,7 @@
         </div>
         <div class="body">
             <h2>Welcome, {{ $user->name }}!</h2>
-            <p>Thank you for registering at <strong>ExamsNinja.com</strong>. We are thrilled to help you master your IT certification exams and boost your career.</p>
+            <p>Thank you for registering at <strong>Exam Topics Base.com</strong>. We are thrilled to help you master your IT certification exams and boost your career.</p>
             <p>Our platform offers verified study guides, printable PDF dumps, and a sophisticated, timed web-based testing engine simulator that replicates real testing conditions (with Practice, Exam, and Review modes).</p>
             
             <p>Ready to kickstart your preparation?</p>
@@ -92,11 +92,11 @@
             </ul>
 
             <p>If you have any questions or need technical support, our team is always ready to guide you.</p>
-            <p>Best regards,<br>The ExamsNinja Team</p>
+            <p>Best regards,<br>The Exam Topics Base Team</p>
         </div>
         <div class="footer">
             <p>Pass Your IT Certification Exam First Attempt. Guaranteed.</p>
-            <p>&copy; {{ date('Y') }} ExamsNinja.com. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Exam Topics Base.com. All rights reserved.</p>
         </div>
     </div>
 </body>

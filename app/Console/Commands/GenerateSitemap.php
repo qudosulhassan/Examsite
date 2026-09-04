@@ -13,7 +13,7 @@ use App\Models\BlogPost;
 class GenerateSitemap extends Command
 {
     protected $signature = 'sitemap:generate';
-    protected $description = 'Generate the sitemaps for ExamsNinja';
+    protected $description = 'Generate the sitemaps for Exam Topics Base';
 
     public function handle()
     {

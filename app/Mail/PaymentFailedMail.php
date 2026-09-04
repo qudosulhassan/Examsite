@@ -29,7 +29,7 @@ class PaymentFailedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Action Required: Your ExamsNinja Subscription Payment Failed',
+            subject: 'Action Required: Your Exam Topics Base Subscription Payment Failed',
         );
     }
 

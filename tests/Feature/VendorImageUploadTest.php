@@ -20,7 +20,7 @@ class VendorImageUploadTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@examsninja.com',
+            'email' => 'admin@examtopicsbase.com',
             'role' => 'admin',
         ]);
     }

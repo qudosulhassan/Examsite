@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Page Not Found - ExamsNinja')
+@section('title', 'Page Not Found - Exam Topics Base')
 
 @section('content')
 <section class="bg-navy text-white py-24 text-center min-h-[65vh] flex flex-col justify-center relative overflow-hidden">

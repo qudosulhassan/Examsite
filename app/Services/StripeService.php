@@ -164,7 +164,7 @@ class StripeService
      */
     protected function getOrCreateStripePrice(string $planName, string $billingCycle, float $price): string
     {
-        $productName = "ExamsNinja " . ucfirst($planName) . " Plan";
+        $productName = "Exam Topics Base " . ucfirst($planName) . " Plan";
         $priceCode = strtolower($planName) . "_" . strtolower($billingCycle);
         
         try {

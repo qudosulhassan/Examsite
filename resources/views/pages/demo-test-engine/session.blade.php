@@ -167,7 +167,7 @@ window.demoTestEngineAnswers = {
 
     {{-- Footer --}}
     <footer class="footer">
-        &copy; {{ date('Y') }} ExamsNinja — Master Interactive Test Engine. All rights reserved.
+        &copy; {{ date('Y') }} Exam Topics Base — Master Interactive Test Engine. All rights reserved.
     </footer>
 
 </div>

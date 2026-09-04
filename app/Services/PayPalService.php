@@ -120,7 +120,7 @@ class PayPalService
             return [
                 'id' => $paypalOrderId,
                 'status' => 'COMPLETED',
-                'payer_email' => 'sandbox-buyer@examsninja.com',
+                'payer_email' => 'sandbox-buyer@examtopicsbase.com',
                 'payer_name' => 'Sandbox Buyer',
                 'amount' => '0.00',
                 'is_mock' => true,

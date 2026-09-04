@@ -14,7 +14,7 @@
 
             <div class="relative z-10 px-8 py-20 md:py-24 text-center">
                 <div class="inline-flex items-center space-x-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-6">
-                    <span class="text-xs font-bold uppercase tracking-widest text-cyan">ExamsNinja Blog</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-cyan">Exam Topics Base Blog</span>
                 </div>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight mb-6">
                     Insights & <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan to-blue-500">Resources</span>
@@ -50,7 +50,7 @@
                     <!-- Main Featured -->
                     @php $mainFeatured = $featuredPosts->first(); @endphp
                     <a href="{{ route('blog.show', $mainFeatured->slug) }}" class="group block relative rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] h-[440px] transform hover:-translate-y-2 transition-all duration-500">
-                        <img src="{{ $mainFeatured->featured_image ? (str_starts_with($mainFeatured->featured_image, 'http') ? $mainFeatured->featured_image : asset('storage/' . $mainFeatured->featured_image)) : 'https://via.placeholder.com/800x400?text=ExamsNinja' }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $mainFeatured->title }}">
+                        <img src="{{ $mainFeatured->featured_image ? (str_starts_with($mainFeatured->featured_image, 'http') ? $mainFeatured->featured_image : asset('storage/' . $mainFeatured->featured_image)) : 'https://via.placeholder.com/800x400?text=Exam Topics Base' }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $mainFeatured->title }}">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#07101E] via-[#07101E]/60 to-transparent opacity-90"></div>
                         <div class="absolute bottom-0 left-0 p-10 w-full">
                             @if($mainFeatured->category)
@@ -71,7 +71,7 @@
                         @foreach($featuredPosts->skip(1) as $subFeatured)
                         <a href="{{ route('blog.show', $subFeatured->slug) }}" class="group flex bg-white rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 hover:border-cyan/30 transform hover:-translate-y-1 transition-all duration-300 h-[204px]">
                             <div class="w-2/5 relative overflow-hidden">
-                                <img src="{{ $subFeatured->featured_image ? (str_starts_with($subFeatured->featured_image, 'http') ? $subFeatured->featured_image : asset('storage/' . $subFeatured->featured_image)) : 'https://via.placeholder.com/400x300?text=ExamsNinja' }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $subFeatured->title }}">
+                                <img src="{{ $subFeatured->featured_image ? (str_starts_with($subFeatured->featured_image, 'http') ? $subFeatured->featured_image : asset('storage/' . $subFeatured->featured_image)) : 'https://via.placeholder.com/400x300?text=Exam Topics Base' }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $subFeatured->title }}">
                             </div>
                             <div class="w-3/5 p-8 flex flex-col justify-center">
                                 @if($subFeatured->category)
@@ -95,7 +95,7 @@
             @forelse($posts as $post)
                 <div class="bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden flex flex-col hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300 group">
                     <a href="{{ route('blog.show', $post->slug) }}" class="relative h-56 overflow-hidden block">
-                        <img src="{{ $post->featured_image ? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . $post->featured_image)) : 'https://via.placeholder.com/600x400?text=ExamsNinja' }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $post->title }}">
+                        <img src="{{ $post->featured_image ? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . $post->featured_image)) : 'https://via.placeholder.com/600x400?text=Exam Topics Base' }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $post->title }}">
                         @if($post->category)
                             <div class="absolute top-4 left-4">
                                 <span class="bg-white/90 backdrop-blur-md text-navy text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">{{ $post->category->name }}</span>

@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Online Test Engine & Certification Simulator - ExamsNinja')
-@section('meta_description', 'Experience the ExamsNinja interactive timed test engine. Practice with real exam scenarios, exam simulation, immediate response grading, and detailed explanations.')
+@section('title', 'Online Test Engine & Certification Simulator - Exam Topics Base')
+@section('meta_description', 'Experience the Exam Topics Base interactive timed test engine. Practice with real exam scenarios, exam simulation, immediate response grading, and detailed explanations.')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->

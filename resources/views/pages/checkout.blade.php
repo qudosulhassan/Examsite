@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Secure Checkout - ExamsNinja')
+@section('title', 'Secure Checkout - Exam Topics Base')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->
@@ -59,7 +59,7 @@
                     </div>
                     <p class="text-[11px] font-bold text-gray-400 mt-4 flex items-center space-x-2">
                         <svg class="w-4 h-4 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <span>ExamsNinja accounts are bound to this email. Purchased guides are activated immediately on this account.</span>
+                        <span>Exam Topics Base accounts are bound to this email. Purchased guides are activated immediately on this account.</span>
                     </p>
                 </div>
 

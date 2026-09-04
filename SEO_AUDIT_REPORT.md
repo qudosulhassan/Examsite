@@ -1,8 +1,8 @@
-# Technical & On-Page SEO Audit Report: ExamsNinja
+# Technical & On-Page SEO Audit Report: Exam Topics Base
 
-> **Audited Repository**: `C:\ExamSite\examsninja`  
+> **Audited Repository**: `C:\ExamSite\examtopicsbase`  
 > **Date**: September 3, 2026  
-> **Target Production Domain**: `https://examsninja.com`  
+> **Target Production Domain**: `https://examtopicsbase.com`  
 > **Audit Type**: Comprehensive Technical, On-Page, Content, Architecture & Performance SEO Audit  
 > **Engine**: Laravel 11.x + Blade + Tailwind CSS + Alpine.js  
 
@@ -44,7 +44,7 @@ While the application features modern UI components and clean Tailwind/Alpine st
 | **5** | 🔴 **Critical** | **Certification Pages Meta Description Bug (100% Broken)** | `resources/views/pages/certifications/show.blade.php:4`, `layouts/public.blade.php:14` | Blade template defines `@section('description')` while the layout expects `@yield('meta_description')`. 100% of certification pages output the generic homepage description. |
 | **6** | 🔴 **Critical** | **Default Open Graph Image is a 404 Broken Asset** | `config/seo.php:23`, `resources/views/layouts/public.blade.php:24` | `og:image` defaults to `images/og-default.png`. The `public/images/` directory does not exist on disk, causing social crawlers to receive a 404 error. |
 | **7** | 🔴 **Critical** | **`favicon.ico` is a 0-Byte Corrupt File & No Icon Tags in `<head>`** | `public/favicon.ico`, `resources/views/layouts/public.blade.php` | `public/favicon.ico` has a file length of 0 bytes, and `<head>` has no `<link rel="icon">`, hurting brand visibility and mobile SERP favicon rendering. |
-| **8** | 🟠 **High** | **100% of Exams Have NULL Meta Metadata (Static Fallback Title Omits Exam Name)** | `exams` table (`meta_title` NULL in 86/86), `pages/exams/show.blade.php:3` | Fallback title `"{$exam->exam_code} Exam Dumps & Study Guide \| ExamsNinja"` completely omits the full certification title (e.g. "Microsoft Azure Administrator"). |
+| **8** | 🟠 **High** | **100% of Exams Have NULL Meta Metadata (Static Fallback Title Omits Exam Name)** | `exams` table (`meta_title` NULL in 86/86), `pages/exams/show.blade.php:3` | Fallback title `"{$exam->exam_code} Exam Dumps & Study Guide \| Exam Topics Base"` completely omits the full certification title (e.g. "Microsoft Azure Administrator"). |
 | **9** | 🟠 **High** | **Inverted Heading Hierarchy on Exam Pages (H1 directly to H3)** | `resources/views/pages/exams/show.blade.php:401, 461, 696, 751` | Syllabus, Sample Questions, and Reviews use `<h3>` without any parent `<h2>`. `<h2>` is only used for cross-selling ("Frequently Bought Together"). |
 | **10** | 🟠 **High** | **Blog Category, Tag & Author Archives Share 100% Identical Duplicate Metadata** | `resources/views/pages/blog/category.blade.php`, `tag.blade.php`, `author.blade.php` | All archive templates simply `@include('pages.blog.index')`, resulting in identical Title, Description, and H1 across every category, tag, and author. |
 | **11** | 🟠 **High** | **Missing Schema: No `Product`, `AggregateRating`, `BreadcrumbList`, or `Article`** | `resources/views/pages/exams/show.blade.php:10-28`, `blog/show.blade.php` | Exam dumps are modeled as `Course` with invalid `sameAs` internal link. Zero `Product` schema, zero `BreadcrumbList` schema, and zero `Article` schema on blog posts. |
@@ -81,12 +81,12 @@ While the application features modern UI components and clean Tailwind/Alpine st
   Disallow: /*?*sort=*
   Disallow: /*?*filter=*
 
-  Sitemap: https://examsninja.com/sitemap.xml
+  Sitemap: https://examtopicsbase.com/sitemap.xml
   ```
 * **Findings & Vulnerabilities**:
   1. `/search` and `/blog/search` are **NOT** disallowed. Googlebot can crawl internal search queries, creating infinite crawl traps and thin doorway pages.
   2. `/demo-test-engine/session/` and `/demo-test-engine/results/` are **NOT** disallowed. User test attempts and personalized score sheets can be crawled.
-  3. `Sitemap:` directive points to `https://examsninja.com/sitemap.xml`, but the physical files on disk were generated with `http://localhost/`.
+  3. `Sitemap:` directive points to `https://examtopicsbase.com/sitemap.xml`, but the physical files on disk were generated with `http://localhost/`.
 
 ### 3.2 XML Sitemap Architecture & Flaws
 * **Generator Command**: `app/Console/Commands/GenerateSitemap.php`
@@ -119,13 +119,13 @@ While the application features modern UI components and clean Tailwind/Alpine st
 
 ### 4.1 Metadata & Title Tags
 * **Exam Pages (`resources/views/pages/exams/show.blade.php`)**:
-  - Title formula: `{$exam->exam_code} Exam Dumps & Study Guide | ExamsNinja`
-  - **Problem**: In 86 out of 86 exams in the database, `meta_title` is NULL. The fallback formula **completely omits the exam's full official title** (`$exam->exam_name`). For example, for AZ-104, the title is `AZ-104 Exam Dumps & Study Guide | ExamsNinja`, completely missing the primary keyword "Microsoft Azure Administrator".
+  - Title formula: `{$exam->exam_code} Exam Dumps & Study Guide | Exam Topics Base`
+  - **Problem**: In 86 out of 86 exams in the database, `meta_title` is NULL. The fallback formula **completely omits the exam's full official title** (`$exam->exam_name`). For example, for AZ-104, the title is `AZ-104 Exam Dumps & Study Guide | Exam Topics Base`, completely missing the primary keyword "Microsoft Azure Administrator".
   - Meta description formula: `Get updated {$exam->exam_code} ({$exam->exam_name}) exam questions, answers, and study guides. Try our free demo or web-based test engine.` (Generic template).
 * **Certification Pages (`resources/views/pages/certifications/show.blade.php`)**:
   - **Critical Bug**: Line 4 has `@section('description', ...)`. The layout expects `@yield('meta_description')`. The tag is never output, causing every certification page to render the default homepage meta description!
 * **Blog Archive Pages (`resources/views/pages/blog/category.blade.php`, `tag.blade.php`, `author.blade.php`)**:
-  - **Critical Duplication**: These files simply invoke `@include('pages.blog.index')`. They have no unique title or description. Every category (`/blog/category/cloud`), tag (`/blog/tag/exam-tips`), and author has the exact same Title: `ExamsNinja Blog - IT Certification News & Tips`.
+  - **Critical Duplication**: These files simply invoke `@include('pages.blog.index')`. They have no unique title or description. Every category (`/blog/category/cloud`), tag (`/blog/tag/exam-tips`), and author has the exact same Title: `Exam Topics Base Blog - IT Certification News & Tips`.
 
 ### 4.2 Heading Hierarchy
 * **Exam Product Page (`resources/views/pages/exams/show.blade.php`)**:
@@ -207,7 +207,7 @@ Demo Test Engine (/demo-test-engine/{exam}) [Orphaned/Modal only]
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "ExamsNinja",
+  "name": "Exam Topics Base",
   "url": "http://127.0.0.1:8000",
   "potentialAction": {
     "@type": "SearchAction",
@@ -255,7 +255,7 @@ Demo Test Engine (/demo-test-engine/{exam}) [Orphaned/Modal only]
   "url": "http://127.0.0.1:8000/vendors/microsoft"
 }
 ```
-* **Errors**: Misrepresents Microsoft as having the URL of ExamsNinja's vendor directory. It should be a `CollectionPage` with `about` referencing the brand/organization.
+* **Errors**: Misrepresents Microsoft as having the URL of Exam Topics Base's vendor directory. It should be a `CollectionPage` with `about` referencing the brand/organization.
 
 #### Blog Posts (`resources/views/pages/blog/show.blade.php`)
 * **Status**: **ZERO Structured Data**. Completely missing `Article` or `BlogPosting` JSON-LD.
@@ -377,7 +377,7 @@ Based strictly on the current code and database:
 ### Phase 2 — On-Page & Metadata Normalization
 1. **Fix Certification Meta Description**: Change `@section('description')` to `@section('meta_description')` in `pages/certifications/show.blade.php`.
 2. **Dynamic Exam Titles**: Update fallback title to:
-   `"{$exam->exam_code}: {$exam->exam_name} Exam Dumps & Practice Test | ExamsNinja"`
+   `"{$exam->exam_code}: {$exam->exam_name} Exam Dumps & Practice Test | Exam Topics Base"`
 3. **Blog Archive Customization**: Provide unique titles, descriptions, and H1 tags for `category.blade.php`, `tag.blade.php`, and `author.blade.php`.
 4. **Correct Heading Hierarchies**: Promote main sections on `pages/exams/show.blade.php` from `<h3>` to `<h2>`.
 

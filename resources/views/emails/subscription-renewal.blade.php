@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscription Renewed - ExamsNinja</title>
+    <title>Subscription Renewed - Exam Topics Base</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -90,12 +90,12 @@
                 <a href="{{ route('dashboard.test-engine') }}" class="btn" target="_blank">Resume timed practice sessions</a>
             </div>
 
-            <p>Thank you for choosing ExamsNinja as your certification partner.</p>
-            <p>Best regards,<br>The ExamsNinja Billing Team</p>
+            <p>Thank you for choosing Exam Topics Base as your certification partner.</p>
+            <p>Best regards,<br>The Exam Topics Base Billing Team</p>
         </div>
         <div class="footer">
             <p>Pass Your IT Certification Exam First Attempt. Guaranteed.</p>
-            <p>&copy; {{ date('Y') }} ExamsNinja.com. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Exam Topics Base.com. All rights reserved.</p>
         </div>
     </div>
 </body>

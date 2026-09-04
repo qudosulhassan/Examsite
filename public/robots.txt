@@ -13,4 +13,4 @@ Disallow: /password/
 Disallow: /*?*sort=*
 Disallow: /*?*filter=*
 
-Sitemap: https://examsninja.com/sitemap.xml
+Sitemap: https://examtopicsbase.com/sitemap.xml

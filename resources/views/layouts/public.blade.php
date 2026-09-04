@@ -97,12 +97,8 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="{{ url('/') }}" class="flex items-center space-x-2">
-                        <svg class="h-8 w-8 text-cyan animate-pulse" viewBox="0 0 24 24" fill="currentColor">
-                            <!-- Shuriken Icon SVG -->
-                            <path d="M12 2L14.5 9.5H22L16 14L18.5 21.5L12 17L5.5 21.5L8 14L2 9.5H9.5L12 2Z" />
-                        </svg>
-                        <span class="text-xl font-bold tracking-tight text-white">Exams<span class="text-cyan">Ninja</span></span>
+                    <a href="{{ url('/') }}" class="flex items-center">
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-9 md:h-10 w-auto object-contain">
                     </a>
                 </div>
 
@@ -225,13 +221,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
                 <!-- Branding -->
                 <div class="lg:col-span-4 space-y-6">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan to-blue-500 p-2 flex items-center justify-center shadow-[0_5px_15px_rgba(0,212,170,0.3)]">
-                            <svg class="w-full h-full text-white" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2L14.5 9.5H22L16 14L18.5 21.5L12 17L5.5 21.5L8 14L2 9.5H9.5L12 2Z" />
-                            </svg>
-                        </div>
-                        <span class="text-2xl font-black text-white tracking-tight">Exams<span class="text-cyan">Ninja</span></span>
+                    <div class="flex items-center">
+                        <a href="{{ url('/') }}" class="inline-block">
+                            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-10 md:h-12 w-auto object-contain">
+                        </a>
                     </div>
                     <p class="text-gray-400 text-sm font-medium leading-relaxed max-w-xs">
                         Pass your IT Certification Exam on the first attempt with our premium study guides, verified questions, and interactive practice engine.
@@ -319,10 +312,10 @@
             <!-- Bottom Bar -->
             <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
                 <p class="text-xs font-medium text-gray-500">
-                    &copy; {{ date('Y') }} ExamsNinja. All rights reserved.
+                    &copy; {{ date('Y') }} Exam Topics Base. All rights reserved.
                 </p>
                 <div class="text-xs font-medium text-gray-500 max-w-2xl text-center md:text-right">
-                    Disclaimer: ExamsNinja is an independent provider of practice test materials. All trademarks and brand names are property of their respective owners.
+                    Disclaimer: Exam Topics Base is an independent provider of practice test materials. All trademarks and brand names are property of their respective owners.
                 </div>
             </div>
         </div>

@@ -29,7 +29,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="site_name" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Site Name</label>
-                        <input type="text" name="site_name" id="site_name" value="{{ old('site_name', $settings['site_name'] ?? 'ExamsNinja') }}" class="w-full text-sm border-gray-300 rounded focus:border-cyan focus:ring-cyan">
+                        <input type="text" name="site_name" id="site_name" value="{{ old('site_name', $settings['site_name'] ?? 'Exam Topics Base') }}" class="w-full text-sm border-gray-300 rounded focus:border-cyan focus:ring-cyan">
                     </div>
                     <div>
                         <label for="site_tagline" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Site Tagline</label>
@@ -37,11 +37,11 @@
                     </div>
                     <div>
                         <label for="contact_email" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Contact Email Address</label>
-                        <input type="email" name="contact_email" id="contact_email" value="{{ old('contact_email', $settings['contact_email'] ?? 'support@examsninja.com') }}" class="w-full text-sm border-gray-300 rounded focus:border-cyan focus:ring-cyan">
+                        <input type="email" name="contact_email" id="contact_email" value="{{ old('contact_email', $settings['contact_email'] ?? 'support@examtopicsbase.com') }}" class="w-full text-sm border-gray-300 rounded focus:border-cyan focus:ring-cyan">
                     </div>
                     <div>
                         <label for="support_email" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Support Email Address</label>
-                        <input type="email" name="support_email" id="support_email" value="{{ old('support_email', $settings['support_email'] ?? 'support@examsninja.com') }}" class="w-full text-sm border-gray-300 rounded focus:border-cyan focus:ring-cyan">
+                        <input type="email" name="support_email" id="support_email" value="{{ old('support_email', $settings['support_email'] ?? 'support@examtopicsbase.com') }}" class="w-full text-sm border-gray-300 rounded focus:border-cyan focus:ring-cyan">
                     </div>
                 </div>
 

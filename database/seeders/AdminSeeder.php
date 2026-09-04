@@ -20,9 +20,9 @@ class AdminSeeder extends Seeder
 
         // Create Admin User
         $admin = User::updateOrCreate(
-            ['email' => 'admin@examsninja.com'],
+            ['email' => 'admin@examtopicsbase.com'],
             [
-                'name' => 'ExamsNinja Admin',
+                'name' => 'Exam Topics Base Admin',
                 'password' => Hash::make('Admin@1234'),
                 'role' => 'admin',
                 'email_verified_at' => now(),
@@ -32,7 +32,7 @@ class AdminSeeder extends Seeder
 
         // Create Student User
         $student = User::updateOrCreate(
-            ['email' => 'student@examsninja.com'],
+            ['email' => 'student@examtopicsbase.com'],
             [
                 'name' => 'John Student',
                 'password' => Hash::make('Student@1234'),

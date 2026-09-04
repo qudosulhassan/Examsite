@@ -1,12 +1,12 @@
-# Walkthrough - ExamsNinja.com Platform Development
+# Walkthrough - Exam Topics Base.com Platform Development
 
-This document details the work accomplished for the setup, database architecture, routing layer, test engine, admin dashboard, cart, payment gateways, webhook processors, queue mailers, and deployment prep for the ExamsNinja IT Certification Prep Platform.
+This document details the work accomplished for the setup, database architecture, routing layer, test engine, admin dashboard, cart, payment gateways, webhook processors, queue mailers, and deployment prep for the Exam Topics Base IT Certification Prep Platform.
 
 ---
 
 ## 1. Scaffold & Server Setup
 - **PHP 8.2 & Composer:** Configured a portable PHP 8.2 runtime at `C:\Users\LENOVO\php82` with critical extensions (`curl`, `fileinfo`, `gd`, `mbstring`, `openssl`, `pdo_mysql`, `pdo_sqlite`, `sqlite3`, `zip`).
-- **Laravel 11 Scaffolding:** Scaffolded the new Laravel 11 project in the `c:\ExamSite\examsninja` workspace.
+- **Laravel 11 Scaffolding:** Scaffolded the new Laravel 11 project in the `c:\ExamSite\examtopicsbase` workspace.
 - **Dependency Installation:** Installed packages: `laravel/breeze`, `laravel/socialite`, `stripe/stripe-php`, `srmklive/paypal`, `aws/aws-sdk-php`, `barryvdh/laravel-dompdf`, `spatie/laravel-permission`.
 - **Storage Disk Configuration:** Configured the `r2` disk driver in `config/filesystems.php` for Cloudflare R2 bucket connection.
 - **Local Settings:** Set up `.env` with configurations for database connection, local mail traps, Google OAuth, Stripe sandbox, and PayPal.

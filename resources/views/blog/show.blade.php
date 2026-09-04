@@ -6,7 +6,7 @@
     <!-- Hero Section -->
     <div class="relative bg-gradient-to-br from-[#07101E] via-navy to-[#0F172A] pt-32 pb-40 overflow-hidden">
         <div class="absolute inset-0 overflow-hidden mix-blend-overlay">
-            <img src="{{ $post->featured_image ? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . $post->featured_image)) : 'https://via.placeholder.com/1200x600?text=ExamsNinja' }}" alt="{{ $post->title }}" class="w-full h-full object-cover opacity-30">
+            <img src="{{ $post->featured_image ? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . $post->featured_image)) : 'https://via.placeholder.com/1200x600?text=Exam Topics Base' }}" alt="{{ $post->title }}" class="w-full h-full object-cover opacity-30">
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-b from-navy/50 to-transparent"></div>
@@ -73,7 +73,7 @@
                     @foreach($relatedPosts as $related)
                         <div class="bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden flex flex-col hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300 group">
                             <a href="{{ route('blog.show', $related->slug) }}" class="relative h-56 overflow-hidden block">
-                                <img src="{{ $related->featured_image ? (str_starts_with($related->featured_image, 'http') ? $related->featured_image : asset('storage/' . $related->featured_image)) : 'https://via.placeholder.com/600x400?text=ExamsNinja' }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $related->title }}">
+                                <img src="{{ $related->featured_image ? (str_starts_with($related->featured_image, 'http') ? $related->featured_image : asset('storage/' . $related->featured_image)) : 'https://via.placeholder.com/600x400?text=Exam Topics Base' }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $related->title }}">
                                 @if($related->category)
                                     <div class="absolute top-4 left-4">
                                         <span class="bg-white/90 backdrop-blur-md text-navy text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">{{ $related->category->name }}</span>

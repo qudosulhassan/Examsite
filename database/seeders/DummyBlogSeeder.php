@@ -15,7 +15,7 @@ class DummyBlogSeeder extends Seeder
         // Get first user or create one
         $user = \App\Models\User::first() ?? \App\Models\User::create([
             'name' => 'Admin User',
-            'email' => 'admin@examsninja.com',
+            'email' => 'admin@examtopicsbase.com',
             'password' => bcrypt('password'),
         ]);
 
@@ -55,7 +55,7 @@ class DummyBlogSeeder extends Seeder
             [
                 'title' => 'Top 10 Tips for Passing Your Next IT Certification',
                 'excerpt' => 'Discover the secret strategies that over 100,000 students have used to ace their IT certification exams on the first try.',
-                'content' => '<h2>1. Understand the Exam Objectives</h2><p>Before you even open a book, read the official exam objectives...</p><h2>2. Use Practice Exams</h2><p>Our ExamsNinja test engine is the best way to prepare...</p>',
+                'content' => '<h2>1. Understand the Exam Objectives</h2><p>Before you even open a book, read the official exam objectives...</p><h2>2. Use Practice Exams</h2><p>Our Exam Topics Base test engine is the best way to prepare...</p>',
                 'is_featured' => true,
             ],
             [

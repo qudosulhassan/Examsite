@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Material Updated - ExamsNinja</title>
+    <title>Exam Material Updated - Exam Topics Base</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -88,11 +88,11 @@
             <p style="font-size: 13px; color: #718096;">Note: PDF guide buyers receive 90 days of free updates from their purchase date. Subscribed simulator students have access to the latest updates indefinitely for the duration of the subscription.</p>
             
             <p>Best of luck with your study preparation!</p>
-            <p>Best regards,<br>The ExamsNinja Product Team</p>
+            <p>Best regards,<br>The Exam Topics Base Product Team</p>
         </div>
         <div class="footer">
             <p>Pass Your IT Certification Exam First Attempt. Guaranteed.</p>
-            <p>&copy; {{ date('Y') }} ExamsNinja.com. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Exam Topics Base.com. All rights reserved.</p>
         </div>
     </div>
 </body>

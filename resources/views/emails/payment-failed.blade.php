@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Failed - ExamsNinja</title>
+    <title>Payment Failed - Exam Topics Base</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -105,11 +105,11 @@
             </div>
 
             <p>If you need assistance, please feel free to reach out to our billing support desk.</p>
-            <p>Best regards,<br>The ExamsNinja Support Team</p>
+            <p>Best regards,<br>The Exam Topics Base Support Team</p>
         </div>
         <div class="footer">
             <p>Pass Your IT Certification Exam First Attempt. Guaranteed.</p>
-            <p>&copy; {{ date('Y') }} ExamsNinja.com. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Exam Topics Base.com. All rights reserved.</p>
         </div>
     </div>
 </body>

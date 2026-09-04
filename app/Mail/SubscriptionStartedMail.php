@@ -29,7 +29,7 @@ class SubscriptionStartedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your ExamsNinja Simulator Subscription is Active!',
+            subject: 'Your Exam Topics Base Simulator Subscription is Active!',
         );
     }
 

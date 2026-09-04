@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Order Complete - ExamsNinja')
+@section('title', 'Order Complete - Exam Topics Base')
 
 @section('content')
 <section class="py-20 bg-gray-50 min-h-[700px] flex items-center relative overflow-hidden">

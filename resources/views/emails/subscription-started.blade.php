@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscription Activated - ExamsNinja</title>
+    <title>Subscription Activated - Exam Topics Base</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -75,7 +75,7 @@
             <h1>Exams<span>Ninja</span></h1>
         </div>
         <div class="body">
-            <h2>Your ExamsNinja Subscription is Active!</h2>
+            <h2>Your Exam Topics Base Subscription is Active!</h2>
             <p>Hi {{ $subscription->user->name }},</p>
             <p>Welcome to our premium prep library! Your subscription has been set up successfully. You now have unlocked premium timed test engine features.</p>
             
@@ -99,11 +99,11 @@
             </ul>
 
             <p>You can manage, cancel, or modify your subscription billing details anytime from the settings section in your user dashboard.</p>
-            <p>Happy preps,<br>The ExamsNinja Core Team</p>
+            <p>Happy preps,<br>The Exam Topics Base Core Team</p>
         </div>
         <div class="footer">
             <p>Pass Your IT Certification Exam First Attempt. Guaranteed.</p>
-            <p>&copy; {{ date('Y') }} ExamsNinja.com. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Exam Topics Base.com. All rights reserved.</p>
         </div>
     </div>
 </body>

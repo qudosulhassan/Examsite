@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Frequently Asked Questions (FAQ) - ExamsNinja')
+@section('title', 'Frequently Asked Questions (FAQ) - Exam Topics Base')
 
 @section('seo_tags')
 <script type="application/ld+json">
@@ -69,7 +69,7 @@
       "name": "What if I fail my exam?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "If you fail the exam, contact our support team at support@examsninja.com with your order details and a copy of your score report. We will process your 100% refund immediately or provide alternative study guides for free, depending on your choice."
+        "text": "If you fail the exam, contact our support team at support@examtopicsbase.com with your order details and a copy of your score report. We will process your 100% refund immediately or provide alternative study guides for free, depending on your choice."
       }
     }
   ]
@@ -209,7 +209,7 @@
                 </svg>
             </button>
             <div x-show="activeIndex === 8" class="p-5 text-sm text-gray-600 leading-relaxed border-t border-gray-250" style="display: none;">
-                If you fail the exam, contact our support team at support@examsninja.com with your order details and a copy of your score report. We will process your 100% refund immediately or provide alternative study guides for free, depending on your choice.
+                If you fail the exam, contact our support team at support@examtopicsbase.com with your order details and a copy of your score report. We will process your 100% refund immediately or provide alternative study guides for free, depending on your choice.
             </div>
         </div>
 

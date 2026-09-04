@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', "Search Results for '" . $query . "' - ExamsNinja")
+@section('title', "Search Results for '" . $query . "' - Exam Topics Base")
 
 @section('content')
 <!-- Header Banner -->

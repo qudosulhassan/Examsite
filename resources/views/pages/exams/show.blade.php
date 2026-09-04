@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', $exam->meta_title ?? "{$exam->exam_code} Exam Dumps & Study Guide | ExamsNinja")
+@section('title', $exam->meta_title ?? "{$exam->exam_code} Exam Dumps & Study Guide | Exam Topics Base")
 @section('meta_description', $exam->meta_description ?? "Get updated {$exam->exam_code} ({$exam->exam_name}) exam questions, answers, and study guides. Try our free demo or web-based test engine.")
 @section('meta_keywords', $exam->meta_keywords ?? "{$exam->exam_code}, {$exam->exam_code} exam dumps, {$exam->exam_code} practice test, {$exam->vendor->name} certification")
 @section('canonical_url', $exam->url)

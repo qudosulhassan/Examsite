@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmation - ExamsNinja</title>
+    <title>Order Confirmation - Exam Topics Base</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -154,11 +154,11 @@
             </div>
 
             <p style="font-size: 13px; color: #718096;">Need an invoice? You can generate and download a PDF invoice for this order from your dashboard under the billing tab.</p>
-            <p>Best regards,<br>The ExamsNinja Billing Team</p>
+            <p>Best regards,<br>The Exam Topics Base Billing Team</p>
         </div>
         <div class="footer">
             <p>Pass Your IT Certification Exam First Attempt. Guaranteed.</p>
-            <p>&copy; {{ date('Y') }} ExamsNinja.com. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Exam Topics Base.com. All rights reserved.</p>
         </div>
     </div>
 </body>

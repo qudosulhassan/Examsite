@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Download Free Exam PDF Sample - ExamsNinja')
+@section('title', 'Download Free Exam PDF Sample - Exam Topics Base')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->

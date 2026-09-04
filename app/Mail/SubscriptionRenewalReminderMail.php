@@ -29,7 +29,7 @@ class SubscriptionRenewalReminderMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your ExamsNinja Subscription Renewal Confirmation',
+            subject: 'Your Exam Topics Base Subscription Renewal Confirmation',
         );
     }
 

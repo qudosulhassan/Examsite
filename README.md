@@ -1,6 +1,6 @@
-# ExamsNinja - IT Certification Prep Platform
+# Exam Topics Base - IT Certification Prep Platform
 
-ExamsNinja is a premium IT Certification Exam Preparation Platform built on Laravel 11, Tailwind CSS, Alpine.js, and MySQL. It integrates Cloudflare R2 object storage for secure PDF guide downloads, and features an interactive browser-based timed test simulator.
+Exam Topics Base is a premium IT Certification Exam Preparation Platform built on Laravel 11, Tailwind CSS, Alpine.js, and MySQL. It integrates Cloudflare R2 object storage for secure PDF guide downloads, and features an interactive browser-based timed test simulator.
 
 ---
 
@@ -23,7 +23,7 @@ ExamsNinja is a premium IT Certification Exam Preparation Platform built on Lara
 ### Installation Steps
 1. Clone the project or navigate to the directory:
    ```bash
-   cd c:\ExamSite\examsninja
+   cd c:\ExamSite\examtopicsbase
    ```
 2. Copy the environment configuration file:
    ```bash
@@ -63,7 +63,7 @@ Since Stripe and PayPal credentials default to placeholder values locally, the p
 ---
 
 ## 3. Hostinger Production Deployment Guide
-Follow these steps to deploy ExamsNinja to a Hostinger Business Plus plan using hPanel and SSH.
+Follow these steps to deploy Exam Topics Base to a Hostinger Business Plus plan using hPanel and SSH.
 
 ### Step 3.1: Connect via SSH & Clone Repository
 1. Log in to your **Hostinger hPanel**.
@@ -72,9 +72,9 @@ Follow these steps to deploy ExamsNinja to a Hostinger Business Plus plan using 
    ```bash
    ssh -p [Port] [Username]@[IP]
    ```
-4. Navigate to your domain's root folder (usually `domains/examsninja.com` or `public_html`):
+4. Navigate to your domain's root folder (usually `domains/examtopicsbase.com` or `public_html`):
    ```bash
-   cd domains/examsninja.com
+   cd domains/examtopicsbase.com
    ```
 5. Clone your git repository or upload the files.
 
@@ -118,7 +118,7 @@ Laravel queues are used for sending transactional emails (Welcome, Order Confirm
 1. In hPanel, navigate to **Advanced > Cron Jobs**.
 2. Create a new cron job with the following parameters:
    - **Interval:** Once per minute (`* * * * *`)
-   - **Command:** `usr/local/bin/php /home/[username]/domains/examsninja.com/artisan schedule:run >> /dev/null 2>&1`
+   - **Command:** `usr/local/bin/php /home/[username]/domains/examtopicsbase.com/artisan schedule:run >> /dev/null 2>&1`
 3. Since Hostinger shared hosting does not support daemon processes like `queue:work` natively:
    - The scheduler is configured to run `php artisan queue:work --once` every minute automatically.
    - Ensure the scheduler command is defined in `routes/console.php` or `app/Console/Kernel.php` to handle queue processing on shared host limits.
@@ -127,7 +127,7 @@ Laravel queues are used for sending transactional emails (Welcome, Order Confirm
 By default, Hostinger expects the website files to be served directly from `public_html`.
 1. Move the contents of `public` to `public_html` OR configure a symbolic link:
    ```bash
-   ln -s /home/[username]/domains/examsninja.com/public /home/[username]/domains/examsninja.com/public_html
+   ln -s /home/[username]/domains/examtopicsbase.com/public /home/[username]/domains/examtopicsbase.com/public_html
    ```
 2. If symlinks are disabled, create/update `.htaccess` in your root `public_html` to rewrite all traffic to the subfolder public directory:
    ```apache
@@ -138,7 +138,7 @@ By default, Hostinger expects the website files to be served directly from `publ
 ---
 
 ## 4. Running Tests
-ExamsNinja contains tests covering routing, Breeze authentication, and user profile management:
+Exam Topics Base contains tests covering routing, Breeze authentication, and user profile management:
 ```bash
 php artisan test
 ```

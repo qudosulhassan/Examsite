@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'All IT Certifications & Study Guides - ExamsNinja')
+@section('title', 'All IT Certifications & Study Guides - Exam Topics Base')
 @section('meta_description', 'Browse our comprehensive directory of IT certifications grouped by vendors like Microsoft, AWS, Cisco, and more. Find the perfect study guide and practice exams.')
 @section('meta_keywords', 'IT certifications, certification paths, microsoft certifications, aws certifications, cisco certifications, comptia')
 @section('canonical_url', route('certifications.index'))

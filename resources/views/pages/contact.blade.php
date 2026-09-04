@@ -1,13 +1,13 @@
 @extends('layouts.public')
 
-@section('title', 'Contact Support - ExamsNinja')
+@section('title', 'Contact Support - Exam Topics Base')
 
 @section('content')
 <!-- Header Banner -->
 <section class="bg-navy text-white py-16 text-center">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
-            Get in Touch with ExamsNinja
+            Get in Touch with Exam Topics Base
         </h1>
         <p class="text-lg text-gray-300 max-w-2xl mx-auto">
             Need help with a purchase? Have questions about study materials? Our support team is here 24/7.
@@ -29,7 +29,7 @@
                     <span class="text-cyan text-lg">✉</span>
                     <div>
                         <strong class="block">Email Support</strong>
-                        <a href="mailto:support@examsninja.com" class="text-cyan hover:underline">support@examsninja.com</a>
+                        <a href="mailto:support@examtopicsbase.com" class="text-cyan hover:underline">support@examtopicsbase.com</a>
                     </div>
                 </div>
                 
