@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', $exam->meta_title ?? ($exam->header_title ? "{$exam->header_title} | Exam Topics Base" : "{$exam->exam_code} Exam Dumps & Study Guide | Exam Topics Base"))
+@section('title', !empty(trim($exam->meta_title ?? '')) ? $exam->meta_title : "{$exam->exam_code} Exam Dumps & Study Guide | Exam Topics Base")
 @section('meta_description', $exam->meta_description ?? "Get updated {$exam->exam_code} ({$exam->exam_name}) exam questions, answers, and study guides. Try our free demo or web-based test engine.")
 @section('meta_keywords', $exam->meta_keywords ?? "{$exam->exam_code}, {$exam->exam_code} exam dumps, {$exam->exam_code} practice test, {$exam->vendor->name} certification")
 @section('canonical_url', $exam->url)
@@ -78,9 +78,13 @@
                 
                 <!-- Exam Intro Header -->
                 <div class="space-y-10">
-                    <h1 class="text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight leading-[1.1] text-white">
-                        <span class="block mb-2">{{ $exam->header_title ?: ($exam->vendor ? $exam->vendor->name . ' ' . $exam->exam_code : $exam->exam_code) }}</span>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan via-blue-400 to-blue-500 inline-block drop-shadow-sm">Study Guide & Practice Questions</span>
+                    <h1 class="text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight leading-[1.1] text-white break-words">
+                        @if(!empty(trim($exam->header_title ?? '')))
+                            <span class="block">{{ trim($exam->header_title) }}</span>
+                        @else
+                            <span class="block mb-2">{{ $exam->vendor ? $exam->vendor->name . ' ' . $exam->exam_code : $exam->exam_code }}</span>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan via-blue-400 to-blue-500 inline-block drop-shadow-sm">Study Guide &amp; Practice Questions</span>
+                        @endif
                     </h1>
                     
                     <!-- Premium Details Grid -->
