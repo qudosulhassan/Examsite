@@ -19,32 +19,32 @@ $existingTopicsJson = json_encode(array_values(array_filter(array_map('trim', $e
 @endphp
 
 <div x-data="examWorkspace({
-    examCode: '{{ addslashes($exam->exam_code) }}',
-    examName: '{{ addslashes($exam->exam_name) }}',
-    headerTitle: '{{ addslashes($exam->header_title ?? '') }}',
-    vendorId: '{{ $exam->vendor_id }}',
-    vendorName: '{{ addslashes($exam->vendor->name ?? 'Unknown Vendor') }}',
-    difficulty: '{{ $exam->difficulty }}',
-    examType: '{{ $exam->exam_type }}',
-    passingScore: {{ (int) $exam->passing_score }},
-    questionCount: '{{ $exam->question_count }}',
+    examCode: {!! json_encode(old('exam_code', $exam->exam_code)) !!},
+    examName: {!! json_encode(old('exam_name', $exam->exam_name)) !!},
+    headerTitle: {!! json_encode(old('header_title', $exam->header_title ?? '')) !!},
+    vendorId: {!! json_encode((string)old('vendor_id', $exam->vendor_id)) !!},
+    vendorName: {!! json_encode($exam->vendor->name ?? 'Unknown Vendor') !!},
+    difficulty: {!! json_encode(old('difficulty', $exam->difficulty)) !!},
+    examType: {!! json_encode(old('exam_type', $exam->exam_type)) !!},
+    passingScore: {{ (int) old('passing_score', $exam->passing_score) }},
+    questionCount: {!! json_encode(old('question_count', (string)$exam->question_count)) !!},
     actualQuestions: {{ (int) $actualQuestionCount }},
     isPdfAvailable: {{ old('is_pdf_available', $exam->is_pdf_available ?? true) ? 'true' : 'false' }},
     isEngineAvailable: {{ old('is_engine_available', $exam->is_engine_available ?? true) ? 'true' : 'false' }},
     isBundleAvailable: {{ old('is_bundle_available', $exam->is_bundle_available ?? true) ? 'true' : 'false' }},
-    pricePdf: '{{ old('price_pdf', $exam->price_pdf) }}',
-    priceEngine: '{{ old('price_engine', $exam->price_engine) }}',
-    priceBundle: '{{ old('price_bundle', $exam->price_bundle ?? '') }}',
-    update3: '{{ $exam->update_price_3_months }}',
-    update6: '{{ $exam->update_price_6_months }}',
-    update12: '{{ $exam->update_price_12_months }}',
-    isActive: {{ $exam->is_active ? 'true' : 'false' }},
-    isFeatured: {{ $exam->is_featured ? 'true' : 'false' }},
-    slug: '{{ addslashes($exam->slug) }}',
-    sortOrder: {{ (int) $exam->sort_order }},
-    metaTitle: '{{ addslashes($exam->meta_title ?? '') }}',
-    metaDescription: '{{ addslashes($exam->meta_description ?? '') }}',
-    metaKeywords: '{{ addslashes($exam->meta_keywords ?? '') }}',
+    pricePdf: {!! json_encode((string)old('price_pdf', $exam->price_pdf)) !!},
+    priceEngine: {!! json_encode((string)old('price_engine', $exam->price_engine)) !!},
+    priceBundle: {!! json_encode((string)old('price_bundle', $exam->price_bundle ?? '')) !!},
+    update3: {!! json_encode((string)old('update_price_3_months', $exam->update_price_3_months)) !!},
+    update6: {!! json_encode((string)old('update_price_6_months', $exam->update_price_6_months)) !!},
+    update12: {!! json_encode((string)old('update_price_12_months', $exam->update_price_12_months)) !!},
+    isActive: {{ old('is_active', $exam->is_active) ? 'true' : 'false' }},
+    isFeatured: {{ old('is_featured', $exam->is_featured) ? 'true' : 'false' }},
+    slug: {!! json_encode(old('slug', $exam->slug)) !!},
+    sortOrder: {{ (int) old('sort_order', $exam->sort_order) }},
+    metaTitle: {!! json_encode(old('meta_title', $exam->meta_title ?? '')) !!},
+    metaDescription: {!! json_encode(old('meta_description', $exam->meta_description ?? '')) !!},
+    metaKeywords: {!! json_encode(old('meta_keywords', $exam->meta_keywords ?? '')) !!},
     hasDemoPdf: {{ $exam->demo_pdf_filename ? 'true' : 'false' }},
     hasFullPdf: {{ $exam->full_pdf_filename ? 'true' : 'false' }},
     topics: {{ $existingTopicsJson ?: '[]' }}
@@ -191,6 +191,7 @@ $existingTopicsJson = json_encode(array_values(array_filter(array_map('trim', $e
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-cyan bg-cyan/10 px-2 py-0.5 rounded">Optional</span>
                             </div>
                             <input type="text" name="header_title" id="header_title" x-model="headerTitle" @input="markDirty()"
+                                   value="{{ old('header_title', $exam->header_title ?? '') }}"
                                    placeholder="e.g. Cisco CCNA 200-301 Certification"
                                    class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2.5 text-navy font-medium focus:border-cyan focus:ring-cyan shadow-sm bg-white">
                             <p class="text-[11px] text-gray-600 mt-1.5">
@@ -1099,6 +1100,10 @@ $existingTopicsJson = json_encode(array_values(array_filter(array_map('trim', $e
                         <div class="flex items-center justify-between py-1 border-b border-gray-50">
                             <span class="text-gray-500">Vendor:</span>
                             <span class="font-bold text-gray-800" x-text="vendorName || '---'"></span>
+                        </div>
+                        <div class="flex items-center justify-between py-1 border-b border-gray-50" x-show="headerTitle && headerTitle.trim().length > 0">
+                            <span class="text-gray-500">Custom H1:</span>
+                            <span class="font-bold text-cyan truncate max-w-[130px]" x-text="headerTitle" :title="headerTitle"></span>
                         </div>
                         <div class="flex items-center justify-between py-1 border-b border-gray-50">
                             <span class="text-gray-500">Difficulty:</span>

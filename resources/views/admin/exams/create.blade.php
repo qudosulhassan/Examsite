@@ -19,31 +19,31 @@ $oldTopicsJson = json_encode(is_array($oldTopics) ? array_values(array_filter(ar
 @endphp
 
 <div x-data="examWorkspace({
-    examCode: '{{ addslashes(old('exam_code', '')) }}',
-    examName: '{{ addslashes(old('exam_name', '')) }}',
-    headerTitle: '{{ addslashes(old('header_title', '')) }}',
-    vendorId: '{{ old('vendor_id', '') }}',
+    examCode: {!! json_encode(old('exam_code', '')) !!},
+    examName: {!! json_encode(old('exam_name', '')) !!},
+    headerTitle: {!! json_encode(old('header_title', '')) !!},
+    vendorId: {!! json_encode((string)old('vendor_id', '')) !!},
     vendorName: '',
-    difficulty: '{{ old('difficulty', 'Associate') }}',
-    examType: '{{ old('exam_type', 'MultipleChoice') }}',
+    difficulty: {!! json_encode(old('difficulty', 'Associate')) !!},
+    examType: {!! json_encode(old('exam_type', 'MultipleChoice')) !!},
     passingScore: {{ (int) old('passing_score', 70) }},
-    questionCount: '{{ old('question_count', '') }}',
+    questionCount: {!! json_encode(old('question_count', '')) !!},
     isPdfAvailable: {{ old('is_pdf_available', '1') ? 'true' : 'false' }},
     isEngineAvailable: {{ old('is_engine_available', '1') ? 'true' : 'false' }},
     isBundleAvailable: {{ old('is_bundle_available', '1') ? 'true' : 'false' }},
-    pricePdf: '{{ old('price_pdf', '29.00') }}',
-    priceEngine: '{{ old('price_engine', '39.00') }}',
-    priceBundle: '{{ old('price_bundle', '59.00') }}',
-    update3: '{{ old('update_price_3_months', '0.00') }}',
-    update6: '{{ old('update_price_6_months', '10.00') }}',
-    update12: '{{ old('update_price_12_months', '20.00') }}',
+    pricePdf: {!! json_encode((string)old('price_pdf', '29.00')) !!},
+    priceEngine: {!! json_encode((string)old('price_engine', '39.00')) !!},
+    priceBundle: {!! json_encode((string)old('price_bundle', '59.00')) !!},
+    update3: {!! json_encode((string)old('update_price_3_months', '0.00')) !!},
+    update6: {!! json_encode((string)old('update_price_6_months', '10.00')) !!},
+    update12: {!! json_encode((string)old('update_price_12_months', '20.00')) !!},
     isActive: {{ old('is_active', '1') ? 'true' : 'false' }},
     isFeatured: {{ old('is_featured') ? 'true' : 'false' }},
-    slug: '{{ addslashes(old('slug', '')) }}',
+    slug: {!! json_encode(old('slug', '')) !!},
     sortOrder: {{ (int) old('sort_order', 0) }},
-    metaTitle: '{{ addslashes(old('meta_title', '')) }}',
-    metaDescription: '{{ addslashes(old('meta_description', '')) }}',
-    metaKeywords: '{{ addslashes(old('meta_keywords', '')) }}',
+    metaTitle: {!! json_encode(old('meta_title', '')) !!},
+    metaDescription: {!! json_encode(old('meta_description', '')) !!},
+    metaKeywords: {!! json_encode(old('meta_keywords', '')) !!},
     hasDemoPdf: false,
     hasFullPdf: false,
     topics: {{ $oldTopicsJson ?: '[]' }}
@@ -178,6 +178,7 @@ $oldTopicsJson = json_encode(is_array($oldTopics) ? array_values(array_filter(ar
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-cyan bg-cyan/10 px-2 py-0.5 rounded">Optional</span>
                             </div>
                             <input type="text" name="header_title" id="header_title" x-model="headerTitle" @input="markDirty()"
+                                   value="{{ old('header_title', '') }}"
                                    placeholder="e.g. Cisco CCNA 200-301 Certification"
                                    class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2.5 text-navy font-medium focus:border-cyan focus:ring-cyan shadow-sm bg-white">
                             <p class="text-[11px] text-gray-600 mt-1.5">
@@ -996,6 +997,10 @@ $oldTopicsJson = json_encode(is_array($oldTopics) ? array_values(array_filter(ar
                         <div class="flex items-center justify-between py-1 border-b border-gray-50">
                             <span class="text-gray-500">Vendor:</span>
                             <span class="font-bold text-gray-800" x-text="vendorName || '---'"></span>
+                        </div>
+                        <div class="flex items-center justify-between py-1 border-b border-gray-50" x-show="headerTitle && headerTitle.trim().length > 0">
+                            <span class="text-gray-500">Custom H1:</span>
+                            <span class="font-bold text-cyan truncate max-w-[130px]" x-text="headerTitle" :title="headerTitle"></span>
                         </div>
                         <div class="flex items-center justify-between py-1 border-b border-gray-50">
                             <span class="text-gray-500">Difficulty:</span>

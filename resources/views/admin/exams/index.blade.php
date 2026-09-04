@@ -60,6 +60,11 @@
                                 <span>{{ $exam->exam_name }}</span>
                                 <span class="bg-navy/5 text-navy font-semibold px-2 py-0.5 rounded text-[10px] border border-navy/10">{{ $exam->question_count }} Q's</span>
                             </div>
+                            @if($exam->header_title)
+                                <div class="text-[11px] text-cyan font-bold truncate max-w-md mt-0.5">
+                                    <span class="text-gray-400 font-normal">H1:</span> {{ $exam->header_title }}
+                                </div>
+                            @endif
                             <div class="text-[10px] text-gray-400">{{ count($exam->topics ?: []) }} Topics | {{ $exam->difficulty }}</div>
                         </td>
                         <td class="px-6 py-4 font-semibold text-gray-700">
