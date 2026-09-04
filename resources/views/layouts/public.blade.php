@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v={{ filemtime(public_path('favicon-32x32.png')) }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-32x32.png') }}?v={{ filemtime(public_path('favicon-32x32.png')) }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v={{ filemtime(public_path('favicon.png')) }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ filemtime(public_path('favicon.ico')) }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}?v={{ filemtime(public_path('apple-touch-icon.png')) }}">
+
     <!-- Site Verification -->
     @if(config('seo.verification.google_search_console'))
         <meta name="google-site-verification" content="{{ config('seo.verification.google_search_console') }}">
@@ -98,7 +105,7 @@
                 <!-- Logo -->
                 <div class="flex items-center">
                     <a href="{{ url('/') }}" class="flex items-center py-1 group">
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-10 sm:h-11 md:h-12 w-auto max-w-[210px] md:max-w-[240px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_2px_12px_rgba(0,212,170,0.2)]">
+                        <img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-10 sm:h-11 md:h-12 w-auto max-w-[210px] md:max-w-[240px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_2px_12px_rgba(0,212,170,0.2)]">
                     </a>
                 </div>
 
@@ -223,7 +230,7 @@
                 <div class="lg:col-span-4 space-y-6">
                     <div class="flex items-center">
                         <a href="{{ url('/') }}" class="inline-block group">
-                            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-12 md:h-14 lg:h-16 w-auto max-w-[260px] md:max-w-[300px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_4px_18px_rgba(0,212,170,0.25)]">
+                            <img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-12 md:h-14 lg:h-16 w-auto max-w-[260px] md:max-w-[300px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_4px_18px_rgba(0,212,170,0.25)]">
                         </a>
                     </div>
                     <p class="text-gray-400 text-sm font-medium leading-relaxed max-w-xs">
