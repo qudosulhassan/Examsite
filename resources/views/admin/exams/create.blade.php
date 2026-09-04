@@ -15,39 +15,42 @@ $certData = $certifications->map(function($c) {
 
 $preSelected = json_encode(old('certifications', []));
 $oldTopics = old('topics', []);
-$oldTopicsJson = json_encode(is_array($oldTopics) ? array_values(array_filter(array_map('trim', $oldTopics))) : []);
+$oldTopicsList = is_array($oldTopics) ? array_values(array_filter(array_map('trim', $oldTopics))) : [];
+
+$workspaceConfig = [
+    'examCode' => (string)old('exam_code', ''),
+    'examName' => (string)old('exam_name', ''),
+    'headerTitle' => (string)old('header_title', ''),
+    'vendorId' => (string)old('vendor_id', ''),
+    'vendorName' => '',
+    'difficulty' => (string)old('difficulty', 'Associate'),
+    'examType' => (string)old('exam_type', 'MultipleChoice'),
+    'passingScore' => (int)old('passing_score', 70),
+    'questionCount' => (string)old('question_count', ''),
+    'actualQuestions' => 0,
+    'isPdfAvailable' => (bool)old('is_pdf_available', '1'),
+    'isEngineAvailable' => (bool)old('is_engine_available', '1'),
+    'isBundleAvailable' => (bool)old('is_bundle_available', '1'),
+    'pricePdf' => (string)old('price_pdf', '29.00'),
+    'priceEngine' => (string)old('price_engine', '39.00'),
+    'priceBundle' => (string)old('price_bundle', '59.00'),
+    'update3' => (string)old('update_price_3_months', '0.00'),
+    'update6' => (string)old('update_price_6_months', '10.00'),
+    'update12' => (string)old('update_price_12_months', '20.00'),
+    'isActive' => (bool)old('is_active', '1'),
+    'isFeatured' => (bool)old('is_featured', 0),
+    'slug' => (string)old('slug', ''),
+    'sortOrder' => (int)old('sort_order', 0),
+    'metaTitle' => (string)old('meta_title', ''),
+    'metaDescription' => (string)old('meta_description', ''),
+    'metaKeywords' => (string)old('meta_keywords', ''),
+    'hasDemoPdf' => false,
+    'hasFullPdf' => false,
+    'topics' => $oldTopicsList,
+];
 @endphp
 
-<div x-data="examWorkspace({
-    examCode: {!! json_encode(old('exam_code', '')) !!},
-    examName: {!! json_encode(old('exam_name', '')) !!},
-    headerTitle: {!! json_encode(old('header_title', '')) !!},
-    vendorId: {!! json_encode((string)old('vendor_id', '')) !!},
-    vendorName: '',
-    difficulty: {!! json_encode(old('difficulty', 'Associate')) !!},
-    examType: {!! json_encode(old('exam_type', 'MultipleChoice')) !!},
-    passingScore: {{ (int) old('passing_score', 70) }},
-    questionCount: {!! json_encode(old('question_count', '')) !!},
-    isPdfAvailable: {{ old('is_pdf_available', '1') ? 'true' : 'false' }},
-    isEngineAvailable: {{ old('is_engine_available', '1') ? 'true' : 'false' }},
-    isBundleAvailable: {{ old('is_bundle_available', '1') ? 'true' : 'false' }},
-    pricePdf: {!! json_encode((string)old('price_pdf', '29.00')) !!},
-    priceEngine: {!! json_encode((string)old('price_engine', '39.00')) !!},
-    priceBundle: {!! json_encode((string)old('price_bundle', '59.00')) !!},
-    update3: {!! json_encode((string)old('update_price_3_months', '0.00')) !!},
-    update6: {!! json_encode((string)old('update_price_6_months', '10.00')) !!},
-    update12: {!! json_encode((string)old('update_price_12_months', '20.00')) !!},
-    isActive: {{ old('is_active', '1') ? 'true' : 'false' }},
-    isFeatured: {{ old('is_featured') ? 'true' : 'false' }},
-    slug: {!! json_encode(old('slug', '')) !!},
-    sortOrder: {{ (int) old('sort_order', 0) }},
-    metaTitle: {!! json_encode(old('meta_title', '')) !!},
-    metaDescription: {!! json_encode(old('meta_description', '')) !!},
-    metaKeywords: {!! json_encode(old('meta_keywords', '')) !!},
-    hasDemoPdf: false,
-    hasFullPdf: false,
-    topics: {{ $oldTopicsJson ?: '[]' }}
-})" class="space-y-8 pb-20">
+<div x-data="examWorkspace({{ json_encode($workspaceConfig) }})" class="space-y-8 pb-20">
 
     <!-- Top Workspace Header -->
     <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
