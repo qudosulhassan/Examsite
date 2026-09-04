@@ -275,9 +275,15 @@
                             'html' => '<span class="text-sm font-bold uppercase text-gray-700">' . substr($vendor->name, 0, 2) . '</span>'
                         ];
                     @endphp
-                    <div class="h-14 w-14 rounded-xl border flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 {{ $style['bg'] }} shadow-sm">
-                        {!! $style['html'] !!}
-                    </div>
+                    @if($vendor->logo_url)
+                        <div class="h-14 w-14 rounded-xl border border-gray-100 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 bg-white p-2 shadow-sm shrink-0">
+                            <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
+                        </div>
+                    @else
+                        <div class="h-14 w-14 rounded-xl border flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 {{ $style['bg'] }} shadow-sm shrink-0">
+                            {!! $style['html'] !!}
+                        </div>
+                    @endif
                     <h3 class="font-bold text-navy text-sm mb-2 group-hover:text-cyan transition-colors">{{ $vendor->name }}</h3>
                     <span class="bg-gray-100 text-gray-500 group-hover:bg-cyan/10 group-hover:text-cyan text-xs font-bold px-3 py-1 rounded-full transition-colors">{{ $vendor->exam_count }} Exams</span>
                 </a>
