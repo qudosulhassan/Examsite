@@ -38,9 +38,9 @@ class AdminDashboardController extends Controller
         );
 
         // 2. Permission Flags (Server-Side Enforcement)
-        $canViewFinance = $user && ($user->hasRole('Super Admin') || $user->hasRole('Admin') || $user->can('view-orders') || $user->can('view-reports'));
-        $canViewUsers = $user && ($user->hasRole('Super Admin') || $user->hasRole('Admin') || $user->can('view-users'));
-        $canViewContent = $user && ($user->hasRole('Super Admin') || $user->hasRole('Admin') || $user->can('view-exams') || $user->can('view-questions'));
+        $canViewFinance = $user && ($user->isAdmin() || $user->can('view-orders') || $user->can('view-reports'));
+        $canViewUsers = $user && ($user->isAdmin() || $user->can('view-users'));
+        $canViewContent = $user && ($user->isAdmin() || $user->can('view-exams') || $user->can('view-questions'));
 
         // 3. Key Performance Indicators (Current vs Previous Period)
         $kpi = [];
@@ -215,9 +215,17 @@ class AdminDashboardController extends Controller
             'suspended' => User::where('status', 'suspended')->count(),
             'deactivated' => User::where('status', 'deactivated')->count(),
         ];
-        $studentsCount = User::role('Student')->count();
-        $adminStaffCount = User::whereHas('roles', function($q) {
-            $q->whereIn('name', ['Super Admin', 'Admin', 'Staff', 'Moderator']);
+        $studentsCount = User::where(function($q) {
+            $q->whereIn('role', ['student', 'Student'])
+              ->orWhereHas('roles', function($rq) {
+                  $rq->whereIn('name', ['student', 'Student']);
+              });
+        })->count();
+        $adminStaffCount = User::where(function($q) {
+            $q->whereIn('role', ['admin', 'super_admin', 'staff', 'moderator', 'Admin', 'Super Admin'])
+              ->orWhereHas('roles', function($rq) {
+                  $rq->whereIn('name', ['Super Admin', 'Admin', 'Staff', 'Moderator', 'super_admin', 'admin', 'staff', 'moderator']);
+              });
         })->count();
 
         // 9. Subscription Lifecycle Breakdown

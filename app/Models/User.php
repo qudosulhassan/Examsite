@@ -152,7 +152,11 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function isStudent(): bool
     {
-        return $this->role === 'student';
+        if (in_array(strtolower($this->role ?? ''), ['student'])) {
+            return true;
+        }
+
+        return $this->hasAnyRole(['Student', 'student']);
     }
 
     /**

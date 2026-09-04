@@ -50,7 +50,7 @@ class BlogController extends Controller
 
         // If draft, only allow if authenticated admin
         if ($post->status === 'draft') {
-            if (!auth()->check() || !auth()->user()->hasRole('admin')) {
+            if (!auth()->check() || !auth()->user()->isAdmin()) {
                 abort(404);
             }
         }
