@@ -276,7 +276,7 @@ class ExamAdminController extends Controller
             $topicsArray = array_values(array_filter(array_map('trim', explode(',', $request->topics))));
         }
 
-        $isActive = $request->input('action') === 'draft' ? false : ($request->has('is_active') ? true : false);
+        $isActive = $request->input('action') === 'draft' ? false : ($request->has('is_active') ? $request->boolean('is_active') : (bool)$exam->is_active);
         $slug = $request->filled('slug') ? Str::slug($request->slug) : Str::slug($request->exam_code);
 
         $updateData = [
