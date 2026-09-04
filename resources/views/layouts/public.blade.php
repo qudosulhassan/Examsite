@@ -97,8 +97,8 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="{{ url('/') }}" class="flex items-center">
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-9 md:h-10 w-auto object-contain">
+                    <a href="{{ url('/') }}" class="flex items-center py-1 group">
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-10 sm:h-11 md:h-12 w-auto max-w-[210px] md:max-w-[240px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_2px_12px_rgba(0,212,170,0.2)]">
                     </a>
                 </div>
 
@@ -222,8 +222,8 @@
                 <!-- Branding -->
                 <div class="lg:col-span-4 space-y-6">
                     <div class="flex items-center">
-                        <a href="{{ url('/') }}" class="inline-block">
-                            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-10 md:h-12 w-auto object-contain">
+                        <a href="{{ url('/') }}" class="inline-block group">
+                            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-12 md:h-14 lg:h-16 w-auto max-w-[260px] md:max-w-[300px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_4px_18px_rgba(0,212,170,0.25)]">
                         </a>
                     </div>
                     <p class="text-gray-400 text-sm font-medium leading-relaxed max-w-xs">

@@ -40,7 +40,7 @@
             <div class="flex flex-col flex-grow bg-navy pt-5 overflow-y-auto">
                 <div class="flex items-center flex-shrink-0 px-4 mb-6">
                     <a href="{{ url('/') }}" class="flex items-center">
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-9 w-auto object-contain">
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-10 w-auto max-w-[200px] object-contain drop-shadow-[0_2px_10px_rgba(0,212,170,0.2)]">
                     </a>
                 </div>
                 <div class="flex-grow flex flex-col">

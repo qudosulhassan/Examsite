@@ -16,9 +16,9 @@
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
-            <div>
-                <a href="/">
-                    <x-application-logo class="h-12 w-auto object-contain" />
+            <div class="mb-2">
+                <a href="/" class="inline-flex items-center px-5 py-3 rounded-2xl bg-navy border border-cyan/20 shadow-lg shadow-navy/30 hover:border-cyan/40 transition-all duration-300">
+                    <x-application-logo class="h-11 sm:h-12 w-auto object-contain drop-shadow-[0_2px_10px_rgba(0,212,170,0.25)]" />
                 </a>
             </div>
 
