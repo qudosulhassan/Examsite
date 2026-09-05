@@ -132,3 +132,13 @@ Route::post('settings/upload-branding', [SettingsAdminController::class, 'upload
 Route::post('settings/remove-branding', [SettingsAdminController::class, 'removeBranding'])->name('settings.remove-branding');
 Route::post('settings/clear-cache', [SettingsAdminController::class, 'clearCache'])->name('settings.clear-cache');
 
+// Payment Gateway Action Endpoints
+Route::post('settings/test-stripe', [SettingsAdminController::class, 'testStripe'])->name('settings.test-stripe');
+Route::post('settings/test-paypal', [SettingsAdminController::class, 'testPayPal'])->name('settings.test-paypal');
+Route::post('settings/update-stripe-credentials', [SettingsAdminController::class, 'updateStripeCredentials'])->name('settings.update-stripe-credentials');
+Route::post('settings/update-paypal-credentials', [SettingsAdminController::class, 'updatePayPalCredentials'])->name('settings.update-paypal-credentials');
+Route::get('settings/transactions/{id}', [SettingsAdminController::class, 'getTransactionDetails'])->name('settings.transaction-details');
+Route::post('settings/transactions/{id}/refund', [SettingsAdminController::class, 'refundTransaction'])->name('settings.refund-transaction');
+Route::post('settings/webhooks/{id}/retry', [SettingsAdminController::class, 'retryWebhook'])->name('settings.retry-webhook');
+Route::post('settings/toggle-gateway', [SettingsAdminController::class, 'toggleGateway'])->name('settings.toggle-gateway');
+

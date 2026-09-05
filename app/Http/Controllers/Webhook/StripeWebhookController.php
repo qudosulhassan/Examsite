@@ -60,7 +60,25 @@ class StripeWebhookController extends Controller
             return response()->json(['error' => 'Event parsing failed'], 400);
         }
 
-        Log::info('Stripe Webhook received event: ' . $event->type);
+        $startTime = microtime(true);
+        $logRecord = null;
+
+        if ($event) {
+            try {
+                $logRecord = \App\Models\PaymentWebhookLog::create([
+                    'gateway' => 'stripe',
+                    'event_type' => $event->type ?? 'unknown',
+                    'event_id' => $event->id ?? null,
+                    'status' => 'pending',
+                    'payload' => json_decode($payload, true) ?: ['raw' => substr($payload, 0, 5000)],
+                    'ip_address' => $request->ip(),
+                ]);
+            } catch (\Throwable $th) {
+                Log::warning('Could not create PaymentWebhookLog record: ' . $th->getMessage());
+            }
+        }
+
+        Log::info('Stripe Webhook received event: ' . ($event->type ?? 'unknown'));
 
         // Process webhook event
         try {
@@ -85,7 +103,45 @@ class StripeWebhookController extends Controller
                     $this->handleSubscriptionDeleted($stripeSub);
                     break;
             }
+
+            $durationMs = (int)round((microtime(true) - $startTime) * 1000);
+
+            if ($logRecord) {
+                $logRecord->update([
+                    'status' => 'processed',
+                    'processing_time_ms' => $durationMs,
+                ]);
+            }
+
+            \App\Models\PaymentActivityLog::record(
+                'stripe',
+                'webhook_received',
+                'success',
+                "Processed Stripe webhook event: {$event->type}",
+                null,
+                ['event_id' => $event->id ?? null, 'type' => $event->type ?? null]
+            );
+
         } catch (\Exception $e) {
+            $durationMs = (int)round((microtime(true) - $startTime) * 1000);
+
+            if ($logRecord) {
+                $logRecord->update([
+                    'status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                    'processing_time_ms' => $durationMs,
+                ]);
+            }
+
+            \App\Models\PaymentActivityLog::record(
+                'stripe',
+                'gateway_error',
+                'error',
+                "Stripe webhook failed for event {$event->type}: {$e->getMessage()}",
+                null,
+                ['error' => $e->getMessage()]
+            );
+
             Log::error('Stripe webhook processing exception: ' . $e->getMessage());
             return response()->json(['error' => 'Processing error: ' . $e->getMessage()], 500);
         }

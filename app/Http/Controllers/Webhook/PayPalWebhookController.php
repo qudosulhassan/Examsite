@@ -29,6 +29,22 @@ class PayPalWebhookController extends Controller
             return response()->json(['error' => 'Invalid webhook payload'], 400);
         }
 
+        $startTime = microtime(true);
+        $logRecord = null;
+
+        try {
+            $logRecord = \App\Models\PaymentWebhookLog::create([
+                'gateway' => 'paypal',
+                'event_type' => $eventType,
+                'event_id' => $payload['id'] ?? null,
+                'status' => 'pending',
+                'payload' => $payload,
+                'ip_address' => $request->ip(),
+            ]);
+        } catch (\Throwable $th) {
+            Log::warning('Could not create PayPal PaymentWebhookLog: ' . $th->getMessage());
+        }
+
         Log::info('PayPal Webhook received event: ' . $eventType);
 
         try {
@@ -58,7 +74,45 @@ class PayPalWebhookController extends Controller
                     $this->handleRecurringPaymentFailed($paypalSubId);
                     break;
             }
+
+            $durationMs = (int)round((microtime(true) - $startTime) * 1000);
+
+            if ($logRecord) {
+                $logRecord->update([
+                    'status' => 'processed',
+                    'processing_time_ms' => $durationMs,
+                ]);
+            }
+
+            \App\Models\PaymentActivityLog::record(
+                'paypal',
+                'webhook_received',
+                'success',
+                "Processed PayPal webhook event: {$eventType}",
+                null,
+                ['event_id' => $payload['id'] ?? null, 'type' => $eventType]
+            );
+
         } catch (\Exception $e) {
+            $durationMs = (int)round((microtime(true) - $startTime) * 1000);
+
+            if ($logRecord) {
+                $logRecord->update([
+                    'status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                    'processing_time_ms' => $durationMs,
+                ]);
+            }
+
+            \App\Models\PaymentActivityLog::record(
+                'paypal',
+                'gateway_error',
+                'error',
+                "PayPal webhook failed for event {$eventType}: {$e->getMessage()}",
+                null,
+                ['error' => $e->getMessage()]
+            );
+
             Log::error('PayPal webhook processing exception: ' . $e->getMessage());
             return response()->json(['error' => 'Processing error: ' . $e->getMessage()], 500);
         }

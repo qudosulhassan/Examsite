@@ -294,6 +294,375 @@ function settingsCenter() {
 
             this.planModalOpen = false;
             this.markDirty();
+        },
+
+        // --- PAYMENT OPERATIONS CENTER ---
+        paymentFilter: '{{ $paymentOverview['active_filter'] ?? 'all' }}',
+        paymentDateFrom: '{{ $paymentOverview['date_from'] ?? '' }}',
+        paymentDateTo: '{{ $paymentOverview['date_to'] ?? '' }}',
+        isTestingStripe: false,
+        isTestingPayPal: false,
+        testResult: null, // { gateway: '', success: bool, message: '', mode: '', details: {} }
+
+        // Transaction Details Drawer
+        selectedTxId: null,
+        txLoading: false,
+        txData: null,
+        txDrawerOpen: false,
+
+        // Refund Modal
+        refundModalOpen: false,
+        refundOrder: null,
+        refundType: 'full',
+        refundAmount: '',
+        refundReason: '',
+        revokeAccess: true,
+        isRefunding: false,
+
+        // Webhook Payload Inspector
+        webhookPayloadModalOpen: false,
+        selectedWebhook: null,
+        isRetryingWebhook: false,
+
+        // Gateway Statuses
+        stripeEnabled: {{ ($settings['payment_gateway_stripe_enabled'] ?? '1') === '1' ? 'true' : 'false' }},
+        paypalEnabled: {{ ($settings['payment_gateway_paypal_enabled'] ?? '1') === '1' ? 'true' : 'false' }},
+
+        // Stripe Credential Management State
+        stripeModalOpen: false,
+        isUpdatingStripe: false,
+        stripeShowSecret: false,
+        stripeShowWebhook: false,
+        stripeForm: {
+            mode: '{{ $paymentInfo['stripe_mode_raw'] ?? 'test' }}',
+            publishable_key: '{{ addslashes($paymentInfo['stripe_raw_public_key'] ?? '') }}',
+            secret_key: '',
+            webhook_secret: '',
+        },
+        stripeData: {
+            configured: {{ $paymentInfo['stripe_configured'] ? 'true' : 'false' }},
+            mode: '{{ $paymentInfo['stripe_mode'] }}',
+            is_live: {{ $paymentInfo['stripe_is_live'] ? 'true' : 'false' }},
+            public_key: '{{ $paymentInfo['stripe_public_key'] }}',
+            raw_public_key: '{{ addslashes($paymentInfo['stripe_raw_public_key'] ?? '') }}',
+            masked_secret: '{{ $paymentInfo['stripe_masked_secret'] }}',
+            masked_webhook: '{{ $paymentInfo['stripe_masked_webhook'] }}',
+            secret_configured: {{ $paymentInfo['stripe_secret_configured'] ? 'true' : 'false' }},
+            webhook_configured: {{ $paymentInfo['stripe_webhook_configured'] ? 'true' : 'false' }},
+        },
+
+        // PayPal Credential Management State
+        paypalModalOpen: false,
+        isUpdatingPayPal: false,
+        paypalShowSecret: false,
+        paypalForm: {
+            mode: '{{ $paymentInfo['paypal_mode_raw'] ?? 'sandbox' }}',
+            client_id: '{{ addslashes($paymentInfo['paypal_raw_client_id'] ?? '') }}',
+            client_secret: '',
+            webhook_id: '{{ addslashes($paymentInfo['paypal_webhook_id'] ?? '') }}',
+        },
+        paypalData: {
+            configured: {{ $paymentInfo['paypal_configured'] ? 'true' : 'false' }},
+            mode: '{{ $paymentInfo['paypal_mode'] }}',
+            is_live: {{ $paymentInfo['paypal_is_live'] ? 'true' : 'false' }},
+            client_id: '{{ $paymentInfo['paypal_client_id'] }}',
+            raw_client_id: '{{ addslashes($paymentInfo['paypal_raw_client_id'] ?? '') }}',
+            webhook_id: '{{ addslashes($paymentInfo['paypal_webhook_id'] ?? '') }}',
+            masked_secret: '{{ $paymentInfo['paypal_masked_secret'] }}',
+            secret_configured: {{ $paymentInfo['paypal_secret_configured'] ? 'true' : 'false' }},
+        },
+
+        // Action Toasts
+        toastMessage: '',
+        toastType: 'success',
+        toastVisible: false,
+
+        showToast(msg, type = 'success') {
+            this.toastMessage = msg;
+            this.toastType = type;
+            this.toastVisible = true;
+            setTimeout(() => { this.toastVisible = false; }, 4500);
+        },
+
+        openStripeModal() {
+            this.stripeForm.mode = this.stripeData.is_live ? 'live' : 'test';
+            this.stripeForm.publishable_key = this.stripeData.raw_public_key;
+            this.stripeForm.secret_key = '';
+            this.stripeForm.webhook_secret = '';
+            this.stripeShowSecret = false;
+            this.stripeShowWebhook = false;
+            this.stripeModalOpen = true;
+        },
+
+        async submitStripeCredentials() {
+            if (this.stripeForm.mode === 'live' && !this.stripeData.is_live) {
+                if (!confirm("⚠️ PRODUCTION WARNING:\n\nYou are switching Stripe to LIVE mode. Real customer credit cards will be charged!\n\nAre you sure you want to proceed?")) {
+                    return;
+                }
+            }
+            this.isUpdatingStripe = true;
+            try {
+                const res = await fetch('{{ route('admin.settings.update-stripe-credentials') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(this.stripeForm)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.stripeData.mode = data.data.mode;
+                    this.stripeData.is_live = data.data.is_live;
+                    this.stripeData.public_key = data.data.public_key;
+                    this.stripeData.raw_public_key = data.data.raw_public_key;
+                    this.stripeData.masked_secret = data.data.masked_secret;
+                    this.stripeData.masked_webhook = data.data.masked_webhook;
+                    this.stripeData.secret_configured = data.data.secret_configured;
+                    this.stripeData.webhook_configured = data.data.webhook_configured;
+                    this.stripeData.configured = data.data.secret_configured;
+                    this.stripeModalOpen = false;
+                    this.showToast(data.message || 'Stripe credentials updated successfully.', 'success');
+                } else {
+                    this.showToast(data.message || 'Could not update Stripe credentials.', 'error');
+                }
+            } catch (err) {
+                this.showToast('Network error: ' + err.message, 'error');
+            } finally {
+                this.isUpdatingStripe = false;
+            }
+        },
+
+        openPayPalModal() {
+            this.paypalForm.mode = this.paypalData.is_live ? 'live' : 'sandbox';
+            this.paypalForm.client_id = this.paypalData.raw_client_id;
+            this.paypalForm.client_secret = '';
+            this.paypalForm.webhook_id = this.paypalData.webhook_id;
+            this.paypalShowSecret = false;
+            this.paypalModalOpen = true;
+        },
+
+        async submitPayPalCredentials() {
+            if (this.paypalForm.mode === 'live' && !this.paypalData.is_live) {
+                if (!confirm("⚠️ PRODUCTION WARNING:\n\nYou are switching PayPal to LIVE mode. Real customer PayPal accounts will be billed!\n\nAre you sure you want to proceed?")) {
+                    return;
+                }
+            }
+            this.isUpdatingPayPal = true;
+            try {
+                const res = await fetch('{{ route('admin.settings.update-paypal-credentials') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(this.paypalForm)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.paypalData.mode = data.data.mode;
+                    this.paypalData.is_live = data.data.is_live;
+                    this.paypalData.client_id = data.data.client_id;
+                    this.paypalData.raw_client_id = data.data.raw_client_id;
+                    this.paypalData.webhook_id = data.data.webhook_id;
+                    this.paypalData.masked_secret = data.data.masked_secret;
+                    this.paypalData.secret_configured = data.data.secret_configured;
+                    this.paypalData.configured = data.data.secret_configured;
+                    this.paypalModalOpen = false;
+                    this.showToast(data.message || 'PayPal credentials updated successfully.', 'success');
+                } else {
+                    this.showToast(data.message || 'Could not update PayPal credentials.', 'error');
+                }
+            } catch (err) {
+                this.showToast('Network error: ' + err.message, 'error');
+            } finally {
+                this.isUpdatingPayPal = false;
+            }
+        },
+
+        async testGatewayConnection(gateway) {
+            if (gateway === 'stripe') this.isTestingStripe = true;
+            if (gateway === 'paypal') this.isTestingPayPal = true;
+            this.testResult = null;
+
+            try {
+                const endpoint = gateway === 'stripe' ? '{{ route('admin.settings.test-stripe') }}' : '{{ route('admin.settings.test-paypal') }}';
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    }
+                });
+                const data = await res.json();
+                this.testResult = {
+                    gateway: gateway.toUpperCase(),
+                    success: data.success,
+                    status: data.status,
+                    mode: data.mode || '',
+                    message: data.message,
+                    details: data.details || null
+                };
+            } catch (err) {
+                this.testResult = {
+                    gateway: gateway.toUpperCase(),
+                    success: false,
+                    status: 'network_error',
+                    message: 'Network request failed: ' + err.message
+                };
+            } finally {
+                if (gateway === 'stripe') this.isTestingStripe = false;
+                if (gateway === 'paypal') this.isTestingPayPal = false;
+            }
+        },
+
+        async openTxDetails(orderId) {
+            this.selectedTxId = orderId;
+            this.txLoading = true;
+            this.txDrawerOpen = true;
+            this.txData = null;
+
+            try {
+                const res = await fetch(`{{ url('/admin/settings/transactions') }}/${orderId}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.txData = data.order;
+                } else {
+                    alert('Error loading transaction details.');
+                    this.txDrawerOpen = false;
+                }
+            } catch (err) {
+                alert('Network error loading transaction details.');
+                this.txDrawerOpen = false;
+            } finally {
+                this.txLoading = false;
+            }
+        },
+
+        openRefundModal(order) {
+            this.refundOrder = order;
+            this.refundType = 'full';
+            this.refundAmount = order.remaining_refundable ?? order.total_amount;
+            this.refundReason = 'Requested by customer';
+            this.revokeAccess = true;
+            this.refundModalOpen = true;
+        },
+
+        async executeRefund() {
+            if (!this.refundOrder) return;
+            const maxRefund = parseFloat(this.refundOrder.remaining_refundable || this.refundOrder.total_amount);
+            const amountToRefund = this.refundType === 'full' ? maxRefund : parseFloat(this.refundAmount);
+
+            if (isNaN(amountToRefund) || amountToRefund <= 0) {
+                alert('Please enter a valid refund amount greater than $0.00.');
+                return;
+            }
+            if (amountToRefund > maxRefund) {
+                alert(`Refund amount ($${amountToRefund}) exceeds remaining refundable amount ($${maxRefund}).`);
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to process a refund of $${amountToRefund.toFixed(2)} for Order #${this.refundOrder.order_number}? This will call the real payment gateway.`)) {
+                return;
+            }
+
+            this.isRefunding = true;
+            try {
+                const res = await fetch(`{{ url('/admin/settings/transactions') }}/${this.refundOrder.id}/refund`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        refund_type: this.refundType,
+                        amount: amountToRefund,
+                        reason: this.refundReason,
+                        revoke_access: this.revokeAccess ? 1 : 0
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    this.refundModalOpen = false;
+                    window.location.reload();
+                } else {
+                    alert('Refund failed: ' + data.message);
+                }
+            } catch (err) {
+                alert('Network error while processing refund: ' + err.message);
+            } finally {
+                this.isRefunding = false;
+            }
+        },
+
+        openWebhookModal(webhook) {
+            this.selectedWebhook = webhook;
+            this.webhookPayloadModalOpen = true;
+        },
+
+        async retryWebhookItem(webhookId) {
+            if (!confirm(`Reprocess webhook #${webhookId}?`)) return;
+
+            this.isRetryingWebhook = true;
+            try {
+                const res = await fetch(`{{ url('/admin/settings/webhooks') }}/${webhookId}/retry`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    this.webhookPayloadModalOpen = false;
+                    window.location.reload();
+                } else {
+                    alert('Retry error: ' + data.message);
+                }
+            } catch (err) {
+                alert('Network error: ' + err.message);
+            } finally {
+                this.isRetryingWebhook = false;
+            }
+        },
+
+        async toggleGatewayStatus(gateway) {
+            const newState = gateway === 'stripe' ? this.stripeEnabled : this.paypalEnabled;
+            if (!confirm(`Are you sure you want to ${newState ? 'enable' : 'disable'} ${gateway.toUpperCase()} checkout?`)) {
+                if (gateway === 'stripe') this.stripeEnabled = !newState;
+                if (gateway === 'paypal') this.paypalEnabled = !newState;
+                return;
+            }
+
+            try {
+                const res = await fetch('{{ route('admin.settings.toggle-gateway') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        gateway: gateway,
+                        enabled: newState ? 1 : 0
+                    })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    alert('Failed to update gateway status.');
+                }
+            } catch (err) {
+                alert('Error updating gateway status.');
+            }
         }
     };
 }
@@ -964,85 +1333,641 @@ function settingsCenter() {
                     </div>
                 </div>
 
-                <!-- TAB 8: PAYMENTS (Read-only status & public keys) -->
-                <div x-show="activeTab === 'payments'" x-cloak class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="section-payments">
-                    <div class="border-b border-gray-100 px-6 py-4 bg-gray-50/50 flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">08</span>
-                            <div>
-                                <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Payment Gateways &amp; Webhooks</h3>
-                                <p class="text-xs text-gray-500">Live operational status for Stripe &amp; PayPal. Secrets are securely preserved.</p>
+                <!-- TAB 8: PAYMENTS OPERATIONS CENTER -->
+                <div x-show="activeTab === 'payments'" x-cloak class="space-y-6" id="section-payments">
+                    
+                    <!-- 1. LIVE VS TEST MODE WARNING BANNER -->
+                    @if($paymentInfo['any_live_active'])
+                        <div class="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white p-5 rounded-2xl shadow-lg border border-red-500/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-pulse">
+                            <div class="flex items-start gap-3.5">
+                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="text-sm font-black uppercase tracking-wider">LIVE PAYMENTS ACTIVE</h3>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-black bg-white text-red-700 uppercase">Production Mode</span>
+                                    </div>
+                                    <p class="text-xs text-red-100 mt-0.5">Real customer cards and PayPal accounts are currently being charged. Exercise extreme caution with refunds and settings.</p>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-black/20 text-xs font-mono font-bold tracking-wide border border-white/20">
+                                Real Gateway Connected
+                            </span>
+                        </div>
+                    @else
+                        <div class="bg-navy border border-cyan/30 text-white p-4.5 rounded-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-cyan/15 text-cyan flex items-center justify-center flex-shrink-0 font-bold text-xs">
+                                    TEST
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="text-xs font-black uppercase tracking-wider text-white">TEST / SANDBOX MODE</h3>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan/20 text-cyan border border-cyan/30">Safe Simulation</span>
+                                    </div>
+                                    <p class="text-[11px] text-gray-300 mt-0.5">Test cards and sandbox credentials active. No real credit cards will be billed.</p>
+                                </div>
+                            </div>
+                            <div class="text-[11px] text-gray-400 font-mono">
+                                Environment: <span class="text-cyan font-bold">Local Development</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- 2. PAYMENT HEALTH PANEL -->
+                    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-3">
+                        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-cyan animate-ping"></div>
+                                <h4 class="text-xs font-black text-navy uppercase tracking-wider">Payment System Health Status</h4>
+                            </div>
+                            <span class="text-[10px] text-gray-400 font-mono">Real Diagnostics</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                            <!-- Stripe API Health -->
+                            <div class="p-3 rounded-xl border border-gray-100 bg-gray-50/70 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between text-[11px] font-bold">
+                                        <span class="text-gray-500 uppercase tracking-wider text-[10px]">Stripe API</span>
+                                        <span class="w-2 h-2 rounded-full {{ $paymentHealth['stripe_api']['status'] === 'healthy' ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
+                                    </div>
+                                    <div class="text-xs font-bold text-navy mt-1 truncate">{{ $paymentHealth['stripe_api']['label'] }}</div>
+                                </div>
+                                <div class="text-[10px] text-gray-400 mt-2 truncate">{{ $paymentHealth['stripe_api']['description'] }}</div>
+                            </div>
+
+                            <!-- Stripe Webhook -->
+                            <div class="p-3 rounded-xl border border-gray-100 bg-gray-50/70 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between text-[11px] font-bold">
+                                        <span class="text-gray-500 uppercase tracking-wider text-[10px]">Stripe Webhook</span>
+                                        <span class="w-2 h-2 rounded-full {{ $paymentHealth['stripe_webhook']['status'] === 'healthy' ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
+                                    </div>
+                                    <div class="text-xs font-bold text-navy mt-1 truncate">{{ $paymentHealth['stripe_webhook']['label'] }}</div>
+                                </div>
+                                <div class="text-[10px] text-gray-400 mt-2 truncate">{{ $paymentHealth['stripe_webhook']['description'] }}</div>
+                            </div>
+
+                            <!-- PayPal API -->
+                            <div class="p-3 rounded-xl border border-gray-100 bg-gray-50/70 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between text-[11px] font-bold">
+                                        <span class="text-gray-500 uppercase tracking-wider text-[10px]">PayPal API</span>
+                                        <span class="w-2 h-2 rounded-full {{ $paymentHealth['paypal_api']['status'] === 'healthy' ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
+                                    </div>
+                                    <div class="text-xs font-bold text-navy mt-1 truncate">{{ $paymentHealth['paypal_api']['label'] }}</div>
+                                </div>
+                                <div class="text-[10px] text-gray-400 mt-2 truncate">{{ $paymentHealth['paypal_api']['description'] }}</div>
+                            </div>
+
+                            <!-- Database Records -->
+                            <div class="p-3 rounded-xl border border-gray-100 bg-gray-50/70 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between text-[11px] font-bold">
+                                        <span class="text-gray-500 uppercase tracking-wider text-[10px]">Database Records</span>
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    </div>
+                                    <div class="text-xs font-bold text-navy mt-1 truncate">{{ $paymentHealth['database_records']['label'] }}</div>
+                                </div>
+                                <div class="text-[10px] text-gray-400 mt-2 truncate">{{ $paymentHealth['database_records']['description'] }}</div>
+                            </div>
+
+                            <!-- Order Sync -->
+                            <div class="p-3 rounded-xl border border-gray-100 bg-gray-50/70 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between text-[11px] font-bold">
+                                        <span class="text-gray-500 uppercase tracking-wider text-[10px]">Failure Monitor</span>
+                                        <span class="w-2 h-2 rounded-full {{ $paymentHealth['order_sync']['status'] === 'healthy' ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
+                                    </div>
+                                    <div class="text-xs font-bold text-navy mt-1 truncate">{{ $paymentHealth['order_sync']['label'] }}</div>
+                                </div>
+                                <div class="text-[10px] text-gray-400 mt-2 truncate">{{ $paymentHealth['order_sync']['description'] }}</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="p-6 space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Stripe Gateway Status Card -->
-                            <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-8 h-8 rounded-lg bg-[#635BFF] text-white flex items-center justify-center font-bold text-xs">
+                    <!-- 3. REAL PAYMENT OVERVIEW KPI METRICS WITH DATE FILTER -->
+                    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+                            <div>
+                                <h3 class="text-sm font-black text-navy uppercase tracking-wider">Payment Revenue &amp; Performance Overview</h3>
+                                <p class="text-xs text-gray-500">Aggregated live order and refund statistics calculated directly from database records.</p>
+                            </div>
+
+                            <!-- Date Filter Control -->
+                            <div class="flex flex-wrap items-center gap-2">
+                                <select onchange="window.location.href='{{ route('admin.settings.index') }}?tab=payments&payment_date_filter=' + this.value" class="text-xs font-bold text-navy border-gray-200 rounded-lg py-1.5 pl-3 pr-8 focus:border-cyan focus:ring-cyan bg-gray-50">
+                                    <option value="all" {{ $paymentOverview['active_filter'] === 'all' ? 'selected' : '' }}>All Time</option>
+                                    <option value="today" {{ $paymentOverview['active_filter'] === 'today' ? 'selected' : '' }}>Today</option>
+                                    <option value="7days" {{ $paymentOverview['active_filter'] === '7days' ? 'selected' : '' }}>Past 7 Days</option>
+                                    <option value="30days" {{ $paymentOverview['active_filter'] === '30days' ? 'selected' : '' }}>Past 30 Days</option>
+                                    <option value="90days" {{ $paymentOverview['active_filter'] === '90days' ? 'selected' : '' }}>Past 90 Days</option>
+                                    <option value="custom" {{ $paymentOverview['active_filter'] === 'custom' ? 'selected' : '' }}>Custom Date Range</option>
+                                </select>
+
+                                @if($paymentOverview['active_filter'] === 'custom')
+                                    <div class="flex items-center gap-1.5">
+                                        <input type="date" id="payment_custom_from" value="{{ $paymentOverview['date_from'] }}" class="text-xs border-gray-200 rounded-lg py-1 px-2">
+                                        <span class="text-xs text-gray-400">to</span>
+                                        <input type="date" id="payment_custom_to" value="{{ $paymentOverview['date_to'] }}" class="text-xs border-gray-200 rounded-lg py-1 px-2">
+                                        <button type="button" onclick="window.location.href='{{ route('admin.settings.index') }}?tab=payments&payment_date_filter=custom&payment_date_from=' + document.getElementById('payment_custom_from').value + '&payment_date_to=' + document.getElementById('payment_custom_to').value" class="px-2.5 py-1 bg-navy text-white text-xs font-bold rounded-lg hover:bg-navy/90">Apply</button>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Metric Cards Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <!-- Total Revenue -->
+                            <div class="p-4 rounded-xl border border-gray-200 bg-gradient-to-br from-white to-gray-50/50 shadow-2xs space-y-1">
+                                <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">Total Net Revenue</div>
+                                <div class="text-xl sm:text-2xl font-black text-navy font-mono tracking-tight">${{ number_format($paymentOverview['total_revenue'], 2) }}</div>
+                                <div class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span>Real settled revenue</span>
+                                </div>
+                            </div>
+
+                            <!-- Successful Payments -->
+                            <div class="p-4 rounded-xl border border-gray-200 bg-gradient-to-br from-white to-gray-50/50 shadow-2xs space-y-1">
+                                <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">Successful Payments</div>
+                                <div class="text-xl sm:text-2xl font-black text-emerald-600 font-mono tracking-tight">{{ number_format($paymentOverview['successful_payments']) }}</div>
+                                <div class="text-[10px] text-gray-500 font-medium">Orders completed</div>
+                            </div>
+
+                            <!-- Success Rate -->
+                            <div class="p-4 rounded-xl border border-gray-200 bg-gradient-to-br from-white to-gray-50/50 shadow-2xs space-y-1">
+                                <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">Success Rate</div>
+                                <div class="text-xl sm:text-2xl font-black text-cyan font-mono tracking-tight">{{ $paymentOverview['success_rate'] }}%</div>
+                                <div class="text-[10px] text-gray-500 font-medium">{{ $paymentOverview['failed_payments'] }} failed attempts</div>
+                            </div>
+
+                            <!-- Total Refunded -->
+                            <div class="p-4 rounded-xl border border-gray-200 bg-gradient-to-br from-white to-gray-50/50 shadow-2xs space-y-1">
+                                <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">Refunded Amount</div>
+                                <div class="text-xl sm:text-2xl font-black text-purple-700 font-mono tracking-tight">${{ number_format($paymentOverview['refunded_amount'], 2) }}</div>
+                                <div class="text-[10px] text-purple-600 font-bold">{{ $paymentOverview['refund_count'] }} refunds recorded</div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Meta Bar -->
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-3.5 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-2">
+                            <div>
+                                Pending Authorizations: <span class="font-bold text-navy">{{ $paymentOverview['pending_payments'] }} orders</span>
+                            </div>
+                            <div>
+                                Last Successful Payment: <span class="font-bold text-navy">{{ $paymentOverview['last_successful_payment'] ? $paymentOverview['last_successful_payment']->diffForHumans() . ' (' . $paymentOverview['last_successful_payment']->format('M d, Y H:i') . ')' : 'No payments yet' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. PAYMENT GATEWAY OPERATIONAL CARDS -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        <!-- STRIPE CARD -->
+                        <div class="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden flex flex-col justify-between">
+                            <div>
+                                <!-- Header -->
+                                <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-[#635BFF] text-white flex items-center justify-center font-black text-sm shadow-sm">
                                             S
                                         </div>
                                         <div>
-                                            <h4 class="text-sm font-black text-navy">Stripe Payments</h4>
-                                            <span class="text-[11px] text-gray-400">Credit Cards, Apple Pay, Google Pay</span>
+                                            <div class="flex items-center gap-2">
+                                                <h4 class="text-sm font-black text-navy uppercase tracking-wide">Stripe Payments</h4>
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="stripeData.is_live ? 'bg-red-100 text-red-700' : 'bg-cyan/10 text-cyan border border-cyan/30'" x-text="stripeData.mode">
+                                                    {{ $paymentInfo['stripe_mode'] }}
+                                                </span>
+                                            </div>
+                                            <p class="text-[11px] text-gray-400">Credit / Debit Cards, Apple Pay, Google Pay</p>
                                         </div>
                                     </div>
-                                    <span class="px-2.5 py-1 text-xs font-bold rounded-full {{ $paymentInfo['stripe_configured'] ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
-                                        {{ $paymentInfo['stripe_configured'] ? 'Active' : 'Test / Mock Mode' }}
-                                    </span>
+
+                                    <!-- Switch Toggle -->
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" x-model="stripeEnabled" @change="toggleGatewayStatus('stripe')" class="sr-only peer">
+                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-navy"></div>
+                                    </label>
                                 </div>
 
-                                <div class="space-y-2 text-xs border-t border-gray-200 pt-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-500">Mode:</span>
-                                        <span class="font-bold text-navy">{{ $paymentInfo['stripe_mode'] }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-500">Public Key:</span>
-                                        <span class="font-mono text-gray-700">{{ $paymentInfo['stripe_public_key'] }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-500">Webhook Status:</span>
-                                        <span class="font-bold {{ $paymentInfo['stripe_webhook_configured'] ? 'text-emerald-700' : 'text-amber-700' }}">
-                                            {{ $paymentInfo['stripe_webhook_configured'] ? 'Configured (/webhook/stripe)' : 'Webhook Secret Pending' }}
+                                <!-- Body Details -->
+                                <div class="p-6 space-y-3.5 text-xs">
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Gateway Status</span>
+                                        <span class="font-bold flex items-center gap-1.5" :class="stripeData.configured ? 'text-emerald-700' : 'text-amber-700'">
+                                            <span class="w-2 h-2 rounded-full" :class="stripeData.configured ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                                            <span x-text="stripeData.configured ? 'Connected' : 'Not Configured (Mock Mode)'">{{ $paymentInfo['stripe_configured'] ? 'Connected' : 'Not Configured (Mock Mode)' }}</span>
                                         </span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Publishable Key</span>
+                                        <span class="font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded text-[11px]" x-text="stripeData.public_key">{{ $paymentInfo['stripe_public_key'] }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Secret Key</span>
+                                        <span class="font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded text-[11px]" x-text="stripeData.masked_secret">{{ $paymentInfo['stripe_masked_secret'] }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Webhook Endpoint</span>
+                                        <span class="font-mono text-navy text-[11px] truncate max-w-[200px]" title="{{ $paymentInfo['stripe_webhook_url'] }}">{{ $paymentInfo['stripe_webhook_url'] }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Webhook Signing Secret</span>
+                                        <span class="font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded text-[11px]" x-text="stripeData.masked_webhook">{{ $paymentInfo['stripe_masked_webhook'] }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between py-1">
+                                        <span class="text-gray-500 font-medium">Last Webhook Received</span>
+                                        <span class="font-medium text-gray-700">{{ $paymentInfo['stripe_last_webhook'] ? $paymentInfo['stripe_last_webhook']->diffForHumans() : 'None recorded yet' }}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- PayPal Gateway Status Card -->
-                            <div class="border border-gray-200 rounded-xl p-5 bg-gray-50/50 space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-8 h-8 rounded-lg bg-[#003087] text-white flex items-center justify-center font-bold text-xs">
+                            <!-- Actions Footer -->
+                            <div class="p-6 bg-gray-50/50 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+                                <div class="flex items-center gap-2">
+                                    <button type="button" @click="openStripeModal()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold text-white bg-navy hover:bg-navy/90 shadow-2xs transition">
+                                        <svg class="w-3.5 h-3.5 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                        <span>Edit Credentials</span>
+                                    </button>
+
+                                    <button type="button" @click="testGatewayConnection('stripe')" :disabled="isTestingStripe" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold text-navy bg-white border border-gray-200 hover:bg-gray-50 shadow-2xs transition disabled:opacity-50">
+                                        <svg class="w-3.5 h-3.5 text-cyan" :class="isTestingStripe ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                        <span x-text="isTestingStripe ? 'Testing...' : 'Test Stripe API'">Test Stripe API</span>
+                                    </button>
+                                </div>
+                                
+                                <span class="text-[10px] text-gray-400 font-mono">Stripe SDK v10+</span>
+                            </div>
+                        </div>
+
+                        <!-- PAYPAL CARD -->
+                        <div class="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden flex flex-col justify-between">
+                            <div>
+                                <!-- Header -->
+                                <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-[#003087] text-white flex items-center justify-center font-black text-sm shadow-sm">
                                             P
                                         </div>
                                         <div>
-                                            <h4 class="text-sm font-black text-navy">PayPal Standard</h4>
-                                            <span class="text-[11px] text-gray-400">PayPal Express &amp; Subscriptions</span>
+                                            <div class="flex items-center gap-2">
+                                                <h4 class="text-sm font-black text-navy uppercase tracking-wide">PayPal Standard &amp; Express</h4>
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="paypalData.is_live ? 'bg-red-100 text-red-700' : 'bg-cyan/10 text-cyan border border-cyan/30'" x-text="paypalData.mode">
+                                                    {{ $paymentInfo['paypal_mode'] }}
+                                                </span>
+                                            </div>
+                                            <p class="text-[11px] text-gray-400">PayPal Wallet, Pay in 4, Subscriptions</p>
                                         </div>
                                     </div>
-                                    <span class="px-2.5 py-1 text-xs font-bold rounded-full {{ $paymentInfo['paypal_configured'] ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
-                                        {{ $paymentInfo['paypal_configured'] ? 'Active' : 'Sandbox Mode' }}
-                                    </span>
+
+                                    <!-- Switch Toggle -->
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" x-model="paypalEnabled" @change="toggleGatewayStatus('paypal')" class="sr-only peer">
+                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-navy"></div>
+                                    </label>
                                 </div>
 
-                                <div class="space-y-2 text-xs border-t border-gray-200 pt-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-500">Mode:</span>
-                                        <span class="font-bold text-navy">{{ $paymentInfo['paypal_mode'] }}</span>
+                                <!-- Body Details -->
+                                <div class="p-6 space-y-3.5 text-xs">
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Gateway Status</span>
+                                        <span class="font-bold flex items-center gap-1.5" :class="paypalData.configured ? 'text-emerald-700' : 'text-amber-700'">
+                                            <span class="w-2 h-2 rounded-full" :class="paypalData.configured ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                                            <span x-text="paypalData.configured ? 'Connected' : 'Sandbox (Mock Mode)'">{{ $paymentInfo['paypal_configured'] ? 'Connected' : 'Sandbox (Mock Mode)' }}</span>
+                                        </span>
                                     </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-500">Webhook URL:</span>
-                                        <span class="font-mono text-gray-700 text-[11px]">/webhook/paypal</span>
+
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Client ID</span>
+                                        <span class="font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded text-[11px]" x-text="paypalData.client_id">{{ $paymentInfo['paypal_client_id'] }}</span>
                                     </div>
+
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Client Secret</span>
+                                        <span class="font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded text-[11px]" x-text="paypalData.masked_secret">{{ $paymentInfo['paypal_masked_secret'] }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Webhook Endpoint</span>
+                                        <span class="font-mono text-navy text-[11px] truncate max-w-[200px]" title="{{ $paymentInfo['paypal_webhook_url'] }}">{{ $paymentInfo['paypal_webhook_url'] }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Webhook ID</span>
+                                        <span class="font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded text-[11px]" x-text="paypalData.webhook_id || 'Not configured'">{{ $paymentInfo['paypal_webhook_id'] ?: 'Not configured' }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between py-1 border-b border-gray-50">
+                                        <span class="text-gray-500 font-medium">Environment Mode</span>
+                                        <span class="font-bold text-navy" x-text="paypalData.mode">{{ $paymentInfo['paypal_mode'] }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between py-1">
+                                        <span class="text-gray-500 font-medium">Last Webhook Received</span>
+                                        <span class="font-medium text-gray-700">{{ $paymentInfo['paypal_last_webhook'] ? $paymentInfo['paypal_last_webhook']->diffForHumans() : 'None recorded yet' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions Footer -->
+                            <div class="p-6 bg-gray-50/50 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+                                <div class="flex items-center gap-2">
+                                    <button type="button" @click="openPayPalModal()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold text-white bg-navy hover:bg-navy/90 shadow-2xs transition">
+                                        <svg class="w-3.5 h-3.5 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                        <span>Edit Credentials</span>
+                                    </button>
+
+                                    <button type="button" @click="testGatewayConnection('paypal')" :disabled="isTestingPayPal" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold text-navy bg-white border border-gray-200 hover:bg-gray-50 shadow-2xs transition disabled:opacity-50">
+                                        <svg class="w-3.5 h-3.5 text-cyan" :class="isTestingPayPal ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                        <span x-text="isTestingPayPal ? 'Testing...' : 'Test PayPal API'">Test PayPal API</span>
+                                    </button>
+                                </div>
+
+                                <span class="text-[10px] text-gray-400 font-mono">srmklive/paypal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONNECTION TEST RESULT MODAL/TOAST -->
+                    <div x-show="testResult" x-cloak class="p-4 rounded-xl border transition" :class="testResult && testResult.success ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start gap-3">
+                                <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" :class="testResult && testResult.success ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                </div>
+                                <div class="space-y-1">
+                                    <h5 class="text-xs font-black uppercase tracking-wide" x-text="(testResult && testResult.gateway) + ' Connection Result: ' + (testResult && testResult.status)"></h5>
+                                    <p class="text-xs font-medium" x-text="testResult && testResult.message"></p>
+                                    <template x-if="testResult && testResult.details">
+                                        <div class="text-[11px] font-mono text-gray-600 bg-white/70 p-2 rounded border border-gray-200 mt-2">
+                                            <span x-text="JSON.stringify(testResult.details)"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            <button type="button" @click="testResult = null" class="text-gray-400 hover:text-gray-600 font-bold">&times;</button>
+                        </div>
+                    </div>
+
+                    <!-- 5. REAL TRANSACTIONS TABLE -->
+                    <div class="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden space-y-4">
+                        <div class="p-6 pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div>
+                                <h3 class="text-sm font-black text-navy uppercase tracking-wider">Payment Transactions</h3>
+                                <p class="text-xs text-gray-500">Live order payments with instant detail drawer and refund controls.</p>
+                            </div>
+
+                            <!-- Filter Controls -->
+                            <div class="flex flex-wrap items-center gap-2">
+                                <input type="text" id="tx_search_input" value="{{ request('tx_search') }}" placeholder="Search order #, customer, ID..." class="text-xs border-gray-200 rounded-lg py-1.5 px-3 w-44 focus:border-cyan focus:ring-cyan" onkeydown="if(event.key==='Enter'){event.preventDefault(); applyTxFilter();}">
+
+                                <select id="tx_gateway_select" onchange="applyTxFilter()" class="text-xs border-gray-200 rounded-lg py-1.5 pl-2.5 pr-7 focus:border-cyan focus:ring-cyan">
+                                    <option value="">All Gateways</option>
+                                    <option value="stripe" {{ request('tx_gateway') === 'stripe' ? 'selected' : '' }}>Stripe</option>
+                                    <option value="paypal" {{ request('tx_gateway') === 'paypal' ? 'selected' : '' }}>PayPal</option>
+                                </select>
+
+                                <select id="tx_status_select" onchange="applyTxFilter()" class="text-xs border-gray-200 rounded-lg py-1.5 pl-2.5 pr-7 focus:border-cyan focus:ring-cyan">
+                                    <option value="">All Statuses</option>
+                                    <option value="paid" {{ request('tx_status') === 'paid' ? 'selected' : '' }}>Paid</option>
+                                    <option value="pending" {{ request('tx_status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="failed" {{ request('tx_status') === 'failed' ? 'selected' : '' }}>Failed</option>
+                                    <option value="refunded" {{ request('tx_status') === 'refunded' ? 'selected' : '' }}>Refunded</option>
+                                </select>
+
+                                <button type="button" onclick="applyTxFilter()" class="px-3 py-1.5 bg-navy text-white text-xs font-bold rounded-lg hover:bg-navy/90 transition">Filter</button>
+                            </div>
+                            <script>
+                            function applyTxFilter() {
+                                const s = encodeURIComponent(document.getElementById('tx_search_input')?.value || '');
+                                const g = encodeURIComponent(document.getElementById('tx_gateway_select')?.value || '');
+                                const st = encodeURIComponent(document.getElementById('tx_status_select')?.value || '');
+                                window.location.href = '{{ route('admin.settings.index') }}?tab=payments&tx_search=' + s + '&tx_gateway=' + g + '&tx_status=' + st;
+                            }
+                            </script>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-gray-600">
+                                <thead class="bg-gray-50/80 text-[10px] font-black uppercase tracking-wider text-gray-400 border-y border-gray-200">
+                                    <tr>
+                                        <th class="py-3 px-6">Order Number</th>
+                                        <th class="py-3 px-6">Customer</th>
+                                        <th class="py-3 px-6">Gateway</th>
+                                        <th class="py-3 px-6">Amount</th>
+                                        <th class="py-3 px-6">Status</th>
+                                        <th class="py-3 px-6">Date</th>
+                                        <th class="py-3 px-6 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    @forelse($transactions as $tx)
+                                        <tr class="hover:bg-gray-50/60 transition">
+                                            <td class="py-3.5 px-6 font-bold text-navy font-mono">
+                                                #{{ $tx->order_number }}
+                                            </td>
+                                            <td class="py-3.5 px-6">
+                                                <div class="font-bold text-navy">{{ $tx->billing_name ?: ($tx->user->name ?? 'Customer') }}</div>
+                                                <div class="text-[11px] text-gray-400 truncate max-w-[150px]">{{ $tx->billing_email ?: ($tx->user->email ?? 'N/A') }}</div>
+                                            </td>
+                                            <td class="py-3.5 px-6">
+                                                <span class="inline-flex items-center gap-1.5 font-bold uppercase text-[11px] {{ $tx->payment_method === 'stripe' ? 'text-[#635BFF]' : 'text-[#003087]' }}">
+                                                    <span class="w-1.5 h-1.5 rounded-full {{ $tx->payment_method === 'stripe' ? 'bg-[#635BFF]' : 'bg-[#003087]' }}"></span>
+                                                    {{ $tx->payment_method }}
+                                                </span>
+                                            </td>
+                                            <td class="py-3.5 px-6 font-mono font-bold text-navy">
+                                                ${{ number_format((float)$tx->total_amount, 2) }}
+                                                @if((float)$tx->refunded_amount > 0)
+                                                    <span class="block text-[10px] text-purple-600 font-normal">-${{ number_format((float)$tx->refunded_amount, 2) }} ref.</span>
+                                                @endif
+                                            </td>
+                                            <td class="py-3.5 px-6">
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border {{ $tx->status_badge['bg'] }}">
+                                                    <span class="w-1.5 h-1.5 rounded-full {{ $tx->status_badge['dot'] }}"></span>
+                                                    <span>{{ $tx->status_badge['label'] }}</span>
+                                                </span>
+                                            </td>
+                                            <td class="py-3.5 px-6 text-gray-400 whitespace-nowrap">
+                                                {{ $tx->created_at->format('M d, Y') }}
+                                                <span class="block text-[10px]">{{ $tx->created_at->format('H:i') }}</span>
+                                            </td>
+                                            <td class="py-3.5 px-6 text-right whitespace-nowrap space-x-2">
+                                                <button type="button" @click="openTxDetails({{ $tx->id }})" class="px-2.5 py-1 text-xs font-bold text-navy bg-gray-100 hover:bg-gray-200 rounded-lg transition">
+                                                    Details
+                                                </button>
+                                                @if($tx->isRefundable())
+                                                    <button type="button" @click="openRefundModal({{ json_encode(['id' => $tx->id, 'order_number' => $tx->order_number, 'total_amount' => $tx->total_amount, 'remaining_refundable' => $tx->remainingRefundableAmount()]) }})" class="px-2.5 py-1 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition">
+                                                        Refund
+                                                    </button>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="py-8 text-center text-xs text-gray-400">
+                                                No payment transactions found matching the selected criteria.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination Links -->
+                        <div class="p-4 border-t border-gray-100">
+                            {{ $transactions->links() }}
+                        </div>
+                    </div>
+
+                    <!-- 6. WEBHOOK MONITORING & ACTIVITY LOGS TABS -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        <!-- WEBHOOK MONITORING -->
+                        <div class="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden flex flex-col justify-between">
+                            <div>
+                                <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-cyan"></div>
+                                        <h4 class="text-xs font-black text-navy uppercase tracking-wide">Recent Webhook Deliveries</h4>
+                                    </div>
+                                    <span class="text-[10px] text-gray-400 font-mono">Real-time Inbound</span>
+                                </div>
+
+                                <div class="divide-y divide-gray-100 max-h-[360px] overflow-y-auto">
+                                    @forelse($webhookLogs as $hook)
+                                        <div class="p-3.5 hover:bg-gray-50/60 transition flex items-center justify-between gap-3 text-xs">
+                                            <div class="space-y-0.5 min-w-0">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-bold text-navy uppercase text-[11px]">{{ $hook->gateway }}</span>
+                                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase {{ $hook->status_badge['bg'] }}">{{ $hook->status }}</span>
+                                                    @if($hook->processing_time_ms)
+                                                        <span class="text-[10px] text-gray-400 font-mono">{{ $hook->processing_time_ms }}ms</span>
+                                                    @endif
+                                                </div>
+                                                <div class="font-mono text-[11px] text-gray-600 truncate">{{ $hook->event_type }}</div>
+                                                <div class="text-[10px] text-gray-400">{{ $hook->created_at->diffForHumans() }}</div>
+                                            </div>
+
+                                            <button type="button" @click="openWebhookModal({{ json_encode($hook) }})" class="px-2 py-1 text-[11px] font-bold text-navy bg-gray-100 hover:bg-gray-200 rounded transition flex-shrink-0">
+                                                Inspect
+                                            </button>
+                                        </div>
+                                    @empty
+                                        <div class="p-8 text-center text-xs text-gray-400">
+                                            No webhook deliveries recorded yet. Inbound events will be logged here automatically.
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 bg-gray-50/50 border-t border-gray-100 text-[11px] text-gray-500 flex items-center justify-between">
+                                <span>Total Logged: {{ $webhookLogs->count() }}</span>
+                                <span class="font-mono text-[10px]">Auto-tracked via Controller</span>
+                            </div>
+                        </div>
+
+                        <!-- PAYMENT AUDIT ACTIVITY LOGS -->
+                        <div class="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden flex flex-col justify-between">
+                            <div>
+                                <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-orange"></div>
+                                        <h4 class="text-xs font-black text-navy uppercase tracking-wide">Payment Activity &amp; Audit Trail</h4>
+                                    </div>
+                                    <span class="text-[10px] text-gray-400 font-mono">Gateway Events</span>
+                                </div>
+
+                                <div class="divide-y divide-gray-100 max-h-[360px] overflow-y-auto">
+                                    @forelse($activityLogs as $act)
+                                        <div class="p-3.5 hover:bg-gray-50/60 transition space-y-1 text-xs">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-black text-navy uppercase text-[10px]">{{ $act->gateway ?? 'SYSTEM' }}</span>
+                                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase {{ $act->status === 'success' ? 'bg-emerald-50 text-emerald-700' : ($act->status === 'error' ? 'bg-rose-50 text-rose-700' : 'bg-gray-100 text-gray-700') }}">
+                                                        {{ $act->event }}
+                                                    </span>
+                                                </div>
+                                                <span class="text-[10px] text-gray-400">{{ $act->created_at->diffForHumans() }}</span>
+                                            </div>
+                                            <p class="text-[11px] text-gray-600">{{ $act->message }}</p>
+                                        </div>
+                                    @empty
+                                        <div class="p-8 text-center text-xs text-gray-400">
+                                            No payment activities logged yet. Gateway tests and refunds will appear here.
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 bg-gray-50/50 border-t border-gray-100 text-[11px] text-gray-500 flex items-center justify-between">
+                                <span>Recent Activities: {{ $activityLogs->count() }}</span>
+                                <span class="font-mono text-[10px]">CSRF &amp; Auth Protected</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. PAYMENT SETTINGS & CURRENCY CONFIGURATION FORM -->
+                    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-6">
+                        <div class="border-b border-gray-100 pb-4">
+                            <h3 class="text-sm font-black text-navy uppercase tracking-wider">Payment &amp; Checkout Configuration</h3>
+                            <p class="text-xs text-gray-500">Supported platform settings. Saved with administrator CSRF authorization.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="default_currency" class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                                    Default Currency <span class="text-red-500">*</span>
+                                </label>
+                                <select name="default_currency" id="default_currency" @change="markDirty()" class="w-full text-sm border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-bold">
+                                    <option value="USD" {{ old('default_currency', $settings['default_currency'] ?? 'USD') === 'USD' ? 'selected' : '' }}>USD ($) — United States Dollar</option>
+                                    <option value="EUR" {{ old('default_currency', $settings['default_currency'] ?? '') === 'EUR' ? 'selected' : '' }}>EUR (€) — Euro</option>
+                                    <option value="GBP" {{ old('default_currency', $settings['default_currency'] ?? '') === 'GBP' ? 'selected' : '' }}>GBP (£) — British Pound</option>
+                                    <option value="CAD" {{ old('default_currency', $settings['default_currency'] ?? '') === 'CAD' ? 'selected' : '' }}>CAD ($) — Canadian Dollar</option>
+                                    <option value="AUD" {{ old('default_currency', $settings['default_currency'] ?? '') === 'AUD' ? 'selected' : '' }}>AUD ($) — Australian Dollar</option>
+                                </select>
+                                <p class="text-[11px] text-gray-400 mt-1">Primary currency passed to Stripe Elements and PayPal orders.</p>
+                            </div>
+
+                            <div>
+                                <label for="payment_receipt_auto_send" class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                                    Customer Invoice Receipts
+                                </label>
+                                <select name="payment_receipt_auto_send" id="payment_receipt_auto_send" @change="markDirty()" class="w-full text-sm border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
+                                    <option value="1" {{ old('payment_receipt_auto_send', $settings['payment_receipt_auto_send'] ?? '1') === '1' ? 'selected' : '' }}>Automatically dispatch PDF invoice email upon payment success</option>
+                                    <option value="0" {{ old('payment_receipt_auto_send', $settings['payment_receipt_auto_send'] ?? '') === '0' ? 'selected' : '' }}>Manual dispatch only</option>
+                                </select>
+                                <p class="text-[11px] text-gray-400 mt-1">Generates Barryvdh Dompdf invoice and dispatches to billing email.</p>
+                            </div>
+
+                            <div>
+                                <label for="payment_failure_notify_admin" class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                                    Payment Failure Alert
+                                </label>
+                                <select name="payment_failure_notify_admin" id="payment_failure_notify_admin" @change="markDirty()" class="w-full text-sm border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
+                                    <option value="1" {{ old('payment_failure_notify_admin', $settings['payment_failure_notify_admin'] ?? '1') === '1' ? 'selected' : '' }}>Log and alert administrator on recurring invoice failure</option>
+                                    <option value="0" {{ old('payment_failure_notify_admin', $settings['payment_failure_notify_admin'] ?? '') === '0' ? 'selected' : '' }}>Log only</option>
+                                </select>
+                            </div>
+
+                            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs text-gray-600 flex items-start gap-3">
+                                <svg class="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                <div>
+                                    <span class="font-bold text-navy">Security Policy:</span> Secret keys (<span class="font-mono text-navy font-bold">STRIPE_SECRET</span>, <span class="font-mono text-navy font-bold">PAYPAL_CLIENT_SECRET</span>, <span class="font-mono text-navy font-bold">STRIPE_WEBHOOK_SECRET</span>) are never stored in plain form inputs. Always configure them in your local <span class="font-mono text-navy font-bold">.env</span> file.
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- TAB 9: MAINTENANCE MODE -->
@@ -1286,6 +2211,503 @@ function settingsCenter() {
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- TRANSACTION DETAILS MODAL DRAWER -->
+    <div x-show="txDrawerOpen" x-cloak class="fixed inset-0 z-50 overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 overflow-hidden">
+            <!-- Backdrop -->
+            <div x-show="txDrawerOpen" x-transition:enter="ease-in-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                 @click="txDrawerOpen = false" class="absolute inset-0 bg-navy/60 backdrop-blur-xs transition-opacity"></div>
+
+            <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+                <div x-show="txDrawerOpen" x-transition:enter="transform transition ease-in-out duration-300" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transform transition ease-in-out duration-300" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
+                     class="w-screen max-w-md bg-white shadow-2xl border-l border-gray-200 flex flex-col justify-between">
+                    
+                    <div>
+                        <!-- Header -->
+                        <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-black text-navy uppercase tracking-wider">Transaction Details</h3>
+                                <p class="text-xs text-gray-500" x-text="txData ? '#' + txData.order_number : 'Loading...'"></p>
+                            </div>
+                            <button type="button" @click="txDrawerOpen = false" class="text-gray-400 hover:text-gray-600 font-bold">&times;</button>
+                        </div>
+
+                        <!-- Content Loading or Loaded -->
+                        <div class="p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-140px)]">
+                            <template x-if="txLoading">
+                                <div class="py-12 text-center text-xs text-gray-400 animate-pulse">
+                                    Loading real transaction records...
+                                </div>
+                            </template>
+
+                            <template x-if="!txLoading && txData">
+                                <div class="space-y-5 text-xs">
+                                    <!-- Status Banner -->
+                                    <div class="p-3.5 rounded-xl border flex items-center justify-between" :class="txData.status_badge.bg">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full" :class="txData.status_badge.dot"></span>
+                                            <span class="font-bold uppercase text-[11px]" x-text="txData.status_badge.label"></span>
+                                        </div>
+                                        <span class="font-mono font-black text-sm" x-text="'$' + txData.total_amount"></span>
+                                    </div>
+
+                                    <!-- Customer Info -->
+                                    <div class="space-y-2 border-b border-gray-100 pb-4">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">Customer Details</div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Name</span>
+                                            <span class="font-bold text-navy" x-text="txData.customer_name"></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Billing Email</span>
+                                            <span class="font-bold text-navy" x-text="txData.customer_email"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Gateway Info -->
+                                    <div class="space-y-2 border-b border-gray-100 pb-4">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">Gateway Information</div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Method</span>
+                                            <span class="font-bold uppercase" x-text="txData.payment_method"></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Reference ID</span>
+                                            <span class="font-mono text-gray-700 truncate max-w-[200px]" x-text="txData.gateway_reference"></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Created At</span>
+                                            <span class="text-gray-700" x-text="txData.created_at"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Items -->
+                                    <div class="space-y-2 border-b border-gray-100 pb-4">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-gray-400">Purchased Items</div>
+                                        <template x-for="(item, idx) in txData.items" :key="idx">
+                                            <div class="flex justify-between py-1 border-b border-gray-50">
+                                                <div>
+                                                    <div class="font-bold text-navy" x-text="item.title"></div>
+                                                    <div class="text-[10px] text-gray-400 uppercase" x-text="item.type"></div>
+                                                </div>
+                                                <span class="font-mono font-bold text-navy" x-text="'$' + item.price"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <!-- Refunds List -->
+                                    <template x-if="txData.refunds && txData.refunds.length">
+                                        <div class="space-y-2">
+                                            <div class="text-[10px] font-black uppercase tracking-wider text-purple-600">Issued Refunds</div>
+                                            <template x-for="ref in txData.refunds" :key="ref.id">
+                                                <div class="p-2.5 rounded-lg bg-purple-50 border border-purple-100 text-[11px] space-y-1">
+                                                    <div class="flex justify-between font-bold text-purple-900">
+                                                        <span x-text="'Refund #' + ref.id"></span>
+                                                        <span x-text="'-$' + ref.amount"></span>
+                                                    </div>
+                                                    <div class="text-gray-500 text-[10px]" x-text="'Reason: ' + (ref.reason || 'None')"></div>
+                                                    <div class="text-gray-400 text-[9px]" x-text="ref.date + ' by ' + ref.admin"></div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Drawer Footer -->
+                    <div class="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-3">
+                        <button type="button" @click="txDrawerOpen = false" class="w-full px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-200 rounded-lg transition">
+                            Close
+                        </button>
+                        <template x-if="txData && txData.is_refundable">
+                            <button type="button" @click="openRefundModal(txData); txDrawerOpen = false" class="w-full px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition shadow-sm">
+                                Issue Refund
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REFUND TRANSACTION MODAL -->
+    <div x-show="refundModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div x-show="refundModalOpen" @click="refundModalOpen = false" class="fixed inset-0 bg-navy/60 backdrop-blur-xs transition-opacity"></div>
+
+            <div x-show="refundModalOpen" class="relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-gray-200">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center font-bold">
+                            $
+                        </div>
+                        <h3 class="text-sm font-black text-navy uppercase">Issue Customer Refund</h3>
+                    </div>
+                    <button type="button" @click="refundModalOpen = false" class="text-gray-400 hover:text-gray-600 font-bold">&times;</button>
+                </div>
+
+                <div class="space-y-4 pt-4 text-xs">
+                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 flex justify-between items-center">
+                        <span class="text-gray-600">Order Number</span>
+                        <span class="font-mono font-bold text-navy" x-text="'#' + (refundOrder && refundOrder.order_number)"></span>
+                    </div>
+
+                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 flex justify-between items-center">
+                        <span class="text-gray-600">Remaining Refundable Balance</span>
+                        <span class="font-mono font-bold text-emerald-700" x-text="'$' + (refundOrder && (refundOrder.remaining_refundable || refundOrder.total_amount))"></span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Refund Type</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" @click="refundType = 'full'; refundAmount = refundOrder.remaining_refundable || refundOrder.total_amount" class="p-2 text-xs font-bold rounded-lg border text-center transition" :class="refundType === 'full' ? 'bg-navy text-white border-navy' : 'bg-white text-gray-700 border-gray-200'">
+                                Full Refund
+                            </button>
+                            <button type="button" @click="refundType = 'partial'" class="p-2 text-xs font-bold rounded-lg border text-center transition" :class="refundType === 'partial' ? 'bg-navy text-white border-navy' : 'bg-white text-gray-700 border-gray-200'">
+                                Partial Refund
+                            </button>
+                        </div>
+                    </div>
+
+                    <div x-show="refundType === 'partial'">
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Partial Refund Amount ($)</label>
+                        <input type="number" step="0.01" min="0.01" :max="refundOrder && (refundOrder.remaining_refundable || refundOrder.total_amount)" x-model="refundAmount" class="w-full text-sm border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-mono font-bold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Reason for Refund</label>
+                        <select x-model="refundReason" class="w-full text-xs border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
+                            <option value="Requested by customer">Requested by customer</option>
+                            <option value="Duplicate charge">Duplicate charge</option>
+                            <option value="Fraudulent transaction">Fraudulent transaction</option>
+                            <option value="Product dissatisfaction">Product dissatisfaction</option>
+                            <option value="Administrative correction">Administrative correction</option>
+                        </select>
+                    </div>
+
+                    <label class="flex items-center gap-2 cursor-pointer pt-1">
+                        <input type="checkbox" x-model="revokeAccess" class="rounded text-navy focus:ring-cyan">
+                        <span class="text-xs text-gray-700 font-medium">Revoke exam and certification access immediately</span>
+                    </label>
+
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900">
+                        <strong>Warning:</strong> This will dispatch an actual refund request to the live/test payment gateway. This operation cannot be undone.
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end gap-3">
+                    <button type="button" @click="refundModalOpen = false" class="px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                        Cancel
+                    </button>
+                    <button type="button" @click="executeRefund()" :disabled="isRefunding" class="px-5 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow transition disabled:opacity-50">
+                        <span x-text="isRefunding ? 'Processing...' : 'Confirm & Issue Refund'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WEBHOOK PAYLOAD INSPECTOR MODAL -->
+    <div x-show="webhookPayloadModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div x-show="webhookPayloadModalOpen" @click="webhookPayloadModalOpen = false" class="fixed inset-0 bg-navy/60 backdrop-blur-xs transition-opacity"></div>
+
+            <div x-show="webhookPayloadModalOpen" class="relative inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-gray-200">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <div>
+                        <h3 class="text-sm font-black text-navy uppercase" x-text="'Webhook Delivery #' + (selectedWebhook && selectedWebhook.id)"></h3>
+                        <p class="text-[11px] text-gray-400 font-mono" x-text="selectedWebhook && selectedWebhook.event_type"></p>
+                    </div>
+                    <button type="button" @click="webhookPayloadModalOpen = false" class="text-gray-400 hover:text-gray-600 font-bold">&times;</button>
+                </div>
+
+                <div class="space-y-4 pt-4 text-xs">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="p-2.5 bg-gray-50 rounded-lg border border-gray-200">
+                            <span class="text-gray-400 uppercase text-[10px] block font-bold">Gateway</span>
+                            <span class="font-bold uppercase text-navy" x-text="selectedWebhook && selectedWebhook.gateway"></span>
+                        </div>
+                        <div class="p-2.5 bg-gray-50 rounded-lg border border-gray-200">
+                            <span class="text-gray-400 uppercase text-[10px] block font-bold">Status</span>
+                            <span class="font-bold uppercase" :class="selectedWebhook && selectedWebhook.status === 'processed' ? 'text-emerald-700' : 'text-rose-700'" x-text="selectedWebhook && selectedWebhook.status"></span>
+                        </div>
+                        <div class="p-2.5 bg-gray-50 rounded-lg border border-gray-200">
+                            <span class="text-gray-400 uppercase text-[10px] block font-bold">Duration</span>
+                            <span class="font-mono font-bold text-navy" x-text="(selectedWebhook && selectedWebhook.processing_time_ms ? selectedWebhook.processing_time_ms + 'ms' : 'N/A')"></span>
+                        </div>
+                    </div>
+
+                    <template x-if="selectedWebhook && selectedWebhook.error_message">
+                        <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs">
+                            <span class="font-bold">Error:</span> <span x-text="selectedWebhook.error_message"></span>
+                        </div>
+                    </template>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-bold text-gray-700 uppercase">Payload Data (JSON)</span>
+                            <span class="text-[10px] text-gray-400 font-mono">Inbound Request Body</span>
+                        </div>
+                        <pre class="bg-gray-900 text-emerald-400 p-4 rounded-xl text-[11px] font-mono overflow-x-auto max-h-72 border border-gray-800 leading-relaxed" x-text="selectedWebhook ? JSON.stringify(selectedWebhook.payload, null, 2) : ''"></pre>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div>
+                        <template x-if="selectedWebhook && (selectedWebhook.status === 'failed' || selectedWebhook.status === 'pending')">
+                            <button type="button" @click="retryWebhookItem(selectedWebhook.id)" :disabled="isRetryingWebhook" class="px-4 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg shadow transition disabled:opacity-50">
+                                <span x-text="isRetryingWebhook ? 'Retrying...' : 'Reprocess Webhook'"></span>
+                            </button>
+                        </template>
+                    </div>
+                    <button type="button" @click="webhookPayloadModalOpen = false" class="px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STRIPE CREDENTIALS MODAL -->
+    <div x-show="stripeModalOpen" x-cloak class="fixed inset-0 z-[100] overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div x-show="stripeModalOpen" @click="stripeModalOpen = false" class="fixed inset-0 bg-navy/70 backdrop-blur-xs transition-opacity"></div>
+
+            <div x-show="stripeModalOpen" class="relative inline-block w-full max-w-xl p-6 sm:p-7 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-gray-200">
+                <!-- Header -->
+                <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#635BFF] text-white flex items-center justify-center font-black text-sm shadow-sm">
+                            S
+                        </div>
+                        <div>
+                            <h3 class="text-base font-black text-navy uppercase font-heading">Stripe API Credentials</h3>
+                            <p class="text-xs text-gray-400">Configure Stripe secret keys, publishable keys &amp; webhook secret.</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="stripeModalOpen = false" class="text-gray-400 hover:text-gray-600 font-bold p-1">&times;</button>
+                </div>
+
+                <!-- Form -->
+                <form @submit.prevent="submitStripeCredentials()" class="space-y-4.5 pt-5 text-xs">
+                    <!-- Environment Mode -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Environment Mode</label>
+                        <select x-model="stripeForm.mode" class="w-full text-xs font-bold border-gray-300 rounded-xl py-2.5 px-3 focus:border-cyan focus:ring-cyan bg-gray-50">
+                            <option value="test">Test / Sandbox Mode (Safe simulation - no real charges)</option>
+                            <option value="live">Live / Production Mode (REAL MONEY &amp; CUSTOMER CHARGES)</option>
+                        </select>
+                    </div>
+
+                    <!-- Prominent Warning when Live Mode Selected -->
+                    <div x-show="stripeForm.mode === 'live'" x-cloak class="p-4 bg-red-50 border-2 border-red-500/40 rounded-xl text-red-900 space-y-1">
+                        <div class="flex items-center gap-2 font-black text-xs uppercase text-red-700 tracking-wide">
+                            <svg class="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span>Live Production Warning</span>
+                        </div>
+                        <p class="text-[11px] text-red-700 leading-relaxed font-medium">
+                            Switching Stripe to <strong>LIVE</strong> mode means actual credit cards will be debited. Ensure you enter your live keys (<code class="font-mono bg-red-100 px-1 py-0.5 rounded text-[10px]">pk_live_...</code> and <code class="font-mono bg-red-100 px-1 py-0.5 rounded text-[10px]">sk_live_...</code>).
+                        </p>
+                    </div>
+
+                    <!-- Publishable Key -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Publishable Key
+                            <span class="text-[10px] font-normal text-gray-400 lowercase">(pk_test_... or pk_live_...)</span>
+                        </label>
+                        <input type="text" x-model="stripeForm.publishable_key" placeholder="pk_test_51..." class="w-full text-xs font-mono border-gray-300 rounded-xl py-2 px-3 focus:border-cyan focus:ring-cyan">
+                        <div class="text-[11px] text-gray-400 mt-1 flex items-center justify-between">
+                            <span>Client-side public key for Stripe Checkout and Elements.</span>
+                        </div>
+                    </div>
+
+                    <!-- Secret Key -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                Secret Key
+                                <span class="text-[10px] font-normal text-gray-400 lowercase">(sk_test_... or sk_live_...)</span>
+                            </label>
+                            <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                AES-256 Encrypted
+                            </span>
+                        </div>
+                        <div class="relative">
+                            <input :type="stripeShowSecret ? 'text' : 'password'" x-model="stripeForm.secret_key" placeholder="•••••••••••••••••••••••• (Leave blank to keep current secret)" class="w-full text-xs font-mono border-gray-300 rounded-xl py-2 px-3 pr-10 focus:border-cyan focus:ring-cyan">
+                            <button type="button" @click="stripeShowSecret = !stripeShowSecret" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-navy focus:outline-none" title="Toggle visibility">
+                                <svg x-show="!stripeShowSecret" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="stripeShowSecret" x-cloak class="w-4 h-4 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            </button>
+                        </div>
+                        <div class="text-[11px] text-gray-500 mt-1 flex items-center justify-between">
+                            <span>Current: <span class="font-mono font-bold text-navy" x-text="stripeData.masked_secret"></span></span>
+                            <span class="text-[10px] text-gray-400">Never exposed in plain text</span>
+                        </div>
+                    </div>
+
+                    <!-- Webhook Signing Secret -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                Webhook Signing Secret
+                                <span class="text-[10px] font-normal text-gray-400 lowercase">(whsec_...)</span>
+                            </label>
+                            <span class="text-[10px] text-gray-400 font-mono">Optional</span>
+                        </div>
+                        <div class="relative">
+                            <input :type="stripeShowWebhook ? 'text' : 'password'" x-model="stripeForm.webhook_secret" placeholder="•••••••••••••••••••••••• (Leave blank to keep current secret)" class="w-full text-xs font-mono border-gray-300 rounded-xl py-2 px-3 pr-10 focus:border-cyan focus:ring-cyan">
+                            <button type="button" @click="stripeShowWebhook = !stripeShowWebhook" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-navy focus:outline-none" title="Toggle visibility">
+                                <svg x-show="!stripeShowWebhook" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="stripeShowWebhook" x-cloak class="w-4 h-4 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            </button>
+                        </div>
+                        <div class="text-[11px] text-gray-500 mt-1 flex items-center justify-between">
+                            <span>Current: <span class="font-mono font-bold text-navy" x-text="stripeData.masked_webhook"></span></span>
+                            <span class="text-[10px] text-gray-400">Endpoint: /webhook/stripe</span>
+                        </div>
+                    </div>
+
+                    <!-- Security Notice -->
+                    <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl text-[11px] text-gray-600 flex items-start gap-2">
+                        <svg class="w-4 h-4 text-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <span><strong>AES-256 Vault:</strong> Secret keys are securely encrypted at rest. Leaving secret inputs blank preserves existing configured keys.</span>
+                    </div>
+
+                    <!-- Footer Buttons -->
+                    <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end gap-3">
+                        <button type="button" @click="stripeModalOpen = false" class="px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            Cancel
+                        </button>
+                        <button type="submit" :disabled="isUpdatingStripe" class="px-5 py-2.5 text-xs font-bold text-white bg-navy hover:bg-navy/90 rounded-lg shadow-sm transition flex items-center gap-2 disabled:opacity-50">
+                            <svg x-show="isUpdatingStripe" class="w-3.5 h-3.5 animate-spin text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            <span x-text="isUpdatingStripe ? 'Saving & Encrypting...' : 'Save Stripe Credentials'">Save Stripe Credentials</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYPAL CREDENTIALS MODAL -->
+    <div x-show="paypalModalOpen" x-cloak class="fixed inset-0 z-[100] overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div x-show="paypalModalOpen" @click="paypalModalOpen = false" class="fixed inset-0 bg-navy/70 backdrop-blur-xs transition-opacity"></div>
+
+            <div x-show="paypalModalOpen" class="relative inline-block w-full max-w-xl p-6 sm:p-7 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-gray-200">
+                <!-- Header -->
+                <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#003087] text-white flex items-center justify-center font-black text-sm shadow-sm">
+                            P
+                        </div>
+                        <div>
+                            <h3 class="text-base font-black text-navy uppercase font-heading">PayPal API Credentials</h3>
+                            <p class="text-xs text-gray-400">Configure Client ID, Client Secret &amp; Webhook ID for PayPal.</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="paypalModalOpen = false" class="text-gray-400 hover:text-gray-600 font-bold p-1">&times;</button>
+                </div>
+
+                <!-- Form -->
+                <form @submit.prevent="submitPayPalCredentials()" class="space-y-4.5 pt-5 text-xs">
+                    <!-- Environment Mode -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Environment Mode</label>
+                        <select x-model="paypalForm.mode" class="w-full text-xs font-bold border-gray-300 rounded-xl py-2.5 px-3 focus:border-cyan focus:ring-cyan bg-gray-50">
+                            <option value="sandbox">Sandbox (Testing / Mock Simulation)</option>
+                            <option value="live">Live / Production (REAL PAYPAL ACCOUNTS &amp; CHARGES)</option>
+                        </select>
+                    </div>
+
+                    <!-- Prominent Warning when Live Mode Selected -->
+                    <div x-show="paypalForm.mode === 'live'" x-cloak class="p-4 bg-red-50 border-2 border-red-500/40 rounded-xl text-red-900 space-y-1">
+                        <div class="flex items-center gap-2 font-black text-xs uppercase text-red-700 tracking-wide">
+                            <svg class="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span>Live Production Warning</span>
+                        </div>
+                        <p class="text-[11px] text-red-700 leading-relaxed font-medium">
+                            Switching PayPal to <strong>LIVE</strong> mode will process live buyer payments. Ensure you enter your PayPal Live REST API app credentials.
+                        </p>
+                    </div>
+
+                    <!-- Client ID -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">PayPal Client ID</label>
+                        <input type="text" x-model="paypalForm.client_id" placeholder="AYSq3RDG..." class="w-full text-xs font-mono border-gray-300 rounded-xl py-2 px-3 focus:border-cyan focus:ring-cyan">
+                        <div class="text-[11px] text-gray-400 mt-1">REST API Client ID from PayPal Developer Portal.</div>
+                    </div>
+
+                    <!-- Client Secret -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">PayPal Client Secret</label>
+                            <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                AES-256 Encrypted
+                            </span>
+                        </div>
+                        <div class="relative">
+                            <input :type="paypalShowSecret ? 'text' : 'password'" x-model="paypalForm.client_secret" placeholder="•••••••••••••••••••••••• (Leave blank to keep current secret)" class="w-full text-xs font-mono border-gray-300 rounded-xl py-2 px-3 pr-10 focus:border-cyan focus:ring-cyan">
+                            <button type="button" @click="paypalShowSecret = !paypalShowSecret" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-navy focus:outline-none" title="Toggle visibility">
+                                <svg x-show="!paypalShowSecret" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="paypalShowSecret" x-cloak class="w-4 h-4 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            </button>
+                        </div>
+                        <div class="text-[11px] text-gray-500 mt-1 flex items-center justify-between">
+                            <span>Current: <span class="font-mono font-bold text-navy" x-text="paypalData.masked_secret"></span></span>
+                            <span class="text-[10px] text-gray-400">Never exposed in plain text</span>
+                        </div>
+                    </div>
+
+                    <!-- Webhook ID -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            PayPal Webhook ID
+                            <span class="text-[10px] font-normal text-gray-400 lowercase">(Optional)</span>
+                        </label>
+                        <input type="text" x-model="paypalForm.webhook_id" placeholder="8JH49102..." class="w-full text-xs font-mono border-gray-300 rounded-xl py-2 px-3 focus:border-cyan focus:ring-cyan">
+                        <div class="text-[11px] text-gray-400 mt-1">Webhook ID configured in PayPal developer dashboard.</div>
+                    </div>
+
+                    <!-- Security Notice -->
+                    <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl text-[11px] text-gray-600 flex items-start gap-2">
+                        <svg class="w-4 h-4 text-cyan flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <span><strong>AES-256 Vault:</strong> Secret keys are securely encrypted at rest. Leaving secret inputs blank preserves existing configured keys.</span>
+                    </div>
+
+                    <!-- Footer Buttons -->
+                    <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-end gap-3">
+                        <button type="button" @click="paypalModalOpen = false" class="px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            Cancel
+                        </button>
+                        <button type="submit" :disabled="isUpdatingPayPal" class="px-5 py-2.5 text-xs font-bold text-white bg-navy hover:bg-navy/90 rounded-lg shadow-sm transition flex items-center gap-2 disabled:opacity-50">
+                            <svg x-show="isUpdatingPayPal" class="w-3.5 h-3.5 animate-spin text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            <span x-text="isUpdatingPayPal ? 'Saving & Encrypting...' : 'Save PayPal Credentials'">Save PayPal Credentials</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING TOAST NOTIFICATION -->
+    <div x-show="toastVisible" x-cloak
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform translate-y-4"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform translate-y-4"
+         class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-xs font-bold"
+         :class="toastType === 'success' ? 'bg-navy text-white border-cyan/40 shadow-cyan/10' : 'bg-red-950 text-white border-red-500/50 shadow-red-900/20'">
+        <span class="w-2.5 h-2.5 rounded-full" :class="toastType === 'success' ? 'bg-cyan animate-pulse' : 'bg-red-400'"></span>
+        <span x-text="toastMessage"></span>
     </div>
 
 </div>
