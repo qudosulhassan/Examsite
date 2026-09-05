@@ -4,42 +4,50 @@
 
 @section('styles')
 <style>
-    /* Ensure Settings Center Grid layout displays reliably across all CSS bundler environments */
-    @media (min-width: 1024px) {
+    /* Settings Center Two-Column Layout */
+    .settings-grid-layout {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 1.5rem !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+    }
+    .settings-sidebar-col {
+        width: 250px !important;
+        min-width: 250px !important;
+        max-width: 250px !important;
+        flex: 0 0 250px !important;
+    }
+    .settings-content-col {
+        flex: 1 1 500px !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    @media (max-width: 768px) {
         .settings-grid-layout {
-            display: grid !important;
-            grid-template-columns: 280px minmax(0, 1fr) !important;
-            gap: 2rem !important;
-            align-items: start !important;
+            flex-direction: column !important;
         }
         .settings-sidebar-col {
-            width: 280px !important;
-            max-width: 280px !important;
-            flex-shrink: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            flex: 1 1 100% !important;
         }
         .settings-content-col {
-            min-width: 0 !important;
             width: 100% !important;
-        }
-    }
-    @media (max-width: 1023px) {
-        .settings-grid-layout {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 1.5rem !important;
-        }
-        .settings-sidebar-col, .settings-content-col {
-            width: 100% !important;
+            flex: 1 1 100% !important;
         }
     }
 
-    /* Fallback responsive grid for 2-column input rows */
+    /* Responsive grid for 2-column input rows */
     .settings-form-grid-2 {
         display: grid !important;
         grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
         gap: 1.5rem !important;
     }
-    @media (min-width: 768px) {
+    @media (min-width: 640px) {
         .settings-form-grid-2 {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         }
@@ -389,9 +397,9 @@ function settingsCenter() {
     @endif
 
     <!-- Main Tab Navigation Layout -->
-    <div class="settings-grid-layout grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div class="settings-grid-layout flex flex-col md:flex-row items-start gap-6 w-full">
         <!-- Tab Navigation Sidebar (Desktop & Mobile Dropdown) -->
-        <div class="settings-sidebar-col lg:col-span-3">
+        <div class="settings-sidebar-col w-full md:w-[260px] md:min-w-[260px] md:max-w-[260px] flex-shrink-0">
             <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm sticky top-6 space-y-1">
                 <div class="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-400">Settings Sections</div>
                 
@@ -411,7 +419,7 @@ function settingsCenter() {
         </div>
 
         <!-- Tab Content Area (Main Form) -->
-        <div class="settings-content-col lg:col-span-9 space-y-6">
+        <div class="settings-content-col flex-1 min-w-0 w-full space-y-6">
             <form id="settingsMainForm" action="{{ route('admin.settings.update') }}" method="POST" @submit="isSubmitting = true" class="space-y-6">
                 @csrf
                 <input type="hidden" name="active_tab" :value="activeTab">
