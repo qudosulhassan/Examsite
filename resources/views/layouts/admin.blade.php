@@ -6,11 +6,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v={{ filemtime(public_path('favicon-32x32.png')) }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-32x32.png') }}?v={{ filemtime(public_path('favicon-32x32.png')) }}">
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v={{ filemtime(public_path('favicon.png')) }}">
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ filemtime(public_path('favicon.ico')) }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}?v={{ filemtime(public_path('apple-touch-icon.png')) }}">
+    @php
+        $adminFavicon = !empty($globalSettings['site_favicon']) ? asset($globalSettings['site_favicon']) : asset('favicon-32x32.png');
+        $adminAppleIcon = !empty($globalSettings['apple_touch_icon']) ? asset($globalSettings['apple_touch_icon']) : asset('apple-touch-icon.png');
+    @endphp
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ $adminFavicon }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ $adminFavicon }}">
+    <link rel="shortcut icon" href="{{ $adminFavicon }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ $adminAppleIcon }}">
 
     <title>Exam Topics Base Admin Portal</title>
 
@@ -47,7 +50,7 @@
             <div class="flex flex-col flex-grow bg-navy pt-5 overflow-y-auto">
                 <div class="flex items-center flex-shrink-0 px-4 mb-6">
                     <a href="{{ url('/') }}" class="flex items-center">
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'ExamTopicsBase') }}" class="h-10 w-auto max-w-[200px] object-contain drop-shadow-[0_2px_10px_rgba(0,212,170,0.2)]">
+                        <img src="{{ !empty($globalSettings['site_logo']) ? asset($globalSettings['site_logo']) : asset('images/logo.png') }}" alt="{{ $globalSettings['site_name'] ?? config('app.name', 'ExamTopicsBase') }}" class="h-10 w-auto max-w-[200px] object-contain drop-shadow-[0_2px_10px_rgba(0,212,170,0.2)]">
                     </a>
                 </div>
                 <div class="flex-grow flex flex-col">
@@ -342,5 +345,6 @@
         </div>
     </div>
     @yield('scripts')
+    @stack('scripts')
 </body>
 </html>

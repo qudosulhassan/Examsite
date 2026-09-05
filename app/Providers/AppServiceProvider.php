@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Share global settings across views safely
+        try {
+            \Illuminate\Support\Facades\View::composer('*', function ($view) {
+                $view->with('globalSettings', \App\Models\Setting::allAsAssoc());
+            });
+        } catch (\Throwable $e) {
+            // Ignore during migrations or initial bootstrap
+        }
     }
 }

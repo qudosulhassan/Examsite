@@ -128,3 +128,7 @@ Route::resource('media', App\Http\Controllers\Admin\MediaController::class)->onl
 // Settings
 Route::get('settings', [SettingsAdminController::class, 'index'])->name('settings.index');
 Route::post('settings', [SettingsAdminController::class, 'update'])->name('settings.update');
+Route::post('settings/upload-branding', [SettingsAdminController::class, 'uploadBranding'])->name('settings.upload-branding');
+Route::post('settings/remove-branding', [SettingsAdminController::class, 'removeBranding'])->name('settings.remove-branding');
+Route::post('settings/clear-cache', [SettingsAdminController::class, 'clearCache'])->name('settings.clear-cache');
+
