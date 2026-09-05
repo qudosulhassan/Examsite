@@ -1,0 +1,21 @@
+# Cloudflare Wrangler Configuration
+# ExamTopicsBase - examtopicsbase.com
+
+name = "examtopicsbase"
+account_id = "fac7d83ae32b890b303eb7bfc45dccbe"
+
+# Zone/Domain info
+# Zone Name : examtopicsbase.com
+# Zone ID   : 9970c237d4bedff42d17cdb3c18ec829
+# Plan      : Free Website
+# Status    : Active
+# NS        : donovan.ns.cloudflare.com, grace.ns.cloudflare.com
+
+# Cloudflare compatibility
+compatibility_date = "2026-09-05"
+
+# Routes (if you add Cloudflare Workers later)
+# [[routes]]
+# pattern = "examtopicsbase.com/*"
+# zone_name = "examtopicsbase.com"
+# zone_id = "9970c237d4bedff42d17cdb3c18ec829"
