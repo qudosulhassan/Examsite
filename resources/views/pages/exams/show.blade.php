@@ -9,7 +9,39 @@
 @section('seo_tags')
 <script type="application/ld+json">
 {
-  "@@context": "https://schema.org",
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Vendors",
+      "item": "{{ url('/vendors') }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "{{ $exam->vendor->name ?? 'Vendor' }}",
+      "item": "{{ !empty($exam->vendor) ? route('vendors.show', $exam->vendor->slug) : url('/vendors') }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "{{ $exam->exam_code }}",
+      "item": "{{ $exam->url }}"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
   "@type": "Course",
   "name": "{{ $exam->exam_code }} - {{ $exam->exam_name }}",
   "description": "{{ strip_tags($exam->description) }}",
