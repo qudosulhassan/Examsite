@@ -9,7 +9,7 @@
 @section('seo_tags')
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
     {
@@ -41,7 +41,7 @@
 </script>
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "Course",
   "name": "{{ $exam->exam_code }} - {{ $exam->exam_name }}",
   "description": "{{ strip_tags($exam->description) }}",
