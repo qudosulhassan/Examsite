@@ -24,7 +24,7 @@ class TechnicalSeoAdminController extends Controller
      */
     public function index(Request $request)
     {
-        $activeTab = $request->get('tab', 'overview');
+        $activeTab = $request->get('tab', $request->get('section', 'overview'));
         $settings = Setting::all()->pluck('value', 'key')->toArray();
 
         // Ensure defaults

@@ -17,7 +17,7 @@
 
 @section('content')
 <div x-data="{
-    activeTab: '{{ request()->get('tab', $activeTab ?? 'overview') }}',
+    activeTab: '{{ request()->get('tab', request()->get('section', $activeTab ?? 'overview')) }}',
     switchTab(tab) {
         this.activeTab = tab;
         const url = new URL(window.location);

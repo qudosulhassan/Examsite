@@ -561,7 +561,7 @@ TXT;
             'status' => 'passed',
             'desc' => $forceHttps ? 'Clean canonicals automatically generated with HTTPS enforcement.' : 'Clean canonicals active (HTTPS enforcement disabled).',
             'action_label' => 'Configure',
-            'action_url' => url('/admin/settings/seo?section=canonical'),
+            'action_url' => url('/admin/settings/seo?tab=canonical'),
         ];
 
         // 5. 404 Error Frequency & Logs
@@ -579,7 +579,7 @@ TXT;
             'status' => $recent404s === 0 ? 'passed' : ($recent404s < 20 ? 'warning' : 'critical'),
             'desc' => "{$recent404s} 404 hits in the last 7 days ({$unresolved404s} unresolved).",
             'action_label' => 'Manage 404s',
-            'action_url' => url('/admin/settings/seo?section=redirects'),
+            'action_url' => url('/admin/settings/seo?tab=redirects'),
         ];
 
         // 6. Active Redirects Health
@@ -595,7 +595,7 @@ TXT;
             'status' => 'passed',
             'desc' => "{$totalRedirects} active URL redirects configured with loop protection.",
             'action_label' => 'View Redirects',
-            'action_url' => url('/admin/settings/seo?section=redirects'),
+            'action_url' => url('/admin/settings/seo?tab=redirects'),
         ];
 
         // 7. Schema Markup Health
@@ -606,7 +606,7 @@ TXT;
             'status' => $schemaMaster ? 'passed' : 'warning',
             'desc' => $schemaMaster ? 'Organization, WebSite, Breadcrumbs, Product, and Course schemas enabled.' : 'Schema markup is currently turned off globally.',
             'action_label' => 'Configure Schema',
-            'action_url' => url('/admin/settings/seo?section=schema'),
+            'action_url' => url('/admin/settings/seo?tab=schema'),
         ];
 
         // 8. Indexing Status (Robots directive)
@@ -618,7 +618,7 @@ TXT;
             'status' => $isNoindex ? 'critical' : 'passed',
             'desc' => $isNoindex ? 'CRITICAL: Site is currently sending "noindex" — search engines are blocked!' : 'Indexation is open ("index, follow").',
             'action_label' => 'Change Indexing',
-            'action_url' => url('/admin/settings/seo?section=meta_indexing'),
+            'action_url' => url('/admin/settings/seo?tab=meta_indexing'),
         ];
 
         // 9. XML Sitemap Health
@@ -631,7 +631,7 @@ TXT;
             'status' => $sitemapFresh && $sitemapCount > 0 ? 'passed' : ($sitemapCount > 0 ? 'warning' : 'critical'),
             'desc' => $sitemapCount > 0 ? "Sitemap covers {$sitemapCount} URLs (last: {$lastGenerated})." : 'Sitemap has not been regenerated yet.',
             'action_label' => 'Regenerate',
-            'action_url' => url('/admin/settings/seo?section=sitemap'),
+            'action_url' => url('/admin/settings/seo?tab=sitemap'),
         ];
 
         // 10. Robots.txt Health
@@ -642,7 +642,7 @@ TXT;
             'status' => $robotsExists ? 'passed' : 'warning',
             'desc' => $robotsExists ? 'Robots.txt is active, protecting admin routes, and referencing sitemap.' : 'Robots.txt missing or empty.',
             'action_label' => 'Edit Robots.txt',
-            'action_url' => url('/admin/settings/seo?section=robots'),
+            'action_url' => url('/admin/settings/seo?tab=robots'),
         ];
 
         // 11. Search Console Verification
@@ -653,7 +653,7 @@ TXT;
             'status' => !empty($gsc) ? 'passed' : 'warning',
             'desc' => !empty($gsc) ? 'Google Site Verification meta tag configured.' : 'Google Search Console verification meta tag is not set.',
             'action_label' => 'Add Verification',
-            'action_url' => url('/admin/settings/seo?section=search_engines'),
+            'action_url' => url('/admin/settings/seo?tab=search_engines'),
         ];
 
         // Calculate Overall Health Score (0-100%)
