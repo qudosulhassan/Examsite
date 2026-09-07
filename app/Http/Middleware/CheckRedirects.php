@@ -18,12 +18,19 @@ class CheckRedirects
         $path = '/' . ltrim($request->path(), '/');
 
         // Check active redirects
-        $redirect = Redirect::where('is_active', true)
-            ->where(function ($q) use ($path) {
-                $q->where('old_url', $path)
-                  ->orWhere('old_url', ltrim($path, '/'));
-            })
-            ->first();
+        $redirect = null;
+        if (\Illuminate\Support\Facades\Schema::hasTable('redirects')) {
+            try {
+                $q = Redirect::query();
+                if (\Illuminate\Support\Facades\Schema::hasColumn('redirects', 'is_active')) {
+                    $q->where('is_active', true);
+                }
+                $redirect = $q->where(function ($query) use ($path) {
+                    $query->where('old_url', $path)
+                          ->orWhere('old_url', ltrim($path, '/'));
+                })->first();
+            } catch (\Throwable $th) {}
+        }
 
         if ($redirect) {
             $dest = $redirect->new_url;

@@ -44,22 +44,46 @@ class TechnicalSeoAdminController extends Controller
         // Robots.txt content
         $robotsContent = $this->seoService->getRobotsTxtContent();
 
-        // Redirects with search/filter
-        $redirectSearch = $request->get('redirect_search');
-        $redirectsQuery = Redirect::query()->orderBy('hits_count', 'desc');
-        if ($redirectSearch) {
-            $redirectsQuery->where(function($q) use ($redirectSearch) {
-                $q->where('old_url', 'like', "%{$redirectSearch}%")
-                  ->orWhere('new_url', 'like', "%{$redirectSearch}%");
-            });
-        }
-        $redirects = $redirectsQuery->paginate(15)->withQueryString();
+        // Redirects with search/filter (safe if table or column missing before migration)
+        $redirects = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15);
+        if (\Illuminate\Support\Facades\Schema::hasTable('redirects')) {
+            try {
+                $redirectsQuery = Redirect::query();
+                if (\Illuminate\Support\Facades\Schema::hasColumn('redirects', 'hits_count')) {
+                    $redirectsQuery->orderBy('hits_count', 'desc');
+                } else {
+                    $redirectsQuery->orderBy('id', 'desc');
+                }
 
-        // 404 Logs
-        $notFoundLogs = SeoNotFoundLog::orderBy('hits_count', 'desc')
-            ->orderBy('last_seen_at', 'desc')
-            ->take(50)
-            ->get();
+                $redirectSearch = $request->get('redirect_search');
+                if ($redirectSearch) {
+                    $redirectsQuery->where(function($q) use ($redirectSearch) {
+                        $q->where('old_url', 'like', "%{$redirectSearch}%")
+                          ->orWhere('new_url', 'like', "%{$redirectSearch}%");
+                    });
+                }
+                $redirects = $redirectsQuery->paginate(15)->withQueryString();
+            } catch (\Throwable $th) {
+                \Illuminate\Support\Facades\Log::warning('Redirects query failed: ' . $th->getMessage());
+            }
+        }
+
+        // 404 Logs (safe if table missing before migration)
+        $notFoundLogs = collect([]);
+        if (\Illuminate\Support\Facades\Schema::hasTable('seo_not_found_logs')) {
+            try {
+                $notFoundQuery = SeoNotFoundLog::query();
+                if (\Illuminate\Support\Facades\Schema::hasColumn('seo_not_found_logs', 'hits_count')) {
+                    $notFoundQuery->orderBy('hits_count', 'desc');
+                }
+                if (\Illuminate\Support\Facades\Schema::hasColumn('seo_not_found_logs', 'last_seen_at')) {
+                    $notFoundQuery->orderBy('last_seen_at', 'desc');
+                }
+                $notFoundLogs = $notFoundQuery->take(50)->get();
+            } catch (\Throwable $th) {
+                \Illuminate\Support\Facades\Log::warning('SEO 404 logs query failed: ' . $th->getMessage());
+            }
+        }
 
         // Internal Linking Data
         $internalLinking = $this->seoService->analyzeInternalLinking();

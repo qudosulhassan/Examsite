@@ -563,8 +563,14 @@ TXT;
         ];
 
         // 5. 404 Error Frequency & Logs
-        $recent404s = SeoNotFoundLog::where('created_at', '>=', now()->subDays(7))->count();
-        $unresolved404s = SeoNotFoundLog::where('is_resolved', false)->count();
+        $recent404s = 0;
+        $unresolved404s = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('seo_not_found_logs')) {
+            try {
+                $recent404s = SeoNotFoundLog::where('created_at', '>=', now()->subDays(7))->count();
+                $unresolved404s = SeoNotFoundLog::where('is_resolved', false)->count();
+            } catch (\Throwable $th) {}
+        }
         $checks['not_found'] = [
             'title' => '404 Errors (Last 7 Days)',
             'count' => $recent404s,
@@ -575,7 +581,12 @@ TXT;
         ];
 
         // 6. Active Redirects Health
-        $totalRedirects = Redirect::count();
+        $totalRedirects = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('redirects')) {
+            try {
+                $totalRedirects = Redirect::count();
+            } catch (\Throwable $th) {}
+        }
         $checks['redirects'] = [
             'title' => '301/302 Redirect Rules',
             'count' => $totalRedirects,
@@ -677,6 +688,10 @@ TXT;
         
         // Skip common static assets like css, js, map, images to prevent log spam
         if (preg_match('/\.(css|js|map|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf)$/i', $path)) {
+            return;
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('seo_not_found_logs')) {
             return;
         }
 
