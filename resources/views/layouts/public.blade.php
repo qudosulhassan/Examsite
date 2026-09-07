@@ -15,35 +15,71 @@
     <link rel="shortcut icon" href="{{ $customFavicon }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ $customAppleIcon }}">
 
-    <!-- Site Verification -->
-    @if(config('seo.verification.google_search_console'))
-        <meta name="google-site-verification" content="{{ config('seo.verification.google_search_console') }}">
+    <!-- Site Verification Tags (Google, Bing, Yandex, Pinterest) -->
+    @php
+        $gscVerification = $globalSettings['seo_gsc_verification'] ?? config('seo.verification.google_search_console');
+        $bingVerification = $globalSettings['seo_bing_verification'] ?? '';
+        $yandexVerification = $globalSettings['seo_yandex_verification'] ?? '';
+        $pinterestVerification = $globalSettings['seo_pinterest_verification'] ?? '';
+
+        $seoService = app(\App\Services\TechnicalSeoService::class);
+        $computedCanonical = $seoService->buildCanonicalUrl();
+        $computedRobots = $seoService->getRobotsMetaDirective();
+    @endphp
+    @if(!empty($gscVerification))
+        <meta name="google-site-verification" content="{{ $gscVerification }}">
+    @endif
+    @if(!empty($bingVerification))
+        <meta name="msvalidate.01" content="{{ $bingVerification }}">
+    @endif
+    @if(!empty($yandexVerification))
+        <meta name="yandex-verification" content="{{ $yandexVerification }}">
+    @endif
+    @if(!empty($pinterestVerification))
+        <meta name="p:domain_verify" content="{{ $pinterestVerification }}">
     @endif
 
     <title>@yield('title', $globalSettings['default_seo_title'] ?? config('seo.defaults.title'))</title>
     <meta name="description" content="@yield('meta_description', $globalSettings['default_meta_description'] ?? config('seo.defaults.description'))">
     <meta name="keywords" content="@yield('meta_keywords', $globalSettings['default_meta_keywords'] ?? config('seo.defaults.keywords'))">
-    <link rel="canonical" href="@yield('canonical_url', $globalSettings['canonical_site_url'] ?? url()->current())">
-    <meta name="robots" content="@yield('robots', $globalSettings['robots_setting'] ?? config('seo.defaults.robots', 'noindex, nofollow'))">
-    <meta name="googlebot" content="@yield('googlebot', $globalSettings['robots_setting'] ?? config('seo.defaults.robots', 'noindex, nofollow'))">
+    <link rel="canonical" href="@yield('canonical_url', $computedCanonical)">
+    <meta name="robots" content="@yield('robots', $computedRobots)">
+    <meta name="googlebot" content="@yield('googlebot', $computedRobots)">
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="@yield('og_type', config('seo.defaults.og_type'))">
-    <meta property="og:url" content="@yield('canonical_url', url()->current())">
+    <meta property="og:type" content="@yield('og_type', $globalSettings['seo_og_type'] ?? config('seo.defaults.og_type', 'website'))">
+    <meta property="og:url" content="@yield('canonical_url', $computedCanonical)">
     <meta property="og:title" content="@yield('title', $globalSettings['default_og_title'] ?? ($globalSettings['default_seo_title'] ?? config('seo.defaults.title')))">
     <meta property="og:description" content="@yield('meta_description', $globalSettings['default_og_description'] ?? ($globalSettings['default_meta_description'] ?? config('seo.defaults.description')))">
-    <meta property="og:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image')))">
+    <meta property="og:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')))">
     <meta property="og:site_name" content="{{ $globalSettings['site_name'] ?? config('seo.site_name', 'Exam Topics Base') }}">
+    @if(!empty($globalSettings['seo_facebook_app_id']))
+        <meta property="fb:app_id" content="{{ $globalSettings['seo_facebook_app_id'] }}">
+    @endif
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:site" content="{{ config('seo.social.twitter_handle') }}">
-    <meta property="twitter:url" content="@yield('canonical_url', url()->current())">
+    <meta property="twitter:card" content="{{ $globalSettings['seo_twitter_card'] ?? 'summary_large_image' }}">
+    <meta property="twitter:site" content="{{ $globalSettings['social_twitter'] ?? config('seo.social.twitter_handle') }}">
+    <meta property="twitter:url" content="@yield('canonical_url', $computedCanonical)">
     <meta property="twitter:title" content="@yield('title', config('seo.defaults.title'))">
     <meta property="twitter:description" content="@yield('meta_description', config('seo.defaults.description'))">
-    <meta property="twitter:image" content="@yield('og_image', asset(config('seo.defaults.og_image')))">
+    <meta property="twitter:image" content="@yield('og_image', asset(config('seo.defaults.og_image', 'images/og-default.png')))">
 
-    <!-- Custom SEO Tags (Schema.org JSON-LD, etc.) -->
+    <!-- Structured Data (JSON-LD) -->
+    @if(($globalSettings['seo_schema_master_enabled'] ?? '1') === '1')
+        @if(($globalSettings['seo_schema_organization_enabled'] ?? '1') === '1')
+            <script type="application/ld+json">
+                {!! json_encode($seoService->generateOrganizationSchema(), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+            </script>
+        @endif
+        @if(request()->is('/') && ($globalSettings['seo_schema_website_enabled'] ?? '1') === '1')
+            <script type="application/ld+json">
+                {!! json_encode($seoService->generateWebSiteSchema(), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+            </script>
+        @endif
+    @endif
+
+    <!-- Custom SEO Tags (Schema.org JSON-LD from page views) -->
     @yield('seo_tags')
 
     <!-- Google Analytics (GA4) -->

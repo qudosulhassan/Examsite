@@ -43,6 +43,9 @@ Route::post('/free-demo', [DemoController::class, 'request'])->name('free-demo.r
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/api/search', [SearchController::class, 'liveSearch']);
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', function (\App\Services\TechnicalSeoService $seoService) {
+    return response($seoService->getRobotsTxtContent(), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+})->name('robots.txt');
 
 // --- Blog ---
 Route::prefix('blog')->name('blog.')->group(function () {

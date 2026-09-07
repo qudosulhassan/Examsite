@@ -63,7 +63,7 @@ function settingsCenter() {
         { id: 'general', name: 'General', badge: '' },
         { id: 'branding', name: 'Branding', badge: 'Logos' },
         { id: 'contact', name: 'Contact & Social', badge: '' },
-        { id: 'seo', name: 'SEO Defaults', badge: '' },
+        { id: 'seo', name: 'Technical SEO', badge: '11 Modules' },
         { id: 'promotion', name: 'Promotion Banner', badge: 'Hero' },
         { id: 'subscriptions', name: 'Subscription Plans', badge: 'Plans' },
         { id: 'email', name: 'Email Settings', badge: '' },
@@ -1067,6 +1067,52 @@ function settingsCenter() {
                     </div>
 
                     <div class="p-6 space-y-6">
+                        <!-- Technical SEO Center Launch Banner -->
+                        <div class="bg-gradient-to-r from-navy via-[#0c1e38] to-navy rounded-xl p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4 border border-gray-800 shadow-md">
+                            <div class="space-y-1 text-center sm:text-left">
+                                <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan/20 text-cyan border border-cyan/30">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse"></span>
+                                    11 Dedicated SEO Modules Ready
+                                </div>
+                                <h4 class="text-base font-extrabold text-white">Advanced Technical SEO Center</h4>
+                                <p class="text-xs text-gray-300 max-w-xl">
+                                    Manage XML Sitemaps, Robots.txt, JSON-LD Schemas, Canonical URLs, 301 Redirects, Crawl Hierarchy, and Core Web Vitals.
+                                </p>
+                            </div>
+                            <a href="{{ route('admin.seo.index') }}" class="inline-flex items-center px-4 py-2.5 text-xs font-bold text-navy bg-cyan hover:bg-cyan/90 rounded-lg shadow-sm transition gap-1.5 flex-shrink-0">
+                                <span>Open Full SEO Center</span>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+
+                        <!-- Quick Module Shortcuts -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 pt-1">
+                            <a href="{{ route('admin.seo.index', ['tab' => 'sitemap']) }}" class="p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-center text-xs font-bold text-navy transition block">
+                                <span class="text-[10px] text-gray-400 block uppercase">Module 1</span>
+                                XML Sitemap
+                            </a>
+                            <a href="{{ route('admin.seo.index', ['tab' => 'robots']) }}" class="p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-center text-xs font-bold text-navy transition block">
+                                <span class="text-[10px] text-gray-400 block uppercase">Module 2</span>
+                                Robots.txt
+                            </a>
+                            <a href="{{ route('admin.seo.index', ['tab' => 'schema']) }}" class="p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-center text-xs font-bold text-navy transition block">
+                                <span class="text-[10px] text-gray-400 block uppercase">Module 3</span>
+                                Schema JSON-LD
+                            </a>
+                            <a href="{{ route('admin.seo.index', ['tab' => 'canonical']) }}" class="p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-center text-xs font-bold text-navy transition block">
+                                <span class="text-[10px] text-gray-400 block uppercase">Module 4</span>
+                                Canonicals
+                            </a>
+                            <a href="{{ route('admin.seo.index', ['tab' => 'redirects']) }}" class="p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-center text-xs font-bold text-navy transition block">
+                                <span class="text-[10px] text-gray-400 block uppercase">Module 7</span>
+                                301 Redirects
+                            </a>
+                            <a href="{{ route('admin.seo.index', ['tab' => 'health_score']) }}" class="p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-center text-xs font-bold text-navy transition block">
+                                <span class="text-[10px] text-gray-400 block uppercase">Module 6</span>
+                                Health Audit
+                            </a>
+                        </div>
+
                         <!-- Google SERP Live Preview -->
                         <div class="bg-gray-50 border border-gray-200 rounded-xl p-4.5 space-y-2">
                             <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Live Google Search Preview</div>

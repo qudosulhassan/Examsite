@@ -242,8 +242,75 @@ class OrderAdminController extends Controller
             }
         }
 
-        $maxRevenue = !empty($points) ? max(array_column($points, 'revenue')) : 100;
-        $maxOrders = !empty($points) ? max(array_column($points, 'orders')) : 5;
+        $maxRevenue = !empty($points) ? (float)max(array_column($points, 'revenue')) : 0.0;
+        $maxOrders = !empty($points) ? (int)max(array_column($points, 'orders')) : 0;
+
+        // Dynamic Nice Scales for Y-Axis
+        $calcScale = function (float $val, bool $isCurrency = true) {
+            if ($val <= 0) {
+                return [
+                    'max' => $isCurrency ? 100 : 5,
+                    'ticks' => $isCurrency ? [100, 75, 50, 25, 0] : [5, 4, 3, 2, 1, 0],
+                ];
+            }
+
+            $rawInterval = $val / 4;
+            $mag = pow(10, floor(log10(max(1, $rawInterval))));
+            $norm = $rawInterval / $mag;
+
+            if ($norm <= 1.2) {
+                $interval = 1 * $mag;
+            } elseif ($norm <= 2.2) {
+                $interval = 2 * $mag;
+            } elseif ($norm <= 3.5) {
+                $interval = 2.5 * $mag;
+            } elseif ($norm <= 7.5) {
+                $interval = 5 * $mag;
+            } else {
+                $interval = 10 * $mag;
+            }
+
+            if (!$isCurrency) {
+                $interval = max(1, (int)round($interval));
+            }
+
+            $niceMax = ceil($val / $interval) * $interval;
+            if ($niceMax <= $val) {
+                $niceMax += $interval;
+            }
+
+            $ticks = [];
+            for ($v = $niceMax; $v >= -0.0001; $v -= $interval) {
+                $ticks[] = $isCurrency ? round($v, 2) : (int)round($v);
+            }
+
+            if (end($ticks) !== 0 && end($ticks) !== 0.0) {
+                $ticks[] = 0;
+            }
+
+            return [
+                'max' => $niceMax,
+                'ticks' => array_values(array_unique($ticks)),
+            ];
+        };
+
+        $revenueScale = $calcScale($maxRevenue, true);
+        $ordersScale = $calcScale((float)$maxOrders, false);
+
+        // Precompute proportional heights with headroom (max ~82% height for highest bar)
+        foreach ($points as &$pt) {
+            $hasRev = $pt['revenue'] > 0;
+            $hasOrd = $pt['orders'] > 0;
+            $pt['hasRev'] = $hasRev;
+            $pt['hasOrd'] = $hasOrd;
+            $pt['revHeight'] = ($hasRev && $revenueScale['max'] > 0)
+                ? max(6, round(($pt['revenue'] / $revenueScale['max']) * 82))
+                : 0;
+            $pt['ordHeight'] = ($hasOrd && $ordersScale['max'] > 0)
+                ? max(6, round(($pt['orders'] / $ordersScale['max']) * 82))
+                : 0;
+        }
+        unset($pt);
 
         return [
             'points' => $points,
@@ -251,6 +318,8 @@ class OrderAdminController extends Controller
             'maxOrders' => max(1, $maxOrders),
             'totalRevenue' => round($paidOrders->sum('total_amount'), 2),
             'totalCount' => $paidOrders->count(),
+            'revenueScale' => $revenueScale,
+            'ordersScale' => $ordersScale,
         ];
     }
 

@@ -142,3 +142,16 @@ Route::post('settings/transactions/{id}/refund', [SettingsAdminController::class
 Route::post('settings/webhooks/{id}/retry', [SettingsAdminController::class, 'retryWebhook'])->name('settings.retry-webhook');
 Route::post('settings/toggle-gateway', [SettingsAdminController::class, 'toggleGateway'])->name('settings.toggle-gateway');
 
+// Technical SEO Center (11 Modules)
+Route::get('settings/seo', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'index'])->name('seo.index');
+Route::get('seo', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'index']);
+Route::post('settings/seo', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'updateSettings'])->name('seo.update');
+Route::post('settings/seo/sitemap-regenerate', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'regenerateSitemap'])->name('seo.sitemap.regenerate');
+Route::post('settings/seo/robots-save', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'saveRobots'])->name('seo.robots.save');
+Route::post('settings/seo/robots-reset', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'resetRobots'])->name('seo.robots.reset');
+Route::post('settings/seo/redirects', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'storeRedirect'])->name('seo.redirects.store');
+Route::post('settings/seo/redirects/{id}/toggle', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'toggleRedirect'])->name('seo.redirects.toggle');
+Route::delete('settings/seo/redirects/{id}', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'destroyRedirect'])->name('seo.redirects.destroy');
+Route::post('settings/seo/not-found/{id}/resolve', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'resolveNotFound'])->name('seo.not-found.resolve');
+Route::post('settings/seo/not-found/clear', [App\Http\Controllers\Admin\TechnicalSeoAdminController::class, 'clearNotFoundLogs'])->name('seo.not-found.clear');
+

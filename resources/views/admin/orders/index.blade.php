@@ -135,11 +135,30 @@
     </div>
 
     <!-- 2. Interactive Revenue & Order Trends Chart -->
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6" x-data="{
+        chartMetric: 'revenue',
+        activePoint: null,
+        hoveredIndex: null
+    }">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100">
             <div>
-                <h3 class="text-base font-extrabold text-navy tracking-tight">Revenue & Sales Trajectory</h3>
-                <p class="text-xs text-gray-400 mt-0.5">
+                <div class="flex items-center space-x-3">
+                    <h3 class="text-base font-extrabold text-navy tracking-tight">Revenue & Sales Trajectory</h3>
+                    <!-- Metric Switcher Pills: Revenue vs Orders -->
+                    <div class="inline-flex p-0.5 bg-gray-100 rounded-lg text-[11px] font-bold">
+                        <button type="button" @click="chartMetric = 'revenue'"
+                                :class="chartMetric === 'revenue' ? 'bg-white text-navy shadow-sm font-black' : 'text-gray-500 hover:text-navy'"
+                                class="px-2.5 py-1 rounded-md transition-all">
+                            Revenue ($)
+                        </button>
+                        <button type="button" @click="chartMetric = 'orders'"
+                                :class="chartMetric === 'orders' ? 'bg-white text-navy shadow-sm font-black' : 'text-gray-500 hover:text-navy'"
+                                class="px-2.5 py-1 rounded-md transition-all">
+                            Orders Count
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">
                     Period Revenue: <span class="font-bold text-emerald-600">${{ number_format($chartData['totalRevenue'], 2) }}</span>
                     &nbsp;•&nbsp; Orders: <span class="font-bold text-navy">{{ $chartData['totalCount'] }}</span>
                 </p>
@@ -171,51 +190,117 @@
                     <div class="text-xs text-gray-400 mt-0.5">Revenue and order points will populate as customers purchase packages.</div>
                 </div>
             @else
-                <div class="space-y-2">
-                    <!-- Bars Container -->
-                    <div class="h-44 w-full flex items-end gap-1 sm:gap-2 pt-6 pb-2 px-2 overflow-x-auto border-b border-gray-100">
-                        @foreach($chartData['points'] as $pt)
-                            @php
-                                $hasRev = $pt['revenue'] > 0;
-                                $heightPercent = ($chartData['maxRevenue'] > 0 && $hasRev) ? max(6, round(($pt['revenue'] / $chartData['maxRevenue']) * 100)) : 0;
-                            @endphp
-                            <div class="flex-1 min-w-[20px] max-w-[48px] flex flex-col items-center group relative h-full justify-end cursor-pointer">
-                                <!-- Tooltip -->
-                                <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center pointer-events-none z-30">
-                                    <div class="bg-navy text-white text-[11px] rounded-lg py-1.5 px-2.5 shadow-xl whitespace-nowrap text-center">
-                                        <div class="font-bold text-cyan">${{ number_format($pt['revenue'], 2) }}</div>
-                                        <div class="text-[9px] text-gray-300">{{ $pt['orders'] }} {{ Str::plural('order', $pt['orders']) }} • {{ $pt['label'] }}</div>
-                                    </div>
-                                    <div class="w-2 h-2 bg-navy transform rotate-45 -mt-1"></div>
-                                </div>
+                <div class="space-y-2 select-none">
+                    <!-- Chart Area with Y-Axis and Plot Area -->
+                    <div class="relative w-full">
 
-                                <!-- Bar Column -->
-                                <div class="w-full rounded-t-md transition-all duration-300 relative group-hover:brightness-110 origin-bottom"
-                                     style="height: {{ $heightPercent }}%; background: {{ $hasRev ? '#00D4AA' : 'transparent' }};">
-                                    @if($hasRev)
-                                        <div class="absolute inset-x-0 top-0 h-1 bg-white/40 rounded-t-md"></div>
-                                    @endif
+                        <!-- Floating Dynamic Tooltip: Positioned FULLY Inside Chart Container -->
+                        <div x-show="activePoint !== null" x-cloak
+                             class="absolute top-2 z-30 pointer-events-none transition-all duration-150 ease-out"
+                             :style="`left: ${Math.min(85, Math.max(15, activePoint ? activePoint.pctX : 50))}%; transform: translateX(-50%);`">
+                            <div class="bg-navy text-white text-xs rounded-xl py-1.5 px-3.5 shadow-2xl border border-gray-700/80 flex items-center gap-2.5 whitespace-nowrap">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full" :class="chartMetric === 'revenue' ? 'bg-cyan animate-pulse' : 'bg-blue-400 animate-pulse'"></span>
+                                    <span class="font-black font-mono text-sm" :class="chartMetric === 'revenue' ? 'text-cyan' : 'text-blue-400'"
+                                          x-text="chartMetric === 'revenue' ? '$' + activePoint?.revenue : activePoint?.orders + (activePoint?.orders === 1 ? ' order' : ' orders')">
+                                    </span>
                                 </div>
-
-                                <!-- Zero Day Indicator -->
-                                @if(!$hasRev)
-                                    <div class="w-1.5 h-1.5 rounded-full bg-gray-200 group-hover:bg-cyan transition-colors mb-0.5"></div>
-                                @endif
+                                <span class="text-gray-600 font-bold">&bull;</span>
+                                <span class="text-gray-300 text-[11px] font-medium" x-text="chartMetric === 'revenue' ? (activePoint?.orders + (activePoint?.orders === 1 ? ' order' : ' orders')) : ('$' + activePoint?.revenue)"></span>
+                                <span class="text-gray-600 font-bold">&bull;</span>
+                                <span class="text-gray-400 text-[11px] font-semibold" x-text="activePoint?.label"></span>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
 
-                    <!-- Labels Row -->
-                    <div class="w-full flex justify-between px-2 text-[10px] font-bold text-gray-400 overflow-x-auto">
-                        @php
-                            $totalPts = count($chartData['points']);
-                            $step = max(1, (int)ceil($totalPts / 10));
-                        @endphp
-                        @foreach($chartData['points'] as $idx => $pt)
-                            @if($idx % $step === 0 || $idx === $totalPts - 1)
-                                <span>{{ $pt['label'] }}</span>
-                            @endif
-                        @endforeach
+                        <div class="flex items-stretch">
+                            <!-- Dynamic Y-Axis Column (Fixed Width Left) -->
+                            <div class="w-12 sm:w-16 flex-shrink-0 flex flex-col justify-between py-1 pr-2.5 text-[10px] font-bold text-gray-400 font-mono text-right border-r border-gray-200/80">
+                                <!-- Revenue Ticks -->
+                                <template x-if="chartMetric === 'revenue'">
+                                    <div class="h-full flex flex-col justify-between">
+                                        @foreach($chartData['revenueScale']['ticks'] as $tick)
+                                            <div class="leading-none">${{ number_format($tick) }}</div>
+                                        @endforeach
+                                    </div>
+                                </template>
+                                <!-- Orders Ticks -->
+                                <template x-if="chartMetric === 'orders'">
+                                    <div class="h-full flex flex-col justify-between">
+                                        @foreach($chartData['ordersScale']['ticks'] as $tick)
+                                            <div class="leading-none">{{ $tick }}</div>
+                                        @endforeach
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Plot Area (Grid + Bars) -->
+                            <div class="flex-1 relative h-56 sm:h-64 pl-2 sm:pl-3">
+                                <!-- Background Horizontal Gridlines -->
+                                <div class="absolute inset-0 flex flex-col justify-between pointer-events-none pl-2 sm:pl-3">
+                                    @php $tickCount = count($chartData['revenueScale']['ticks']); @endphp
+                                    @for($i = 0; $i < $tickCount; $i++)
+                                        <div class="w-full {{ $i === $tickCount - 1 ? 'border-b-2 border-gray-200' : 'border-b border-dashed border-gray-150' }} h-0"></div>
+                                    @endfor
+                                </div>
+
+                                <!-- Bars Flex Columns on top of grid -->
+                                <div class="relative z-10 h-full w-full flex items-end gap-1 sm:gap-2">
+                                    @foreach($chartData['points'] as $idx => $pt)
+                                        @php
+                                            $pctX = count($chartData['points']) > 1 ? round(($idx / (count($chartData['points']) - 1)) * 100, 1) : 50;
+                                        @endphp
+                                        <div class="flex-1 min-w-[8px] max-w-[48px] h-full flex flex-col items-center justify-end group cursor-pointer relative"
+                                             @mouseenter="activePoint = {
+                                                 label: '{{ addslashes($pt['label']) }}',
+                                                 revenue: '{{ number_format($pt['revenue'], 2) }}',
+                                                 orders: {{ $pt['orders'] }},
+                                                 pctX: {{ $pctX }}
+                                             }; hoveredIndex = {{ $idx }};"
+                                             @mouseleave="activePoint = null; hoveredIndex = null;">
+
+                                            <!-- Subtle Column Hover Highlight -->
+                                            <div class="absolute inset-y-0 inset-x-[-2px] rounded-md transition-colors pointer-events-none"
+                                                 :class="hoveredIndex === {{ $idx }} ? 'bg-cyan/10' : ''"></div>
+
+                                            <!-- Bar Column -->
+                                            <div class="w-full rounded-t-md transition-all duration-200 relative group-hover:brightness-110 origin-bottom"
+                                                 :style="chartMetric === 'revenue' 
+                                                     ? 'height: {{ $pt['revHeight'] }}%; background: {{ $pt['hasRev'] ? '#00D4AA' : 'transparent' }};' 
+                                                     : 'height: {{ $pt['ordHeight'] }}%; background: {{ $pt['hasOrd'] ? '#3B82F6' : 'transparent' }};'">
+                                                @if($pt['hasRev'])
+                                                    <div class="absolute inset-x-0 top-0 h-1 bg-white/40 rounded-t-md" x-show="chartMetric === 'revenue'"></div>
+                                                @endif
+                                                @if($pt['hasOrd'])
+                                                    <div class="absolute inset-x-0 top-0 h-1 bg-white/40 rounded-t-md" x-show="chartMetric === 'orders'"></div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Zero Day Baseline Dot -->
+                                            <div class="w-1.5 h-1.5 rounded-full bg-gray-200 group-hover:bg-cyan transition-colors mb-0.5"
+                                                 :class="{
+                                                     'hidden': (chartMetric === 'revenue' && {{ $pt['hasRev'] ? 'true' : 'false' }}) || (chartMetric === 'orders' && {{ $pt['hasOrd'] ? 'true' : 'false' }})
+                                                 }"></div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- X-Axis Labels Row -->
+                        <div class="flex items-center pt-2">
+                            <div class="w-12 sm:w-16 flex-shrink-0"></div>
+                            <div class="flex-1 flex justify-between px-2 text-[10px] font-bold text-gray-400 pl-2 sm:pl-3 overflow-x-auto">
+                                @php
+                                    $totalPts = count($chartData['points']);
+                                    $step = max(1, (int)ceil($totalPts / 8));
+                                @endphp
+                                @foreach($chartData['points'] as $idx => $pt)
+                                    @if($idx % $step === 0 || $idx === $totalPts - 1)
+                                        <span>{{ $pt['label'] }}</span>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endif

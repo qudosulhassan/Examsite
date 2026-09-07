@@ -193,8 +193,15 @@
                             Media Gallery
                         </a>
 
-                        <a href="{{ url('/admin/settings') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/settings') }}">
+                        <a href="{{ url('/admin/settings') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ (request()->is('admin/settings') && !request()->is('admin/settings/seo*')) ? 'bg-gray-800 text-orange border-l-4 border-orange' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
                             Settings
+                        </a>
+
+                        <a href="{{ route('admin.seo.index') }}" class="group flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-md transition {{ (request()->is('admin/settings/seo*') || request()->is('admin/seo*')) ? 'bg-gray-800 text-cyan border-l-4 border-cyan' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
+                            <span>Technical SEO</span>
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan/20 text-cyan border border-cyan/30">
+                                11 Modules
+                            </span>
                         </a>
                     </nav>
                 </div>
@@ -339,6 +346,10 @@
 
                         <a href="{{ url('/admin/media') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Media Gallery</a>
                         <a href="{{ url('/admin/settings') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Settings</a>
+                        <a href="{{ route('admin.seo.index') }}" class="group flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">
+                            <span>Technical SEO</span>
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan/20 text-cyan">11</span>
+                        </a>
                     </nav>
                 </div>
             </div>
