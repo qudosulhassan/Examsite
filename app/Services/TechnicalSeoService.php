@@ -423,17 +423,17 @@ TXT;
             case 'product':
                 $mockExam = new Exam([
                     'id' => 101,
-                    'code' => 'AZ-104',
-                    'title' => 'Microsoft Azure Administrator',
-                    'price' => 39.99,
+                    'exam_code' => 'AZ-104',
+                    'exam_name' => 'Microsoft Azure Administrator',
+                    'price_bundle' => 39.99,
                     'description' => 'Latest and real AZ-104 practice questions, verified answers, and simulation test engine.',
                 ]);
                 return json_encode($this->generateExamProductSchema($mockExam), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             case 'course':
                 $mockExam = new Exam([
                     'id' => 101,
-                    'code' => 'AZ-104',
-                    'title' => 'Microsoft Azure Administrator',
+                    'exam_code' => 'AZ-104',
+                    'exam_name' => 'Microsoft Azure Administrator',
                 ]);
                 return json_encode($this->generateCourseSchema($mockExam), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             case 'article':
@@ -540,8 +540,8 @@ TXT;
         ];
 
         // 3. Duplicate Titles / Descriptions Check
-        $duplicateExamTitles = Exam::select('title', \Illuminate\Support\Facades\DB::raw('count(*) as c'))
-            ->groupBy('title')->having('c', '>', 1)->count();
+        $duplicateExamTitles = Exam::select('exam_name', \Illuminate\Support\Facades\DB::raw('count(*) as c'))
+            ->groupBy('exam_name')->having('c', '>', 1)->count();
         $checks['duplicate_content'] = [
             'title' => 'Duplicate Titles / Potential Collisions',
             'count' => $duplicateExamTitles,
@@ -701,7 +701,7 @@ TXT;
 
     public function analyzeInternalLinking(): array
     {
-        $exams = Exam::where('is_active', true)->select('id', 'title', 'slug', 'vendor_id')->with('vendor')->get();
+        $exams = Exam::where('is_active', true)->select('id', 'exam_name', 'exam_code', 'slug', 'vendor_id')->with('vendor')->get();
         $blogPosts = BlogPost::where('is_published', true)->select('id', 'title', 'slug')->get();
 
         $orphanExams = [];

@@ -151,4 +151,22 @@ class Exam extends Model
     {
         return $this->questions()->count();
     }
+
+    /**
+     * Accessor aliases for compatibility with general SEO and schema builders.
+     */
+    public function getTitleAttribute(): string
+    {
+        return $this->attributes['exam_name'] ?? $this->attributes['header_title'] ?? '';
+    }
+
+    public function getCodeAttribute(): string
+    {
+        return $this->attributes['exam_code'] ?? '';
+    }
+
+    public function getPriceAttribute(): float
+    {
+        return (float)($this->attributes['price_bundle'] ?? $this->attributes['price_pdf'] ?? 29.99);
+    }
 }
