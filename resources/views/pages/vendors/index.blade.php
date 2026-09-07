@@ -174,7 +174,7 @@
                     </p>
 
                     <div class="flex justify-between items-center pt-6 border-t border-gray-100 mt-auto relative z-10">
-                        <span class="bg-gray-50 text-gray-400 group-hover:bg-cyan/10 group-hover:text-cyan text-[11px] uppercase tracking-widest font-black px-3 py-1.5 rounded-lg border border-transparent group-hover:border-cyan/20 transition-colors">{{ $vendor->exam_count }} Exams</span>
+                        <span class="bg-gray-50 text-gray-400 group-hover:bg-cyan/10 group-hover:text-cyan text-[11px] uppercase tracking-widest font-black px-3 py-1.5 rounded-lg border border-transparent group-hover:border-cyan/20 transition-colors">{{ $vendor->exam_count }} {{ Str::plural('Exam', $vendor->exam_count) }}</span>
                         <a href="{{ url('/vendors/' . $vendor->slug) }}" class="text-[13px] font-black text-white bg-navy group-hover:bg-gradient-to-r group-hover:from-cyan group-hover:to-blue-500 px-5 py-2.5 rounded-xl transition-all duration-300 flex items-center space-x-2 shadow-md group-hover:shadow-[0_0_20px_rgba(0,212,170,0.3)] group/btn">
                             <span>Browse</span>
                             <svg class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>

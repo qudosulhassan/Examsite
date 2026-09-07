@@ -292,7 +292,7 @@
                         </div>
                     @endif
                     <h3 class="font-bold text-navy text-sm mb-2 group-hover:text-cyan transition-colors">{{ $vendor->name }}</h3>
-                    <span class="bg-gray-100 text-gray-500 group-hover:bg-cyan/10 group-hover:text-cyan text-xs font-bold px-3 py-1 rounded-full transition-colors">{{ $vendor->exam_count }} Exams</span>
+                    <span class="bg-gray-100 text-gray-500 group-hover:bg-cyan/10 group-hover:text-cyan text-xs font-bold px-3 py-1 rounded-full transition-colors">{{ $vendor->exam_count }} {{ Str::plural('Exam', $vendor->exam_count) }}</span>
                 </a>
             @endforeach
         </div>

@@ -25,11 +25,21 @@ class Exam extends Model
         });
 
         static::saved(function ($exam) {
+            // Recalculate vendor exam count
+            if ($exam->vendor_id) {
+                $count = static::where('vendor_id', $exam->vendor_id)->count();
+                Vendor::where('id', $exam->vendor_id)->update(['exam_count' => $count]);
+            }
             // Trigger sitemap regeneration
             Artisan::call('sitemap:generate');
         });
 
         static::deleted(function ($exam) {
+            // Recalculate vendor exam count
+            if ($exam->vendor_id) {
+                $count = static::where('vendor_id', $exam->vendor_id)->count();
+                Vendor::where('id', $exam->vendor_id)->update(['exam_count' => $count]);
+            }
             Artisan::call('sitemap:generate');
         });
     }

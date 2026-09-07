@@ -14,7 +14,7 @@ class VendorController extends Controller
      */
     public function index(Request $request)
     {
-        $vendorsQuery = Vendor::where('is_active', true)->orderBy('sort_order');
+        $vendorsQuery = Vendor::where('is_active', true)->withCount('exams')->orderBy('sort_order');
         $vendors = $vendorsQuery->get();
 
         return view('pages.vendors.index', compact('vendors'));

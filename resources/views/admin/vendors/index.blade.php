@@ -16,6 +16,7 @@
                 <tr>
                     <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Vendor Name</th>
                     <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Sort Order</th>
+                    <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Exams</th>
                     <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-right text-[10px] font-bold text-gray-400 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -37,6 +38,11 @@
                         </td>
                         <td class="px-6 py-4 text-gray-500 font-semibold">
                             {{ $vendor->sort_order }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-navy/5 text-navy border border-navy/10">
+                                {{ $vendor->exam_count }} {{ Str::plural('exam', $vendor->exam_count) }}
+                            </span>
                         </td>
                         <td class="px-6 py-4">
                             <span class="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase {{ $vendor->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">

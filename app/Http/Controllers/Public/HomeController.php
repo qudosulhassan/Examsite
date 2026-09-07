@@ -15,6 +15,7 @@ class HomeController extends Controller
     {
         // Get active vendors with their active exams count
         $vendors = Vendor::where('is_active', true)
+            ->withCount('exams')
             ->orderBy('sort_order')
             ->get();
 

@@ -53,6 +53,25 @@ class Vendor extends Model
     ];
 
     /**
+     * Get the actual exams count dynamically.
+     * Uses withCount('exams') if loaded, or counts related exams, fallback to column if null.
+     */
+    public function getExamCountAttribute($value): int
+    {
+        if (isset($this->attributes['exams_count'])) {
+            return (int) $this->attributes['exams_count'];
+        }
+
+        if ($this->relationLoaded('exams')) {
+            return (int) $this->exams->count();
+        }
+
+        // Return the actual count from relationship
+        $actualCount = $this->exams()->count();
+        return $actualCount > 0 ? $actualCount : (int) ($value ?? 0);
+    }
+
+    /**
      * Get the exams for the vendor.
      */
     public function exams()
