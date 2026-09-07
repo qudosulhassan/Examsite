@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 50" width="80" height="50">
+        <path d="M15 32 C25 22, 55 22, 65 32 C60 36, 40 38, 15 32 Z" fill="#EE0000"/>
+        <ellipse cx="40" cy="24" rx="16" ry="10" fill="#EE0000"/>
+        <ellipse cx="40" cy="27" rx="15" ry="3" fill="#111111"/>
+        <text x="40" y="46" font-family="system-ui, sans-serif" font-size="11" font-weight="900" fill="#EE0000" text-anchor="middle">RedHat</text>
+    </svg>

@@ -75,19 +75,28 @@ class Vendor extends Model
      */
     public function getLogoUrlAttribute(): ?string
     {
+        // 1. Check if an official local SVG asset exists for this vendor slug
+        $localSvg = 'images/vendors/' . $this->slug . '.svg';
+        if (file_exists(public_path($localSvg))) {
+            return asset($localSvg);
+        }
+
         if (!$this->logo_path) {
             return null;
         }
 
+        // 2. If it's a full remote URL (e.g. Wikimedia / CDN), return it
         if (str_starts_with($this->logo_path, 'http://') || str_starts_with($this->logo_path, 'https://')) {
             return $this->logo_path;
         }
 
-        if (str_starts_with($this->logo_path, '/storage/')) {
-            return asset($this->logo_path);
+        // 3. If it's a local storage path, only return asset() if the physical file actually exists!
+        $cleaned = ltrim(str_replace('/storage/', '', $this->logo_path), '/');
+        if (file_exists(storage_path('app/public/' . $cleaned)) || file_exists(public_path('storage/' . $cleaned))) {
+            return asset('storage/' . $cleaned);
         }
 
-        return asset('storage/' . ltrim($this->logo_path, '/'));
+        return null;
     }
 }
 

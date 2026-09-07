@@ -217,6 +217,10 @@
                                 'bg' => 'bg-slate-50 border-gray-200', 
                                 'html' => '<div class="grid grid-cols-2 gap-0.5 w-6 h-6"><div class="bg-red-500 w-2.5 h-2.5"></div><div class="bg-green-500 w-2.5 h-2.5"></div><div class="bg-blue-500 w-2.5 h-2.5"></div><div class="bg-yellow-500 w-2.5 h-2.5"></div></div>'
                             ],
+                            'amazon' => [
+                                'bg' => 'bg-zinc-900 border-zinc-700', 
+                                'html' => '<div class="flex flex-col items-center justify-center"><span class="text-[10px] tracking-widest font-extrabold text-white leading-none">AWS</span><svg class="w-6 h-2 text-amber-500 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 8"><path stroke-linecap="round" d="M2 2c6 4 14 4 20 0m-2.5 1.5L22 2l-3.5-1" /></svg></div>'
+                            ],
                             'amazon-web-services-aws' => [
                                 'bg' => 'bg-zinc-900 border-zinc-700', 
                                 'html' => '<div class="flex flex-col items-center justify-center"><span class="text-[10px] tracking-widest font-extrabold text-white leading-none">AWS</span><svg class="w-6 h-2 text-amber-500 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 8"><path stroke-linecap="round" d="M2 2c6 4 14 4 20 0m-2.5 1.5L22 2l-3.5-1" /></svg></div>'
@@ -277,7 +281,10 @@
                     @endphp
                     @if($vendor->logo_url)
                         <div class="h-14 w-14 rounded-xl border border-gray-100 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 bg-white p-2 shadow-sm shrink-0">
-                            <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
+                            <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display:none;" class="w-full h-full items-center justify-center rounded-xl {{ $style['bg'] }}">
+                                {!! $style['html'] !!}
+                            </div>
                         </div>
                     @else
                         <div class="h-14 w-14 rounded-xl border flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 {{ $style['bg'] }} shadow-sm shrink-0">

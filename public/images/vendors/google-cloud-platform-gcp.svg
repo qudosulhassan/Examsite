@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+        <path d="M38 18 C33 18 29 21 28 25 C25 25 22 28 22 31 C22 35 25 38 28 38 L44 38 C48 38 52 34 52 30 C52 26 49 22 45 22 C44 20 41 18 38 18 Z" fill="#4285F4"/>
+        <path d="M24 38 C20 38 16 34 16 30 C16 27 18 24 21 23 C22 21 23 19 25 18 C23 20 21 23 21 26" fill="#EA4335"/>
+        <path d="M28 38 L44 38 C47 38 50 36 51 33" stroke="#34A853" stroke-width="3" fill="none"/>
+        <text x="32" y="54" font-family="system-ui, sans-serif" font-size="14" font-weight="900" fill="#4285F4" text-anchor="middle">GCP</text>
+    </svg>

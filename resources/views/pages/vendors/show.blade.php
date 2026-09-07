@@ -65,6 +65,10 @@
                             'bg' => 'bg-slate-50 border-gray-200', 
                             'html' => '<div class="grid grid-cols-2 gap-0.5 w-8 h-8"><div class="bg-red-500 w-3.5 h-3.5"></div><div class="bg-green-500 w-3.5 h-3.5"></div><div class="bg-blue-500 w-3.5 h-3.5"></div><div class="bg-yellow-500 w-3.5 h-3.5"></div></div>'
                         ],
+                        'amazon' => [
+                            'bg' => 'bg-zinc-900 border-zinc-700', 
+                            'html' => '<div class="flex flex-col items-center justify-center"><span class="text-xs tracking-widest font-extrabold text-white leading-none">AWS</span><svg class="w-8 h-2.5 text-amber-500 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 8"><path stroke-linecap="round" d="M2 2c6 4 14 4 20 0m-2.5 1.5L22 2l-3.5-1" /></svg></div>'
+                        ],
                         'amazon-web-services-aws' => [
                             'bg' => 'bg-zinc-900 border-zinc-700', 
                             'html' => '<div class="flex flex-col items-center justify-center"><span class="text-xs tracking-widest font-extrabold text-white leading-none">AWS</span><svg class="w-8 h-2.5 text-amber-500 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 8"><path stroke-linecap="round" d="M2 2c6 4 14 4 20 0m-2.5 1.5L22 2l-3.5-1" /></svg></div>'
