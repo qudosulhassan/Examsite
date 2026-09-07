@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="mb-6 text-center">
+        <h1 class="text-2xl font-black text-gray-900 dark:text-white">Sign In to Your Account</h1>
+        <p class="text-xs text-gray-500 mt-1">Access your practice test engine and study guides</p>
+    </div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 

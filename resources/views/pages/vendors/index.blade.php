@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Browse IT Certification Providers - ExamsNinja')
+@section('title', 'Browse IT Certification Providers — Exam Topics Base')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->
@@ -150,15 +150,16 @@
                                 'html' => '<span class="text-sm font-bold uppercase text-gray-700">' . substr($vendor->name, 0, 2) . '</span>'
                             ];
                         @endphp
-                        @if($vendor->logo_url)
-                            <div class="h-16 w-16 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 bg-white p-2.5 shrink-0">
-                                <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
-                            </div>
-                        @else
-                            <div class="h-16 w-16 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 shrink-0 {{ $style['bg'] }}">
+                        <div class="h-16 w-16 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 shrink-0 relative {{ $vendor->logo_url ? 'bg-white p-2.5' : $style['bg'] }}">
+                            @if($vendor->logo_url)
+                                <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div style="display:none;" class="w-full h-full items-center justify-center rounded-2xl {{ $style['bg'] }}">
+                                    {!! $style['html'] !!}
+                                </div>
+                            @else
                                 {!! $style['html'] !!}
-                            </div>
-                        @endif
+                            @endif
+                        </div>
                         <div>
                             <h3 class="font-black text-navy text-xl group-hover:text-cyan transition-colors leading-tight">{{ $vendor->name }}</h3>
                         </div>

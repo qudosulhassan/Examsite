@@ -69,7 +69,7 @@ Route::get('/faq', function () {
 })->name('faq');
 
 Route::get('/pricing', function () {
-    return redirect()->route('vendors.index');
+    return redirect()->route('vendors.index', [], 301);
 })->name('pricing');
 
 Route::get('/test-engine', [HomeController::class, 'testEngine'])->name('public.test-engine');

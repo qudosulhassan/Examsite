@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', $vendor->meta_title ?? "{$vendor->name} Certification Exam Study Guides - ExamsNinja")
+@section('title', $vendor->meta_title ?? "{$vendor->name} Certification Exam Study Guides — Exam Topics Base")
 @section('meta_description', $vendor->meta_description ?? "Browse our extensive catalog of updated {$vendor->name} certification exams, study guides, and verified question banks.")
 @section('meta_keywords', $vendor->meta_keywords ?? "{$vendor->name} exams, {$vendor->name} certification, {$vendor->name} practice test, {$vendor->name} dumps")
 @section('canonical_url', route('vendors.show', $vendor->slug))
@@ -97,15 +97,16 @@
                         'html' => '<span class="text-white font-bold text-2xl uppercase">' . substr($vendor->name, 0, 2) . '</span>'
                     ];
                 @endphp
-                @if($vendor->logo_url)
-                    <div class="h-16 w-16 rounded-lg flex items-center justify-center bg-white border-gray-200 p-2">
-                        <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain">
-                    </div>
-                @else
-                    <div class="h-16 w-16 rounded-lg flex items-center justify-center border {{ $style['bg'] }}">
+                <div class="h-16 w-16 rounded-lg flex items-center justify-center shrink-0 relative {{ $vendor->logo_url ? 'bg-white border-gray-200 p-2' : 'border ' . $style['bg'] }}">
+                    @if($vendor->logo_url)
+                        <img src="{{ $vendor->logo_url }}" alt="{{ $vendor->name }}" class="max-h-full max-w-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display:none;" class="w-full h-full items-center justify-center rounded-lg border {{ $style['bg'] }}">
+                            {!! $style['html'] !!}
+                        </div>
+                    @else
                         {!! $style['html'] !!}
-                    </div>
-                @endif
+                    @endif
+                </div>
                 <div>
                     <h1 class="text-3xl font-extrabold tracking-tight mb-2">{{ $vendor->name }} Certification Study Guides</h1>
                     <p class="text-sm text-gray-300 max-w-xl">{{ $vendor->description }}</p>

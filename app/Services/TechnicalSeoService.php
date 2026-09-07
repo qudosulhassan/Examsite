@@ -25,7 +25,6 @@ class TechnicalSeoService
         $staticRoutes = [
             'home' => ['priority' => '1.0', 'changefreq' => 'daily'],
             'vendors.index' => ['priority' => '0.8', 'changefreq' => 'weekly'],
-            'pricing' => ['priority' => '0.8', 'changefreq' => 'weekly'],
             'free-demo.index' => ['priority' => '0.8', 'changefreq' => 'weekly'],
             'faq' => ['priority' => '0.7', 'changefreq' => 'monthly'],
             'about' => ['priority' => '0.6', 'changefreq' => 'monthly'],
@@ -89,7 +88,10 @@ class TechnicalSeoService
         }
 
         // Blog Posts
-        $posts = BlogPost::where('is_published', true)->get();
+        $posts = BlogPost::where(function($q) {
+            $q->where('status', 'published')
+              ->orWhere('is_published', true);
+        })->get();
         $blogUrls = [];
         foreach ($posts as $p) {
             $blogUrls[] = [
@@ -717,7 +719,10 @@ TXT;
     public function analyzeInternalLinking(): array
     {
         $exams = Exam::where('is_active', true)->select('id', 'exam_name', 'exam_code', 'slug', 'vendor_id')->with('vendor')->get();
-        $blogPosts = BlogPost::where('is_published', true)->select('id', 'title', 'slug')->get();
+        $blogPosts = BlogPost::where(function($q) {
+            $q->where('status', 'published')
+              ->orWhere('is_published', true);
+        })->select('id', 'title', 'slug')->get();
 
         $orphanExams = [];
         $lowLinkExams = [];
