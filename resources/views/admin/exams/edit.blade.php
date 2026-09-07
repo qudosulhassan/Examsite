@@ -23,6 +23,7 @@ $workspaceConfig = [
     'headerTitle' => (string)old('header_title', $exam->header_title ?? ''),
     'vendorId' => (string)old('vendor_id', $exam->vendor_id),
     'vendorName' => (string)($exam->vendor ? $exam->vendor->name : 'Unknown Vendor'),
+    'vendorSlug' => (string)($exam->vendor ? $exam->vendor->slug : ''),
     'difficulty' => (string)old('difficulty', $exam->difficulty),
     'examType' => (string)old('exam_type', $exam->exam_type),
     'passingScore' => (int)old('passing_score', $exam->passing_score),
@@ -145,7 +146,7 @@ $workspaceConfig = [
                                         class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2.5 focus:border-cyan focus:ring-cyan shadow-sm bg-white font-medium">
                                     <option value="">Select a vendor...</option>
                                     @foreach($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}" data-name="{{ $vendor->name }}" {{ old('vendor_id', $exam->vendor_id) == $vendor->id ? 'selected' : '' }}>
+                                        <option value="{{ $vendor->id }}" data-name="{{ $vendor->name }}" data-slug="{{ $vendor->slug }}" {{ old('vendor_id', $exam->vendor_id) == $vendor->id ? 'selected' : '' }}>
                                             {{ $vendor->name }}
                                         </option>
                                     @endforeach
@@ -952,7 +953,7 @@ $workspaceConfig = [
                                 <div class="flex items-center space-x-2 text-xs text-[#202124]">
                                     <div class="w-4 h-4 rounded-full bg-cyan/20 flex items-center justify-center text-[10px] font-bold text-navy">E</div>
                                     <span class="text-xs text-[#202124] font-medium">{{ request()->getHost() }}</span>
-                                    <span class="text-gray-400">› exams › <span x-text="slug || (examCode ? examCode.toLowerCase() : 'exam')"></span></span>
+                                    <span class="text-gray-400">› exams › <span x-text="vendorSlug || 'vendor'"></span> › <span x-text="cleanSlug()"></span></span>
                                 </div>
                                 <h4 class="text-base text-[#1a0dab] hover:underline font-medium cursor-pointer truncate"
                                     x-text="metaTitle || (examCode ? examCode + ' - ' + examName + ' Study Guide' : 'Exam Title')"></h4>
@@ -983,10 +984,12 @@ $workspaceConfig = [
                             <!-- Custom URL Slug -->
                             <div>
                                 <label for="slug" class="block text-xs font-bold text-gray-700 uppercase mb-2">
-                                    Custom URL Slug
+                                    Custom URL Slug (Exam Code Only)
                                 </label>
                                 <input type="text" name="slug" id="slug" x-model="slug" @input="markDirty()"
+                                       placeholder="e.g. sc-900"
                                        class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2.5 font-mono text-navy focus:border-cyan focus:ring-cyan shadow-sm">
+                                <p class="text-[11px] text-gray-400 mt-1">Canonical public URL: <span class="font-mono text-navy">/exams/<span x-text="vendorSlug || '{vendor}'"></span>/<span x-text="cleanSlug()"></span></span>. Do not repeat vendor name.</p>
                                 <p class="text-[11px] text-amber-600 mt-1 font-medium flex items-center gap-1">
                                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                     Changing existing slug automatically creates a permanent 301 redirect.
@@ -1261,6 +1264,7 @@ function examWorkspace(initial) {
         headerTitle: initial.headerTitle,
         vendorId: initial.vendorId,
         vendorName: initial.vendorName,
+        vendorSlug: initial.vendorSlug || '',
         difficulty: initial.difficulty,
         examType: initial.examType,
         passingScore: initial.passingScore,
@@ -1300,6 +1304,7 @@ function examWorkspace(initial) {
                 const el = document.getElementById('vendor_id');
                 if (el && el.selectedIndex > 0) {
                     this.vendorName = el.options[el.selectedIndex].getAttribute('data-name') || this.vendorName;
+                    this.vendorSlug = el.options[el.selectedIndex].getAttribute('data-slug') || this.vendorSlug;
                 }
             });
         },
@@ -1312,8 +1317,17 @@ function examWorkspace(initial) {
             const selectedOpt = e.target.options[e.target.selectedIndex];
             if (selectedOpt) {
                 this.vendorName = selectedOpt.getAttribute('data-name') || '';
+                this.vendorSlug = selectedOpt.getAttribute('data-slug') || '';
             }
             this.markDirty();
+        },
+
+        cleanSlug() {
+            let s = (this.slug || (this.examCode ? this.examCode.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : 'exam')).trim();
+            if (this.vendorSlug && s.startsWith(this.vendorSlug + '-')) {
+                s = s.substring(this.vendorSlug.length + 1);
+            }
+            return s || 'exam';
         },
 
         addTopic() {

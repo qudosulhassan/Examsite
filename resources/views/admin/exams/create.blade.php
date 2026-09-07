@@ -23,6 +23,7 @@ $workspaceConfig = [
     'headerTitle' => (string)old('header_title', ''),
     'vendorId' => (string)old('vendor_id', ''),
     'vendorName' => '',
+    'vendorSlug' => '',
     'difficulty' => (string)old('difficulty', 'Associate'),
     'examType' => (string)old('exam_type', 'MultipleChoice'),
     'passingScore' => (int)old('passing_score', 70),
@@ -133,7 +134,7 @@ $workspaceConfig = [
                                         class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2.5 focus:border-cyan focus:ring-cyan shadow-sm bg-white font-medium">
                                     <option value="">Select a vendor...</option>
                                     @foreach($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}" data-name="{{ $vendor->name }}" {{ old('vendor_id') == $vendor->id ? 'selected' : '' }}>
+                                        <option value="{{ $vendor->id }}" data-name="{{ $vendor->name }}" data-slug="{{ $vendor->slug }}" {{ old('vendor_id') == $vendor->id ? 'selected' : '' }}>
                                             {{ $vendor->name }}
                                         </option>
                                     @endforeach
@@ -854,7 +855,7 @@ $workspaceConfig = [
                                 <div class="flex items-center space-x-2 text-xs text-[#202124]">
                                     <div class="w-4 h-4 rounded-full bg-cyan/20 flex items-center justify-center text-[10px] font-bold text-navy">E</div>
                                     <span class="text-xs text-[#202124] font-medium">{{ request()->getHost() }}</span>
-                                    <span class="text-gray-400">› exams › <span x-text="slug || (examCode ? examCode.toLowerCase() : 'exam')"></span></span>
+                                    <span class="text-gray-400">› exams › <span x-text="vendorSlug || 'vendor'"></span> › <span x-text="cleanSlug()"></span></span>
                                 </div>
                                 <h4 class="text-base text-[#1a0dab] hover:underline font-medium cursor-pointer truncate"
                                     x-text="metaTitle || (examCode ? examCode + ' - ' + examName + ' Study Guide' : 'Exam Title')"></h4>
@@ -885,12 +886,12 @@ $workspaceConfig = [
                             <!-- Custom URL Slug -->
                             <div>
                                 <label for="slug" class="block text-xs font-bold text-gray-700 uppercase mb-2">
-                                    Custom URL Slug
+                                    Custom URL Slug (Exam Code Only)
                                 </label>
                                 <input type="text" name="slug" id="slug" x-model="slug" @input="markDirty()"
-                                       placeholder="Leave empty to auto-slugify from exam code"
+                                       placeholder="e.g. sc-900 (leave empty to auto-slugify from exam code)"
                                        class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2.5 font-mono text-navy focus:border-cyan focus:ring-cyan shadow-sm">
-                                <p class="text-[11px] text-gray-400 mt-1">Leave empty to auto-generate from exam code.</p>
+                                <p class="text-[11px] text-gray-400 mt-1">Canonical public URL: <span class="font-mono text-navy">/exams/<span x-text="vendorSlug || '{vendor}'"></span>/<span x-text="cleanSlug()"></span></span>. Do not repeat vendor name.</p>
                                 @error('slug') <p class="text-red-500 text-xs mt-1.5 font-medium">{{ $message }}</p> @enderror
                             </div>
 
@@ -1105,6 +1106,7 @@ function examWorkspace(initial) {
         headerTitle: initial.headerTitle,
         vendorId: initial.vendorId,
         vendorName: initial.vendorName,
+        vendorSlug: initial.vendorSlug || '',
         difficulty: initial.difficulty,
         examType: initial.examType,
         passingScore: initial.passingScore,
@@ -1140,11 +1142,12 @@ function examWorkspace(initial) {
                     e.returnValue = '';
                 }
             });
-            // Auto initialize vendor name if pre-selected
+            // Auto initialize vendor name and slug if pre-selected
             this.$nextTick(() => {
                 const el = document.getElementById('vendor_id');
                 if (el && el.selectedIndex > 0) {
                     this.vendorName = el.options[el.selectedIndex].getAttribute('data-name') || '';
+                    this.vendorSlug = el.options[el.selectedIndex].getAttribute('data-slug') || '';
                 }
             });
         },
@@ -1157,8 +1160,17 @@ function examWorkspace(initial) {
             const selectedOpt = e.target.options[e.target.selectedIndex];
             if (selectedOpt) {
                 this.vendorName = selectedOpt.getAttribute('data-name') || '';
+                this.vendorSlug = selectedOpt.getAttribute('data-slug') || '';
             }
             this.markDirty();
+        },
+
+        cleanSlug() {
+            let s = (this.slug || (this.examCode ? this.examCode.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : 'exam')).trim();
+            if (this.vendorSlug && s.startsWith(this.vendorSlug + '-')) {
+                s = s.substring(this.vendorSlug.length + 1);
+            }
+            return s || 'exam';
         },
 
         addTopic() {

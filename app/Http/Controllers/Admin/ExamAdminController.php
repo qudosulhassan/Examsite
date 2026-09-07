@@ -138,7 +138,9 @@ class ExamAdminController extends Controller
         }
 
         $isActive = $request->input('action') === 'draft' ? false : ($request->has('is_active') ? true : false);
-        $slug = $request->filled('slug') ? Str::slug($request->slug) : Str::slug($request->exam_code);
+        $vendor = Vendor::find($request->vendor_id);
+        $vendorSlug = $vendor ? $vendor->slug : null;
+        $slug = $this->cleanExamSlug($request->slug, $request->exam_code, $vendorSlug);
 
         $exam = Exam::create([
             'vendor_id' => $request->vendor_id,
@@ -277,7 +279,9 @@ class ExamAdminController extends Controller
         }
 
         $isActive = $request->input('action') === 'draft' ? false : ($request->has('is_active') ? $request->boolean('is_active') : (bool)$exam->is_active);
-        $slug = $request->filled('slug') ? Str::slug($request->slug) : Str::slug($request->exam_code);
+        $vendor = Vendor::find($request->vendor_id);
+        $vendorSlug = $vendor ? $vendor->slug : null;
+        $slug = $this->cleanExamSlug($request->slug, $request->exam_code, $vendorSlug);
 
         $updateData = [
             'vendor_id' => $request->vendor_id,
@@ -467,5 +471,35 @@ class ExamAdminController extends Controller
             'size_formatted' => $sizeBytes > 0 ? round($sizeBytes / (1024 * 1024), 2) . ' MB' : 'Available',
             'last_modified' => $lastModified ?: 'Recently',
         ];
+    }
+
+    /**
+     * Clean and normalize exam slug.
+     * Ensures slug does not duplicate vendor prefix (e.g. microsoft-sc-900 -> sc-900).
+     */
+    protected function cleanExamSlug(?string $rawSlug, string $examCode, ?string $vendorSlug = null): string
+    {
+        $raw = trim($rawSlug ?? '');
+
+        // If absolute or relative URL / path entered, extract last segment
+        if (str_contains($raw, '/')) {
+            $parts = array_values(array_filter(explode('/', $raw)));
+            $raw = end($parts) ?: '';
+        }
+
+        $slug = !empty($raw) ? Str::slug($raw) : Str::slug($examCode);
+
+        // Strip leading vendor slug prefix if present (e.g. microsoft-sc-900 -> sc-900)
+        if ($vendorSlug) {
+            $vClean = Str::slug($vendorSlug);
+            if (!empty($vClean) && str_starts_with($slug, $vClean . '-')) {
+                $trimmed = substr($slug, strlen($vClean) + 1);
+                if (!empty($trimmed)) {
+                    $slug = $trimmed;
+                }
+            }
+        }
+
+        return $slug ?: Str::slug($examCode);
     }
 }

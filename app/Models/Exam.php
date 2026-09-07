@@ -16,11 +16,19 @@ class Exam extends Model
         static::updating(function ($exam) {
             if ($exam->isDirty('slug')) {
                 $vendorSlug = $exam->vendor ? $exam->vendor->slug : 'exam';
-                Redirect::create([
-                    'old_url' => 'exams/' . $vendorSlug . '/' . $exam->getOriginal('slug'),
-                    'new_url' => 'exams/' . $vendorSlug . '/' . $exam->slug,
-                    'status_code' => 301,
-                ]);
+                $oldPath = 'exams/' . $vendorSlug . '/' . $exam->getOriginal('slug');
+                $newPath = 'exams/' . $vendorSlug . '/' . $exam->slug;
+
+                if ($oldPath !== $newPath && !Redirect::wouldCauseLoop($oldPath, $newPath)) {
+                    Redirect::firstOrCreate(
+                        ['old_url' => $oldPath],
+                        [
+                            'new_url' => $newPath,
+                            'status_code' => 301,
+                            'is_active' => true,
+                        ]
+                    );
+                }
             }
         });
 

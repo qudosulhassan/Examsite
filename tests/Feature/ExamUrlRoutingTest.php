@@ -70,4 +70,68 @@ class ExamUrlRoutingTest extends TestCase
     {
         $this->assertStringContainsString('/exams/microsoft/az-104', $this->exam->url);
     }
+
+    public function test_creating_exam_generates_nested_url_and_opens_with_200_ok()
+    {
+        $adminUser = \App\Models\User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($adminUser)->post(route('admin.exams.store'), [
+            'vendor_id' => $this->vendor->id,
+            'exam_code' => 'SC-900',
+            'exam_name' => 'Microsoft Security Fundamentals',
+            'price_pdf' => 29.00,
+            'price_engine' => 39.00,
+            'passing_score' => 70,
+            'difficulty' => 'Associate',
+            'exam_type' => 'MultipleChoice',
+            'is_active' => '1',
+            'action' => 'publish',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+
+        $newExam = Exam::where('exam_code', 'SC-900')->first();
+        $this->assertNotNull($newExam);
+        $this->assertEquals('sc-900', $newExam->slug);
+        $this->assertEquals(url('/exams/microsoft/sc-900'), $newExam->url);
+
+        // Confirm public URL opens with 200 OK directly, without hitting 301 or 404
+        $publicResponse = $this->get('/exams/microsoft/sc-900');
+        $publicResponse->assertStatus(200);
+        $publicResponse->assertSee('SC-900');
+
+        // Confirm no unnecessary redirect rule was created for this newly created exam
+        $this->assertDatabaseMissing('redirects', [
+            'old_url' => 'exams/microsoft/sc-900',
+        ]);
+    }
+
+    public function test_exam_slug_strips_duplicate_vendor_prefix()
+    {
+        $adminUser = \App\Models\User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($adminUser)->post(route('admin.exams.store'), [
+            'vendor_id' => $this->vendor->id,
+            'exam_code' => 'MS-900',
+            'exam_name' => 'Microsoft 365 Fundamentals',
+            'slug' => 'microsoft-ms-900', // Admin inadvertently enters vendor prefix
+            'price_pdf' => 29.00,
+            'price_engine' => 39.00,
+            'passing_score' => 70,
+            'difficulty' => 'Associate',
+            'exam_type' => 'MultipleChoice',
+            'is_active' => '1',
+            'action' => 'publish',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+
+        $exam = Exam::where('exam_code', 'MS-900')->first();
+        $this->assertNotNull($exam);
+        $this->assertEquals('ms-900', $exam->slug);
+        $this->assertEquals(url('/exams/microsoft/ms-900'), $exam->url);
+
+        $publicResponse = $this->get('/exams/microsoft/ms-900');
+        $publicResponse->assertStatus(200);
+    }
 }
