@@ -171,79 +171,51 @@
                     <div class="text-xs text-gray-400 mt-0.5">Revenue and order points will populate as customers purchase packages.</div>
                 </div>
             @else
-                <div class="space-y-1">
-                    <!-- Chart Area with Y-axis guides and Bars -->
-                    <div class="relative h-48 w-full flex">
-                        <!-- Left Y-Axis Labels -->
-                        <div class="w-12 sm:w-14 flex-shrink-0 h-full flex flex-col justify-between text-[10px] font-bold text-gray-400 pb-6 pr-2 text-right select-none">
-                            <span>${{ number_format($chartData['maxRevenue']) }}</span>
-                            <span>${{ number_format($chartData['maxRevenue'] / 2) }}</span>
-                            <span>0</span>
-                        </div>
-
-                        <!-- Plot Area (Gridlines + Bars + X-Axis Labels) -->
-                        <div class="flex-1 h-full relative flex flex-col min-w-0">
-                            <!-- Background Horizontal Grid Lines -->
-                            <div class="absolute inset-x-0 top-0 bottom-6 flex flex-col justify-between pointer-events-none">
-                                <div class="border-b border-dashed border-gray-150 w-full"></div>
-                                <div class="border-b border-dashed border-gray-150 w-full"></div>
-                                <div class="border-b border-gray-200 w-full"></div>
-                            </div>
-
-                            <!-- Bars Track Container -->
-                            <div class="relative h-full flex items-end gap-1 sm:gap-1.5 pb-6 overflow-x-auto">
-                                @php
-                                    $totalPts = count($chartData['points']);
-                                    $labelStep = max(1, (int)ceil($totalPts / 10));
-                                @endphp
-                                @foreach($chartData['points'] as $idx => $pt)
-                                    @php
-                                        $hasRev = $pt['revenue'] > 0;
-                                        $heightPercent = ($chartData['maxRevenue'] > 0 && $hasRev) ? max(6, min(100, round(($pt['revenue'] / $chartData['maxRevenue']) * 100))) : 0;
-                                    @endphp
-                                    <div class="flex-1 min-w-[20px] max-w-[48px] h-full flex flex-col items-center justify-end relative group cursor-pointer">
-                                        <!-- Column Hover Highlight Track -->
-                                        <div class="absolute inset-0 bottom-6 rounded-t-lg group-hover:bg-cyan-50/40 transition-colors pointer-events-none"></div>
-
-                                        <!-- Tooltip -->
-                                        <div class="absolute bottom-[calc(100%-1.25rem)] mb-2 hidden group-hover:flex flex-col items-center pointer-events-none z-30 transition-all">
-                                            <div class="bg-navy text-white text-[11px] rounded-xl py-2 px-3 shadow-2xl ring-1 ring-white/10 whitespace-nowrap text-left space-y-1">
-                                                <div class="flex items-center justify-between gap-3 border-b border-white/10 pb-1">
-                                                    <span class="text-[10px] text-gray-300 font-medium">{{ $pt['label'] }}</span>
-                                                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-cyan">{{ $pt['orders'] }} {{ Str::plural('order', $pt['orders']) }}</span>
-                                                </div>
-                                                <div class="font-black text-sm text-cyan flex items-baseline gap-1">
-                                                    <span>${{ number_format($pt['revenue'], 2) }}</span>
-                                                    <span class="text-[9px] text-gray-400 font-normal">revenue</span>
-                                                </div>
-                                            </div>
-                                            <div class="w-2.5 h-2.5 bg-navy transform rotate-45 -mt-1.5 ring-1 ring-white/10"></div>
-                                        </div>
-
-                                        <!-- The Bar -->
-                                        <div class="w-full relative flex flex-col justify-end items-center transition-all duration-300 z-10"
-                                             style="height: {{ $heightPercent }}%;">
-                                            @if($hasRev)
-                                                <div class="w-full h-full rounded-t-md transition-all duration-300 shadow-sm bg-gradient-to-t from-cyan-600 via-cyan-500 to-cyan-400 group-hover:from-cyan-500 group-hover:to-cyan-300 shadow-cyan-500/25">
-                                                    <!-- Top edge highlight -->
-                                                    <div class="h-0.5 w-full bg-white/40 rounded-t-md"></div>
-                                                </div>
-                                            @else
-                                                <!-- Zero Day Indicator: subtle dot on the axis -->
-                                                <div class="w-1.5 h-1.5 rounded-full bg-gray-200 group-hover:bg-cyan-400 group-hover:scale-125 transition-all mb-0.5"></div>
-                                            @endif
-                                        </div>
-
-                                        <!-- X-Axis Date Label directly under the bar -->
-                                        <div class="absolute -bottom-0.5 inset-x-0 text-center text-[10px] font-bold text-gray-400 select-none overflow-visible whitespace-nowrap pointer-events-none">
-                                            @if($idx % $labelStep === 0 || $idx === $totalPts - 1)
-                                                <span>{{ $pt['label'] }}</span>
-                                            @endif
-                                        </div>
+                <div class="space-y-2">
+                    <!-- Bars Container -->
+                    <div class="h-44 w-full flex items-end gap-1 sm:gap-2 pt-6 pb-2 px-2 overflow-x-auto border-b border-gray-100">
+                        @foreach($chartData['points'] as $pt)
+                            @php
+                                $hasRev = $pt['revenue'] > 0;
+                                $heightPercent = ($chartData['maxRevenue'] > 0 && $hasRev) ? max(6, round(($pt['revenue'] / $chartData['maxRevenue']) * 100)) : 0;
+                            @endphp
+                            <div class="flex-1 min-w-[20px] max-w-[48px] flex flex-col items-center group relative h-full justify-end cursor-pointer">
+                                <!-- Tooltip -->
+                                <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center pointer-events-none z-30">
+                                    <div class="bg-navy text-white text-[11px] rounded-lg py-1.5 px-2.5 shadow-xl whitespace-nowrap text-center">
+                                        <div class="font-bold text-cyan">${{ number_format($pt['revenue'], 2) }}</div>
+                                        <div class="text-[9px] text-gray-300">{{ $pt['orders'] }} {{ Str::plural('order', $pt['orders']) }} • {{ $pt['label'] }}</div>
                                     </div>
-                                @endforeach
+                                    <div class="w-2 h-2 bg-navy transform rotate-45 -mt-1"></div>
+                                </div>
+
+                                <!-- Bar Column -->
+                                <div class="w-full rounded-t-md transition-all duration-300 relative group-hover:brightness-110 origin-bottom"
+                                     style="height: {{ $heightPercent }}%; background: {{ $hasRev ? '#00D4AA' : 'transparent' }};">
+                                    @if($hasRev)
+                                        <div class="absolute inset-x-0 top-0 h-1 bg-white/40 rounded-t-md"></div>
+                                    @endif
+                                </div>
+
+                                <!-- Zero Day Indicator -->
+                                @if(!$hasRev)
+                                    <div class="w-1.5 h-1.5 rounded-full bg-gray-200 group-hover:bg-cyan transition-colors mb-0.5"></div>
+                                @endif
                             </div>
-                        </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Labels Row -->
+                    <div class="w-full flex justify-between px-2 text-[10px] font-bold text-gray-400 overflow-x-auto">
+                        @php
+                            $totalPts = count($chartData['points']);
+                            $step = max(1, (int)ceil($totalPts / 10));
+                        @endphp
+                        @foreach($chartData['points'] as $idx => $pt)
+                            @if($idx % $step === 0 || $idx === $totalPts - 1)
+                                <span>{{ $pt['label'] }}</span>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
             @endif
