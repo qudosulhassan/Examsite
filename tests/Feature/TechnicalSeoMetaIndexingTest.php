@@ -135,21 +135,32 @@ class TechnicalSeoMetaIndexingTest extends TestCase
         $publicResponse->assertSee('<meta name="p:domain_verify" content="7f8a9b12345">', false);
     }
 
-    public function test_public_pages_do_not_have_noindex_x_robots_tag_when_indexed()
+    public function test_public_pages_return_index_follow_in_x_robots_tag_header()
     {
         Setting::set('seo_robots_index', 'index');
         Setting::set('seo_robots_follow', 'follow');
         Setting::clearCache();
 
+        // 1. Homepage
         $response = $this->get('/');
         $response->assertStatus(200);
-        
-        // Ensure no X-Robots-Tag noindex header is emitted on public pages
-        $xRobots = $response->headers->get('X-Robots-Tag');
-        $this->assertTrue(empty($xRobots) || !str_contains($xRobots, 'noindex'), "Public page should not emit noindex X-Robots-Tag: {$xRobots}");
-        
-        // Ensure HTML meta tag has index, follow
+        $this->assertEquals('index, follow', $response->headers->get('X-Robots-Tag'));
         $response->assertSee('<meta name="robots" content="index, follow', false);
+
+        // 2. Vendors directory
+        $vendorResponse = $this->get('/vendors');
+        $vendorResponse->assertStatus(200);
+        $this->assertEquals('index, follow', $vendorResponse->headers->get('X-Robots-Tag'));
+
+        // 3. Blog directory
+        $blogResponse = $this->get('/blog');
+        $blogResponse->assertStatus(200);
+        $this->assertEquals('index, follow', $blogResponse->headers->get('X-Robots-Tag'));
+
+        // 4. Certifications directory
+        $certResponse = $this->get('/certifications');
+        $certResponse->assertStatus(200);
+        $this->assertEquals('index, follow', $certResponse->headers->get('X-Robots-Tag'));
     }
 
     public function test_private_pages_have_noindex_nofollow_in_headers_and_meta()
@@ -172,6 +183,14 @@ class TechnicalSeoMetaIndexingTest extends TestCase
         $adminResponse->assertSee('<meta name="robots" content="noindex, nofollow">', false);
     }
 
+    public function test_search_page_returns_noindex_follow_header()
+    {
+        $searchResponse = $this->get('/search?q=test');
+        $searchResponse->assertStatus(200);
+        $this->assertEquals('noindex, follow', $searchResponse->headers->get('X-Robots-Tag'));
+        $searchResponse->assertSee('<meta name="robots" content="noindex, follow">', false);
+    }
+
     public function test_directives_sync_with_legacy_robots_setting()
     {
         $this->actingAs($this->admin)->post(route('admin.seo.update'), [
@@ -184,5 +203,9 @@ class TechnicalSeoMetaIndexingTest extends TestCase
         ]);
 
         $this->assertEquals('noindex, nofollow', Setting::get('robots_setting'));
+
+        // Public pages now return noindex, nofollow
+        $response = $this->get('/');
+        $this->assertEquals('noindex, nofollow', $response->headers->get('X-Robots-Tag'));
     }
 }

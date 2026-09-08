@@ -23,7 +23,8 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'microphone=(), camera=(), geolocation=()');
         
-        // Smart X-Robots-Tag: Explicitly noindex private/admin/auth/checkout/engine pages.
+        // Route-specific X-Robots-Tag: Public SEO pages return index, follow.
+        // Private admin, auth, checkout, dashboard, and test-session pages return noindex, nofollow.
         $isPrivate = $request->is([
             'admin*',
             'dashboard*',
@@ -37,28 +38,47 @@ class SecurityHeaders
             'password*',
             'forgot-password',
             'reset-password*',
+            'verify-email*',
+            'confirm-password',
             'cart*',
             'checkout*',
             'demo-test-engine/session*',
             'demo-test-engine/results*',
+            'test-session*',
+            'exam-session*',
+            'practice-exam*',
+            'simulator*',
             'api*',
             'webhook*',
             'webhooks*',
+        ]) || $response->getStatusCode() >= 400;
+
+        $isSearch = $request->is([
+            'search*',
+            'blog/search*',
         ]);
 
-        if ($isPrivate) {
+        $isFeedOrMeta = $request->is([
+            'robots.txt',
+            'sitemap*.xml',
+            '*.xml',
+        ]);
+
+        if ($isFeedOrMeta) {
+            $response->headers->remove('X-Robots-Tag');
+        } elseif ($isPrivate) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        } elseif ($isSearch) {
+            $response->headers->set('X-Robots-Tag', 'noindex, follow');
         } else {
-            // For public routes, check if Technical SEO setting is explicitly noindex
+            // Public SEO pages (exams, vendors, certifications, blog, home, and static pages)
             try {
-                $robotsSetting = app(\App\Services\TechnicalSeoService::class)->getRobotsMetaDirective();
-                if (str_contains($robotsSetting, 'noindex')) {
-                    $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
-                } else {
-                    $response->headers->remove('X-Robots-Tag');
-                }
+                $index = \App\Models\Setting::get('seo_robots_index', 'index');
+                $follow = \App\Models\Setting::get('seo_robots_follow', 'follow');
+
+                $response->headers->set('X-Robots-Tag', "{$index}, {$follow}");
             } catch (\Throwable $e) {
-                $response->headers->remove('X-Robots-Tag');
+                $response->headers->set('X-Robots-Tag', 'index, follow');
             }
         }
         
