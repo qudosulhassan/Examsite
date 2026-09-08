@@ -61,9 +61,9 @@
     <meta property="twitter:card" content="{{ $globalSettings['seo_twitter_card'] ?? 'summary_large_image' }}">
     <meta property="twitter:site" content="{{ $globalSettings['social_twitter'] ?? config('seo.social.twitter_handle') }}">
     <meta property="twitter:url" content="@yield('canonical_url', $computedCanonical)">
-    <meta property="twitter:title" content="@yield('title', config('seo.defaults.title'))">
-    <meta property="twitter:description" content="@yield('meta_description', config('seo.defaults.description'))">
-    <meta property="twitter:image" content="@yield('og_image', asset(config('seo.defaults.og_image', 'images/og-default.png')))">
+    <meta property="twitter:title" content="@yield('title', $globalSettings['default_og_title'] ?? ($globalSettings['default_seo_title'] ?? config('seo.defaults.title')))">
+    <meta property="twitter:description" content="@yield('meta_description', $globalSettings['default_og_description'] ?? ($globalSettings['default_meta_description'] ?? config('seo.defaults.description')))">
+    <meta property="twitter:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')))">
 
     <!-- Structured Data (JSON-LD) -->
     @if(($globalSettings['seo_schema_master_enabled'] ?? '1') === '1')

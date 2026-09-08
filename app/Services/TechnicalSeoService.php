@@ -491,17 +491,20 @@ TXT;
         if (Setting::get('seo_robots_noarchive', '0') === '1') {
             $directives[] = 'noarchive';
         }
-        if (Setting::get('seo_robots_nosnippet', '0') === '1') {
+
+        $nosnippet = Setting::get('seo_robots_nosnippet', '0') === '1';
+        if ($nosnippet) {
             $directives[] = 'nosnippet';
-        }
-        if (Setting::get('seo_robots_max_snippet', '1') === '1') {
-            $directives[] = 'max-snippet:-1';
-        }
-        if (Setting::get('seo_robots_max_image_preview', '1') === '1') {
-            $directives[] = 'max-image-preview:large';
-        }
-        if (Setting::get('seo_robots_max_video_preview', '1') === '1') {
-            $directives[] = 'max-video-preview:-1';
+        } else {
+            if (Setting::get('seo_robots_max_snippet', '1') === '1') {
+                $directives[] = 'max-snippet:-1';
+            }
+            if (Setting::get('seo_robots_max_image_preview', '1') === '1') {
+                $directives[] = 'max-image-preview:large';
+            }
+            if (Setting::get('seo_robots_max_video_preview', '1') === '1') {
+                $directives[] = 'max-video-preview:-1';
+            }
         }
 
         return implode(', ', $directives);

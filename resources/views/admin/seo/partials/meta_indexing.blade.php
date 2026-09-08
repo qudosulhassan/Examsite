@@ -1,7 +1,43 @@
-<div class="space-y-6">
+<div class="space-y-6" x-data="{
+    indexDir: '{{ old('seo_robots_index', $settings['seo_robots_index'] ?? 'index') }}',
+    followDir: '{{ old('seo_robots_follow', $settings['seo_robots_follow'] ?? 'follow') }}',
+    noarchive: {{ old('seo_robots_noarchive', $settings['seo_robots_noarchive'] ?? '0') === '1' ? 'true' : 'false' }},
+    nosnippet: {{ old('seo_robots_nosnippet', $settings['seo_robots_nosnippet'] ?? '0') === '1' ? 'true' : 'false' }},
+    maxImagePreview: {{ old('seo_robots_max_image_preview', $settings['seo_robots_max_image_preview'] ?? '1') === '1' ? 'true' : 'false' }},
+    get computedRobotsDirective() {
+        let parts = [this.indexDir, this.followDir];
+        if (this.noarchive) {
+            parts.push('noarchive');
+        }
+        if (this.nosnippet) {
+            parts.push('nosnippet');
+        } else {
+            parts.push('max-snippet:-1');
+            if (this.maxImagePreview) {
+                parts.push('max-image-preview:large');
+            }
+            parts.push('max-video-preview:-1');
+        }
+        return parts.join(', ');
+    }
+}">
     <form action="{{ route('admin.seo.update') }}" method="POST" class="space-y-6">
         @csrf
         <input type="hidden" name="active_tab" value="meta_indexing">
+
+        @if ($errors->any())
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl shadow-sm">
+                <div class="flex items-center gap-2 text-red-800 font-bold text-xs mb-1">
+                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    <span>Please correct the errors below:</span>
+                </div>
+                <ul class="list-disc list-inside text-xs text-red-700 space-y-0.5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="space-y-1">
@@ -23,18 +59,24 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="seo_robots_index" class="block text-xs font-bold text-navy mb-1.5 uppercase tracking-wide">Index Directive</label>
-                    <select name="seo_robots_index" id="seo_robots_index" class="w-full text-xs border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-medium">
-                        <option value="index" {{ ($settings['seo_robots_index'] ?? 'index') === 'index' ? 'selected' : '' }}>index (Allow pages to appear in search results - Recommended)</option>
-                        <option value="noindex" {{ ($settings['seo_robots_index'] ?? '') === 'noindex' ? 'selected' : '' }}>noindex (Block all search indexing - Staging / Maintenance)</option>
+                    <select name="seo_robots_index" id="seo_robots_index" x-model="indexDir" class="w-full text-xs border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-medium">
+                        <option value="index">index (Allow pages to appear in search results - Recommended)</option>
+                        <option value="noindex">noindex (Block all search indexing - Staging / Maintenance)</option>
                     </select>
+                    @error('seo_robots_index')
+                        <p class="mt-1 text-[11px] text-red-600 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
                     <label for="seo_robots_follow" class="block text-xs font-bold text-navy mb-1.5 uppercase tracking-wide">Follow Directive</label>
-                    <select name="seo_robots_follow" id="seo_robots_follow" class="w-full text-xs border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-medium">
-                        <option value="follow" {{ ($settings['seo_robots_follow'] ?? 'follow') === 'follow' ? 'selected' : '' }}>follow (Allow search spiders to follow on-page links - Recommended)</option>
-                        <option value="nofollow" {{ ($settings['seo_robots_follow'] ?? '') === 'nofollow' ? 'selected' : '' }}>nofollow (Instruct crawlers not to follow internal or external links)</option>
+                    <select name="seo_robots_follow" id="seo_robots_follow" x-model="followDir" class="w-full text-xs border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-medium">
+                        <option value="follow">follow (Allow search spiders to follow on-page links - Recommended)</option>
+                        <option value="nofollow">nofollow (Instruct crawlers not to follow internal or external links)</option>
                     </select>
+                    @error('seo_robots_follow')
+                        <p class="mt-1 text-[11px] text-red-600 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
@@ -44,28 +86,31 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <label class="flex items-center space-x-3 bg-gray-50 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100/80 transition">
                         <input type="hidden" name="seo_robots_noarchive" value="0">
-                        <input type="checkbox" name="seo_robots_noarchive" value="1" {{ ($settings['seo_robots_noarchive'] ?? '0') === '1' ? 'checked' : '' }} class="rounded border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
+                        <input type="checkbox" name="seo_robots_noarchive" value="1" x-model="noarchive" class="rounded border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
                         <span class="text-xs font-semibold text-gray-700">noarchive <span class="text-[10px] text-gray-400 block font-normal">Do not show cached link in SERP</span></span>
                     </label>
 
                     <label class="flex items-center space-x-3 bg-gray-50 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100/80 transition">
                         <input type="hidden" name="seo_robots_nosnippet" value="0">
-                        <input type="checkbox" name="seo_robots_nosnippet" value="1" {{ ($settings['seo_robots_nosnippet'] ?? '0') === '1' ? 'checked' : '' }} class="rounded border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
+                        <input type="checkbox" name="seo_robots_nosnippet" value="1" x-model="nosnippet" class="rounded border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
                         <span class="text-xs font-semibold text-gray-700">nosnippet <span class="text-[10px] text-gray-400 block font-normal">Do not show text snippet or video preview</span></span>
                     </label>
 
                     <label class="flex items-center space-x-3 bg-gray-50 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100/80 transition">
                         <input type="hidden" name="seo_robots_max_image_preview" value="0">
-                        <input type="checkbox" name="seo_robots_max_image_preview" value="1" {{ ($settings['seo_robots_max_image_preview'] ?? '1') === '1' ? 'checked' : '' }} class="rounded border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
+                        <input type="checkbox" name="seo_robots_max_image_preview" value="1" x-model="maxImagePreview" class="rounded border-gray-300 text-cyan focus:ring-cyan h-4 w-4">
                         <span class="text-xs font-semibold text-gray-700">max-image-preview:large <span class="text-[10px] text-gray-400 block font-normal">Enable large image rich previews in Google Discover</span></span>
                     </label>
                 </div>
             </div>
 
-            <!-- Live Tag Preview -->
+            <!-- Live Tag Preview (Dynamic & Realtime) -->
             <div class="bg-gray-900 text-cyan p-4 rounded-xl font-mono text-xs space-y-1">
-                <span class="text-gray-400 text-[10px] uppercase tracking-wider block font-bold">Generated Output Tag</span>
-                <code>&lt;meta name="robots" content="{{ app(\App\Services\TechnicalSeoService::class)->getRobotsMetaDirective() }}"&gt;</code>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-400 text-[10px] uppercase tracking-wider block font-bold">Generated Output Tag</span>
+                    <span class="text-[10px] text-cyan/70 font-sans font-semibold">Live Preview (Updates instantly)</span>
+                </div>
+                <code>&lt;meta name="robots" content="<span x-text="computedRobotsDirective">{{ app(\App\Services\TechnicalSeoService::class)->getRobotsMetaDirective() }}</span>"&gt;</code>
             </div>
         </div>
 
@@ -77,24 +122,36 @@
                 <div>
                     <label for="default_og_title" class="block text-xs font-bold text-navy mb-1 uppercase tracking-wide">Default Social Share Title</label>
                     <input type="text" name="default_og_title" id="default_og_title" value="{{ old('default_og_title', $settings['default_og_title'] ?? '') }}" placeholder="{{ $settings['site_name'] ?? 'Exam Topics Base' }}" class="w-full text-xs border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
+                    @error('default_og_title')
+                        <p class="mt-1 text-[11px] text-red-600 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
                     <label for="seo_twitter_card" class="block text-xs font-bold text-navy mb-1 uppercase tracking-wide">Twitter Card Format</label>
                     <select name="seo_twitter_card" id="seo_twitter_card" class="w-full text-xs border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
-                        <option value="summary_large_image" {{ ($settings['seo_twitter_card'] ?? 'summary_large_image') === 'summary_large_image' ? 'selected' : '' }}>summary_large_image (High-impact large social preview - Recommended)</option>
-                        <option value="summary" {{ ($settings['seo_twitter_card'] ?? '') === 'summary' ? 'selected' : '' }}>summary (Compact square image preview)</option>
+                        <option value="summary_large_image" {{ old('seo_twitter_card', $settings['seo_twitter_card'] ?? 'summary_large_image') === 'summary_large_image' ? 'selected' : '' }}>summary_large_image (High-impact large social preview - Recommended)</option>
+                        <option value="summary" {{ old('seo_twitter_card', $settings['seo_twitter_card'] ?? '') === 'summary' ? 'selected' : '' }}>summary (Compact square image preview)</option>
                     </select>
+                    @error('seo_twitter_card')
+                        <p class="mt-1 text-[11px] text-red-600 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="md:col-span-2">
                     <label for="default_og_description" class="block text-xs font-bold text-navy mb-1 uppercase tracking-wide">Default Social Description</label>
                     <textarea name="default_og_description" id="default_og_description" rows="2" class="w-full text-xs border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">{{ old('default_og_description', $settings['default_og_description'] ?? '') }}</textarea>
+                    @error('default_og_description')
+                        <p class="mt-1 text-[11px] text-red-600 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
                     <label for="seo_facebook_app_id" class="block text-xs font-bold text-navy mb-1 uppercase tracking-wide">Facebook App ID (Optional)</label>
                     <input type="text" name="seo_facebook_app_id" id="seo_facebook_app_id" value="{{ old('seo_facebook_app_id', $settings['seo_facebook_app_id'] ?? '') }}" placeholder="123456789012345" class="w-full text-xs border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
+                    @error('seo_facebook_app_id')
+                        <p class="mt-1 text-[11px] text-red-600 font-semibold">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 

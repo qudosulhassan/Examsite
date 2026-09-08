@@ -32,6 +32,9 @@ class TechnicalSeoAdminController extends Controller
         $settings['site_url'] = $settings['site_url'] ?? config('app.url', 'http://127.0.0.1:8000');
         $settings['seo_robots_index'] = $settings['seo_robots_index'] ?? 'index';
         $settings['seo_robots_follow'] = $settings['seo_robots_follow'] ?? 'follow';
+        $settings['seo_robots_noarchive'] = $settings['seo_robots_noarchive'] ?? '0';
+        $settings['seo_robots_nosnippet'] = $settings['seo_robots_nosnippet'] ?? '0';
+        $settings['seo_robots_max_image_preview'] = $settings['seo_robots_max_image_preview'] ?? '1';
         $settings['seo_canonical_force_https'] = $settings['seo_canonical_force_https'] ?? '1';
         $settings['seo_schema_master_enabled'] = $settings['seo_schema_master_enabled'] ?? '1';
 
@@ -121,11 +124,53 @@ class TechnicalSeoAdminController extends Controller
     public function updateSettings(Request $request)
     {
         $tab = $request->get('active_tab', 'overview');
+
+        if ($tab === 'meta_indexing') {
+            $validated = $request->validate([
+                'seo_robots_index' => 'required|string|in:index,noindex',
+                'seo_robots_follow' => 'required|string|in:follow,nofollow',
+                'seo_robots_noarchive' => 'nullable|in:0,1',
+                'seo_robots_nosnippet' => 'nullable|in:0,1',
+                'seo_robots_max_image_preview' => 'nullable|in:0,1',
+                'default_og_title' => 'nullable|string|max:255',
+                'default_og_description' => 'nullable|string|max:1000',
+                'seo_twitter_card' => 'nullable|string|in:summary,summary_large_image',
+                'seo_facebook_app_id' => 'nullable|string|max:100',
+            ]);
+
+            // Ensure checkbox booleans are normalized ('1' or '0')
+            Setting::set('seo_robots_index', $validated['seo_robots_index']);
+            Setting::set('seo_robots_follow', $validated['seo_robots_follow']);
+            Setting::set('seo_robots_noarchive', $request->input('seo_robots_noarchive') === '1' ? '1' : '0');
+            Setting::set('seo_robots_nosnippet', $request->input('seo_robots_nosnippet') === '1' ? '1' : '0');
+            Setting::set('seo_robots_max_image_preview', $request->input('seo_robots_max_image_preview') === '1' ? '1' : '0');
+
+            if ($request->has('default_og_title')) {
+                Setting::set('default_og_title', (string) $request->input('default_og_title'));
+            }
+            if ($request->has('default_og_description')) {
+                Setting::set('default_og_description', (string) $request->input('default_og_description'));
+            }
+            if ($request->has('seo_twitter_card')) {
+                Setting::set('seo_twitter_card', (string) $request->input('seo_twitter_card'));
+            }
+            if ($request->has('seo_facebook_app_id')) {
+                Setting::set('seo_facebook_app_id', (string) $request->input('seo_facebook_app_id'));
+            }
+
+            Setting::clearCache();
+
+            return redirect()->route('admin.seo.index', ['tab' => $tab])
+                ->with('success', 'Meta & Indexing directives saved and applied successfully.');
+        }
+
         $inputs = $request->except(['_token', 'active_tab']);
 
         foreach ($inputs as $key => $value) {
             Setting::set($key, is_array($value) ? json_encode($value) : (string)$value);
         }
+
+        Setting::clearCache();
 
         return redirect()->route('admin.seo.index', ['tab' => $tab])
             ->with('success', 'Technical SEO settings saved successfully.');
