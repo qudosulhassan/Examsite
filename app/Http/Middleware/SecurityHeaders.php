@@ -23,8 +23,43 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'microphone=(), camera=(), geolocation=()');
         
-        if ($robots = config('seo.defaults.robots')) {
-            $response->headers->set('X-Robots-Tag', $robots);
+        // Smart X-Robots-Tag: Explicitly noindex private/admin/auth/checkout/engine pages.
+        $isPrivate = $request->is([
+            'admin*',
+            'dashboard*',
+            'user*',
+            'profile*',
+            'my-account*',
+            'orders*',
+            'downloads*',
+            'login',
+            'register',
+            'password*',
+            'forgot-password',
+            'reset-password*',
+            'cart*',
+            'checkout*',
+            'demo-test-engine/session*',
+            'demo-test-engine/results*',
+            'api*',
+            'webhook*',
+            'webhooks*',
+        ]);
+
+        if ($isPrivate) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        } else {
+            // For public routes, check if Technical SEO setting is explicitly noindex
+            try {
+                $robotsSetting = app(\App\Services\TechnicalSeoService::class)->getRobotsMetaDirective();
+                if (str_contains($robotsSetting, 'noindex')) {
+                    $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+                } else {
+                    $response->headers->remove('X-Robots-Tag');
+                }
+            } catch (\Throwable $e) {
+                $response->headers->remove('X-Robots-Tag');
+            }
         }
         
         if (app()->environment('production')) {

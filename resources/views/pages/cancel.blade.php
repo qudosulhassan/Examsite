@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Order Cancelled - Exam Topics Base')
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <section class="py-20 bg-gray-50 min-h-[700px] flex items-center relative overflow-hidden">

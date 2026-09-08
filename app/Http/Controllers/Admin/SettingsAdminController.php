@@ -381,6 +381,21 @@ class SettingsAdminController extends Controller
             }
         }
 
+        // Sync legacy robots_setting with Technical SEO controls
+        if (isset($validated['robots_setting'])) {
+            $val = strtolower($validated['robots_setting']);
+            if (str_contains($val, 'noindex')) {
+                Setting::set('seo_robots_index', 'noindex');
+            } elseif (str_contains($val, 'index')) {
+                Setting::set('seo_robots_index', 'index');
+            }
+            if (str_contains($val, 'nofollow')) {
+                Setting::set('seo_robots_follow', 'nofollow');
+            } elseif (str_contains($val, 'follow')) {
+                Setting::set('seo_robots_follow', 'follow');
+            }
+        }
+
         // Clear cached settings
         Setting::clearCache();
 

@@ -147,6 +147,7 @@ class TechnicalSeoAdminController extends Controller
             // Ensure checkbox booleans are normalized ('1' or '0')
             Setting::set('seo_robots_index', $validated['seo_robots_index']);
             Setting::set('seo_robots_follow', $validated['seo_robots_follow']);
+            Setting::set('robots_setting', $validated['seo_robots_index'] . ', ' . $validated['seo_robots_follow']);
             Setting::set('seo_robots_noarchive', $request->input('seo_robots_noarchive') === '1' ? '1' : '0');
             Setting::set('seo_robots_nosnippet', $request->input('seo_robots_nosnippet') === '1' ? '1' : '0');
             Setting::set('seo_robots_max_image_preview', $request->input('seo_robots_max_image_preview') === '1' ? '1' : '0');

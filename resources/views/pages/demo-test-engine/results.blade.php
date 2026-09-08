@@ -1,4 +1,6 @@
 @extends('layouts.public')
+@section('title', 'Demo Test Engine Results - Exam Topics Base')
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <div class="max-w-4xl mx-auto space-y-10 py-16 px-4 sm:px-6 relative z-10">

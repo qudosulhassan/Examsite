@@ -23,8 +23,10 @@
         $pinterestVerification = $globalSettings['seo_pinterest_verification'] ?? '';
 
         $seoService = app(\App\Services\TechnicalSeoService::class);
-        $computedCanonical = $seoService->buildCanonicalUrl();
-        $computedRobots = $seoService->getRobotsMetaDirective();
+        $rawCanonical = trim($__env->yieldContent('canonical_url'));
+        $computedCanonical = !empty($rawCanonical) ? $seoService->buildCanonicalUrl($rawCanonical) : $seoService->buildCanonicalUrl();
+        $yieldRobots = trim($__env->yieldContent('robots'));
+        $computedRobots = !empty($yieldRobots) ? $yieldRobots : $seoService->getRobotsMetaDirective();
     @endphp
     @if(!empty($gscVerification))
         <meta name="google-site-verification" content="{{ $gscVerification }}">
@@ -42,13 +44,13 @@
     <title>@yield('title', $globalSettings['default_seo_title'] ?? config('seo.defaults.title'))</title>
     <meta name="description" content="@yield('meta_description', $globalSettings['default_meta_description'] ?? config('seo.defaults.description'))">
     <meta name="keywords" content="@yield('meta_keywords', $globalSettings['default_meta_keywords'] ?? config('seo.defaults.keywords'))">
-    <link rel="canonical" href="@yield('canonical_url', $computedCanonical)">
-    <meta name="robots" content="@yield('robots', $computedRobots)">
-    <meta name="googlebot" content="@yield('googlebot', $computedRobots)">
+    <link rel="canonical" href="{{ $computedCanonical }}">
+    <meta name="robots" content="{{ $computedRobots }}">
+    <meta name="googlebot" content="{{ $computedRobots }}">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', $globalSettings['seo_og_type'] ?? config('seo.defaults.og_type', 'website'))">
-    <meta property="og:url" content="@yield('canonical_url', $computedCanonical)">
+    <meta property="og:url" content="{{ $computedCanonical }}">
     <meta property="og:title" content="@yield('title', $globalSettings['default_og_title'] ?? ($globalSettings['default_seo_title'] ?? config('seo.defaults.title')))">
     <meta property="og:description" content="@yield('meta_description', $globalSettings['default_og_description'] ?? ($globalSettings['default_meta_description'] ?? config('seo.defaults.description')))">
     <meta property="og:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')))">

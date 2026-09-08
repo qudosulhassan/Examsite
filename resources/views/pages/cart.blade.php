@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Shopping Cart - Exam Topics Base')
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->

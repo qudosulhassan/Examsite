@@ -1,7 +1,8 @@
 @extends('layouts.public')
 
 @section('title', $certification->meta_title ?? $certification->name . ' Certification')
-@section('description', $certification->meta_description ?? 'Study and practice for the ' . $certification->name . ' certification exams.')
+@section('meta_description', $certification->meta_description ?? 'Study and practice for the ' . $certification->name . ' certification exams.')
+@section('canonical_url', route('certifications.show', $certification->slug))
 
 @section('content')
 

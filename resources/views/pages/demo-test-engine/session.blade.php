@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', "{$exam->exam_code} — Practice Test Engine")
+@section('robots', 'noindex, nofollow')
 
 @section('styles')
 <style>

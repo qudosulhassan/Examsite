@@ -134,4 +134,55 @@ class TechnicalSeoMetaIndexingTest extends TestCase
         $publicResponse->assertSee('<meta name="yandex-verification" content="a1b2c3d4e5f6g7h8">', false);
         $publicResponse->assertSee('<meta name="p:domain_verify" content="7f8a9b12345">', false);
     }
+
+    public function test_public_pages_do_not_have_noindex_x_robots_tag_when_indexed()
+    {
+        Setting::set('seo_robots_index', 'index');
+        Setting::set('seo_robots_follow', 'follow');
+        Setting::clearCache();
+
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        
+        // Ensure no X-Robots-Tag noindex header is emitted on public pages
+        $xRobots = $response->headers->get('X-Robots-Tag');
+        $this->assertTrue(empty($xRobots) || !str_contains($xRobots, 'noindex'), "Public page should not emit noindex X-Robots-Tag: {$xRobots}");
+        
+        // Ensure HTML meta tag has index, follow
+        $response->assertSee('<meta name="robots" content="index, follow', false);
+    }
+
+    public function test_private_pages_have_noindex_nofollow_in_headers_and_meta()
+    {
+        // 1. Auth / Login page
+        $loginResponse = $this->get('/login');
+        $loginResponse->assertStatus(200);
+        $this->assertEquals('noindex, nofollow', $loginResponse->headers->get('X-Robots-Tag'));
+        $loginResponse->assertSee('<meta name="robots" content="noindex, nofollow">', false);
+
+        // 2. Cart page
+        $cartResponse = $this->get('/cart');
+        $cartResponse->assertStatus(200);
+        $this->assertEquals('noindex, nofollow', $cartResponse->headers->get('X-Robots-Tag'));
+        $cartResponse->assertSee('<meta name="robots" content="noindex, nofollow">', false);
+
+        // 3. Admin dashboard
+        $adminResponse = $this->actingAs($this->admin)->get('/admin');
+        $this->assertEquals('noindex, nofollow', $adminResponse->headers->get('X-Robots-Tag'));
+        $adminResponse->assertSee('<meta name="robots" content="noindex, nofollow">', false);
+    }
+
+    public function test_directives_sync_with_legacy_robots_setting()
+    {
+        $this->actingAs($this->admin)->post(route('admin.seo.update'), [
+            'active_tab' => 'meta_indexing',
+            'seo_robots_index' => 'noindex',
+            'seo_robots_follow' => 'nofollow',
+            'seo_robots_noarchive' => '0',
+            'seo_robots_nosnippet' => '0',
+            'seo_robots_max_image_preview' => '1',
+        ]);
+
+        $this->assertEquals('noindex, nofollow', Setting::get('robots_setting'));
+    }
 }

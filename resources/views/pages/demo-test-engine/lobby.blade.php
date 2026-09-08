@@ -1,4 +1,6 @@
 @extends('layouts.public')
+@section('title', "{$exam->exam_code} Practice Exam Demo - Exam Topics Base")
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <div class="relative bg-gradient-to-br from-[#07101E] via-navy to-[#0F172A] min-h-[calc(100vh-100px)] py-12 px-4 sm:px-6 overflow-hidden">

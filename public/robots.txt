@@ -10,6 +10,10 @@ Disallow: /webhook/
 Disallow: /login
 Disallow: /register
 Disallow: /password/
+Disallow: /search
+Disallow: /search?*
+Disallow: /demo-test-engine/session/
+Disallow: /demo-test-engine/results/
 Disallow: /*?*sort=*
 Disallow: /*?*filter=*
 

@@ -11,11 +11,6 @@
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://localhost/pricing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-            </url>
-    <url>
     <loc>http://localhost/free-demo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

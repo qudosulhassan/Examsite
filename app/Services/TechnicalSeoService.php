@@ -185,7 +185,11 @@ Disallow: /login
 Disallow: /register
 Disallow: /password/
 
-# Disallow Filter & Sort Query Strings
+# Disallow Filter, Search & Dynamic Session Paths
+Disallow: /search
+Disallow: /search?*
+Disallow: /demo-test-engine/session/
+Disallow: /demo-test-engine/results/
 Disallow: /*?*sort=*
 Disallow: /*?*filter=*
 

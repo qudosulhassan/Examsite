@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', "Search Results for '" . $query . "' - Exam Topics Base")
+@section('robots', 'noindex, follow')
 
 @section('content')
 <!-- Header Banner -->

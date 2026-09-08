@@ -16,6 +16,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ $adminAppleIcon }}">
 
     <title>Exam Topics Base Admin Portal</title>
+    <meta name="robots" content="noindex, nofollow">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
