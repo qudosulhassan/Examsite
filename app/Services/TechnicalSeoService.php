@@ -770,6 +770,7 @@ TXT;
                 'Ensure all hero images have explicit width/height and fetchpriority="high"',
                 'Leverage Cloudflare Edge Cache for static assets and public exam pages',
                 'Keep database queries eager-loaded with relationships (e.g. Exam with Vendor)',
+            ],
         ];
     }
 
