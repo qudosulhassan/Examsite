@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Services\AuditLogService;
+use App\Services\HtmlSanitizerService;
 
 class BlogAdminController extends Controller
 {
@@ -199,7 +200,7 @@ class BlogAdminController extends Controller
             'title' => $request->title,
             'slug' => $slug,
             'excerpt' => $request->excerpt ?? Str::words(strip_tags($request->content), 25),
-            'content' => $request->content,
+            'content' => HtmlSanitizerService::sanitize($request->content),
             'featured_image' => $imagePath,
             'featured_image_alt' => $request->featured_image_alt,
             'reading_time' => $readingTime,
@@ -304,7 +305,7 @@ class BlogAdminController extends Controller
             'title' => $request->title,
             'slug' => $slug,
             'excerpt' => $request->excerpt ?? Str::words(strip_tags($request->content), 25),
-            'content' => $request->content,
+            'content' => HtmlSanitizerService::sanitize($request->content),
             'featured_image' => $imagePath,
             'featured_image_alt' => $request->featured_image_alt,
             'reading_time' => $readingTime,
@@ -542,5 +543,26 @@ class BlogAdminController extends Controller
             }
         }
         return array_unique($tagIds);
+    }
+
+    /**
+     * AJAX upload for Tiptap inline blog images.
+     */
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp,svg|max:10240',
+        ]);
+
+        $file = $request->file('image');
+        $filename = 'inline_' . time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('blog/images', $filename, 'public');
+        $url = Storage::url($path);
+
+        return response()->json([
+            'success' => true,
+            'url' => $url,
+            'alt' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
+        ]);
     }
 }

@@ -99,6 +99,7 @@ Route::post('blog/{id}/restore', [BlogAdminController::class, 'restore'])->name(
 Route::delete('blog/{id}/force-delete', [BlogAdminController::class, 'forceDelete'])->name('blog.force-delete');
 Route::post('blog/quick-category', [BlogAdminController::class, 'quickCategory'])->name('blog.quick-category');
 Route::post('blog/quick-tag', [BlogAdminController::class, 'quickTag'])->name('blog.quick-tag');
+Route::post('blog/upload-image', [BlogAdminController::class, 'uploadImage'])->name('blog.upload-image');
 Route::resource('blog', BlogAdminController::class);
 
 // Blog Categories & Tags

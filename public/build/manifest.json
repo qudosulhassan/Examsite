@@ -1,6 +1,10 @@
 {
+  "_index-I5gYYRlg.js": {
+    "file": "assets/index-I5gYYRlg.js",
+    "name": "index"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-BYPJAH7_.css",
+    "file": "assets/app-DRBlMMPC.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,9 +13,21 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BiSWIl0W.js",
+    "file": "assets/app-z7ZnEGSv.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_index-I5gYYRlg.js"
+    ]
+  },
+  "resources/js/blog-editor.js": {
+    "file": "assets/blog-editor-BsdBTYsk.js",
+    "name": "blog-editor",
+    "src": "resources/js/blog-editor.js",
+    "isEntry": true,
+    "imports": [
+      "_index-I5gYYRlg.js"
+    ]
   }
 }
