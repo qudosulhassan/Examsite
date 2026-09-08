@@ -770,8 +770,159 @@ TXT;
                 'Ensure all hero images have explicit width/height and fetchpriority="high"',
                 'Leverage Cloudflare Edge Cache for static assets and public exam pages',
                 'Keep database queries eager-loaded with relationships (e.g. Exam with Vendor)',
-                'Gzip / Brotli compression enabled in production web server',
+        ];
+    }
+
+    /* =========================================================================
+       MODULE 9: SEARCH ENGINE VERIFICATION
+       ========================================================================= */
+
+    /**
+     * Clean and extract raw verification token from raw string or full meta HTML tag.
+     */
+    public function cleanVerificationToken(?string $input): string
+    {
+        if (empty($input)) {
+            return '';
+        }
+
+        $trimmed = trim($input);
+
+        // If user pasted a full meta tag, e.g. <meta name="..." content="token" />
+        if (preg_match('/content=["\']([^"\']+)["\']/i', $trimmed, $matches)) {
+            return trim($matches[1]);
+        }
+
+        // Fallback: strip tags if any stray angle brackets exist
+        return trim(strip_tags($trimmed));
+    }
+
+    /**
+     * Verify search engine verification tokens directly against live production HTML.
+     */
+    public function verifySearchEngineTokensLive(): array
+    {
+        $productionUrl = 'https://examtopicsbase.com';
+
+        $tokens = [
+            'google' => [
+                'name' => 'Google Search Console',
+                'key' => 'seo_gsc_verification',
+                'meta_name' => 'google-site-verification',
+                'token' => Setting::get('seo_gsc_verification', config('seo.verification.google_search_console')),
+            ],
+            'bing' => [
+                'name' => 'Bing Webmaster Tools',
+                'key' => 'seo_bing_verification',
+                'meta_name' => 'msvalidate.01',
+                'token' => Setting::get('seo_bing_verification', ''),
+            ],
+            'yandex' => [
+                'name' => 'Yandex Webmaster',
+                'key' => 'seo_yandex_verification',
+                'meta_name' => 'yandex-verification',
+                'token' => Setting::get('seo_yandex_verification', ''),
+            ],
+            'pinterest' => [
+                'name' => 'Pinterest Domain',
+                'key' => 'seo_pinterest_verification',
+                'meta_name' => 'p:domain_verify',
+                'token' => Setting::get('seo_pinterest_verification', ''),
             ],
         ];
+
+        // Fetch live production HTML with a 10-second timeout, bypassing cache headers
+        $html = '';
+        $fetchError = null;
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'ExamTopicsBase-Verification-Bot/1.0 (+https://examtopicsbase.com)',
+                    'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                    'Pragma' => 'no-cache',
+                ])
+                ->get($productionUrl);
+
+            if ($response->successful()) {
+                $html = $response->body();
+            } else {
+                $fetchError = 'Live site responded with HTTP ' . $response->status();
+            }
+        } catch (\Throwable $e) {
+            $fetchError = 'Unable to reach live site: ' . $e->getMessage();
+        }
+
+        $results = [];
+
+        foreach ($tokens as $engine => $info) {
+            $savedToken = trim((string)$info['token']);
+            $metaName = $info['meta_name'];
+
+            if (empty($savedToken)) {
+                $results[$engine] = [
+                    'name' => $info['name'],
+                    'saved_token' => null,
+                    'status' => 'not_configured',
+                    'status_label' => 'Not Configured',
+                    'badge_class' => 'bg-gray-100 text-gray-600 border border-gray-200',
+                    'message' => 'No verification token saved in database.',
+                ];
+                continue;
+            }
+
+            if ($fetchError !== null) {
+                $results[$engine] = [
+                    'name' => $info['name'],
+                    'saved_token' => $savedToken,
+                    'status' => 'error',
+                    'status_label' => 'Verification Failed',
+                    'badge_class' => 'bg-rose-100 text-rose-700 border border-rose-200',
+                    'message' => $fetchError,
+                ];
+                continue;
+            }
+
+            // Look for <meta name="{$metaName}" content="{$savedToken}"> in the live HTML
+            $escapedMeta = preg_quote($metaName, '/');
+            $pattern = '/<meta\s+[^>]*name=["\']' . $escapedMeta . '["\'][^>]*content=["\']([^"\']*)["\'][^>]*>/i';
+
+            if (preg_match($pattern, $html, $match)) {
+                $foundContent = trim($match[1]);
+
+                if ($foundContent === $savedToken) {
+                    $results[$engine] = [
+                        'name' => $info['name'],
+                        'saved_token' => $savedToken,
+                        'detected_tag' => $match[0],
+                        'status' => 'verified',
+                        'status_label' => 'Detected on Live Site',
+                        'badge_class' => 'bg-emerald-100 text-emerald-800 border border-emerald-300',
+                        'message' => 'Valid meta tag confirmed active on live https://examtopicsbase.com HTML.',
+                    ];
+                } else {
+                    $results[$engine] = [
+                        'name' => $info['name'],
+                        'saved_token' => $savedToken,
+                        'detected_tag' => $match[0],
+                        'status' => 'mismatch',
+                        'status_label' => 'Verification Failed',
+                        'badge_class' => 'bg-amber-100 text-amber-800 border border-amber-300',
+                        'message' => 'Tag detected on live site, but content did not match saved token.',
+                    ];
+                }
+            } else {
+                $results[$engine] = [
+                    'name' => $info['name'],
+                    'saved_token' => $savedToken,
+                    'status' => 'not_found',
+                    'status_label' => 'Verification Failed',
+                    'badge_class' => 'bg-rose-100 text-rose-700 border border-rose-200',
+                    'message' => 'Tag <meta name="' . $metaName . '"> was not found in the live HTML <head>. Ensure changes are published and cache is purged.',
+                ];
+            }
+        }
+
+        return $results;
     }
 }

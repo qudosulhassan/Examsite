@@ -104,6 +104,11 @@ class TechnicalSeoAdminController extends Controller
             'article' => $this->seoService->getPreviewSchema('article'),
         ];
 
+        // Search Engine Verification Live Check (only when accessing the search_engines tab to keep other tabs instant)
+        $verificationResults = ($activeTab === 'search_engines') 
+            ? $this->seoService->verifySearchEngineTokensLive() 
+            : [];
+
         return view('admin.seo.index', compact(
             'activeTab',
             'settings',
@@ -114,7 +119,8 @@ class TechnicalSeoAdminController extends Controller
             'notFoundLogs',
             'internalLinking',
             'performance',
-            'schemaPreviews'
+            'schemaPreviews',
+            'verificationResults'
         ));
     }
 
@@ -162,6 +168,31 @@ class TechnicalSeoAdminController extends Controller
 
             return redirect()->route('admin.seo.index', ['tab' => $tab])
                 ->with('success', 'Meta & Indexing directives saved and applied successfully.');
+        }
+
+        if ($tab === 'search_engines') {
+            $validated = $request->validate([
+                'seo_gsc_verification' => 'nullable|string',
+                'seo_bing_verification' => 'nullable|string',
+                'seo_yandex_verification' => 'nullable|string',
+                'seo_pinterest_verification' => 'nullable|string',
+            ]);
+
+            // Clean inputs to ensure only raw tokens are stored (even if user pasted full HTML meta tags)
+            $cleanGsc = $this->seoService->cleanVerificationToken($validated['seo_gsc_verification'] ?? null);
+            $cleanBing = $this->seoService->cleanVerificationToken($validated['seo_bing_verification'] ?? null);
+            $cleanYandex = $this->seoService->cleanVerificationToken($validated['seo_yandex_verification'] ?? null);
+            $cleanPinterest = $this->seoService->cleanVerificationToken($validated['seo_pinterest_verification'] ?? null);
+
+            Setting::set('seo_gsc_verification', $cleanGsc);
+            Setting::set('seo_bing_verification', $cleanBing);
+            Setting::set('seo_yandex_verification', $cleanYandex);
+            Setting::set('seo_pinterest_verification', $cleanPinterest);
+
+            Setting::clearCache();
+
+            return redirect()->route('admin.seo.index', ['tab' => $tab])
+                ->with('success', 'Search engine verification tokens saved and cleaned successfully.');
         }
 
         $inputs = $request->except(['_token', 'active_tab']);

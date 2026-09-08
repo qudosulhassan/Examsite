@@ -100,4 +100,38 @@ class TechnicalSeoMetaIndexingTest extends TestCase
 
         $response->assertSessionHasErrors(['seo_robots_index', 'seo_robots_follow']);
     }
+
+    public function test_admin_can_save_verification_tokens_and_they_are_cleaned_and_rendered()
+    {
+        // User pastes full HTML meta tags with quotes or whitespace
+        $rawGsc = '<meta name="google-site-verification" content="caTdpujjoxu4S825WcwZHR0frALZjuRYH4MITxURQyE" />';
+        $rawBing = '<meta name="msvalidate.01" content="892348ABCDEF1234567890" />';
+        $rawYandex = '   a1b2c3d4e5f6g7h8   ';
+        $rawPinterest = '<meta name="p:domain_verify" content="7f8a9b12345" />';
+
+        $response = $this->actingAs($this->admin)->post(route('admin.seo.update'), [
+            'active_tab' => 'search_engines',
+            'seo_gsc_verification' => $rawGsc,
+            'seo_bing_verification' => $rawBing,
+            'seo_yandex_verification' => $rawYandex,
+            'seo_pinterest_verification' => $rawPinterest,
+        ]);
+
+        $response->assertRedirect(route('admin.seo.index', ['tab' => 'search_engines']));
+        $response->assertSessionHas('success', 'Search engine verification tokens saved and cleaned successfully.');
+
+        // Verify stored settings contain ONLY the tokens
+        $this->assertEquals('caTdpujjoxu4S825WcwZHR0frALZjuRYH4MITxURQyE', Setting::get('seo_gsc_verification'));
+        $this->assertEquals('892348ABCDEF1234567890', Setting::get('seo_bing_verification'));
+        $this->assertEquals('a1b2c3d4e5f6g7h8', Setting::get('seo_yandex_verification'));
+        $this->assertEquals('7f8a9b12345', Setting::get('seo_pinterest_verification'));
+
+        // Verify public HTML renders clean meta tags in <head>
+        $publicResponse = $this->get('/');
+        $publicResponse->assertStatus(200);
+        $publicResponse->assertSee('<meta name="google-site-verification" content="caTdpujjoxu4S825WcwZHR0frALZjuRYH4MITxURQyE">', false);
+        $publicResponse->assertSee('<meta name="msvalidate.01" content="892348ABCDEF1234567890">', false);
+        $publicResponse->assertSee('<meta name="yandex-verification" content="a1b2c3d4e5f6g7h8">', false);
+        $publicResponse->assertSee('<meta name="p:domain_verify" content="7f8a9b12345">', false);
+    }
 }

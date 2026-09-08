@@ -53,37 +53,84 @@
             </div>
         </div>
 
+        <!-- Live Verification Status Card -->
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-150 pb-3">
+                <div>
+                    <h5 class="text-xs font-bold text-navy uppercase tracking-wider">Live Production Verification Status</h5>
+                    <p class="text-[11px] text-gray-500">Live inspection executed directly against https://examtopicsbase.com HTML source.</p>
+                </div>
+                <a href="{{ route('admin.seo.index', ['tab' => 'search_engines']) }}" class="inline-flex items-center text-xs font-bold text-navy hover:text-cyan transition gap-1.5 self-start sm:self-auto bg-gray-50 hover:bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-lg">
+                    <svg class="w-3.5 h-3.5 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <span>Re-verify Live Site</span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($verificationResults ?? [] as $engine => $res)
+                    <div class="p-4 rounded-xl border {{ $res['status'] === 'verified' ? 'bg-emerald-50/50 border-emerald-200' : ($res['status'] === 'not_configured' ? 'bg-gray-50 border-gray-200' : 'bg-rose-50/50 border-rose-200') }} space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-navy">{{ $res['name'] }}</span>
+                            <span class="px-2 py-0.5 text-[10px] font-extrabold rounded-full {{ $res['badge_class'] }}">
+                                {{ $res['status_label'] }}
+                            </span>
+                        </div>
+
+                        <div class="text-xs text-gray-600 space-y-1">
+                            @if(!empty($res['saved_token']))
+                                <div class="text-[11px] font-mono text-gray-700 truncate">
+                                    <span class="font-bold text-gray-500">Token:</span> {{ $res['saved_token'] }}
+                                </div>
+                            @endif
+                            <div class="text-[11px] {{ $res['status'] === 'verified' ? 'text-emerald-700' : ($res['status'] === 'not_configured' ? 'text-gray-500' : 'text-rose-700 font-medium') }}">
+                                {{ $res['message'] }}
+                            </div>
+                            @if(!empty($res['detected_tag']))
+                                <div class="pt-1">
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Live Tag Detected:</span>
+                                    <code class="text-[10px] bg-white border border-gray-200 text-navy px-2 py-0.5 rounded block overflow-x-auto font-mono mt-0.5">{{ $res['detected_tag'] }}</code>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
         <!-- Verification Meta Tag Inputs -->
         <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-6">
-            <h5 class="text-xs font-bold text-navy uppercase tracking-wider border-b border-gray-150 pb-3">Search Engine Verification Codes</h5>
+            <div class="border-b border-gray-150 pb-3">
+                <h5 class="text-xs font-bold text-navy uppercase tracking-wider">Search Engine Verification Codes</h5>
+                <p class="text-[11px] text-gray-500 mt-0.5">Paste either the full meta tag (e.g. &lt;meta name="google-site-verification" content="..."&gt;) or just the token. The system automatically extracts and cleans the token.</p>
+            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Google Site Verification -->
                 <div>
                     <label for="seo_gsc_verification" class="block text-xs font-bold text-navy mb-1 uppercase tracking-wide">Google Search Console Verification Token</label>
                     <input type="text" name="seo_gsc_verification" id="seo_gsc_verification" value="{{ old('seo_gsc_verification', $settings['seo_gsc_verification'] ?? config('seo.verification.google_search_console')) }}" placeholder="e.g. 4vN1j9G_x9z_abcdefgh123456" class="w-full text-xs font-mono border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
-                    <p class="text-[11px] text-gray-400 mt-1">Will generate: &lt;meta name="google-site-verification" content="..."&gt;</p>
+                    <p class="text-[11px] text-gray-400 mt-1">Accepts raw token or full &lt;meta name="google-site-verification" content="..."&gt;</p>
                 </div>
 
                 <!-- Bing Webmaster Verification -->
                 <div>
                     <label for="seo_bing_verification" class="block text-xs font-bold text-navy mb-1 uppercase tracking-wide">Bing Webmaster Tools Verification Token</label>
                     <input type="text" name="seo_bing_verification" id="seo_bing_verification" value="{{ old('seo_bing_verification', $settings['seo_bing_verification'] ?? '') }}" placeholder="e.g. 892348ABCDEF1234567890" class="w-full text-xs font-mono border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
-                    <p class="text-[11px] text-gray-400 mt-1">Will generate: &lt;meta name="msvalidate.01" content="..."&gt;</p>
+                    <p class="text-[11px] text-gray-400 mt-1">Accepts raw token or full &lt;meta name="msvalidate.01" content="..."&gt;</p>
                 </div>
 
                 <!-- Yandex Verification -->
                 <div>
                     <label for="seo_yandex_verification" class="block text-xs font-bold text-navy mb-1 uppercase tracking-wide">Yandex Verification Token</label>
                     <input type="text" name="seo_yandex_verification" id="seo_yandex_verification" value="{{ old('seo_yandex_verification', $settings['seo_yandex_verification'] ?? '') }}" placeholder="e.g. a1b2c3d4e5f6g7h8" class="w-full text-xs font-mono border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
-                    <p class="text-[11px] text-gray-400 mt-1">Will generate: &lt;meta name="yandex-verification" content="..."&gt;</p>
+                    <p class="text-[11px] text-gray-400 mt-1">Accepts raw token or full &lt;meta name="yandex-verification" content="..."&gt;</p>
                 </div>
 
                 <!-- Pinterest Verification -->
                 <div>
                     <label for="seo_pinterest_verification" class="block text-xs font-bold text-navy mb-1 uppercase tracking-wide">Pinterest Domain Verification</label>
                     <input type="text" name="seo_pinterest_verification" id="seo_pinterest_verification" value="{{ old('seo_pinterest_verification', $settings['seo_pinterest_verification'] ?? '') }}" placeholder="e.g. 7f8a9b..." class="w-full text-xs font-mono border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan">
-                    <p class="text-[11px] text-gray-400 mt-1">Will generate: &lt;meta name="p:domain_verify" content="..."&gt;</p>
+                    <p class="text-[11px] text-gray-400 mt-1">Accepts raw token or full &lt;meta name="p:domain_verify" content="..."&gt;</p>
                 </div>
             </div>
 
