@@ -607,9 +607,26 @@ export function initBlogEditor(container) {
     return editor;
 }
 
-// Auto-initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
+// Auto-initialize helper
+export function initAllBlogEditors() {
     document.querySelectorAll('.tiptap-container').forEach(container => {
         initBlogEditor(container);
     });
-});
+}
+
+// Expose globally
+if (typeof window !== 'undefined') {
+    window.initBlogEditor = initBlogEditor;
+    window.initAllBlogEditors = initAllBlogEditors;
+}
+
+// Auto-initialize on DOM ready or immediately if document is already loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAllBlogEditors);
+} else {
+    initAllBlogEditors();
+}
+
+// Also re-check on Alpine initialization if present
+document.addEventListener('alpine:initialized', initAllBlogEditors);
+
