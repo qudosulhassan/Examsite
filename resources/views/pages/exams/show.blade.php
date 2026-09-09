@@ -458,17 +458,6 @@
 
     <div class="container-custom relative z-10 space-y-16">
                 
-                <!-- Description -->
-                <div class="bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
-                    <h3 class="text-2xl sm:text-3xl font-black text-navy mb-4 flex items-center">
-                        <svg class="w-8 h-8 text-cyan mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        About the Certification Exam
-                    </h3>
-                    <div class="prose prose-base sm:prose-lg text-gray-600 max-w-none leading-relaxed font-normal space-y-4">
-                        <p class="font-normal text-gray-600">{{ $exam->description }}</p>
-                        <p class="font-normal text-gray-600">Our expert certification guides include comprehensive questions and answers designed to mirror the actual exam environment. The full study package will prepare you for the variety of formats found on this test, including multiple choice, multi-select, and drag-and-drop questions.</p>
-                    </div>
-                </div>
 
                 @if(!empty($exam->article_content))
                 <!-- Comprehensive Exam Article & Study Guide -->
