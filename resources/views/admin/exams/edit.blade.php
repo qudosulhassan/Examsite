@@ -721,53 +721,8 @@ $workspaceConfig = [
                             </div>
                         </div>
 
-                        <!-- Exam Description TipTap Rich Text Editor -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <label class="block text-xs font-bold text-gray-700 uppercase">
-                                    Exam Overview & Description
-                                </label>
-                                <span class="text-[11px] text-gray-400">Rich text formatting with TipTap</span>
-                            </div>
-
-                            <div class="tiptap-container border border-gray-300 rounded-xl overflow-hidden shadow-sm" data-content="{{ base64_encode(old('description', $exam->description)) }}">
-                                <!-- Toolbar -->
-                                <div class="bg-gray-50 border-b border-gray-200 px-3 py-2 flex flex-wrap items-center gap-1">
-                                    <button type="button" class="btn-bold p-1.5 rounded hover:bg-gray-200 text-gray-600 transition" title="Bold">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z"/></svg>
-                                    </button>
-                                    <button type="button" class="btn-italic p-1.5 rounded hover:bg-gray-200 text-gray-600 transition" title="Italic">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l-1.5 6m-5.5 2h5M8 4h5"/></svg>
-                                    </button>
-                                    <div class="w-px h-5 bg-gray-300 mx-1"></div>
-                                    <button type="button" class="btn-p px-2 py-1 rounded text-xs font-bold text-gray-600 hover:bg-gray-200 transition" title="Paragraph">P</button>
-                                    <button type="button" class="btn-h1 px-2 py-1 rounded text-xs font-bold text-gray-600 hover:bg-gray-200 transition" title="Heading 1">H1</button>
-                                    <button type="button" class="btn-h2 px-2 py-1 rounded text-xs font-bold text-gray-600 hover:bg-gray-200 transition" title="Heading 2">H2</button>
-                                    <button type="button" class="btn-h3 px-2 py-1 rounded text-xs font-bold text-gray-600 hover:bg-gray-200 transition" title="Heading 3">H3</button>
-                                    <div class="w-px h-5 bg-gray-300 mx-1"></div>
-                                    <button type="button" class="btn-bullet p-1.5 rounded hover:bg-gray-200 text-gray-600 transition" title="Bullet List">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                                    </button>
-                                    <button type="button" class="btn-ordered p-1.5 rounded hover:bg-gray-200 text-gray-600 transition" title="Numbered List">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H21M9 12H21M9 19H21M5 5.01V5M5 12.01V12M5 19.01V19"/></svg>
-                                    </button>
-                                    <button type="button" class="btn-quote p-1.5 rounded hover:bg-gray-200 text-gray-600 transition" title="Quote">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
-                                    </button>
-                                    <div class="w-px h-5 bg-gray-300 mx-1"></div>
-                                    <button type="button" class="btn-link p-1.5 rounded hover:bg-gray-200 text-gray-600 transition" title="Link">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                                    </button>
-                                </div>
-
-                                <!-- Editor Content Body -->
-                                <div class="editor-element min-h-[220px] p-4 bg-white text-gray-800 text-sm focus:outline-none"></div>
-
-                                <!-- Hidden input for form submit -->
-                                <input type="hidden" name="description" class="content-input" value="{{ old('description', $exam->description) }}">
-                            </div>
-                            @error('description') <p class="text-red-500 text-xs mt-1.5 font-medium">{{ $message }}</p> @enderror
-                        </div>
+                        <!-- Hidden input for description (kept for form submission compatibility) -->
+                        <input type="hidden" name="description" class="content-input" value="{{ old('description', $exam->description) }}">
                     </div>
                 </div>
 
