@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', !empty(trim($exam->meta_title ?? '')) ? $exam->meta_title : "{$exam->exam_code} Exam Dumps & Study Guide | Exam Topics Base")
-@section('meta_description', $exam->meta_description ?? "Get updated {$exam->exam_code} ({$exam->exam_name}) exam questions, answers, and study guides. Try our free demo or web-based test engine.")
+@section('title', $exam->resolved_seo_title)
+@section('meta_description', $exam->resolved_meta_description)
 @section('meta_keywords', $exam->meta_keywords ?? "{$exam->exam_code}, {$exam->exam_code} exam dumps, {$exam->exam_code} practice test, {$exam->vendor->name} certification")
 @section('canonical_url', $exam->url)
 @section('og_type', 'product')

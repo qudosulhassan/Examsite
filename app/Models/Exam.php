@@ -180,6 +180,22 @@ class Exam extends Model
     }
 
     /**
+     * Get resolved final rendered public SEO Title.
+     */
+    public function getResolvedSeoTitleAttribute(): string
+    {
+        return app(\App\Services\TechnicalSeoService::class)->resolveExamSeoTitle($this);
+    }
+
+    /**
+     * Get resolved final rendered public Meta Description.
+     */
+    public function getResolvedMetaDescriptionAttribute(): string
+    {
+        return app(\App\Services\TechnicalSeoService::class)->resolveExamMetaDescription($this);
+    }
+
+    /**
      * Accessor aliases for compatibility with general SEO and schema builders.
      */
     public function getTitleAttribute(): string

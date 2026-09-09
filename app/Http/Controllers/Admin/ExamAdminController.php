@@ -17,6 +17,54 @@ class ExamAdminController extends Controller
 {
     public function index(Request $request)
     {
+        $seoService = app(\App\Services\TechnicalSeoService::class);
+        $seoIssue = $request->input('seo_issue');
+        $seoIssueData = null;
+        $seoIssueTitle = null;
+
+        if ($seoIssue === 'missing_title') {
+            $seoIssueData = $seoService->auditExamTitles();
+            $seoIssueTitle = 'Missing SEO Titles';
+        } elseif ($seoIssue === 'missing_description') {
+            $seoIssueData = $seoService->auditExamDescriptions();
+            $seoIssueTitle = 'Missing Meta Descriptions';
+        } elseif ($seoIssue === 'duplicate_title') {
+            $seoIssueData = $seoService->auditDuplicateTitles();
+            $seoIssueTitle = 'Duplicate SEO Titles';
+        }
+
+        // If an SEO issue filter is requested
+        if ($seoIssue && $seoIssueData !== null) {
+            $search = trim($request->input('search', ''));
+            if ($search !== '') {
+                if ($seoIssue === 'duplicate_title') {
+                    $seoIssueData = array_values(array_filter($seoIssueData, function ($cluster) use ($search) {
+                        if (stripos($cluster['title'], $search) !== false) return true;
+                        foreach ($cluster['exams'] as $e) {
+                            if (stripos($e['exam_code'], $search) !== false || stripos($e['exam_name'], $search) !== false) return true;
+                        }
+                        return false;
+                    }));
+                } else {
+                    $seoIssueData = array_values(array_filter($seoIssueData, function ($item) use ($search) {
+                        return stripos($item['exam_code'], $search) !== false
+                            || stripos($item['exam_name'], $search) !== false
+                            || stripos($item['vendor_name'], $search) !== false
+                            || stripos($item['issue'], $search) !== false;
+                    }));
+                }
+            }
+
+            return view('admin.exams.index', [
+                'exams' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15),
+                'seoIssue' => $seoIssue,
+                'seoIssueTitle' => $seoIssueTitle,
+                'seoIssueData' => $seoIssueData,
+                'seoIssueCount' => count($seoIssueData),
+            ]);
+        }
+
+        // Standard exams list
         $query = Exam::with('vendor');
 
         if ($request->filled('search')) {
@@ -27,9 +75,15 @@ class ExamAdminController extends Controller
             });
         }
 
-        $exams = $query->orderBy('exam_code')->paginate(10)->withQueryString();
+        $exams = $query->orderBy('exam_code')->paginate(15)->withQueryString();
         
-        return view('admin.exams.index', compact('exams'));
+        return view('admin.exams.index', [
+            'exams' => $exams,
+            'seoIssue' => null,
+            'seoIssueTitle' => null,
+            'seoIssueData' => null,
+            'seoIssueCount' => 0,
+        ]);
     }
 
     public function searchSuggestions(Request $request)

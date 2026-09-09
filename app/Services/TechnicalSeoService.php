@@ -518,6 +518,186 @@ TXT;
         return implode(', ', $directives);
     }
 
+    /**
+     * Resolve the final rendered public SEO Title for an exam.
+     */
+    public function resolveExamSeoTitle(Exam $exam): string
+    {
+        $custom = trim((string)($exam->meta_title ?? ''));
+        if ($custom !== '') {
+            return $custom;
+        }
+
+        $code = trim((string)($exam->exam_code ?? ''));
+        if ($code !== '') {
+            return "{$code} Exam Dumps & Study Guide | Exam Topics Base";
+        }
+
+        $name = trim((string)($exam->exam_name ?? ''));
+        if ($name !== '') {
+            return "{$name} Study Guide | Exam Topics Base";
+        }
+
+        return Setting::get('default_seo_title', config('seo.defaults.title', 'Exam Topics Base'));
+    }
+
+    /**
+     * Resolve the final rendered public Meta Description for an exam.
+     */
+    public function resolveExamMetaDescription(Exam $exam): string
+    {
+        $custom = trim((string)($exam->meta_description ?? ''));
+        if ($custom !== '') {
+            return $custom;
+        }
+
+        $code = trim((string)($exam->exam_code ?? ''));
+        if ($code !== '') {
+            $nameSuffix = !empty(trim((string)($exam->exam_name ?? ''))) ? " ({$exam->exam_name})" : "";
+            return "Get updated {$code}{$nameSuffix} exam questions, answers, and study guides. Try our free demo or web-based test engine.";
+        }
+
+        return Setting::get('default_meta_description', config('seo.defaults.description', ''));
+    }
+
+    /**
+     * Audit all published active exams for genuinely missing, empty, or invalid rendered SEO titles.
+     */
+    public function auditExamTitles(): array
+    {
+        $exams = Exam::where('is_active', true)
+            ->with('vendor')
+            ->orderBy('exam_code')
+            ->get();
+
+        $defaultSiteTitle = Setting::get('default_seo_title', config('seo.defaults.title', 'Exam Topics Base'));
+        $issues = [];
+
+        foreach ($exams as $exam) {
+            $renderedTitle = $this->resolveExamSeoTitle($exam);
+            $cleanTitle = trim($renderedTitle);
+            $issueReason = null;
+
+            if (empty($cleanTitle)) {
+                $issueReason = 'Title is completely empty';
+            } elseif (strlen($cleanTitle) < 10) {
+                $issueReason = 'Title is critically short (< 10 characters)';
+            } elseif (empty(trim((string)($exam->meta_title ?? ''))) && empty(trim((string)($exam->exam_code ?? '')))) {
+                $issueReason = 'Missing custom and generated title (fell back to site default title)';
+            } elseif (preg_match('/^(exam title|untitled|study guide)$/i', $cleanTitle)) {
+                $issueReason = 'Invalid placeholder title detected';
+            }
+
+            if ($issueReason !== null) {
+                $vendorSlug = $exam->vendor ? $exam->vendor->slug : 'vendor';
+                $issues[] = [
+                    'id' => $exam->id,
+                    'exam_code' => $exam->exam_code ?: 'NO-CODE',
+                    'exam_name' => $exam->exam_name ?: 'Untitled Exam',
+                    'vendor_name' => $exam->vendor ? $exam->vendor->name : 'Unknown Vendor',
+                    'vendor_slug' => $vendorSlug,
+                    'current_title' => $cleanTitle,
+                    'url' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $exam->slug ?: $exam->id]),
+                    'issue' => $issueReason,
+                    'exam' => $exam,
+                ];
+            }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * Audit all published active exams for genuinely missing, empty, or invalid Meta Descriptions.
+     */
+    public function auditExamDescriptions(): array
+    {
+        $exams = Exam::where('is_active', true)
+            ->with('vendor')
+            ->orderBy('exam_code')
+            ->get();
+
+        $defaultSiteDesc = Setting::get('default_meta_description', config('seo.defaults.description', ''));
+        $issues = [];
+
+        foreach ($exams as $exam) {
+            $renderedDesc = $this->resolveExamMetaDescription($exam);
+            $cleanDesc = trim($renderedDesc);
+            $issueReason = null;
+
+            if (empty($cleanDesc)) {
+                $issueReason = 'Meta description is completely empty';
+            } elseif (strlen($cleanDesc) < 25) {
+                $issueReason = 'Meta description is critically short (< 25 characters)';
+            } elseif (empty(trim((string)($exam->meta_description ?? ''))) && empty(trim((string)($exam->exam_code ?? '')))) {
+                $issueReason = 'Missing custom and generated description (fell back to site default description)';
+            }
+
+            if ($issueReason !== null) {
+                $vendorSlug = $exam->vendor ? $exam->vendor->slug : 'vendor';
+                $issues[] = [
+                    'id' => $exam->id,
+                    'exam_code' => $exam->exam_code ?: 'NO-CODE',
+                    'exam_name' => $exam->exam_name ?: 'Untitled Exam',
+                    'vendor_name' => $exam->vendor ? $exam->vendor->name : 'Unknown Vendor',
+                    'vendor_slug' => $vendorSlug,
+                    'current_description' => $cleanDesc,
+                    'url' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $exam->slug ?: $exam->id]),
+                    'issue' => $issueReason,
+                    'exam' => $exam,
+                ];
+            }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * Audit all published active exams for duplicate rendered SEO titles.
+     */
+    public function auditDuplicateTitles(): array
+    {
+        $exams = Exam::where('is_active', true)
+            ->with('vendor')
+            ->orderBy('exam_code')
+            ->get();
+
+        $groups = [];
+        foreach ($exams as $exam) {
+            $renderedTitle = $this->resolveExamSeoTitle($exam);
+            $key = strtolower(trim($renderedTitle));
+            if (!isset($groups[$key])) {
+                $groups[$key] = [
+                    'title' => $renderedTitle,
+                    'exams' => [],
+                ];
+            }
+            $vendorSlug = $exam->vendor ? $exam->vendor->slug : 'vendor';
+            $groups[$key]['exams'][] = [
+                'id' => $exam->id,
+                'exam_code' => $exam->exam_code ?: 'NO-CODE',
+                'exam_name' => $exam->exam_name ?: 'Untitled Exam',
+                'vendor_name' => $exam->vendor ? $exam->vendor->name : 'Unknown Vendor',
+                'vendor_slug' => $vendorSlug,
+                'url' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $exam->slug ?: $exam->id]),
+                'exam' => $exam,
+            ];
+        }
+
+        $clusters = [];
+        foreach ($groups as $group) {
+            if (count($group['exams']) > 1) {
+                $clusters[] = [
+                    'title' => $group['title'],
+                    'count' => count($group['exams']),
+                    'exams' => $group['exams'],
+                ];
+            }
+        }
+
+        return $clusters;
+    }
+
     /* =========================================================================
        MODULE 6: SEO HEALTH AUDIT ENGINE
        ========================================================================= */
@@ -527,41 +707,45 @@ TXT;
         $checks = [];
 
         // 1. Missing SEO Titles
-        $missingExamTitles = Exam::whereNull('meta_title')->orWhere('meta_title', '')->count();
-        $missingVendorTitles = Vendor::whereNull('meta_title')->orWhere('meta_title', '')->count();
-        $totalMissingTitles = $missingExamTitles + $missingVendorTitles;
+        $missingTitles = $this->auditExamTitles();
+        $missingTitleCount = count($missingTitles);
         $checks['titles'] = [
             'title' => 'Missing SEO Titles',
-            'count' => $totalMissingTitles,
-            'status' => $totalMissingTitles === 0 ? 'passed' : ($totalMissingTitles < 15 ? 'warning' : 'critical'),
-            'desc' => $totalMissingTitles === 0 ? 'All exams and vendors have custom SEO titles defined.' : "{$totalMissingTitles} items are relying on default fallback titles.",
+            'count' => $missingTitleCount,
+            'status' => $missingTitleCount === 0 ? 'passed' : ($missingTitleCount < 10 ? 'warning' : 'critical'),
+            'desc' => $missingTitleCount === 0 
+                ? 'All published exams have valid custom or generated SEO titles rendered.' 
+                : "{$missingTitleCount} published " . ($missingTitleCount === 1 ? 'exam has an' : 'exams have') . ' empty or invalid rendered SEO title.',
             'action_label' => 'Review Exams',
-            'action_url' => url('/admin/exams'),
+            'action_url' => route('admin.exams.index', ['seo_issue' => 'missing_title']),
         ];
 
         // 2. Missing Meta Descriptions
-        $missingExamDesc = Exam::whereNull('meta_description')->orWhere('meta_description', '')->count();
-        $missingVendorDesc = Vendor::whereNull('meta_description')->orWhere('meta_description', '')->count();
-        $totalMissingDesc = $missingExamDesc + $missingVendorDesc;
+        $missingDesc = $this->auditExamDescriptions();
+        $missingDescCount = count($missingDesc);
         $checks['descriptions'] = [
             'title' => 'Missing Meta Descriptions',
-            'count' => $totalMissingDesc,
-            'status' => $totalMissingDesc === 0 ? 'passed' : ($totalMissingDesc < 25 ? 'warning' : 'critical'),
-            'desc' => $totalMissingDesc === 0 ? 'All exams and vendors have custom meta descriptions.' : "{$totalMissingDesc} pages have no dedicated meta description.",
+            'count' => $missingDescCount,
+            'status' => $missingDescCount === 0 ? 'passed' : ($missingDescCount < 15 ? 'warning' : 'critical'),
+            'desc' => $missingDescCount === 0 
+                ? 'All published exams have valid custom or generated meta descriptions rendered.' 
+                : "{$missingDescCount} published " . ($missingDescCount === 1 ? 'exam has an' : 'exams have') . ' empty or invalid meta description.',
             'action_label' => 'Edit Descriptions',
-            'action_url' => url('/admin/exams'),
+            'action_url' => route('admin.exams.index', ['seo_issue' => 'missing_description']),
         ];
 
         // 3. Duplicate Titles / Descriptions Check
-        $duplicateExamTitles = Exam::select('exam_name', \Illuminate\Support\Facades\DB::raw('count(*) as c'))
-            ->groupBy('exam_name')->having('c', '>', 1)->count();
+        $duplicateClusters = $this->auditDuplicateTitles();
+        $duplicateCount = count($duplicateClusters);
         $checks['duplicate_content'] = [
             'title' => 'Duplicate Titles / Potential Collisions',
-            'count' => $duplicateExamTitles,
-            'status' => $duplicateExamTitles === 0 ? 'passed' : 'warning',
-            'desc' => $duplicateExamTitles === 0 ? 'No duplicate titles found across active exams.' : "{$duplicateExamTitles} duplicate exam title clusters detected.",
+            'count' => $duplicateCount,
+            'status' => $duplicateCount === 0 ? 'passed' : 'warning',
+            'desc' => $duplicateCount === 0 
+                ? 'No duplicate rendered SEO titles found across published exams.' 
+                : "{$duplicateCount} duplicate rendered SEO title " . ($duplicateCount === 1 ? 'cluster' : 'clusters') . ' detected.',
             'action_label' => 'Inspect Exams',
-            'action_url' => url('/admin/exams'),
+            'action_url' => route('admin.exams.index', ['seo_issue' => 'duplicate_title']),
         ];
 
         // 4. Canonical URLs Health

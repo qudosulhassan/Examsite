@@ -26,6 +26,11 @@ class TechnicalSeoAdminController extends Controller
      */
     public function index(Request $request)
     {
+        if ($request->boolean('refresh')) {
+            \Illuminate\Support\Facades\Artisan::call('view:clear');
+            session()->flash('success', 'Technical SEO audit successfully re-run against live database.');
+        }
+
         $activeTab = $request->get('tab', $request->get('section', 'overview'));
         $settings = Setting::all()->pluck('value', 'key')->toArray();
 
