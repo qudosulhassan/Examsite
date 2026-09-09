@@ -14,13 +14,13 @@ class Exam extends Model
     protected static function booted()
     {
         static::updating(function ($exam) {
-            if ($exam->isDirty('slug')) {
-                $vendorSlug = $exam->vendor ? $exam->vendor->slug : 'exam';
+            if ($exam->isDirty('slug') && !empty($exam->getOriginal('slug')) && !empty($exam->slug) && $exam->is_active && $exam->vendor) {
+                $vendorSlug = $exam->vendor->slug;
                 $oldPath = 'exams/' . $vendorSlug . '/' . $exam->getOriginal('slug');
                 $newPath = 'exams/' . $vendorSlug . '/' . $exam->slug;
 
                 if ($oldPath !== $newPath && !Redirect::wouldCauseLoop($oldPath, $newPath)) {
-                    Redirect::firstOrCreate(
+                    Redirect::updateOrCreate(
                         ['old_url' => $oldPath],
                         [
                             'new_url' => $newPath,
@@ -48,6 +48,15 @@ class Exam extends Model
                 $count = static::where('vendor_id', $exam->vendor_id)->count();
                 Vendor::where('id', $exam->vendor_id)->update(['exam_count' => $count]);
             }
+
+            // Remove any redirect rules that point to this deleted exam
+            if ($exam->vendor && !empty($exam->slug)) {
+                $targetPath = 'exams/' . $exam->vendor->slug . '/' . $exam->slug;
+                Redirect::where('new_url', $targetPath)
+                    ->orWhere('new_url', '/' . $targetPath)
+                    ->delete();
+            }
+
             Artisan::call('sitemap:generate');
         });
     }

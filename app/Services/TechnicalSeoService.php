@@ -57,12 +57,16 @@ class TechnicalSeoService
         }
 
         // Exams
-        $exams = Exam::where('is_active', true)->with('vendor')->get();
+        $exams = Exam::where('is_active', true)
+            ->whereHas('vendor', function ($q) {
+                $q->where('is_active', true);
+            })
+            ->with('vendor')
+            ->get();
         $examUrls = [];
         foreach ($exams as $e) {
-            $vendorSlug = $e->vendor ? $e->vendor->slug : 'exam';
             $examUrls[] = [
-                'loc' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $e->slug]),
+                'loc' => route('exams.show', ['vendor' => $e->vendor->slug, 'slug' => $e->slug]),
                 'priority' => '0.9',
                 'changefreq' => 'weekly',
                 'lastmod' => $e->last_updated_at ? $e->last_updated_at->format('Y-m-d') : ($e->updated_at ? $e->updated_at->format('Y-m-d') : now()->format('Y-m-d')),

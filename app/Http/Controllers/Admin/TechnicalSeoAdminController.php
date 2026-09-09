@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\Redirect;
 use App\Models\SeoNotFoundLog;
+use App\Models\Exam;
+use App\Models\Vendor;
 use App\Services\TechnicalSeoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -267,6 +269,10 @@ class TechnicalSeoAdminController extends Controller
             return back()->with('error', 'Error: This redirect would create a circular redirect loop. Action aborted.');
         }
 
+        if ($error = $this->validateDestinationExam($destination)) {
+            return back()->with('error', $error);
+        }
+
         Redirect::updateOrCreate(
             ['old_url' => $source],
             [
@@ -323,6 +329,10 @@ class TechnicalSeoAdminController extends Controller
             return back()->with('error', 'Error: Creating this redirect would form a redirect loop.');
         }
 
+        if ($error = $this->validateDestinationExam($destination)) {
+            return back()->with('error', $error);
+        }
+
         Redirect::updateOrCreate(
             ['old_url' => $source],
             [
@@ -336,6 +346,32 @@ class TechnicalSeoAdminController extends Controller
 
         return redirect()->route('admin.seo.index', ['tab' => 'redirects'])
             ->with('success', "404 for {$source} resolved with 301 redirect to {$destination}.");
+    }
+
+    /**
+     * Validate that if a destination is an exam URL, the target exam actually exists.
+     */
+    protected function validateDestinationExam(string $destination): ?string
+    {
+        $clean = trim($destination, '/');
+        $parts = explode('/', $clean);
+        if (count($parts) === 3 && $parts[0] === 'exams') {
+            $vSlug = $parts[1];
+            $eSlug = $parts[2];
+            $exam = Exam::where('is_active', true)
+                ->where(function ($q) use ($eSlug) {
+                    $q->where('slug', $eSlug)->orWhere('exam_code', $eSlug);
+                })
+                ->whereHas('vendor', function ($q) use ($vSlug) {
+                    $q->where('slug', $vSlug)->where('is_active', true);
+                })
+                ->first();
+
+            if (!$exam) {
+                return "The destination exam '/exams/{$vSlug}/{$eSlug}' does not exist in the database. Redirects cannot point to non-existent exams.";
+            }
+        }
+        return null;
     }
 
     /**

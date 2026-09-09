@@ -35,7 +35,6 @@ Route::get('/vendors/{slug}', [App\Http\Controllers\Public\VendorController::cla
 Route::get('/certifications', [App\Http\Controllers\Public\CertificationController::class, 'index'])->name('certifications.index');
 Route::get('/certifications/{slug}', [App\Http\Controllers\Public\CertificationController::class, 'show'])->name('certifications.show');
 Route::get('/exams/{vendor}/{slug}', [App\Http\Controllers\Public\ExamController::class, 'show'])->name('exams.show');
-Route::get('/exams/{slug}', [App\Http\Controllers\Public\ExamController::class, 'legacyShow'])->name('exams.legacy');
 
 Route::get('/free-demo', [DemoController::class, 'index'])->name('free-demo.index');
 Route::post('/free-demo', [DemoController::class, 'request'])->name('free-demo.request');

@@ -19,61 +19,30 @@ class ExamController extends Controller
         $vendorClean = strtolower(trim($vendor));
         $slugClean = strtolower(trim($slug));
 
-        // 1. Resolve Vendor
+        // 1. Strictly resolve Vendor
         $vendorModel = Vendor::where('slug', $vendorClean)
-            ->orWhereRaw("LOWER(REPLACE(slug, '-', '')) = ?", [str_replace('-', '', $vendorClean)])
-            ->orWhereRaw("LOWER(name) = ?", [$vendorClean])
+            ->where('is_active', true)
             ->first();
 
-        // 2. Query Exam
-        $examQuery = Exam::where('is_active', true)->with('vendor');
-
-        if ($vendorModel) {
-            $examQuery->where('vendor_id', $vendorModel->id);
+        if (!$vendorModel) {
+            abort(404);
         }
 
-        $exam = (clone $examQuery)->where(function ($q) use ($slugClean) {
-            $q->where('slug', $slugClean)
-              ->orWhere('exam_code', $slugClean)
-              ->orWhere('exam_code', strtoupper($slugClean))
-              ->orWhere('slug', strtolower($slugClean));
-        })->first();
-
-        if (!$exam && $vendorModel) {
-            // Also try with vendor prefix (e.g. microsoft-az-104)
-            $prefixedSlug = $vendorModel->slug . '-' . $slugClean;
-            $exam = (clone $examQuery)->where(function ($q) use ($prefixedSlug) {
-                $q->where('slug', $prefixedSlug)
-                  ->orWhere('exam_code', strtoupper($prefixedSlug));
-            })->first();
-        }
-
-        if (!$exam) {
-            // Fallback: match without dashes
-            $strippedSlug = str_replace('-', '', $slugClean);
-            $exam = (clone $examQuery)->where(function ($q) use ($strippedSlug) {
-                $q->whereRaw("LOWER(REPLACE(exam_code, '-', '')) = ?", [$strippedSlug])
-                  ->orWhereRaw("LOWER(REPLACE(slug, '-', '')) = ?", [$strippedSlug]);
-            })->first();
-        }
-
-        // Global fallback if vendor slug in URL did not match exam's actual vendor
-        if (!$exam) {
-            $exam = Exam::where('is_active', true)
-                ->where(function ($q) use ($slugClean) {
-                    $q->where('slug', $slugClean)
-                      ->orWhere('exam_code', $slugClean)
-                      ->orWhere('exam_code', strtoupper($slugClean));
-                })
-                ->with('vendor')
-                ->first();
-        }
+        // 2. Query Exam strictly belonging to this vendor
+        $exam = Exam::where('is_active', true)
+            ->where('vendor_id', $vendorModel->id)
+            ->where(function ($q) use ($slugClean) {
+                $q->where('slug', $slugClean)
+                  ->orWhere('exam_code', $slugClean);
+            })
+            ->with('vendor')
+            ->first();
 
         if (!$exam) {
             abort(404);
         }
 
-        $canonicalVendor = $exam->vendor ? $exam->vendor->slug : 'exam';
+        $canonicalVendor = $exam->vendor ? $exam->vendor->slug : $vendorModel->slug;
         $canonicalSlug = $exam->slug;
 
         // 3. Canonical 301 URL redirect if URL does not match canonical /exams/{vendor}/{slug}
@@ -100,54 +69,5 @@ class ExamController extends Controller
 
         return view('pages.exams.show', compact('exam', 'sampleQuestions', 'reviews'));
     }
-
-    /**
-     * Legacy single-slug redirect (/exams/{slug} -> /exams/{vendor}/{slug}).
-     */
-    public function legacyShow(string $slug)
-    {
-        $slugClean = strtolower(trim($slug));
-
-        // Check if there is an explicit redirect record
-        $redirect = Redirect::where('old_url', 'exams/' . $slugClean)
-            ->orWhere('old_url', 'exams/' . $slug)
-            ->first();
-
-        if ($redirect) {
-            return redirect(url($redirect->new_url), 301);
-        }
-
-        // Otherwise resolve exam by slug or code
-        $exam = Exam::where('is_active', true)
-            ->where(function ($q) use ($slugClean) {
-                $q->where('slug', $slugClean)
-                  ->orWhere('exam_code', $slugClean)
-                  ->orWhere('exam_code', strtoupper($slugClean))
-                  ->orWhere('slug', strtolower($slugClean));
-            })
-            ->with('vendor')
-            ->first();
-
-        if (!$exam) {
-            $strippedSlug = str_replace('-', '', $slugClean);
-            $exam = Exam::where('is_active', true)
-                ->where(function ($q) use ($strippedSlug) {
-                    $q->whereRaw("LOWER(REPLACE(exam_code, '-', '')) = ?", [$strippedSlug])
-                      ->orWhereRaw("LOWER(REPLACE(slug, '-', '')) = ?", [$strippedSlug]);
-                })
-                ->with('vendor')
-                ->first();
-        }
-
-        if (!$exam) {
-            abort(404);
-        }
-
-        $vendorSlug = $exam->vendor ? $exam->vendor->slug : 'exam';
-
-        return redirect()->route('exams.show', [
-            'vendor' => $vendorSlug,
-            'slug' => $exam->slug,
-        ], 301);
-    }
 }
+

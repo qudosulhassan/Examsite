@@ -72,7 +72,7 @@ class ExamSeeder extends Seeder
                     'vendor_id' => $vendor->id,
                     'exam_code' => $examData['code'],
                     'exam_name' => $examData['name'],
-                    'slug' => Str::slug($vendor->name . ' ' . $examData['code']),
+                    'slug' => Str::slug($examData['code']),
                     'description' => "This study guide and practice engine contains verified questions and answers compiled by IT professionals to help you pass the {$examData['name']} ({$examData['code']}) certification exam on your first attempt.",
                     'topics' => ['Core Concepts', 'Implementation & Setup', 'Troubleshooting', 'Security Best Practices', 'Advanced Scenarios'],
                     'question_count' => 10, // We will seed 10 questions per exam

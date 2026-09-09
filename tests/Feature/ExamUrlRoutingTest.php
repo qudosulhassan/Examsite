@@ -50,20 +50,35 @@ class ExamUrlRoutingTest extends TestCase
         $response->assertSee('AZ-104');
     }
 
-    public function test_legacy_vendor_hyphenated_url_redirects_to_nested_url()
+    public function test_legacy_vendor_hyphenated_url_redirects_only_if_explicit_redirect_configured()
     {
-        // /exams/microsoft-az-104 should 301 redirect to /exams/microsoft/az-104
+        // /exams/microsoft-az-104 has explicit redirect configured in setUp
         $response = $this->get('/exams/microsoft-az-104');
         $response->assertStatus(301);
         $response->assertRedirect('/exams/microsoft/az-104');
     }
 
-    public function test_legacy_short_code_url_redirects_to_nested_url()
+    public function test_unmapped_legacy_urls_and_nonexistent_exams_return_404()
     {
-        // /exams/az-104 should 301 redirect to /exams/microsoft/az-104
+        // /exams/az-104 without redirect rule returns 404
         $response = $this->get('/exams/az-104');
-        $response->assertStatus(301);
-        $response->assertRedirect('/exams/microsoft/az-104');
+        $response->assertStatus(404);
+
+        // /exams/microsoft-sc-900 without redirect rule returns 404
+        $response = $this->get('/exams/microsoft-sc-900');
+        $response->assertStatus(404);
+
+        // Non-existent exam under valid vendor returns 404
+        $response = $this->get('/exams/microsoft/nonexistent-code');
+        $response->assertStatus(404);
+
+        // Non-existent vendor returns 404
+        $response = $this->get('/exams/fake-vendor/az-104');
+        $response->assertStatus(404);
+
+        // Verify no ghost exams or redirects were auto-created
+        $this->assertDatabaseMissing('exams', ['slug' => 'nonexistent-code']);
+        $this->assertDatabaseMissing('redirects', ['old_url' => 'exams/microsoft/nonexistent-code']);
     }
 
     public function test_exam_model_url_attribute()
@@ -133,5 +148,21 @@ class ExamUrlRoutingTest extends TestCase
 
         $publicResponse = $this->get('/exams/microsoft/ms-900');
         $publicResponse->assertStatus(200);
+    }
+
+    public function test_admin_cannot_create_redirect_to_nonexistent_exam()
+    {
+        $adminUser = \App\Models\User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($adminUser)->post(route('admin.seo.redirects.store'), [
+            'old_url' => 'exams/old-fake-exam',
+            'new_url' => 'exams/microsoft/non-existent-exam',
+            'status_code' => 301,
+        ]);
+
+        $response->assertSessionHas('error');
+        $this->assertDatabaseMissing('redirects', [
+            'old_url' => 'exams/old-fake-exam',
+        ]);
     }
 }
