@@ -49,6 +49,11 @@ Alpine.start();
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tiptap-container').forEach(container => {
+        // Skip full rich blog / article editors (handled by blog-editor.js)
+        if (container.dataset.editorType === 'full' || container.classList.contains('tiptap-full-editor') || container.querySelector('.btn-source-mode') || container.dataset.tiptapInitialized) {
+            return;
+        }
+
         const editorEl = container.querySelector('.editor-element');
         const inputEl = container.querySelector('.content-input');
         

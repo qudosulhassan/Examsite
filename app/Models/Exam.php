@@ -68,6 +68,7 @@ class Exam extends Model
         'header_title',
         'slug',
         'description',
+        'article_content',
         'topics',
         'question_count',
         'passing_score',

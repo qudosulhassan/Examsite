@@ -6,6 +6,10 @@
 @section('canonical_url', $exam->url)
 @section('og_type', 'product')
 
+@section('styles')
+@include('partials.rich-content-styles')
+@endsection
+
 @section('seo_tags')
 <script type="application/ld+json">
 {
@@ -465,6 +469,15 @@
                         <p class="font-normal text-gray-600">Our expert certification guides include comprehensive questions and answers designed to mirror the actual exam environment. The full study package will prepare you for the variety of formats found on this test, including multiple choice, multi-select, and drag-and-drop questions.</p>
                     </div>
                 </div>
+
+                @if(!empty($exam->article_content))
+                <!-- Comprehensive Exam Article & Study Guide -->
+                <div class="bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
+                    <div class="blog-content-body prose prose-base sm:prose-lg prose-cyan max-w-none text-gray-700 leading-relaxed">
+                        {!! $exam->article_content !!}
+                    </div>
+                </div>
+                @endif
 
                 <!-- Collapsible Topics covered -->
                 <div class="space-y-4" x-data="{ open: true }">

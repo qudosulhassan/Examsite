@@ -76,6 +76,10 @@ function formatHtml(html) {
 // Initialize Blog Tiptap Editor
 export function initBlogEditor(container) {
     if (!container || container.dataset.tiptapInitialized) return;
+    // Only initialize full rich editors (avoid capturing simple textareas or unequipped containers)
+    if (!container.classList.contains('tiptap-full-editor') && !container.querySelector('.source-editor-element') && container.dataset.editorType !== 'full') {
+        return;
+    }
     container.dataset.tiptapInitialized = 'true';
 
     const editorEl = container.querySelector('.editor-element');
@@ -143,7 +147,7 @@ export function initBlogEditor(container) {
             Superscript,
             CharacterCount,
             Placeholder.configure({
-                placeholder: 'Draft your comprehensive, high-ranking IT certification guide or article...',
+                placeholder: container.dataset.placeholder || 'Draft your comprehensive, high-ranking IT certification guide or article...',
             }),
         ],
         content: initialHtml,
@@ -599,6 +603,7 @@ export function initBlogEditor(container) {
     validateHeadingHierarchy();
 
     window.tiptapEditorInstance = editor;
+    window.initBlogEditor = initBlogEditor;
     return editor;
 }
 

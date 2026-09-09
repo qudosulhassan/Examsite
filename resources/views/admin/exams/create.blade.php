@@ -2,6 +2,10 @@
 
 @section('title', 'Create New Certification Exam')
 
+@section('styles')
+@include('admin.partials.tiptap-styles')
+@endsection
+
 @section('content')
 @php
 $certData = $certifications->map(function($c) {
@@ -725,11 +729,34 @@ $workspaceConfig = [
                     </div>
                 </div>
 
-                <!-- 05: PDF & DIGITAL ASSETS -->
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="section-files">
+                <!-- 05: ARTICLE CONTENT -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="section-article">
                     <div class="border-b border-gray-100 px-6 py-4 bg-gray-50/50 flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">05</span>
+                            <div>
+                                <h3 class="text-sm font-bold text-navy uppercase tracking-wide">ARTICLE CONTENT</h3>
+                                <p class="text-xs text-gray-500">Professional TipTap WYSIWYG &amp; HTML Source Editor with real-time statistics</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                        @include('admin.partials.tiptap-editor', [
+                            'name' => 'article_content',
+                            'value' => old('article_content', ''),
+                            'placeholder' => 'Draft your comprehensive, high-ranking IT certification guide or article...',
+                            'minHeight' => '480px'
+                        ])
+                        @error('article_content') <p class="text-red-500 text-xs mt-1.5 font-medium">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                <!-- 06: PDF & DIGITAL ASSETS -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="section-files">
+                    <div class="border-b border-gray-100 px-6 py-4 bg-gray-50/50 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">06</span>
                             <div>
                                 <h3 class="text-sm font-bold text-navy uppercase tracking-wide">PDF & Digital Assets</h3>
                                 <p class="text-xs text-gray-500">Manage demo previews and authenticated full customer download guides.</p>
@@ -785,11 +812,11 @@ $workspaceConfig = [
                     </div>
                 </div>
 
-                <!-- 06: SEARCH ENGINE OPTIMIZATION (SEO) -->
+                <!-- 07: SEARCH ENGINE OPTIMIZATION (SEO) -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" x-data="{ seoOpen: true }" id="section-seo">
                     <div class="border-b border-gray-100 px-6 py-4 bg-gray-50/50 flex items-center justify-between cursor-pointer" @click="seoOpen = !seoOpen">
                         <div class="flex items-center space-x-3">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">06</span>
+                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">07</span>
                             <div>
                                 <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Search Engine Optimization (SEO)</h3>
                                 <p class="text-xs text-gray-500">Fine-tune Google SERP snippets, meta tags, and search index previews.</p>
@@ -866,11 +893,11 @@ $workspaceConfig = [
                     </div>
                 </div>
 
-                <!-- 07: ADVANCED SETTINGS -->
+                <!-- 08: ADVANCED SETTINGS -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" x-data="{ advancedOpen: false }" id="section-advanced">
                     <div class="border-b border-gray-100 px-6 py-4 bg-gray-50/50 flex items-center justify-between cursor-pointer" @click="advancedOpen = !advancedOpen">
                         <div class="flex items-center space-x-3">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">07</span>
+                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">08</span>
                             <div>
                                 <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Advanced & Technical Settings</h3>
                                 <p class="text-xs text-gray-500">URL slugs, sort order, featured status, and internal administration notes.</p>
@@ -1098,6 +1125,7 @@ $workspaceConfig = [
 @endsection
 
 @section('scripts')
+@vite(['resources/js/blog-editor.js'])
 <script>
 function examWorkspace(initial) {
     return {

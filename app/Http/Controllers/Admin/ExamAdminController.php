@@ -12,6 +12,7 @@ use App\Services\AuditLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Services\HtmlSanitizerService;
 
 class ExamAdminController extends Controller
 {
@@ -143,6 +144,7 @@ class ExamAdminController extends Controller
             'exam_type' => 'required|in:MultipleChoice,MultiSelect,LabBased',
             'topics' => 'nullable', // string or array
             'description' => 'nullable|string',
+            'article_content' => 'nullable|string',
             'demo_pdf' => 'nullable|file|mimes:pdf|max:20480',
             'full_pdf' => 'nullable|file|mimes:pdf|max:51200',
             'meta_title' => 'nullable|string|max:255',
@@ -217,6 +219,7 @@ class ExamAdminController extends Controller
             'exam_type' => $request->exam_type,
             'topics' => $topicsArray,
             'description' => $request->description,
+            'article_content' => HtmlSanitizerService::sanitize($request->article_content),
             'is_active' => $isActive,
             'is_featured' => $request->has('is_featured'),
             'sort_order' => $request->filled('sort_order') ? (int)$request->sort_order : 0,
@@ -306,6 +309,7 @@ class ExamAdminController extends Controller
             'exam_type' => 'required|in:MultipleChoice,MultiSelect,LabBased',
             'topics' => 'nullable',
             'description' => 'nullable|string',
+            'article_content' => 'nullable|string',
             'demo_pdf' => 'nullable|file|mimes:pdf|max:20480',
             'full_pdf' => 'nullable|file|mimes:pdf|max:51200',
             'remove_demo_pdf' => 'nullable|boolean',
@@ -358,6 +362,7 @@ class ExamAdminController extends Controller
             'exam_type' => $request->exam_type,
             'topics' => $topicsArray,
             'description' => $request->description,
+            'article_content' => HtmlSanitizerService::sanitize($request->article_content),
             'is_active' => $isActive,
             'is_featured' => $request->has('is_featured'),
             'sort_order' => $request->filled('sort_order') ? (int)$request->sort_order : 0,
