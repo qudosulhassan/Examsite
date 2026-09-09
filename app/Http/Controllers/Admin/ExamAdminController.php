@@ -143,6 +143,7 @@ class ExamAdminController extends Controller
             'difficulty' => 'required|in:Associate,Professional,Expert',
             'exam_type' => 'required|in:MultipleChoice,MultiSelect,LabBased',
             'topics' => 'nullable', // string or array
+            'faqs' => 'nullable', // array of {question, answer}
             'description' => 'nullable|string',
             'article_content' => 'nullable|string',
             'demo_pdf' => 'nullable|file|mimes:pdf|max:20480',
@@ -198,6 +199,19 @@ class ExamAdminController extends Controller
         $vendorSlug = $vendor ? $vendor->slug : null;
         $slug = $this->cleanExamSlug($request->slug, $request->exam_code, $vendorSlug);
 
+        $faqsArray = [];
+        if (is_array($request->faqs)) {
+            foreach ($request->faqs as $faq) {
+                if (is_array($faq)) {
+                    $q = trim((string)($faq['question'] ?? ''));
+                    $a = trim((string)($faq['answer'] ?? ''));
+                    if ($q !== '' && $a !== '') {
+                        $faqsArray[] = ['question' => $q, 'answer' => $a];
+                    }
+                }
+            }
+        }
+
         $exam = Exam::create([
             'vendor_id' => $request->vendor_id,
             'exam_code' => $request->exam_code,
@@ -218,6 +232,7 @@ class ExamAdminController extends Controller
             'difficulty' => $request->difficulty,
             'exam_type' => $request->exam_type,
             'topics' => $topicsArray,
+            'faqs' => $faqsArray,
             'description' => $request->description,
             'article_content' => HtmlSanitizerService::sanitize($request->article_content),
             'is_active' => $isActive,
@@ -308,6 +323,7 @@ class ExamAdminController extends Controller
             'difficulty' => 'required|in:Associate,Professional,Expert',
             'exam_type' => 'required|in:MultipleChoice,MultiSelect,LabBased',
             'topics' => 'nullable',
+            'faqs' => 'nullable',
             'description' => 'nullable|string',
             'article_content' => 'nullable|string',
             'demo_pdf' => 'nullable|file|mimes:pdf|max:20480',
@@ -341,6 +357,19 @@ class ExamAdminController extends Controller
         $vendorSlug = $vendor ? $vendor->slug : null;
         $slug = $this->cleanExamSlug($request->slug, $request->exam_code, $vendorSlug);
 
+        $faqsArray = [];
+        if (is_array($request->faqs)) {
+            foreach ($request->faqs as $faq) {
+                if (is_array($faq)) {
+                    $q = trim((string)($faq['question'] ?? ''));
+                    $a = trim((string)($faq['answer'] ?? ''));
+                    if ($q !== '' && $a !== '') {
+                        $faqsArray[] = ['question' => $q, 'answer' => $a];
+                    }
+                }
+            }
+        }
+
         $updateData = [
             'vendor_id' => $request->vendor_id,
             'exam_code' => $request->exam_code,
@@ -361,6 +390,7 @@ class ExamAdminController extends Controller
             'difficulty' => $request->difficulty,
             'exam_type' => $request->exam_type,
             'topics' => $topicsArray,
+            'faqs' => $faqsArray,
             'description' => $request->description,
             'article_content' => HtmlSanitizerService::sanitize($request->article_content),
             'is_active' => $isActive,

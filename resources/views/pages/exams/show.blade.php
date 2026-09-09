@@ -62,6 +62,26 @@
   }
 }
 </script>
+@if(!empty($exam->faqs) && is_array($exam->faqs) && count($exam->faqs) > 0)
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    @foreach($exam->faqs as $faqIndex => $faq)
+    {
+      "@type": "Question",
+      "name": {!! json_encode($faq['question'] ?? '') !!},
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": {!! json_encode(strip_tags($faq['answer'] ?? '')) !!}
+      }
+    }{{ $faqIndex < count($exam->faqs) - 1 ? ',' : '' }}
+    @endforeach
+  ]
+}
+</script>
+@endif
 @endsection
 
 @section('content')
@@ -513,6 +533,48 @@
                         </div>
                     </div>
                 </div>
+
+                @if(!empty($exam->faqs) && is_array($exam->faqs) && count($exam->faqs) > 0)
+                <!-- Frequently Asked Questions (FAQ) Section -->
+                <div class="space-y-6 pt-4" x-data="{ activeFaq: null }">
+                    <div class="text-center mb-8">
+                        <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-3 inline-block">Got Questions?</span>
+                        <h3 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Frequently Asked Questions</h3>
+                        <p class="text-base sm:text-lg text-gray-600 font-normal max-w-2xl mx-auto mt-2">Everything you need to know about the {{ $exam->exam_code }} certification exam, preparation materials, and practice resources.</p>
+                    </div>
+
+                    <div class="space-y-4 max-w-4xl mx-auto">
+                        @foreach($exam->faqs as $faqIndex => $faq)
+                            <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-[0_5px_20px_rgba(0,0,0,0.02)] hover:border-cyan/30 transition-all duration-200 group">
+                                <button type="button"
+                                        @click="activeFaq = activeFaq === {{ $faqIndex }} ? null : {{ $faqIndex }}"
+                                        class="flex justify-between items-center w-full p-6 text-left focus:outline-none transition-colors"
+                                        :class="activeFaq === {{ $faqIndex }} ? 'bg-slate-50/80 text-cyan' : 'text-navy group-hover:text-cyan'">
+                                    <span class="font-bold text-base sm:text-lg pr-4 flex items-center gap-3">
+                                        <span class="w-7 h-7 rounded-lg bg-cyan/10 text-cyan text-xs font-black flex items-center justify-center shrink-0">Q{{ $faqIndex + 1 }}</span>
+                                        <span>{{ $faq['question'] ?? '' }}</span>
+                                    </span>
+                                    <div class="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-cyan/10 flex items-center justify-center shrink-0 transition-colors">
+                                        <svg class="h-5 w-5 text-gray-400 group-hover:text-cyan transition duration-300 transform"
+                                             :class="activeFaq === {{ $faqIndex }} ? 'rotate-180 text-cyan' : ''"
+                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </button>
+                                <div x-show="activeFaq === {{ $faqIndex }}"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 -translate-y-2"
+                                     x-transition:enter-end="opacity-100 translate-y-0"
+                                     class="p-6 pt-2 text-sm sm:text-base text-gray-600 leading-relaxed border-t border-gray-100/80 bg-white"
+                                     style="display: none;">
+                                    <p class="whitespace-pre-line">{!! nl2br(e($faq['answer'] ?? '')) !!}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
 
                 <!-- Sample Questions -->
                 <div class="space-y-10 pt-8">

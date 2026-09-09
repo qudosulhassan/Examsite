@@ -20,6 +20,10 @@ $certData = $certifications->map(function($c) {
 $preSelected = $exam->certifications->pluck('id')->toJson();
 $existingTopics = is_array($exam->topics) ? $exam->topics : ($exam->topics ? explode(',', $exam->topics) : []);
 $existingTopicsList = array_values(array_filter(array_map('trim', $existingTopics)));
+$existingFaqs = old('faqs', $exam->faqs ?? []);
+$existingFaqsList = is_array($existingFaqs) ? array_values(array_filter($existingFaqs, function($item) {
+    return is_array($item) && !empty(trim($item['question'] ?? '')) && !empty(trim($item['answer'] ?? ''));
+})) : [];
 
 $workspaceConfig = [
     'examCode' => (string)old('exam_code', $exam->exam_code),
@@ -52,6 +56,7 @@ $workspaceConfig = [
     'hasDemoPdf' => (bool)$exam->demo_pdf_filename,
     'hasFullPdf' => (bool)$exam->full_pdf_filename,
     'topics' => $existingTopicsList,
+    'faqs' => $existingFaqsList,
 ];
 @endphp
 
@@ -749,11 +754,77 @@ $workspaceConfig = [
                     </div>
                 </div>
 
-                <!-- 06: PDF & DIGITAL ASSETS -->
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="section-files">
+                <!-- 06: FREQUENTLY ASKED QUESTIONS (FAQS) -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="section-faqs">
                     <div class="border-b border-gray-100 px-6 py-4 bg-gray-50/50 flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">06</span>
+                            <div>
+                                <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Frequently Asked Questions (FAQs)</h3>
+                                <p class="text-xs text-gray-500">Custom questions and answers rendered on the public exam page and in Google FAQPage schema.</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-mono font-bold text-gray-400" x-text="faqs.length + ' FAQs'"></span>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        <!-- FAQ List -->
+                        <div class="space-y-4">
+                            <template x-for="(faq, index) in faqs" :key="index">
+                                <div class="p-5 border border-gray-200 rounded-xl bg-gray-50/50 space-y-4 relative group">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-6 h-6 rounded-full bg-cyan/10 text-cyan text-xs font-black flex items-center justify-center" x-text="index + 1"></span>
+                                            <span class="text-xs font-bold uppercase text-navy">Question & Answer</span>
+                                        </div>
+                                        <button type="button" @click="removeFaq(index)" class="text-xs text-red-500 hover:text-red-700 font-bold flex items-center gap-1 transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            <span>Remove</span>
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">
+                                            Question <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" :name="'faqs[' + index + '][question]'" x-model="faq.question" @input="markDirty()"
+                                               placeholder="e.g. How many questions are on the real exam?"
+                                               class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2.5 font-medium text-navy focus:border-cyan focus:ring-cyan shadow-sm bg-white">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">
+                                            Answer <span class="text-red-500">*</span>
+                                        </label>
+                                        <textarea :name="'faqs[' + index + '][answer]'" x-model="faq.answer" @input="markDirty()" rows="3"
+                                                  placeholder="Provide a clear, detailed answer..."
+                                                  class="w-full border-gray-300 rounded-lg text-sm px-3.5 py-2.5 text-gray-700 focus:border-cyan focus:ring-cyan shadow-sm bg-white"></textarea>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div x-show="faqs.length === 0" class="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/40">
+                                <svg class="w-10 h-10 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <p class="text-sm font-medium text-gray-500">No FAQs configured yet for this exam.</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Click the button below to add dynamic, exam-specific frequently asked questions.</p>
+                            </div>
+                        </div>
+
+                        <!-- Add FAQ Button -->
+                        <div>
+                            <button type="button" @click="addFaq()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-navy text-white text-xs font-bold hover:bg-gray-800 transition shadow-sm">
+                                <svg class="w-4 h-4 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                <span>+ Add FAQ Item</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 07: PDF & DIGITAL ASSETS -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="section-files">
+                    <div class="border-b border-gray-100 px-6 py-4 bg-gray-50/50 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">07</span>
                             <div>
                                 <h3 class="text-sm font-bold text-navy uppercase tracking-wide">PDF & Digital Assets</h3>
                                 <p class="text-xs text-gray-500">Manage demo previews and authenticated full customer download guides.</p>
@@ -865,11 +936,11 @@ $workspaceConfig = [
                     </div>
                 </div>
 
-                <!-- 07: SEARCH ENGINE OPTIMIZATION (SEO) -->
+                <!-- 08: SEARCH ENGINE OPTIMIZATION (SEO) -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" x-data="{ seoOpen: true }" id="section-seo">
                     <div class="border-b border-gray-100 px-6 py-4 bg-gray-50/50 flex items-center justify-between cursor-pointer" @click="seoOpen = !seoOpen">
                         <div class="flex items-center space-x-3">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">07</span>
+                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">08</span>
                             <div>
                                 <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Search Engine Optimization (SEO)</h3>
                                 <p class="text-xs text-gray-500">Fine-tune Google SERP snippets, meta tags, and search index previews.</p>
@@ -940,17 +1011,17 @@ $workspaceConfig = [
                                 <h4 class="text-base text-[#1a0dab] hover:underline font-medium cursor-pointer truncate"
                                     x-text="metaTitle || (examCode ? examCode + ' - ' + examName + ' Study Guide' : 'Exam Title')"></h4>
                                 <p class="text-xs text-[#4d5156] line-clamp-2 leading-relaxed"
-                                   x-text="metaDescription || 'Get updated ' + (examCode || '') + ' (' + (examName || '') + ') exam questions, answers, and study guides. Try our free demo or web-based test engine.'"></p>
+                                    x-text="metaDescription || 'Get updated ' + (examCode || '') + ' (' + (examName || '') + ') exam questions, answers, and study guides. Try our free demo or web-based test engine.'"></p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 08: ADVANCED SETTINGS -->
+                <!-- 09: ADVANCED SETTINGS -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" x-data="{ advancedOpen: false }" id="section-advanced">
                     <div class="border-b border-gray-100 px-6 py-4 bg-gray-50/50 flex items-center justify-between cursor-pointer" @click="advancedOpen = !advancedOpen">
                         <div class="flex items-center space-x-3">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">08</span>
+                            <span class="flex items-center justify-center w-7 h-7 rounded-md bg-navy text-white text-xs font-black">09</span>
                             <div>
                                 <h3 class="text-sm font-bold text-navy uppercase tracking-wide">Advanced & Technical Settings</h3>
                                 <p class="text-xs text-gray-500">URL slugs, 301 redirects, sort order, and internal administration notes.</p>
@@ -1273,6 +1344,7 @@ function examWorkspace(initial) {
         hasFullPdf: initial.hasFullPdf,
         topics: initial.topics || [],
         newTopicInput: '',
+        faqs: initial.faqs || [],
         isDirty: false,
         isSubmitting: false,
 
@@ -1324,6 +1396,19 @@ function examWorkspace(initial) {
 
         removeTopic(index) {
             this.topics.splice(index, 1);
+            this.markDirty();
+        },
+
+        addFaq() {
+            this.faqs.push({
+                question: '',
+                answer: ''
+            });
+            this.markDirty();
+        },
+
+        removeFaq(index) {
+            this.faqs.splice(index, 1);
             this.markDirty();
         },
 

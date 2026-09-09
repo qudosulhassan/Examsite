@@ -70,6 +70,7 @@ class Exam extends Model
         'description',
         'article_content',
         'topics',
+        'faqs',
         'question_count',
         'passing_score',
         'difficulty',
@@ -97,6 +98,7 @@ class Exam extends Model
 
     protected $casts = [
         'topics' => 'array',
+        'faqs' => 'array',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'is_pdf_available' => 'boolean',
