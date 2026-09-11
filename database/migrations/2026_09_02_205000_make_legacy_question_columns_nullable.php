@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('questions', function (Blueprint $table) {
-            $table->text('option_a')->nullable()->change();
-            $table->text('option_b')->nullable()->change();
-            $table->text('option_c')->nullable()->change();
-            $table->text('option_d')->nullable()->change();
-            $table->string('correct_option')->nullable()->change();
-        });
+        if (Schema::hasColumn('questions', 'option_a')) {
+            Schema::table('questions', function (Blueprint $table) {
+                $table->text('option_a')->nullable()->change();
+                $table->text('option_b')->nullable()->change();
+                $table->text('option_c')->nullable()->change();
+                $table->text('option_d')->nullable()->change();
+                $table->string('correct_option')->nullable()->change();
+            });
+        }
     }
 
     /**

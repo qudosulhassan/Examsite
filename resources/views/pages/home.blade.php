@@ -1,6 +1,11 @@
 @extends('layouts.public')
 
-@section('title', 'Exam Topics Base - Pass Your IT Certification Exam First Attempt')
+@php
+    $siteBrand = ($currentSite && !empty($currentSite->name)) ? $currentSite->name : config('app.name', 'ExamTopicsBase');
+    $homeTitle = ($currentSite && !empty($currentSite->default_seo_title)) ? $currentSite->default_seo_title : "{$siteBrand} - Pass Your IT Certification Exam First Attempt";
+@endphp
+
+@section('title', $homeTitle)
 
 @section('seo_tags')
 <script type="application/ld+json">

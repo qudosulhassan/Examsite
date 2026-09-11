@@ -19,6 +19,17 @@ use App\Http\Controllers\Admin\BlogTagController;
 Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
 // CRUD Resources
+Route::get('sites/{site}/exams', [App\Http\Controllers\Admin\SiteAdminController::class, 'manageExams'])->name('sites.exams');
+Route::post('sites/{site}/exams/attach', [App\Http\Controllers\Admin\SiteAdminController::class, 'attachExam'])->name('sites.exams.attach');
+Route::delete('sites/{site}/exams/{exam}', [App\Http\Controllers\Admin\SiteAdminController::class, 'detachExam'])->name('sites.exams.detach');
+Route::post('sites/{site}/exams/bulk', [App\Http\Controllers\Admin\SiteAdminController::class, 'bulkExamAction'])->name('sites.exams.bulk');
+Route::post('sites/{site}/domains', [App\Http\Controllers\Admin\SiteAdminController::class, 'addDomain'])->name('sites.domains.add');
+Route::delete('sites/{site}/domains/{domain}', [App\Http\Controllers\Admin\SiteAdminController::class, 'removeDomain'])->name('sites.domains.remove');
+Route::post('sites/{site}/exam-overlay', [App\Http\Controllers\Admin\SiteAdminController::class, 'saveExamOverlay'])->name('sites.exam-overlay.save');
+// Edit must be explicit (excluded from resource to avoid double-registration conflict)
+Route::get('sites/{site}/edit', [App\Http\Controllers\Admin\SiteAdminController::class, 'edit'])->name('sites.edit');
+Route::get('sites/{site}', [App\Http\Controllers\Admin\SiteAdminController::class, 'show'])->name('sites.show');
+Route::resource('sites', App\Http\Controllers\Admin\SiteAdminController::class)->except(['show', 'edit']);
 Route::resource('packages', PackageAdminController::class);
 Route::resource('vendors', VendorAdminController::class);
 Route::resource('certifications', App\Http\Controllers\Admin\CertificationController::class);

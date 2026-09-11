@@ -21,14 +21,23 @@ class CheckRedirects
         $redirect = null;
         if (\Illuminate\Support\Facades\Schema::hasTable('redirects')) {
             try {
+                $site = app()->bound('current_site') ? app('current_site') : null;
                 $q = Redirect::query();
                 if (\Illuminate\Support\Facades\Schema::hasColumn('redirects', 'is_active')) {
                     $q->where('is_active', true);
                 }
+
+                if ($site && \Illuminate\Support\Facades\Schema::hasColumn('redirects', 'site_id')) {
+                    $q->where(function ($query) use ($site) {
+                        $query->where('site_id', $site->id)
+                              ->orWhereNull('site_id');
+                    });
+                }
+
                 $redirect = $q->where(function ($query) use ($path) {
                     $query->where('old_url', $path)
                           ->orWhere('old_url', ltrim($path, '/'));
-                })->first();
+                })->orderByRaw('CASE WHEN site_id IS NULL THEN 1 ELSE 0 END ASC')->first();
             } catch (\Throwable $th) {}
         }
 

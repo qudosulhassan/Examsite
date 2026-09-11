@@ -25,6 +25,10 @@ Thumbs.db
 *.sqlite
 *.sqlite-journal
 database/*.sqlite
+database/*.sqlite*
 database/*.sqlite-journal
 examsninja_local
 composer.phar
+/scratch
+scratch/
+scratch_*

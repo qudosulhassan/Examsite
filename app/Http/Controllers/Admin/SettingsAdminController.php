@@ -198,11 +198,11 @@ class SettingsAdminController extends Controller
         if ($request->filled('tx_search')) {
             $s = $request->tx_search;
             $txQuery->where(function ($q) use ($s) {
-                $q->where('order_number', 'like', "%{$s}%")
-                  ->orWhere('billing_name', 'like', "%{$s}%")
-                  ->orWhere('billing_email', 'like', "%{$s}%")
-                  ->orWhere('stripe_payment_intent_id', 'like', "%{$s}%")
-                  ->orWhere('paypal_order_id', 'like', "%{$s}%");
+                $q->whereLike('order_number', "%{$s}%")
+                  ->orWhereLike('billing_name', "%{$s}%")
+                  ->orWhereLike('billing_email', "%{$s}%")
+                  ->orWhereLike('stripe_payment_intent_id', "%{$s}%")
+                  ->orWhereLike('paypal_order_id', "%{$s}%");
             });
         }
         if ($request->filled('tx_gateway')) {

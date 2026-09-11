@@ -132,8 +132,8 @@ class BlogController extends Controller
         $posts = BlogPost::with(['user', 'category'])
             ->where('status', 'published')
             ->where(function($query) use ($q) {
-                $query->where('title', 'like', "%{$q}%")
-                      ->orWhere('content', 'like', "%{$q}%");
+                $query->whereLike('title', "%{$q}%")
+                      ->orWhereLike('content', "%{$q}%");
             })
             ->latest('published_at')
             ->paginate(9);

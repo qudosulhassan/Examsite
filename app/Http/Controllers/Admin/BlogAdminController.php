@@ -87,15 +87,15 @@ class BlogAdminController extends Controller
         // Server-side search across Title, Slug, Excerpt, Content, Author, Category
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%")
-                  ->orWhere('excerpt', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%")
+                $q->whereLike('title', "%{$search}%")
+                  ->orWhereLike('slug', "%{$search}%")
+                  ->orWhereLike('excerpt', "%{$search}%")
+                  ->orWhereLike('content', "%{$search}%")
                   ->orWhereHas('user', function ($uQ) use ($search) {
-                      $uQ->where('name', 'like', "%{$search}%");
+                      $uQ->whereLike('name', "%{$search}%");
                   })
                   ->orWhereHas('category', function ($cQ) use ($search) {
-                      $cQ->where('name', 'like', "%{$search}%");
+                      $cQ->whereLike('name', "%{$search}%");
                   });
             });
         }

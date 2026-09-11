@@ -71,8 +71,8 @@ class ExamAdminController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('exam_code', 'like', "%{$search}%")
-                  ->orWhere('exam_name', 'like', "%{$search}%");
+                $q->whereLike('exam_code', "%{$search}%")
+                  ->orWhereLike('exam_name', "%{$search}%");
             });
         }
 
@@ -93,8 +93,8 @@ class ExamAdminController extends Controller
         if ($request->filled('query')) {
             $search = $request->input('query');
             $query->where(function($q) use ($search) {
-                $q->where('exam_code', 'like', "%{$search}%")
-                  ->orWhere('exam_name', 'like', "%{$search}%");
+                $q->whereLike('exam_code', "%{$search}%")
+                  ->orWhereLike('exam_name', "%{$search}%");
             });
         }
         

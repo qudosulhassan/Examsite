@@ -7,17 +7,17 @@
 
     <!-- Favicon -->
     @php
-        $customFavicon = !empty($globalSettings['site_favicon']) ? asset($globalSettings['site_favicon']) : asset('favicon-32x32.png');
+        $siteFavicon = ($currentSite && !empty($currentSite->favicon)) ? asset($currentSite->favicon) : (!empty($globalSettings['site_favicon']) ? asset($globalSettings['site_favicon']) : asset('favicon-32x32.png'));
         $customAppleIcon = !empty($globalSettings['apple_touch_icon']) ? asset($globalSettings['apple_touch_icon']) : asset('apple-touch-icon.png');
     @endphp
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ $customFavicon }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ $customFavicon }}">
-    <link rel="shortcut icon" href="{{ $customFavicon }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ $siteFavicon }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ $siteFavicon }}">
+    <link rel="shortcut icon" href="{{ $siteFavicon }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ $customAppleIcon }}">
 
     <!-- Site Verification Tags (Google, Bing, Yandex, Pinterest) -->
     @php
-        $gscVerification = $globalSettings['seo_gsc_verification'] ?? config('seo.verification.google_search_console');
+        $gscVerification = ($currentSite && !empty($currentSite->google_search_console_code)) ? $currentSite->google_search_console_code : ($globalSettings['seo_gsc_verification'] ?? config('seo.verification.google_search_console'));
         $bingVerification = $globalSettings['seo_bing_verification'] ?? '';
         $yandexVerification = $globalSettings['seo_yandex_verification'] ?? '';
         $pinterestVerification = $globalSettings['seo_pinterest_verification'] ?? '';
@@ -26,7 +26,12 @@
         $rawCanonical = trim($__env->yieldContent('canonical_url'));
         $computedCanonical = !empty($rawCanonical) ? $seoService->buildCanonicalUrl($rawCanonical) : $seoService->buildCanonicalUrl();
         $yieldRobots = trim($__env->yieldContent('robots'));
-        $computedRobots = !empty($yieldRobots) ? $yieldRobots : $seoService->getRobotsMetaDirective();
+        $computedRobots = !empty($yieldRobots) ? $yieldRobots : (($currentSite && !empty($currentSite->robots_directive) && $currentSite->id > 1) ? $currentSite->robots_directive : $seoService->getRobotsMetaDirective());
+
+        $defaultSiteTitle = ($currentSite && !empty($currentSite->default_seo_title)) ? $currentSite->default_seo_title : ($globalSettings['default_seo_title'] ?? config('seo.defaults.title'));
+        $defaultSiteDesc = ($currentSite && !empty($currentSite->default_meta_description)) ? $currentSite->default_meta_description : ($globalSettings['default_meta_description'] ?? config('seo.defaults.description'));
+        $defaultSiteKeywords = ($currentSite && !empty($currentSite->primary_keyword_strategy)) ? $currentSite->primary_keyword_strategy : ($globalSettings['default_meta_keywords'] ?? config('seo.defaults.keywords'));
+        $activeSiteName = $currentSite ? $currentSite->name : ($globalSettings['site_name'] ?? config('seo.site_name', 'Exam Topics Base'));
     @endphp
     @if(!empty($gscVerification))
         <meta name="google-site-verification" content="{{ $gscVerification }}">
@@ -41,9 +46,9 @@
         <meta name="p:domain_verify" content="{{ $pinterestVerification }}">
     @endif
 
-    <title>@yield('title', $globalSettings['default_seo_title'] ?? config('seo.defaults.title'))</title>
-    <meta name="description" content="@yield('meta_description', $globalSettings['default_meta_description'] ?? config('seo.defaults.description'))">
-    <meta name="keywords" content="@yield('meta_keywords', $globalSettings['default_meta_keywords'] ?? config('seo.defaults.keywords'))">
+    <title>@yield('title', $defaultSiteTitle)</title>
+    <meta name="description" content="@yield('meta_description', $defaultSiteDesc)">
+    <meta name="keywords" content="@yield('meta_keywords', $defaultSiteKeywords)">
     <link rel="canonical" href="{{ $computedCanonical }}">
     <meta name="robots" content="{{ $computedRobots }}">
     <meta name="googlebot" content="{{ $computedRobots }}">
@@ -51,10 +56,10 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', $globalSettings['seo_og_type'] ?? config('seo.defaults.og_type', 'website'))">
     <meta property="og:url" content="{{ $computedCanonical }}">
-    <meta property="og:title" content="@yield('title', $globalSettings['default_og_title'] ?? ($globalSettings['default_seo_title'] ?? config('seo.defaults.title')))">
-    <meta property="og:description" content="@yield('meta_description', $globalSettings['default_og_description'] ?? ($globalSettings['default_meta_description'] ?? config('seo.defaults.description')))">
+    <meta property="og:title" content="@yield('title', $defaultSiteTitle)">
+    <meta property="og:description" content="@yield('meta_description', $defaultSiteDesc)">
     <meta property="og:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')))">
-    <meta property="og:site_name" content="{{ $globalSettings['site_name'] ?? config('seo.site_name', 'Exam Topics Base') }}">
+    <meta property="og:site_name" content="{{ $activeSiteName }}">
     @if(!empty($globalSettings['seo_facebook_app_id']))
         <meta property="fb:app_id" content="{{ $globalSettings['seo_facebook_app_id'] }}">
     @endif
@@ -167,11 +172,21 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo (Dynamic with fallback) -->
                 @php
-                    $primaryLogo = !empty($globalSettings['site_logo']) ? asset($globalSettings['site_logo']) : asset('images/logo.png');
+                    $primaryLogo = ($currentSite && !empty($currentSite->logo)) ? asset($currentSite->logo) : (!empty($globalSettings['site_logo']) ? asset($globalSettings['site_logo']) : asset('images/logo.png'));
+                    $activeBrandName = $currentSite ? $currentSite->name : ($globalSettings['site_name'] ?? config('app.name', 'ExamTopicsBase'));
                 @endphp
                 <div class="flex items-center">
                     <a href="{{ url('/') }}" class="flex items-center py-1 group">
-                        <img src="{{ $primaryLogo }}" alt="{{ $globalSettings['site_name'] ?? config('app.name', 'ExamTopicsBase') }}" class="h-10 sm:h-11 md:h-12 w-auto max-w-[210px] md:max-w-[240px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_2px_12px_rgba(0,212,170,0.2)]">
+                        @if($currentSite && !empty($currentSite->logo))
+                            <img src="{{ $primaryLogo }}" alt="{{ $activeBrandName }}" class="h-10 sm:h-11 md:h-12 w-auto max-w-[210px] md:max-w-[240px] object-contain transition-all duration-300">
+                        @elseif(!empty($globalSettings['site_logo']))
+                            <img src="{{ $primaryLogo }}" alt="{{ $activeBrandName }}" class="h-10 sm:h-11 md:h-12 w-auto max-w-[210px] md:max-w-[240px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_2px_12px_rgba(0,212,170,0.2)]">
+                        @else
+                            <span class="text-xl font-black tracking-tight text-white flex items-center gap-2">
+                                <span class="w-8 h-8 rounded-lg bg-cyan text-navy flex items-center justify-center font-black text-sm">{{ strtoupper(substr($activeBrandName, 0, 2)) }}</span>
+                                <span>{{ $activeBrandName }}</span>
+                            </span>
+                        @endif
                     </a>
                 </div>
 

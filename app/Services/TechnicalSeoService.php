@@ -269,9 +269,13 @@ TXT;
 
     public function generateOrganizationSchema(): array
     {
-        $siteName = Setting::get('site_name', config('app.name', 'Exam Topics Base'));
+        $site = app()->bound('current_site') ? app('current_site') : null;
+        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'Exam Topics Base'));
         $siteUrl = url('/');
-        $logo = Setting::get('site_logo') ? asset(Setting::get('site_logo')) : asset('images/logo.png');
+        $logoPath = ($site && !empty($site->logo)) ? $site->logo : Setting::get('site_logo');
+        $logo = $logoPath ? asset($logoPath) : asset('images/logo.png');
+
+        $contactEmail = ($site && !empty($site->contact_email)) ? $site->contact_email : Setting::get('contact_email', 'support@examtopicsbase.com');
 
         $socialLinks = array_filter([
             Setting::get('social_twitter'),
@@ -289,7 +293,7 @@ TXT;
             'logo' => $logo,
             'contactPoint' => [
                 '@type' => 'ContactPoint',
-                'email' => Setting::get('contact_email', 'support@examtopicsbase.com'),
+                'email' => $contactEmail,
                 'contactType' => 'customer support',
             ],
             'sameAs' => array_values($socialLinks),
@@ -298,7 +302,8 @@ TXT;
 
     public function generateWebSiteSchema(): array
     {
-        $siteName = Setting::get('site_name', config('app.name', 'Exam Topics Base'));
+        $site = app()->bound('current_site') ? app('current_site') : null;
+        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'Exam Topics Base'));
         $siteUrl = url('/');
 
         return [
@@ -337,7 +342,9 @@ TXT;
 
     public function generateArticleSchema($post): array
     {
-        $siteName = Setting::get('site_name', config('app.name', 'Exam Topics Base'));
+        $site = app()->bound('current_site') ? app('current_site') : null;
+        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'Exam Topics Base'));
+        $logoPath = ($site && !empty($site->logo)) ? $site->logo : Setting::get('site_logo', 'images/logo.png');
 
         return [
             '@context' => 'https://schema.org',
@@ -355,7 +362,7 @@ TXT;
                 'name' => $siteName,
                 'logo' => [
                     '@type' => 'ImageObject',
-                    'url' => asset(Setting::get('site_logo', 'images/logo.png')),
+                    'url' => asset($logoPath),
                 ],
             ],
             'description' => $post->meta_description ?? substr(strip_tags($post->excerpt ?? $post->content ?? ''), 0, 160),
@@ -402,6 +409,9 @@ TXT;
     {
         $vendorName = $exam->vendor ? $exam->vendor->name : 'IT Provider';
 
+        $site = app()->bound('current_site') ? app('current_site') : null;
+        $siteName = $site ? $site->name : Setting::get('site_name', 'Exam Topics Base');
+
         return [
             '@context' => 'https://schema.org',
             '@type' => 'Course',
@@ -409,7 +419,7 @@ TXT;
             'description' => $exam->meta_description ?: ($exam->description ? substr(strip_tags($exam->description), 0, 200) : 'Comprehensive exam preparation course and practice test questions.'),
             'provider' => [
                 '@type' => 'Organization',
-                'name' => Setting::get('site_name', 'Exam Topics Base'),
+                'name' => $siteName,
                 'sameAs' => url('/'),
             ],
             'educationalCredentialAwarded' => $exam->code ? $exam->code . ' Certification' : 'Professional Certification',
@@ -523,22 +533,30 @@ TXT;
      */
     public function resolveExamSeoTitle(Exam $exam): string
     {
+        $site = app()->bound('current_site') ? app('current_site') : null;
+        $overlay = $exam->getOverlayForSite($site);
+
+        if ($overlay && !empty(trim((string)($overlay->meta_title ?? '')))) {
+            return trim($overlay->meta_title);
+        }
+
         $custom = trim((string)($exam->meta_title ?? ''));
         if ($custom !== '') {
             return $custom;
         }
 
+        $siteBrand = $site ? $site->name : 'Exam Topics Base';
         $code = trim((string)($exam->exam_code ?? ''));
         if ($code !== '') {
-            return "{$code} Exam Dumps & Study Guide | Exam Topics Base";
+            return "{$code} Exam Dumps & Study Guide | {$siteBrand}";
         }
 
         $name = trim((string)($exam->exam_name ?? ''));
         if ($name !== '') {
-            return "{$name} Study Guide | Exam Topics Base";
+            return "{$name} Study Guide | {$siteBrand}";
         }
 
-        return Setting::get('default_seo_title', config('seo.defaults.title', 'Exam Topics Base'));
+        return $site ? $site->getSetting('default_seo_title', $siteBrand) : Setting::get('default_seo_title', config('seo.defaults.title', 'Exam Topics Base'));
     }
 
     /**
@@ -546,6 +564,13 @@ TXT;
      */
     public function resolveExamMetaDescription(Exam $exam): string
     {
+        $site = app()->bound('current_site') ? app('current_site') : null;
+        $overlay = $exam->getOverlayForSite($site);
+
+        if ($overlay && !empty(trim((string)($overlay->meta_description ?? '')))) {
+            return trim($overlay->meta_description);
+        }
+
         $custom = trim((string)($exam->meta_description ?? ''));
         if ($custom !== '') {
             return $custom;
@@ -557,7 +582,7 @@ TXT;
             return "Get updated {$code}{$nameSuffix} exam questions, answers, and study guides. Try our free demo or web-based test engine.";
         }
 
-        return Setting::get('default_meta_description', config('seo.defaults.description', ''));
+        return $site ? $site->getSetting('default_meta_description', '') : Setting::get('default_meta_description', config('seo.defaults.description', ''));
     }
 
     /**

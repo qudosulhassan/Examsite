@@ -62,13 +62,16 @@
   }
 }
 </script>
-@if(!empty($exam->faqs) && is_array($exam->faqs) && count($exam->faqs) > 0)
+@php
+    $schemaFaqs = $exam->resolved_faqs;
+@endphp
+@if(!empty($schemaFaqs) && is_array($schemaFaqs) && count($schemaFaqs) > 0)
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    @foreach($exam->faqs as $faqIndex => $faq)
+    @foreach($schemaFaqs as $faqIndex => $faq)
     {
       "@type": "Question",
       "name": {!! json_encode($faq['question'] ?? '') !!},
@@ -76,7 +79,7 @@
         "@type": "Answer",
         "text": {!! json_encode(strip_tags($faq['answer'] ?? '')) !!}
       }
-    }{{ $faqIndex < count($exam->faqs) - 1 ? ',' : '' }}
+    }{{ $faqIndex < count($schemaFaqs) - 1 ? ',' : '' }}
     @endforeach
   ]
 }
@@ -479,11 +482,14 @@
     <div class="container-custom relative z-10 space-y-16">
                 
 
-                @if(!empty($exam->article_content))
+                @php
+                    $renderedArticleContent = $exam->resolved_article_content;
+                @endphp
+                @if(!empty($renderedArticleContent))
                 <!-- Comprehensive Exam Article & Study Guide -->
                 <div class="bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
                     <div class="blog-content-body prose prose-base sm:prose-lg prose-cyan max-w-none text-gray-700 leading-relaxed">
-                        {!! $exam->article_content !!}
+                        {!! $renderedArticleContent !!}
                     </div>
                 </div>
                 @endif
@@ -534,7 +540,10 @@
                     </div>
                 </div>
 
-                @if(!empty($exam->faqs) && is_array($exam->faqs) && count($exam->faqs) > 0)
+                @php
+                    $renderedFaqs = $exam->resolved_faqs;
+                @endphp
+                @if(!empty($renderedFaqs) && is_array($renderedFaqs) && count($renderedFaqs) > 0)
                 <!-- Frequently Asked Questions (FAQ) Section -->
                 <div class="space-y-6 pt-4" x-data="{ activeFaq: null }">
                     <div class="text-center mb-8">
@@ -544,7 +553,7 @@
                     </div>
 
                     <div class="space-y-4 max-w-4xl mx-auto">
-                        @foreach($exam->faqs as $faqIndex => $faq)
+                        @foreach($renderedFaqs as $faqIndex => $faq)
                             <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-[0_5px_20px_rgba(0,0,0,0.02)] hover:border-cyan/30 transition-all duration-200 group">
                                 <button type="button"
                                         @click="activeFaq = activeFaq === {{ $faqIndex }} ? null : {{ $faqIndex }}"

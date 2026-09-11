@@ -27,4 +27,9 @@ class Certification extends Model
     {
         return $this->belongsToMany(Exam::class);
     }
+
+    public function sites()
+    {
+        return $this->belongsToMany(Site::class, 'site_certifications')->withPivot(['is_active'])->withTimestamps();
+    }
 }

@@ -46,10 +46,10 @@ class HomeController extends Controller
 
         if (!empty($searchQuery)) {
             $query->where(function ($q) use ($searchQuery) {
-                $q->where('exam_code', 'like', "%{$searchQuery}%")
-                  ->orWhere('exam_name', 'like', "%{$searchQuery}%")
+                $q->whereLike('exam_code', "%{$searchQuery}%")
+                  ->orWhereLike('exam_name', "%{$searchQuery}%")
                   ->orWhereHas('vendor', function($v) use ($searchQuery) {
-                      $v->where('name', 'like', "%{$searchQuery}%");
+                      $v->whereLike('name', "%{$searchQuery}%");
                   });
             });
         }

@@ -58,6 +58,11 @@ return new class extends Migration
 
             Schema::enableForeignKeyConstraints();
         } else {
+            if ($driver === 'pgsql') {
+                DB::statement('ALTER TABLE order_items DROP CONSTRAINT IF EXISTS order_items_item_type_check');
+                DB::statement('ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_payment_method_check');
+            }
+
             Schema::table('order_items', function (Blueprint $table) {
                 $table->string('item_type')->change();
             });

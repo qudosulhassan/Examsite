@@ -21,51 +21,74 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class OrderAdminController extends Controller
 {
     /**
+     * Scope an order query to the current active application/site.
+     */
+    protected function scopeForCurrentSite($query)
+    {
+        $siteId = (int) (app(\App\Services\SiteContext::class)->id() ?? config('site.id', 1));
+        return $query->where('site_id', $siteId);
+    }
+
+    /**
+     * Find order strictly scoped to the active application/site (HTTP 404/403 if belonging to other site).
+     */
+    protected function findOrderScoped(int $id, array $with = []): Order
+    {
+        $query = Order::query();
+        if (!empty($with)) {
+            $query->with($with);
+        }
+        return $this->scopeForCurrentSite($query)->findOrFail($id);
+    }
+
+    /**
      * Display order dashboard overview with statistics, revenue chart data, filters, and paginated orders.
      */
     public function index(Request $request)
     {
-        // --- 1. Real Database-driven Statistics ---
-        $totalOrders = Order::count();
-        $todayOrders = Order::whereDate('created_at', today())->count();
-        $thisMonthOrders = Order::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
+        // --- 1. Real Database-driven Statistics (Site Scoped) ---
+        $baseQuery = $this->scopeForCurrentSite(Order::query());
+
+        $totalOrders = (clone $baseQuery)->count();
+        $todayOrders = (clone $baseQuery)->whereDate('created_at', today())->count();
+        $thisMonthOrders = (clone $baseQuery)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
         
-        $totalGrossRevenue = (float)Order::whereIn('payment_status', ['paid', 'completed', 'partially_refunded', 'refunded'])->sum('total_amount');
-        $totalRefundedAmount = (float)Order::sum('refunded_amount') + (float)Refund::where('status', 'completed')->sum('amount');
+        $totalGrossRevenue = (float)(clone $baseQuery)->whereIn('payment_status', ['paid', 'completed', 'partially_refunded', 'refunded'])->sum('total_amount');
+        $totalRefundedAmount = (float)(clone $baseQuery)->sum('refunded_amount');
         // Prevent double counting if refunds stored in both
-        $distinctRefunded = (float)Order::where('payment_status', 'refunded')->sum('total_amount') + (float)Order::where('payment_status', 'partially_refunded')->sum('refunded_amount');
+        $distinctRefunded = (float)(clone $baseQuery)->where('payment_status', 'refunded')->sum('total_amount') + (float)(clone $baseQuery)->where('payment_status', 'partially_refunded')->sum('refunded_amount');
         $netRevenue = max(0.0, $totalGrossRevenue - $distinctRefunded);
 
-        $paidOrders = Order::whereIn('payment_status', ['paid', 'completed'])->count();
-        $pendingOrders = Order::whereIn('payment_status', ['pending', 'processing'])->count();
-        $refundedOrders = Order::whereIn('payment_status', ['refunded', 'partially_refunded'])->count();
-        $failedOrders = Order::whereIn('payment_status', ['failed', 'cancelled'])->count();
+        $paidOrders = (clone $baseQuery)->whereIn('payment_status', ['paid', 'completed'])->count();
+        $pendingOrders = (clone $baseQuery)->whereIn('payment_status', ['pending', 'processing'])->count();
+        $refundedOrders = (clone $baseQuery)->whereIn('payment_status', ['refunded', 'partially_refunded'])->count();
+        $failedOrders = (clone $baseQuery)->whereIn('payment_status', ['failed', 'cancelled'])->count();
 
         // --- 2. Revenue Overview Chart Data ---
         $chartPeriod = $request->get('chart_period', '30days');
         $chartData = $this->calculateChartData($chartPeriod);
 
         // --- 3. Filterable Orders Query ---
-        $query = Order::with(['user', 'items.exam.vendor', 'coupon', 'refunds']);
+        $query = $this->scopeForCurrentSite(Order::with(['user', 'items.exam.vendor', 'coupon', 'refunds']));
 
         // Search (Order Number, Customer Name, Customer Email, Transaction/Stripe/PayPal ID, Product/Exam Name)
         if ($request->filled('search')) {
             $search = trim($request->search);
             $query->where(function ($q) use ($search) {
-                $q->where('order_number', 'like', "%{$search}%")
-                  ->orWhere('stripe_payment_intent_id', 'like', "%{$search}%")
-                  ->orWhere('paypal_order_id', 'like', "%{$search}%")
-                  ->orWhere('billing_name', 'like', "%{$search}%")
-                  ->orWhere('billing_email', 'like', "%{$search}%")
+                $q->whereLike('order_number', "%{$search}%")
+                  ->orWhereLike('stripe_payment_intent_id', "%{$search}%")
+                  ->orWhereLike('paypal_order_id', "%{$search}%")
+                  ->orWhereLike('billing_name', "%{$search}%")
+                  ->orWhereLike('billing_email', "%{$search}%")
                   ->orWhereHas('user', function ($uq) use ($search) {
-                      $uq->where('name', 'like', "%{$search}%")
-                         ->orWhere('email', 'like', "%{$search}%");
+                      $uq->whereLike('name', "%{$search}%")
+                         ->orWhereLike('email', "%{$search}%");
                   })
                   ->orWhereHas('items', function ($iq) use ($search) {
-                      $iq->where('plan_name', 'like', "%{$search}%")
+                      $iq->whereLike('plan_name', "%{$search}%")
                          ->orWhereHas('exam', function ($eq) use ($search) {
-                             $eq->where('exam_code', 'like', "%{$search}%")
-                                ->orWhere('exam_name', 'like', "%{$search}%");
+                             $eq->whereLike('exam_code', "%{$search}%")
+                                ->orWhereLike('exam_name', "%{$search}%");
                          });
                   });
             });
@@ -149,7 +172,7 @@ class OrderAdminController extends Controller
         $orders = $query->paginate($perPage)->withQueryString();
 
         // Distinct options for filter selects
-        $paymentMethods = Order::distinct()->whereNotNull('payment_method')->pluck('payment_method')->filter()->values();
+        $paymentMethods = $this->scopeForCurrentSite(Order::distinct()->whereNotNull('payment_method'))->pluck('payment_method')->filter()->values();
 
         return view('admin.orders.index', compact(
             'orders',
@@ -194,9 +217,10 @@ class OrderAdminController extends Controller
             default => now()->subDays(29)->startOfDay(),
         };
 
-        $paidOrders = Order::where('created_at', '>=', $startDate)
-            ->whereIn('payment_status', ['paid', 'completed', 'partially_refunded'])
-            ->get();
+        $paidOrders = $this->scopeForCurrentSite(
+            Order::where('created_at', '>=', $startDate)
+                ->whereIn('payment_status', ['paid', 'completed', 'partially_refunded'])
+        )->get();
 
         $points = [];
         $current = clone $startDate;
@@ -328,18 +352,18 @@ class OrderAdminController extends Controller
      */
     public function show(int $id)
     {
-        $order = Order::with([
+        $order = $this->findOrderScoped($id, [
             'user',
             'items.exam.vendor',
             'coupon',
             'refunds.admin',
             'timelines.performer',
             'userExams.exam.vendor',
-        ])->findOrFail($id);
+        ]);
 
         // Calculate Customer Metrics
-        $customerOrdersCount = Order::where('user_id', $order->user_id)->count();
-        $customerTotalSpent = (float)Order::where('user_id', $order->user_id)
+        $customerOrdersCount = $this->scopeForCurrentSite(Order::where('user_id', $order->user_id))->count();
+        $customerTotalSpent = (float)$this->scopeForCurrentSite(Order::where('user_id', $order->user_id))
             ->whereIn('payment_status', ['paid', 'completed'])
             ->sum('total_amount');
 
@@ -351,7 +375,7 @@ class OrderAdminController extends Controller
      */
     public function refund(Request $request, int $id)
     {
-        $order = Order::findOrFail($id);
+        $order = $this->findOrderScoped($id);
 
         $request->validate([
             'refund_type' => 'required|in:full,partial',
@@ -433,7 +457,7 @@ class OrderAdminController extends Controller
      */
     public function updateStatus(Request $request, int $id)
     {
-        $order = Order::findOrFail($id);
+        $order = $this->findOrderScoped($id);
 
         $request->validate([
             'payment_status' => 'required|in:paid,pending,completed,failed,cancelled,refunded,partially_refunded',
@@ -454,7 +478,7 @@ class OrderAdminController extends Controller
      */
     public function updateNotes(Request $request, int $id)
     {
-        $order = Order::findOrFail($id);
+        $order = $this->findOrderScoped($id);
 
         $request->validate([
             'admin_notes' => 'nullable|string|max:2000',
@@ -471,7 +495,7 @@ class OrderAdminController extends Controller
      */
     public function downloadInvoice(int $id)
     {
-        $order = Order::with(['user', 'items.exam'])->findOrFail($id);
+        $order = $this->findOrderScoped($id, ['user', 'items.exam']);
 
         OrderTimeline::record($order->id, 'invoice_downloaded', 'Administrator generated and downloaded PDF invoice.', auth()->id());
 
@@ -488,7 +512,7 @@ class OrderAdminController extends Controller
      */
     public function printInvoice(int $id)
     {
-        $order = Order::with(['user', 'items.exam.vendor', 'coupon', 'refunds'])->findOrFail($id);
+        $order = $this->findOrderScoped($id, ['user', 'items.exam.vendor', 'coupon', 'refunds']);
 
         return view('admin.orders.print', compact('order'));
     }
@@ -498,7 +522,7 @@ class OrderAdminController extends Controller
      */
     public function resendConfirmation(int $id)
     {
-        $order = Order::with(['user', 'items.exam'])->findOrFail($id);
+        $order = $this->findOrderScoped($id, ['user', 'items.exam']);
 
         try {
             if (class_exists(\App\Mail\OrderConfirmationMail::class) && $order->billing_email) {
@@ -522,22 +546,27 @@ class OrderAdminController extends Controller
             'action' => 'required|in:mark_completed,mark_cancelled,export',
         ]);
 
-        $orders = Order::whereIn('id', $request->order_ids)->get();
+        $orders = $this->scopeForCurrentSite(Order::whereIn('id', $request->order_ids))->get();
+        $scopedIds = $orders->pluck('id')->all();
+
+        if (empty($scopedIds)) {
+            return back()->with('error', 'No valid orders selected for this site.');
+        }
 
         if ($request->action === 'mark_completed') {
-            Order::whereIn('id', $request->order_ids)->update(['payment_status' => 'completed']);
+            $this->scopeForCurrentSite(Order::whereIn('id', $scopedIds))->update(['payment_status' => 'completed']);
             foreach ($orders as $o) {
                 OrderTimeline::record($o->id, 'status_updated', "Bulk marked as Completed.", auth()->id());
             }
-            return back()->with('success', count($request->order_ids) . ' orders marked as completed.');
+            return back()->with('success', count($scopedIds) . ' orders marked as completed.');
         }
 
         if ($request->action === 'mark_cancelled') {
-            Order::whereIn('id', $request->order_ids)->update(['payment_status' => 'cancelled']);
+            $this->scopeForCurrentSite(Order::whereIn('id', $scopedIds))->update(['payment_status' => 'cancelled']);
             foreach ($orders as $o) {
                 OrderTimeline::record($o->id, 'status_updated', "Bulk marked as Cancelled.", auth()->id());
             }
-            return back()->with('success', count($request->order_ids) . ' orders marked as cancelled.');
+            return back()->with('success', count($scopedIds) . ' orders marked as cancelled.');
         }
 
         if ($request->action === 'export') {
@@ -552,14 +581,14 @@ class OrderAdminController extends Controller
      */
     public function export(Request $request)
     {
-        $query = Order::with(['user', 'items.exam', 'coupon']);
+        $query = $this->scopeForCurrentSite(Order::with(['user', 'items.exam', 'coupon']));
 
         if ($request->filled('search')) {
             $search = trim($request->search);
             $query->where(function ($q) use ($search) {
-                $q->where('order_number', 'like', "%{$search}%")
-                  ->orWhere('billing_name', 'like', "%{$search}%")
-                  ->orWhere('billing_email', 'like', "%{$search}%");
+                $q->whereLike('order_number', "%{$search}%")
+                  ->orWhereLike('billing_name', "%{$search}%")
+                  ->orWhereLike('billing_email', "%{$search}%");
             });
         }
 

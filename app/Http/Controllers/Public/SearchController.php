@@ -24,8 +24,8 @@ class SearchController extends Controller
         // Search exams by code or name
         $exams = Exam::where('is_active', true)
             ->where(function ($q) use ($query) {
-                $q->where('exam_code', 'like', "%{$query}%")
-                  ->orWhere('exam_name', 'like', "%{$query}%");
+                $q->whereLike('exam_code', "%{$query}%")
+                  ->orWhereLike('exam_name', "%{$query}%");
             })
             ->with('vendor')
             ->limit(5)
@@ -33,7 +33,7 @@ class SearchController extends Controller
 
         // Search vendors by name
         $vendors = Vendor::where('is_active', true)
-            ->where('name', 'like', "%{$query}%")
+            ->whereLike('name', "%{$query}%")
             ->limit(3)
             ->get(['id', 'name', 'slug', 'logo_path']);
 
@@ -71,10 +71,10 @@ class SearchController extends Controller
 
         if (!empty($query)) {
             $examsQuery->where(function ($q) use ($query) {
-                $q->where('exam_code', 'like', "%{$query}%")
-                  ->orWhere('exam_name', 'like', "%{$query}%")
+                $q->whereLike('exam_code', "%{$query}%")
+                  ->orWhereLike('exam_name', "%{$query}%")
                   ->orWhereHas('vendor', function($v) use ($query) {
-                      $v->where('name', 'like', "%{$query}%");
+                      $v->whereLike('name', "%{$query}%");
                   });
             });
         }

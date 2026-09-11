@@ -9,6 +9,8 @@ use App\Models\Question;
 use App\Models\Review;
 use App\Models\Redirect;
 
+use App\Services\ThemeManager;
+
 class ExamController extends Controller
 {
     /**
@@ -35,12 +37,19 @@ class ExamController extends Controller
                 $q->where('slug', $slugClean)
                   ->orWhere('exam_code', $slugClean);
             })
-            ->with('vendor')
+            ->with(['vendor', 'overlays'])
             ->first();
 
         if (!$exam) {
             abort(404);
         }
+
+        // Verify catalog visibility via SiteContext service
+        $siteContext = app(\App\Services\SiteContext::class);
+        if (!$siteContext->isExamVisible($exam)) {
+            abort(404);
+        }
+        $overlay = $siteContext->getOverlayForExam($exam);
 
         $canonicalVendor = $exam->vendor ? $exam->vendor->slug : $vendorModel->slug;
         $canonicalSlug = $exam->slug;
@@ -67,7 +76,7 @@ class ExamController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('pages.exams.show', compact('exam', 'sampleQuestions', 'reviews'));
+        return app(ThemeManager::class)->view('exams.show', compact('exam', 'sampleQuestions', 'reviews', 'overlay'));
     }
 }
 

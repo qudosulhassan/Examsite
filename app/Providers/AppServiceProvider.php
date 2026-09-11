@@ -11,7 +11,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Services\ThemeManager::class, function () {
+            return new \App\Services\ThemeManager();
+        });
+
+        $this->app->singleton(\App\Services\SiteContext::class, function () {
+            return new \App\Services\SiteContext();
+        });
     }
 
     /**
@@ -19,6 +25,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register cross-database case-insensitive LIKE/ILIKE macros
+        \Illuminate\Database\Query\Builder::macro('whereLike', function ($column, $value) {
+            $op = ($this->getConnection()->getDriverName() === 'pgsql') ? 'ilike' : 'like';
+            return $this->where($column, $op, $value);
+        });
+
+        \Illuminate\Database\Query\Builder::macro('orWhereLike', function ($column, $value) {
+            $op = ($this->getConnection()->getDriverName() === 'pgsql') ? 'ilike' : 'like';
+            return $this->orWhere($column, $op, $value);
+        });
+
         // Share global settings across views safely
         try {
             \Illuminate\Support\Facades\View::composer('*', function ($view) {

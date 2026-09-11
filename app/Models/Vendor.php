@@ -89,6 +89,11 @@ class Vendor extends Model
         return $this->hasMany(Certification::class)->orderBy('sort_order');
     }
 
+    public function sites()
+    {
+        return $this->belongsToMany(Site::class, 'site_vendors')->withPivot(['is_active', 'is_featured'])->withTimestamps();
+    }
+
     /**
      * Get browser-accessible URL for vendor logo
      */
@@ -109,9 +114,9 @@ class Vendor extends Model
             return $this->logo_path;
         }
 
-        // 3. If it's a local storage path, only return asset() if the physical file actually exists!
+        // 3. If it's a local storage path, only return asset() if the physical or fake file actually exists!
         $cleaned = ltrim(str_replace('/storage/', '', $this->logo_path), '/');
-        if (file_exists(storage_path('app/public/' . $cleaned)) || file_exists(public_path('storage/' . $cleaned))) {
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleaned) || file_exists(storage_path('app/public/' . $cleaned)) || file_exists(public_path('storage/' . $cleaned))) {
             return asset('storage/' . $cleaned);
         }
 

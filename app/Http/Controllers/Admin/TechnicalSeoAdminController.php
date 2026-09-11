@@ -68,8 +68,8 @@ class TechnicalSeoAdminController extends Controller
                 $redirectSearch = $request->get('redirect_search');
                 if ($redirectSearch) {
                     $redirectsQuery->where(function($q) use ($redirectSearch) {
-                        $q->where('old_url', 'like', "%{$redirectSearch}%")
-                          ->orWhere('new_url', 'like', "%{$redirectSearch}%");
+                        $q->whereLike('old_url', "%{$redirectSearch}%")
+                          ->orWhereLike('new_url', "%{$redirectSearch}%");
                     });
                 }
                 $redirects = $redirectsQuery->paginate(15)->withQueryString();

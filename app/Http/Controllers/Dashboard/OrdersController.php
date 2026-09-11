@@ -14,7 +14,9 @@ class OrdersController extends Controller
      */
     public function index()
     {
+        $siteId = (int) (app(\App\Services\SiteContext::class)->id() ?? config('site.id', 1));
         $orders = Order::where('user_id', auth()->id())
+            ->where('site_id', $siteId)
             ->with('items.exam')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -27,7 +29,9 @@ class OrdersController extends Controller
      */
     public function invoice(int $id)
     {
+        $siteId = (int) (app(\App\Services\SiteContext::class)->id() ?? config('site.id', 1));
         $order = Order::where('id', $id)
+            ->where('site_id', $siteId)
             ->where('user_id', auth()->id())
             ->with('items.exam')
             ->firstOrFail();

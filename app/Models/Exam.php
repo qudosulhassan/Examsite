@@ -198,6 +198,77 @@ class Exam extends Model
         return app(\App\Services\TechnicalSeoService::class)->resolveExamMetaDescription($this);
     }
 
+    public function overlays()
+    {
+        return $this->hasMany(SiteExamOverlay::class);
+    }
+
+    public function sites()
+    {
+        return $this->belongsToMany(Site::class, 'site_exam_overlays')
+            ->withPivot(['is_active', 'is_featured', 'is_indexed', 'custom_slug', 'custom_header_title', 'custom_h1', 'meta_title', 'meta_description'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the overlay record for a given site or the currently active site.
+     */
+    public function getOverlayForSite(?Site $site = null): ?SiteExamOverlay
+    {
+        if ($site) {
+            if ($this->relationLoaded('overlays')) {
+                return $this->overlays->firstWhere('site_id', $site->id);
+            }
+            return $this->overlays()->where('site_id', $site->id)->first();
+        }
+
+        $targetSite = (app()->bound('current_site') && app('current_site') instanceof Site)
+            ? app('current_site')
+            : (app()->bound(\App\Services\SiteContext::class) ? app(\App\Services\SiteContext::class)->site() : null);
+
+        if (!$targetSite) {
+            return null;
+        }
+
+        if ($this->relationLoaded('overlays')) {
+            return $this->overlays->firstWhere('site_id', $targetSite->id);
+        }
+
+        return $this->overlays()->where('site_id', $targetSite->id)->first();
+    }
+
+    /**
+     * Resolve site-specific or fallback article content.
+     */
+    public function getResolvedArticleContentAttribute(): ?string
+    {
+        if (app()->bound(\App\Services\SiteContext::class)) {
+            return app(\App\Services\SiteContext::class)->resolveExamArticleContent($this);
+        }
+
+        $overlay = $this->getOverlayForSite();
+        if ($overlay && !empty(trim($overlay->custom_article_content ?? ''))) {
+            return $overlay->custom_article_content;
+        }
+        return $this->article_content;
+    }
+
+    /**
+     * Resolve site-specific or fallback FAQs.
+     */
+    public function getResolvedFaqsAttribute(): array
+    {
+        if (app()->bound(\App\Services\SiteContext::class)) {
+            return app(\App\Services\SiteContext::class)->resolveExamFaqs($this);
+        }
+
+        $overlay = $this->getOverlayForSite();
+        if ($overlay && !empty($overlay->custom_faqs)) {
+            return is_array($overlay->custom_faqs) ? $overlay->custom_faqs : (json_decode($overlay->custom_faqs, true) ?: []);
+        }
+        return is_array($this->faqs) ? $this->faqs : (json_decode($this->faqs, true) ?: []);
+    }
+
     /**
      * Accessor aliases for compatibility with general SEO and schema builders.
      */
@@ -213,6 +284,14 @@ class Exam extends Model
 
     public function getPriceAttribute(): float
     {
+        if (app()->bound(\App\Services\SiteContext::class)) {
+            return app(\App\Services\SiteContext::class)->resolveExamPrice($this, 'bundle');
+        }
+
+        $overlay = $this->getOverlayForSite();
+        if ($overlay && $overlay->custom_price_bundle !== null) {
+            return (float)$overlay->custom_price_bundle;
+        }
         return (float)($this->attributes['price_bundle'] ?? $this->attributes['price_pdf'] ?? 29.99);
     }
 }

@@ -10,6 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
+        'site_id',
         'user_id',
         'order_number',
         'subtotal',
@@ -27,11 +28,20 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'site_id' => 'integer',
         'subtotal' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
         'refunded_amount' => 'decimal:2',
     ];
+
+    /**
+     * Get the site the order belongs to.
+     */
+    public function site()
+    {
+        return $this->belongsTo(Site::class);
+    }
 
     /**
      * Get the user that placed the order.

@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $trustedProxies = env('TRUSTED_PROXIES', '*');
+        $middleware->trustProxies(at: $trustedProxies);
+
+        $middleware->append(\App\Http\Middleware\IdentifySite::class);
         $middleware->append(\App\Http\Middleware\CheckRedirects::class);
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
 

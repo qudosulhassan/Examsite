@@ -162,7 +162,9 @@ class CheckoutController extends Controller
 
         // Create free order
         $user = auth()->user();
+        $siteId = (int) (app(\App\Services\SiteContext::class)->id() ?? config('site.id', 1));
         $order = Order::create([
+            'site_id' => $siteId,
             'user_id' => $user->id,
             'order_number' => 'EN-' . strtoupper(Str::random(10)),
             'subtotal' => $subtotal,
@@ -328,7 +330,9 @@ class CheckoutController extends Controller
                 $total = max(0, $subtotal - $discount);
 
                 // Create Order record
+                $siteId = (int) (app(\App\Services\SiteContext::class)->id() ?? config('site.id', 1));
                 $order = Order::create([
+                    'site_id' => $siteId,
                     'user_id' => $user->id,
                     'order_number' => 'EN-' . strtoupper(Str::random(10)),
                     'subtotal' => $subtotal,
@@ -493,7 +497,9 @@ class CheckoutController extends Controller
                     $paymentStatus = 'paid';
 
                     // Create Order
+                    $siteId = (int) (app(\App\Services\SiteContext::class)->id() ?? config('site.id', 1));
                     $order = Order::create([
+                        'site_id' => $siteId,
                         'user_id' => $user->id,
                         'order_number' => 'EN-' . strtoupper(Str::random(10)),
                         'subtotal' => $subtotal,
