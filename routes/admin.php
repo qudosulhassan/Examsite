@@ -27,9 +27,9 @@ Route::post('sites/{site}/domains', [App\Http\Controllers\Admin\SiteAdminControl
 Route::delete('sites/{site}/domains/{domain}', [App\Http\Controllers\Admin\SiteAdminController::class, 'removeDomain'])->name('sites.domains.remove');
 Route::post('sites/{site}/exam-overlay', [App\Http\Controllers\Admin\SiteAdminController::class, 'saveExamOverlay'])->name('sites.exam-overlay.save');
 // Edit must be explicit (excluded from resource to avoid double-registration conflict)
+Route::resource('sites', App\Http\Controllers\Admin\SiteAdminController::class)->except(['show', 'edit']);
 Route::get('sites/{site}/edit', [App\Http\Controllers\Admin\SiteAdminController::class, 'edit'])->name('sites.edit');
 Route::get('sites/{site}', [App\Http\Controllers\Admin\SiteAdminController::class, 'show'])->name('sites.show');
-Route::resource('sites', App\Http\Controllers\Admin\SiteAdminController::class)->except(['show', 'edit']);
 Route::resource('packages', PackageAdminController::class);
 Route::resource('vendors', VendorAdminController::class);
 Route::resource('certifications', App\Http\Controllers\Admin\CertificationController::class);

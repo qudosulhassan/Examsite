@@ -97,8 +97,8 @@ class AdminDashboardController extends Controller
         $activeExams = Exam::where('is_active', 1)->count();
         $totalQuestions = Question::count();
         $questionsWithExplanation = Question::whereNotNull('explanation')->where('explanation', '!=', '')->count();
-        $questionsWithCorrectOption = Question::whereNotNull('correct_option')->where('correct_option', '!=', '')->count();
-        $questionsWithImages = Question::whereNotNull('image_filename')->where('image_filename', '!=', '')->count();
+        $questionsWithCorrectOption = Question::has('answers')->count();
+        $questionsWithImages = Question::has('media')->count();
 
         // 4. Revenue & Orders Overview Timeseries Chart
         $chartPeriod = $request->get('chart_period', '30days');

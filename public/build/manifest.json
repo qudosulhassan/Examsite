@@ -4,7 +4,7 @@
     "name": "index"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BUVQb3Qg.css",
+    "file": "assets/app-CZnKC5pi.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -13,7 +13,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BjIgt0-i.js",
+    "file": "assets/app-BfmnMHUg.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -22,7 +22,7 @@
     ]
   },
   "resources/js/blog-editor.js": {
-    "file": "assets/blog-editor-D9eaclnk.js",
+    "file": "assets/blog-editor-CYiUCHMW.js",
     "name": "blog-editor",
     "src": "resources/js/blog-editor.js",
     "isEntry": true,

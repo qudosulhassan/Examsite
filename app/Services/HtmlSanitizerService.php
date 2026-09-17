@@ -42,6 +42,66 @@ class HtmlSanitizerService
             return 'style="' . htmlspecialchars($style, ENT_QUOTES, 'UTF-8') . '"';
         }, $html);
 
+        // 5. Clean any character encoding mojibake (e.g. â€“ or Ã¢Â€Â“ to –)
+        $html = self::cleanMojibake($html);
+
         return trim($html);
+    }
+
+    /**
+     * Auto-heal common single and double encoded mojibake sequences (e.g., â€“ or Ã¢Â€Â“ into –)
+     */
+    public static function cleanMojibake(?string $text): string
+    {
+        if (empty($text)) {
+            return '';
+        }
+
+        $map = [
+            // Double / multi-encoded sequences
+            'Ã¢Â€Â“' => '–',
+            'Ã¢Â€Â—' => '—',
+            'Ã¢Â€Â”' => '—',
+            'Ã¢Â€Âœ' => '“',
+            'Ã¢Â€Â\x9d' => '”',
+            'Ã¢Â€Â˜' => '‘',
+            'Ã¢Â€Â™' => '’',
+            'Ã¢Â€Â¢' => '•',
+            'Ã¢Â„Â¢' => '™',
+            'Ã‚Â©'   => '©',
+            'Ã‚Â®'   => '®',
+            'Ã‚Â°'   => '°',
+            'Ã‚Â±'   => '±',
+
+            // Exact byte-level sequences for single mojibake
+            "\xC3\xA2\xC2\x80\xC2\x93" => '–', // â€“ (en dash)
+            "\xC3\xA2\xC2\x80\xC2\x94" => '—', // â€” (em dash)
+            "\xC3\xA2\xC2\x80\xC2\x9C" => '“', // â€œ (left double quote)
+            "\xC3\xA2\xC2\x80\xC2\x9D" => '”', // â€ (right double quote)
+            "\xC3\xA2\xC2\x80\xC2\x98" => '‘', // â€˜ (left single quote)
+            "\xC3\xA2\xC2\x80\xC2\x99" => '’', // â€™ (right single quote)
+            "\xC3\xA2\xC2\x80\xC2\xA2" => '•', // â€¢ (bullet)
+            "\xC3\xA2\xC2\x84\xC2\xA2" => '™', // â„¢ (trademark)
+            "\xC3\x82\xC2\xA9"         => '©', // Â©
+            "\xC3\x82\xC2\xAE"         => '®', // Â®
+            "\xC3\x82\xC2\xB0"         => '°', // Â°
+            "\xC3\x82\xC2\xB1"         => '±', // Â±
+
+            // Literal string variations
+            'â€“' => '–',
+            'â€”' => '—',
+            'â€œ' => '“',
+            'â€' => '”',
+            'â€˜' => '‘',
+            'â€™' => '’',
+            'â€¢' => '•',
+            'â„¢' => '™',
+            'Â©'  => '©',
+            'Â®'  => '®',
+            'Â°'  => '°',
+            'Â±'  => '±',
+        ];
+
+        return strtr($text, $map);
     }
 }

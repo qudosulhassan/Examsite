@@ -30,6 +30,11 @@ class SiteAdminController extends Controller
         if ($currentAppSiteId !== 1 && $site->id !== $currentAppSiteId) {
             abort(403, "Unauthorized access to site ID {$site->id}. This admin panel is restricted to Site ID {$currentAppSiteId}.");
         }
+
+        // On Central Core (Site A), multi-site platform controls are restricted to Platform / Super Admin
+        if ($currentAppSiteId === 1 && !auth()->user()?->isSuperAdmin()) {
+            abort(403, 'Unauthorized access. Multi-site platform management is restricted to Platform Administrators.');
+        }
     }
 
     public function index()
@@ -37,6 +42,10 @@ class SiteAdminController extends Controller
         $currentAppSiteId = (int)config('site.id', 1);
         if ($currentAppSiteId !== 1) {
             return redirect()->route('admin.sites.edit', $currentAppSiteId);
+        }
+
+        if (!auth()->user()?->isSuperAdmin()) {
+            abort(403, 'Unauthorized access. Websites Platform management is restricted to Platform Administrators.');
         }
 
         $sites = Site::with(['domains', 'examOverlays'])->withCount('domains')->get();
@@ -50,6 +59,10 @@ class SiteAdminController extends Controller
             return redirect()->route('admin.sites.edit', $currentAppSiteId)->with('error', 'Creating new websites is reserved for the Central Core.');
         }
 
+        if (!auth()->user()?->isSuperAdmin()) {
+            abort(403, 'Unauthorized access. Websites Platform management is restricted to Platform Administrators.');
+        }
+
         return view('admin.sites.create');
     }
 
@@ -58,6 +71,10 @@ class SiteAdminController extends Controller
         $currentAppSiteId = (int)config('site.id', 1);
         if ($currentAppSiteId !== 1) {
             return redirect()->route('admin.sites.edit', $currentAppSiteId);
+        }
+
+        if (!auth()->user()?->isSuperAdmin()) {
+            abort(403, 'Unauthorized access. Websites Platform management is restricted to Platform Administrators.');
         }
 
         $validated = $request->validate([

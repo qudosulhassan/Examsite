@@ -59,9 +59,16 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let initialHtml = '';
         try {
-            initialHtml = atob(container.getAttribute('data-content') || '');
+            const raw = container.getAttribute('data-content') || '';
+            const bin = atob(raw);
+            const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+            initialHtml = new TextDecoder('utf-8').decode(bytes);
         } catch (e) {
-            console.error('Failed to decode initial content:', e);
+            try {
+                initialHtml = atob(container.getAttribute('data-content') || '');
+            } catch (e2) {
+                console.error('Failed to decode initial content:', e2);
+            }
         }
 
         const editor = new Editor({

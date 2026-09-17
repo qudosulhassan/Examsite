@@ -92,10 +92,7 @@ class TechnicalSeoService
         }
 
         // Blog Posts
-        $posts = BlogPost::where(function($q) {
-            $q->where('status', 'published')
-              ->orWhere('is_published', true);
-        })->get();
+        $posts = BlogPost::where('status', 'published')->get();
         $blogUrls = [];
         foreach ($posts as $p) {
             $blogUrls[] = [
@@ -939,10 +936,7 @@ TXT;
     public function analyzeInternalLinking(): array
     {
         $exams = Exam::where('is_active', true)->select('id', 'exam_name', 'exam_code', 'slug', 'vendor_id')->with('vendor')->get();
-        $blogPosts = BlogPost::where(function($q) {
-            $q->where('status', 'published')
-              ->orWhere('is_published', true);
-        })->select('id', 'title', 'slug')->get();
+        $blogPosts = BlogPost::where('status', 'published')->select('id', 'title', 'slug')->get();
 
         $orphanExams = [];
         $lowLinkExams = [];

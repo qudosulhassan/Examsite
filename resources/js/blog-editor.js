@@ -73,6 +73,56 @@ function formatHtml(html) {
     return result.substring(1, result.length - 3);
 }
 
+// Safely decode Base64 encoded UTF-8 strings without Latin-1 byte corruption
+export function decodeBase64Utf8(base64Str) {
+    if (!base64Str) return '';
+    try {
+        const binString = atob(base64Str);
+        const bytes = Uint8Array.from(binString, (c) => c.charCodeAt(0));
+        return new TextDecoder('utf-8').decode(bytes);
+    } catch (e) {
+        try {
+            return atob(base64Str);
+        } catch (e2) {
+            return base64Str;
+        }
+    }
+}
+
+// Auto-heal common double-encoded or mangled UTF-8 mojibake sequences
+export function cleanMojibake(text) {
+    if (!text || typeof text !== 'string') return text || '';
+    return text
+        // Double/multi-encoded sequences (e.g., Ã¢Â€Â“ -> –)
+        .replace(/Ã¢Â€Â“/g, '–')
+        .replace(/Ã¢Â€Â”/g, '—')
+        .replace(/Ã¢Â€Âœ/g, '“')
+        .replace(/Ã¢Â€Â\u009d/g, '”')
+        .replace(/Ã¢Â€Â\x9d/g, '”')
+        .replace(/Ã¢Â€Â˜/g, '‘')
+        .replace(/Ã¢Â€Â™/g, '’')
+        .replace(/Ã¢Â€Â¢/g, '•')
+        .replace(/Ã¢Â„Â¢/g, '™')
+        .replace(/Ã‚Â©/g, '©')
+        .replace(/Ã‚Â®/g, '®')
+        .replace(/Ã‚Â°/g, '°')
+        .replace(/Ã‚Â±/g, '±')
+        // Single-level mojibake sequences (e.g., â€“ -> –)
+        .replace(/â€“/g, '–')
+        .replace(/â€”/g, '—')
+        .replace(/â€œ/g, '“')
+        .replace(/â€\u009d/g, '”')
+        .replace(/â€\x9d/g, '”')
+        .replace(/â€˜/g, '‘')
+        .replace(/â€™/g, '’')
+        .replace(/â€¢/g, '•')
+        .replace(/â„¢/g, '™')
+        .replace(/Â©/g, '©')
+        .replace(/Â®/g, '®')
+        .replace(/Â°/g, '°')
+        .replace(/Â±/g, '±');
+}
+
 // Initialize Blog Tiptap Editor
 export function initBlogEditor(container) {
     if (!container || container.dataset.tiptapInitialized) return;
@@ -87,15 +137,12 @@ export function initBlogEditor(container) {
     const sourceEl = container.querySelector('.source-editor-element');
     const isSourceModeActive = { value: false };
 
-    let initialHtml = '';
-    try {
-        initialHtml = atob(container.getAttribute('data-content') || '');
-    } catch (e) {
-        initialHtml = container.getAttribute('data-content') || '';
-    }
+    let rawContent = container.getAttribute('data-content') || '';
+    let initialHtml = decodeBase64Utf8(rawContent);
     if (!initialHtml && inputEl) {
         initialHtml = inputEl.value || '';
     }
+    initialHtml = cleanMojibake(initialHtml);
 
     const editor = new Editor({
         element: editorEl,
@@ -161,7 +208,7 @@ export function initBlogEditor(container) {
                 clean = clean.replace(/<o:p[\s\S]*?<\/o:p>/gi, '');
                 clean = clean.replace(/class="Mso[\s\S]*?"/gi, '');
                 clean = clean.replace(/style="mso-[\s\S]*?"/gi, '');
-                return clean;
+                return cleanMojibake(clean);
             },
         },
         onUpdate: ({ editor }) => {
