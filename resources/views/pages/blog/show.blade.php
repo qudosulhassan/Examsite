@@ -174,8 +174,9 @@
     
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         @if($post->category)
-            <a href="{{ route('blog.category', $post->category->slug) }}" class="inline-block mb-4 px-3 py-1 bg-cyan bg-opacity-20 text-cyan text-sm font-bold uppercase tracking-wider rounded-full hover:bg-opacity-30 transition">
-                {{ $post->category->name }}
+            <a href="{{ route('blog.category', $post->category->slug) }}" class="inline-flex items-center gap-1.5 mb-5 px-4 py-1.5 bg-cyan hover:bg-cyan-600 text-navy text-xs font-black uppercase tracking-wider rounded-full shadow-md shadow-cyan/20 transition-all transform hover:-translate-y-0.5">
+                <svg class="w-3.5 h-3.5 text-navy shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                <span>{{ $post->category->name }}</span>
             </a>
         @endif
         
@@ -351,7 +352,7 @@
             <!-- Newsletter -->
             <div class="bg-white p-6 rounded-xl shadow border border-gray-100">
                 <div class="flex items-center space-x-3 mb-4 border-b pb-4">
-                    <div class="p-2 bg-cyan bg-opacity-10 rounded-lg text-cyan">
+                    <div class="p-2 bg-cyan/10 border border-cyan/20 rounded-lg text-cyan">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900">Subscribe</h3>
@@ -372,7 +373,7 @@
                         <div>
                             <input type="email" name="email" placeholder="Email Address" required class="w-full px-4 py-2.5 rounded-lg border-gray-300 focus:ring-cyan focus:border-cyan text-sm">
                         </div>
-                        <button type="submit" class="w-full bg-cyan hover:bg-opacity-90 text-white font-bold py-2.5 rounded-lg shadow transition text-sm">
+                        <button type="submit" class="w-full bg-cyan hover:bg-cyan-600 text-navy font-bold py-2.5 rounded-lg shadow transition text-sm">
                             Subscribe Now
                         </button>
                     </form>
