@@ -657,7 +657,7 @@
                         <p class="text-sm text-gray-500 line-clamp-2 mb-6 font-medium leading-relaxed">{{ $post->excerpt }}</p>
                         <div class="mt-auto flex items-center justify-between pt-6 border-t border-gray-100">
                             <div class="flex items-center space-x-3">
-                                <img src="{{ $post->user->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($post->user->name).'&color=FF6B35&background=0A1628' }}" alt="{{ $post->user->name }}" class="w-8 h-8 rounded-full shadow-sm">
+                                <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }}" class="w-8 h-8 rounded-full shadow-sm object-cover">
                                 <span class="text-xs font-black text-navy">{{ $post->user->name }}</span>
                             </div>
                             <span class="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center">

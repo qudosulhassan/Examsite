@@ -47,7 +47,7 @@
                             </a>
                             <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
                                 <div class="flex items-center">
-                                    <img src="{{ $featuredPost->user->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($featuredPost->user->name).'&color=FF6B35&background=0A1628' }}" alt="{{ $featuredPost->user->name }}" class="w-10 h-10 rounded-full border border-gray-200">
+                                    <img src="{{ $featuredPost->user->avatar_url }}" alt="{{ $featuredPost->user->name }}" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
                                     <div class="ml-3">
                                         <a href="{{ route('blog.author', $featuredPost->user->id) }}" class="text-sm font-bold text-gray-900 hover:text-cyan">{{ $featuredPost->user->name }}</a>
                                         <p class="text-xs text-gray-500">{{ $featuredPost->published_at->format('M d, Y') }}</p>
@@ -74,10 +74,10 @@
                     </div>
                 @elseif(isset($author))
                     <div class="bg-white p-6 rounded-lg shadow flex items-center space-x-6">
-                        <img src="{{ $author->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($author->name).'&color=FF6B35&background=0A1628' }}" alt="{{ $author->name }}" class="w-20 h-20 rounded-full border-2 border-cyan">
+                        <img src="{{ $author->avatar_url }}" alt="{{ $author->name }}" class="w-20 h-20 rounded-full border-2 border-cyan object-cover flex-shrink-0">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-800">{{ $author->name }}</h2>
-                            <p class="text-gray-600 mt-1">Author of {{ $posts->total() }} articles.</p>
+                            <p class="text-gray-600 mt-1 text-sm leading-relaxed">{{ $author->bio ?: 'Author of ' . $posts->total() . ' articles.' }}</p>
                         </div>
                     </div>
                 @elseif(isset($q))
@@ -117,7 +117,7 @@
                                 </a>
                                 <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                                     <div class="flex items-center">
-                                        <img src="{{ $post->user->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($post->user->name).'&color=FF6B35&background=0A1628' }}" class="w-8 h-8 rounded-full border border-gray-200" alt="{{ $post->user->name }}">
+                                        <img src="{{ $post->user->avatar_url }}" class="w-8 h-8 rounded-full border border-gray-200 object-cover" alt="{{ $post->user->name }}">
                                         <div class="ml-2">
                                             <a href="{{ route('blog.author', $post->user->id) }}" class="text-xs font-bold text-gray-900 hover:text-cyan">{{ $post->user->name }}</a>
                                             <p class="text-[10px] text-gray-500">{{ $post->published_at->format('M d, Y') }}</p>

@@ -95,7 +95,7 @@
                 </div>
                 <div class="flex-shrink-0 flex bg-gray-800 p-4 border-t border-gray-700">
                     <div class="flex items-center">
-                        <img class="h-9 w-9 rounded-full border border-cyan" src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&color=00D4AA&background=0A1628' }}" alt="">
+                        <img class="h-9 w-9 rounded-full border border-cyan object-cover" src="{{ auth()->user()->avatar_url }}" alt="">
                         <div class="ml-3">
                             <p class="text-sm font-medium text-white">{{ auth()->user()->name }}</p>
                             <form method="POST" action="{{ route('logout') }}">

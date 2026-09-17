@@ -169,6 +169,7 @@ class UserAdminController extends Controller
             'status' => 'required|in:active,suspended,pending,deactivated',
             'email_verified' => 'nullable|boolean',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'bio' => 'nullable|string|max:2000',
         ]);
 
         // Construct full name
@@ -191,6 +192,7 @@ class UserAdminController extends Controller
             'last_name' => $request->last_name,
             'email' => strtolower(trim($request->email)),
             'phone' => $request->phone,
+            'bio' => $request->bio,
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'status' => $request->status,
@@ -270,6 +272,7 @@ class UserAdminController extends Controller
             'status' => 'required|in:active,suspended,pending,deactivated',
             'email_verified' => 'nullable|boolean',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'bio' => 'nullable|string|max:2000',
         ]);
 
         // Prevent downgrading the final Super Admin
@@ -297,6 +300,7 @@ class UserAdminController extends Controller
             'last_name' => $request->last_name,
             'email' => strtolower(trim($request->email)),
             'phone' => $request->phone,
+            'bio' => $request->bio,
             'role' => $request->role,
             'status' => $request->status,
         ];

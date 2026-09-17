@@ -224,7 +224,7 @@
                     @auth
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none text-gray-300 hover:text-cyan transition">
-                                <img class="h-8 w-8 rounded-full border border-cyan" src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&color=00D4AA&background=0A1628' }}" alt="Avatar">
+                                <img class="h-8 w-8 rounded-full border border-cyan object-cover" src="{{ auth()->user()->avatar_url }}" alt="Avatar">
                                 <span class="max-w-xs truncate">{{ auth()->user()->name }}</span>
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                             </button>

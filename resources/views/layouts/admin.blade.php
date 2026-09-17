@@ -220,7 +220,7 @@
                 </div>
                 <div class="flex-shrink-0 flex bg-gray-850 p-4 border-t border-gray-800">
                     <div class="flex items-center">
-                        <img class="h-9 w-9 rounded-full border border-orange" src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&color=FF6B35&background=0A1628' }}" alt="">
+                        <img class="h-9 w-9 rounded-full border border-orange object-cover" src="{{ auth()->user()->avatar_url }}" alt="">
                         <div class="ml-3">
                             <p class="text-sm font-medium text-white">{{ auth()->user()->name }}</p>
                             <form method="POST" action="{{ route('logout') }}">

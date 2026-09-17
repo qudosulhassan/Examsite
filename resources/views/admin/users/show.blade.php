@@ -108,6 +108,12 @@
                             </span>
                         @endif
                     </div>
+                    @if($user->bio)
+                        <div class="mt-3.5 p-3 bg-gray-50 rounded-lg border border-gray-150 text-xs text-gray-600 leading-relaxed max-w-xl">
+                            <span class="font-bold text-gray-700 block text-[10px] uppercase tracking-wider mb-0.5">Author / User Bio</span>
+                            {{ $user->bio }}
+                        </div>
+                    @endif
                 </div>
             </div>
 
