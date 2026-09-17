@@ -112,9 +112,7 @@ class BlogController extends Controller
 
     public function author(string $slug)
     {
-        $author = User::where('slug', $slug)
-            ->orWhere('id', is_numeric($slug) ? (int)$slug : 0)
-            ->firstOrFail();
+        $author = User::where('slug', $slug)->firstOrFail();
         
         $posts = BlogPost::with(['user', 'category'])
             ->where('status', 'published')
