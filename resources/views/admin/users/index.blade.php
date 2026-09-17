@@ -6,18 +6,12 @@
     selectAll: false,
     bulkActionModal: false,
     bulkActionType: '',
-    deleteConfirmModal: false,
-    userToDelete: null,
     toggleSelectAll() {
         if (this.selectAll) {
             this.selectedUsers = Array.from(document.querySelectorAll('.user-checkbox')).map(el => el.value);
         } else {
             this.selectedUsers = [];
         }
-    },
-    confirmDelete(id, name, email) {
-        this.userToDelete = { id, name, email };
-        this.deleteConfirmModal = true;
     }
 }">
 
@@ -569,9 +563,13 @@
                                     Edit
                                 </a>
                                 <span class="text-gray-300">|</span>
-                                <button type="button" @click="confirmDelete({{ $usr->id }}, '{{ addslashes($usr->name) }}', '{{ addslashes($usr->email) }}')" class="text-red-500 font-bold hover:underline" title="Delete User">
-                                    Delete
-                                </button>
+                                <form action="{{ route('admin.users.destroy', $usr->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete user \'{{ addslashes($usr->name) }}\' ({{ addslashes($usr->email) }})? This will soft-delete the account.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-500 font-bold hover:underline" title="Delete User">
+                                        Delete
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @empty
@@ -602,39 +600,6 @@
                 {{ $users->links() }}
             </div>
         @endif
-    </div>
-
-    <!-- 5. Delete Confirmation Modal -->
-    <div x-show="deleteConfirmModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" @click="deleteConfirmModal = false"></div>
-        <div class="relative bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 z-10">
-            <div class="flex items-center space-x-3 text-red-600 mb-4">
-                <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center font-black">
-                    ⚠️
-                </div>
-                <h3 class="text-lg font-bold text-navy">Confirm User Deletion</h3>
-            </div>
-
-            <p class="text-xs text-gray-500 leading-relaxed">
-                Are you sure you want to delete user <strong class="text-navy" x-text="userToDelete ? userToDelete.name : ''"></strong> (<span x-text="userToDelete ? userToDelete.email : ''"></span>)?
-            </p>
-            <p class="text-[11px] text-gray-400 mt-2">
-                This will soft-delete the user account while preserving related transaction history and logs.
-            </p>
-
-            <div class="mt-6 flex justify-end space-x-3">
-                <button type="button" @click="deleteConfirmModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">
-                    Cancel
-                </button>
-                <form :action="'{{ url('/admin/users') }}/' + (userToDelete ? userToDelete.id : '')" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md transition">
-                        Confirm Delete
-                    </button>
-                </form>
-            </div>
-        </div>
     </div>
 
 </div>
