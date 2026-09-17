@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Header Hero -->
-<section class="relative bg-gradient-to-b from-[#0A1628] via-[#0D1F38] to-[#0A1628] text-white py-16 lg:py-20 border-b border-white/10 overflow-hidden">
+<section class="relative bg-navy text-white py-16 lg:py-20 border-b border-white/10 overflow-hidden" style="background: linear-gradient(180deg, #0A1628 0%, #0D1F38 50%, #0A1628 100%) !important; background-color: #0A1628 !important; color: #ffffff !important;">
     <!-- Ambient glow -->
     <div class="absolute top-0 right-1/4 w-96 h-96 bg-cyan/10 rounded-full filter blur-[120px] pointer-events-none"></div>
     <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full filter blur-[120px] pointer-events-none"></div>
@@ -14,13 +14,13 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
             Candidate Privacy &amp; Data Protection
         </div>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white" style="color: #ffffff !important;">
             Privacy Policy
         </h1>
-        <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed">
+        <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed" style="color: #cbd5e1 !important;">
             Your trust is our highest priority. Learn how ExamTopicsBase safeguards your personal information, protects payment transactions, and upholds your global data privacy rights.
         </p>
-        <div class="flex items-center justify-center gap-4 text-xs text-gray-400 pt-2 font-medium">
+        <div class="flex items-center justify-center gap-4 text-xs text-gray-400 pt-2 font-medium" style="color: #94a3b8 !important;">
             <span>Effective Date: January 1, 2026</span>
             <span>&bull;</span>
             <span>Last Updated: September 2026</span>
@@ -31,35 +31,35 @@
 </section>
 
 <!-- Trust Highlights Grid -->
-<section class="bg-[#07101E] border-b border-white/5 py-8">
+<section class="border-b border-white/5 py-8" style="background-color: #07101E !important; color: #ffffff !important;">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+            <div class="p-4 rounded-xl border border-white/10 flex items-start gap-3" style="background-color: rgba(255, 255, 255, 0.04) !important; border-color: rgba(255, 255, 255, 0.1) !important;">
                 <div class="w-8 h-8 rounded-lg bg-cyan/20 text-cyan flex items-center justify-center flex-shrink-0 font-bold">✓</div>
                 <div>
-                    <h4 class="text-xs font-bold text-white uppercase tracking-wider">Zero Data Selling</h4>
-                    <p class="text-xs text-gray-400 mt-0.5">We never sell, rent, or trade candidate details to third parties.</p>
+                    <h4 class="text-xs font-bold text-white uppercase tracking-wider" style="color: #ffffff !important;">Zero Data Selling</h4>
+                    <p class="text-xs mt-0.5" style="color: #94a3b8 !important;">We never sell, rent, or trade candidate details to third parties.</p>
                 </div>
             </div>
-            <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+            <div class="p-4 rounded-xl border border-white/10 flex items-start gap-3" style="background-color: rgba(255, 255, 255, 0.04) !important; border-color: rgba(255, 255, 255, 0.1) !important;">
                 <div class="w-8 h-8 rounded-lg bg-cyan/20 text-cyan flex items-center justify-center flex-shrink-0 font-bold">🔒</div>
                 <div>
-                    <h4 class="text-xs font-bold text-white uppercase tracking-wider">PCI-DSS Payments</h4>
-                    <p class="text-xs text-gray-400 mt-0.5">Card processing handled by Stripe &amp; PayPal. We never store raw card numbers.</p>
+                    <h4 class="text-xs font-bold text-white uppercase tracking-wider" style="color: #ffffff !important;">PCI-DSS Payments</h4>
+                    <p class="text-xs mt-0.5" style="color: #94a3b8 !important;">Card processing handled by Stripe &amp; PayPal. We never store raw card numbers.</p>
                 </div>
             </div>
-            <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+            <div class="p-4 rounded-xl border border-white/10 flex items-start gap-3" style="background-color: rgba(255, 255, 255, 0.04) !important; border-color: rgba(255, 255, 255, 0.1) !important;">
                 <div class="w-8 h-8 rounded-lg bg-cyan/20 text-cyan flex items-center justify-center flex-shrink-0 font-bold">🛡️</div>
                 <div>
-                    <h4 class="text-xs font-bold text-white uppercase tracking-wider">256-Bit SSL/TLS</h4>
-                    <p class="text-xs text-gray-400 mt-0.5">Bank-grade end-to-end encryption for all sessions and test engines.</p>
+                    <h4 class="text-xs font-bold text-white uppercase tracking-wider" style="color: #ffffff !important;">256-Bit SSL/TLS</h4>
+                    <p class="text-xs mt-0.5" style="color: #94a3b8 !important;">Bank-grade end-to-end encryption for all sessions and test engines.</p>
                 </div>
             </div>
-            <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+            <div class="p-4 rounded-xl border border-white/10 flex items-start gap-3" style="background-color: rgba(255, 255, 255, 0.04) !important; border-color: rgba(255, 255, 255, 0.1) !important;">
                 <div class="w-8 h-8 rounded-lg bg-cyan/20 text-cyan flex items-center justify-center flex-shrink-0 font-bold">👤</div>
                 <div>
-                    <h4 class="text-xs font-bold text-white uppercase tracking-wider">Your Data Rights</h4>
-                    <p class="text-xs text-gray-400 mt-0.5">Request, export, or delete your personal account data at any time.</p>
+                    <h4 class="text-xs font-bold text-white uppercase tracking-wider" style="color: #ffffff !important;">Full User Control</h4>
+                    <p class="text-xs mt-0.5" style="color: #94a3b8 !important;">Export, edit, or request complete deletion of your account at any time.</p>
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Header Hero -->
-<section class="relative bg-gradient-to-b from-[#0A1628] via-[#0D1F38] to-[#0A1628] text-white py-16 lg:py-24 border-b border-white/10 overflow-hidden">
+<section class="relative bg-navy text-white py-16 lg:py-24 border-b border-white/10 overflow-hidden" style="background: linear-gradient(180deg, #0A1628 0%, #0D1F38 50%, #0A1628 100%) !important; background-color: #0A1628 !important; color: #ffffff !important;">
     <div class="absolute top-0 right-1/4 w-96 h-96 bg-cyan/15 rounded-full filter blur-[130px] pointer-events-none"></div>
     <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-orange/15 rounded-full filter blur-[130px] pointer-events-none"></div>
 
@@ -14,16 +14,16 @@
             Risk-Free Certification Preparation
         </div>
 
-        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
-            100% Money Back <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan via-teal-300 to-emerald-400">Guarantee</span>
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight" style="color: #ffffff !important;">
+            100% Money Back <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan via-teal-300 to-emerald-400" style="color: #00D4AA;">Guarantee</span>
         </h1>
 
-        <p class="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Pass your official IT certification exam on your first attempt, or receive a <strong class="text-white">full 100% refund</strong>. We stand behind the accuracy and rigor of our study materials.
+        <p class="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed" style="color: #cbd5e1 !important;">
+            Pass your official IT certification exam on your first attempt, or receive a <strong class="text-white" style="color: #ffffff !important;">full 100% refund</strong>. We stand behind the accuracy and rigor of our study materials.
         </p>
 
         <!-- Trust Badges -->
-        <div class="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm font-semibold text-gray-300">
+        <div class="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm font-semibold text-gray-300" style="color: #cbd5e1 !important;">
             <span class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 99.6% First-Attempt Pass Rate

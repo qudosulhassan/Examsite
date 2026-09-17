@@ -697,10 +697,11 @@
             <a href="{{ url('/vendors') }}" class="w-full sm:w-auto bg-white text-navy hover:bg-gray-100 px-10 py-5 rounded-xl text-lg font-black uppercase tracking-wide shadow-2xl transition-transform hover:scale-105">
                 Find Your Exam Now
             </a>
-            <p class="text-white/80 text-sm font-bold mt-4 sm:mt-0 flex items-center justify-center">
-                <svg class="w-5 h-5 mr-2 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                100% Money-Back Guarantee
-            </p>
+            <a href="{{ url('/guarantee') }}" class="group inline-flex items-center text-white/90 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 px-6 py-4 rounded-xl text-sm font-bold transition-all shadow-md backdrop-blur-sm hover:scale-105 mt-4 sm:mt-0">
+                <svg class="w-5 h-5 mr-2 text-emerald-300 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>100% Money-Back Guarantee</span>
+                <svg class="w-4 h-4 ml-2 text-emerald-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
         </div>
     </div>
 </section>

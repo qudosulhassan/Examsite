@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Header Hero -->
-<section class="relative bg-gradient-to-b from-[#0A1628] via-[#0D1F38] to-[#0A1628] text-white py-16 lg:py-20 border-b border-white/10 overflow-hidden">
+<section class="relative bg-navy text-white py-16 lg:py-20 border-b border-white/10 overflow-hidden" style="background: linear-gradient(180deg, #0A1628 0%, #0D1F38 50%, #0A1628 100%) !important; background-color: #0A1628 !important; color: #ffffff !important;">
     <div class="absolute top-0 right-1/4 w-96 h-96 bg-cyan/10 rounded-full filter blur-[120px] pointer-events-none"></div>
     <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full filter blur-[120px] pointer-events-none"></div>
 
@@ -13,13 +13,13 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             Intellectual Property &amp; Legal Compliance
         </div>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white" style="color: #ffffff !important;">
             Digital Millennium Copyright Act (DMCA) Policy
         </h1>
-        <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed">
+        <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed" style="color: #cbd5e1 !important;">
             ExamTopicsBase respects intellectual property rights and strictly adheres to Title 17, United States Code, Section 512.
         </p>
-        <div class="flex items-center justify-center gap-4 text-xs text-gray-400 pt-2 font-medium">
+        <div class="flex items-center justify-center gap-4 text-xs text-gray-400 pt-2 font-medium" style="color: #94a3b8 !important;">
             <span>Designated Agent: dmca@examtopicsbase.com</span>
             <span>&bull;</span>
             <span>Fast Review Turnaround (24-48 Business Hours)</span>

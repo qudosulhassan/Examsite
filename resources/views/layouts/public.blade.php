@@ -200,6 +200,10 @@
                     </a>
 
                     <a href="{{ url('/free-demo') }}" class="text-gray-300 hover:text-cyan transition font-semibold text-cyan">Free Demo</a>
+                    <a href="{{ url('/guarantee') }}" class="text-emerald-400 hover:text-emerald-300 transition font-semibold flex items-center gap-1.5 group" title="100% Money-Back Guarantee">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>Guarantee</span>
+                    </a>
                     <a href="{{ url('/blog') }}" class="text-gray-300 hover:text-cyan transition">Blog</a>
                     <a href="{{ url('/faq') }}" class="text-gray-300 hover:text-cyan transition">FAQ</a>
                     <a href="{{ url('/contact') }}" class="text-gray-300 hover:text-cyan transition">Contact</a>
@@ -273,9 +277,21 @@
                 </a>
 
                 <a href="{{ url('/free-demo') }}" class="block px-3 py-2 rounded-md text-base font-medium text-cyan hover:bg-gray-800">Free Demo</a>
+                <a href="{{ url('/guarantee') }}" class="block px-3 py-2 rounded-md text-base font-semibold text-emerald-400 hover:bg-gray-800 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>100% Guarantee</span>
+                    </span>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-black uppercase">Risk-Free</span>
+                </a>
                 <a href="{{ url('/blog') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Blog</a>
                 <a href="{{ url('/faq') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">FAQ</a>
                 <a href="{{ url('/contact') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Contact</a>
+                <div class="pt-2 border-t border-gray-800/80 my-2">
+                    <div class="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">Policies &amp; Legal</div>
+                    <a href="{{ url('/privacy-policy') }}" class="block px-3 py-1.5 rounded-md text-sm font-medium text-gray-300 hover:text-cyan hover:bg-gray-800">Privacy Policy</a>
+                    <a href="{{ url('/dmca') }}" class="block px-3 py-1.5 rounded-md text-sm font-medium text-gray-300 hover:text-cyan hover:bg-gray-800">DMCA Policy</a>
+                </div>
                 <hr class="border-gray-800 my-2">
                 @auth
                     @if(auth()->user()->isAdmin())
@@ -306,9 +322,9 @@
         <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600 rounded-full mix-blend-screen filter blur-[150px] opacity-5 pointer-events-none"></div>
         
         <div class="relative z-10 container-custom">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 mb-16">
                 <!-- Branding -->
-                <div class="lg:col-span-4 space-y-6">
+                <div class="lg:col-span-3 space-y-6">
                     <div class="flex items-center">
                         <a href="{{ url('/') }}" class="inline-block group">
                             <img src="{{ $primaryLogo }}" alt="{{ $globalSettings['site_name'] ?? config('app.name', 'ExamTopicsBase') }}" class="h-12 md:h-14 lg:h-16 w-auto max-w-[260px] md:max-w-[300px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_4px_18px_rgba(0,212,170,0.25)]">
@@ -376,7 +392,6 @@
                                 Test Engine <span class="ml-2 bg-cyan/10 text-cyan text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest border border-cyan/20">New</span>
                             </a>
                         </li>
-
                         <li>
                             <a href="{{ url('/free-demo') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
                                 <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
@@ -404,30 +419,60 @@
                     </ul>
                 </div>
 
-                <!-- Trust / Guarantee -->
-                <div class="lg:col-span-3">
-                    <h3 class="text-white font-bold text-lg mb-6">100% Satisfaction</h3>
+                <!-- Policies & Trust -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-white font-bold text-lg mb-6">Policies &amp; Trust</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="{{ url('/guarantee') }}" class="text-emerald-400 hover:text-emerald-300 text-sm font-semibold transition-colors flex items-center group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 group-hover:scale-125 transition-transform"></span>
+                                100% Guarantee
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('/privacy-policy') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
+                                Privacy Policy
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('/dmca') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
+                                DMCA Policy
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('/faq') }}#refund" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
+                                Refund Policy
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Guaranteed Satisfaction Card -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-white font-bold text-lg mb-6">Guaranteed</h3>
                     <a href="{{ url('/guarantee') }}" class="block group">
-                        <div class="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm shadow-xl group-hover:border-cyan/50 group-hover:bg-white/[0.08] transition duration-300">
-                            <div class="flex items-start mb-3">
-                                <div class="w-8 h-8 rounded-full bg-cyan/20 flex items-center justify-center text-cyan mr-3 flex-shrink-0 group-hover:scale-110 transition-transform">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        <div class="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm shadow-xl group-hover:border-cyan/50 group-hover:bg-white/[0.08] transition duration-300">
+                            <div class="flex items-start mb-2.5">
+                                <div class="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 mr-2.5 flex-shrink-0 group-hover:scale-110 transition-transform">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-white text-sm mb-1 group-hover:text-cyan transition-colors flex items-center gap-1.5">
-                                        <span>Money Back Guarantee</span>
-                                        <svg class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    <h4 class="font-bold text-white text-xs mb-0.5 group-hover:text-cyan transition-colors">
+                                        Money Back
                                     </h4>
-                                    <p class="text-[13px] text-gray-400 font-medium leading-relaxed">Full 100% refund immediately if you fail within 30 days of purchase.</p>
+                                    <p class="text-[11px] text-gray-400 font-medium leading-tight">100% full refund if you fail.</p>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between pt-3 border-t border-white/10 mt-3 text-[11px]">
-                                <span class="bg-white/5 text-gray-300 text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-widest border border-white/10 flex items-center">
-                                    <svg class="w-3 h-3 text-cyan mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                    SSL Secure
+                            <div class="flex items-center justify-between pt-2.5 border-t border-white/10 mt-2 text-[10px]">
+                                <span class="bg-emerald-500/15 text-emerald-300 font-bold px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    Verified
                                 </span>
-                                <span class="text-cyan font-bold text-xs group-hover:underline flex items-center gap-1">
-                                    Read Policy &rarr;
+                                <span class="text-cyan font-bold group-hover:underline flex items-center gap-0.5">
+                                    Details &rarr;
                                 </span>
                             </div>
                         </div>
@@ -436,18 +481,28 @@
             </div>
 
             <!-- Bottom Bar -->
-            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-xs font-medium text-gray-400 text-center sm:text-left">
+            <div class="border-t border-white/10 pt-8 flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div class="flex flex-col sm:flex-row items-center gap-4 text-xs font-medium text-gray-400 text-center sm:text-left">
                     <span>&copy; {{ date('Y') }} Exam Topics Base. All rights reserved.</span>
-                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-gray-400">
-                        <a href="{{ url('/privacy-policy') }}" class="hover:text-cyan transition-colors">Privacy Policy</a>
-                        <span class="text-white/20">&bull;</span>
-                        <a href="{{ url('/dmca') }}" class="hover:text-cyan transition-colors">DMCA Policy</a>
-                        <span class="text-white/20">&bull;</span>
-                        <a href="{{ url('/guarantee') }}" class="hover:text-cyan transition-colors">100% Guarantee</a>
+                    
+                    <!-- Modern Styled Policy Badges -->
+                    <div class="flex flex-wrap items-center justify-center gap-2">
+                        <a href="{{ url('/privacy-policy') }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 hover:bg-cyan/15 text-gray-300 hover:text-cyan border border-white/10 hover:border-cyan/30 transition text-xs font-semibold">
+                            <svg class="w-3.5 h-3.5 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            <span>Privacy Policy</span>
+                        </a>
+                        <a href="{{ url('/dmca') }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 hover:bg-cyan/15 text-gray-300 hover:text-cyan border border-white/10 hover:border-cyan/30 transition text-xs font-semibold">
+                            <svg class="w-3.5 h-3.5 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span>DMCA Policy</span>
+                        </a>
+                        <a href="{{ url('/guarantee') }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-400/50 transition text-xs font-semibold shadow-sm">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>100% Guarantee</span>
+                        </a>
                     </div>
                 </div>
-                <div class="text-xs font-medium text-gray-500 max-w-xl text-center md:text-right">
+                
+                <div class="text-xs font-medium text-gray-500 max-w-lg text-center lg:text-right leading-relaxed">
                     Disclaimer: Exam Topics Base is an independent provider of practice test materials. All trademarks and brand names are property of their respective owners.
                 </div>
             </div>
