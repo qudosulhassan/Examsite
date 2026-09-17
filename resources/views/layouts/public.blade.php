@@ -390,6 +390,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ url('/faq') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
+                                FAQ
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ url('/contact') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
                                 <span class="w-1.5 h-1.5 rounded-full bg-cyan/30 mr-2 group-hover:bg-cyan transition-colors"></span>
                                 Contact
@@ -401,32 +407,47 @@
                 <!-- Trust / Guarantee -->
                 <div class="lg:col-span-3">
                     <h3 class="text-white font-bold text-lg mb-6">100% Satisfaction</h3>
-                    <div class="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm shadow-xl">
-                        <div class="flex items-start mb-3">
-                            <div class="w-8 h-8 rounded-full bg-cyan/20 flex items-center justify-center text-cyan mr-3 flex-shrink-0">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <a href="{{ url('/guarantee') }}" class="block group">
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm shadow-xl group-hover:border-cyan/50 group-hover:bg-white/[0.08] transition duration-300">
+                            <div class="flex items-start mb-3">
+                                <div class="w-8 h-8 rounded-full bg-cyan/20 flex items-center justify-center text-cyan mr-3 flex-shrink-0 group-hover:scale-110 transition-transform">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm mb-1 group-hover:text-cyan transition-colors flex items-center gap-1.5">
+                                        <span>Money Back Guarantee</span>
+                                        <svg class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </h4>
+                                    <p class="text-[13px] text-gray-400 font-medium leading-relaxed">Full 100% refund immediately if you fail within 30 days of purchase.</p>
+                                </div>
                             </div>
-                            <div>
-                                <h4 class="font-bold text-white text-sm mb-1">Money Back Guarantee</h4>
-                                <p class="text-[13px] text-gray-400 font-medium leading-relaxed">Full 100% refund immediately if you fail within 30 days of purchase.</p>
+                            <div class="flex items-center justify-between pt-3 border-t border-white/10 mt-3 text-[11px]">
+                                <span class="bg-white/5 text-gray-300 text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-widest border border-white/10 flex items-center">
+                                    <svg class="w-3 h-3 text-cyan mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    SSL Secure
+                                </span>
+                                <span class="text-cyan font-bold text-xs group-hover:underline flex items-center gap-1">
+                                    Read Policy &rarr;
+                                </span>
                             </div>
                         </div>
-                        <div class="flex space-x-2 pt-3 border-t border-white/10 mt-3">
-                            <span class="bg-white/5 text-gray-300 text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-widest border border-white/10 flex items-center">
-                                <svg class="w-3 h-3 text-cyan mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                SSL Secure
-                            </span>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
             <!-- Bottom Bar -->
             <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-xs font-medium text-gray-500">
-                    &copy; {{ date('Y') }} Exam Topics Base. All rights reserved.
-                </p>
-                <div class="text-xs font-medium text-gray-500 max-w-2xl text-center md:text-right">
+                <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-xs font-medium text-gray-400 text-center sm:text-left">
+                    <span>&copy; {{ date('Y') }} Exam Topics Base. All rights reserved.</span>
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-gray-400">
+                        <a href="{{ url('/privacy-policy') }}" class="hover:text-cyan transition-colors">Privacy Policy</a>
+                        <span class="text-white/20">&bull;</span>
+                        <a href="{{ url('/dmca') }}" class="hover:text-cyan transition-colors">DMCA Policy</a>
+                        <span class="text-white/20">&bull;</span>
+                        <a href="{{ url('/guarantee') }}" class="hover:text-cyan transition-colors">100% Guarantee</a>
+                    </div>
+                </div>
+                <div class="text-xs font-medium text-gray-500 max-w-xl text-center md:text-right">
                     Disclaimer: Exam Topics Base is an independent provider of practice test materials. All trademarks and brand names are property of their respective owners.
                 </div>
             </div>

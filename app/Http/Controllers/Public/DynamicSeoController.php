@@ -34,6 +34,9 @@ class DynamicSeoController extends Controller
                 '/faq' => ['priority' => '0.7', 'changefreq' => 'monthly'],
                 '/about' => ['priority' => '0.6', 'changefreq' => 'monthly'],
                 '/contact' => ['priority' => '0.6', 'changefreq' => 'monthly'],
+                '/privacy-policy' => ['priority' => '0.5', 'changefreq' => 'monthly'],
+                '/dmca' => ['priority' => '0.5', 'changefreq' => 'monthly'],
+                '/guarantee' => ['priority' => '0.7', 'changefreq' => 'monthly'],
             ];
 
             foreach ($staticRoutes as $path => $meta) {

@@ -104,6 +104,22 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
     return back()->with('success', 'Thank you! Your message has been sent to our support queue. We will contact you shortly.');
 });
 
+// Legal, Compliance & Guarantee Policies
+Route::get('/privacy-policy', function () {
+    return view('pages.privacy');
+})->name('privacy-policy');
+Route::redirect('/privacy', '/privacy-policy', 301);
+
+Route::get('/dmca', function () {
+    return view('pages.dmca');
+})->name('dmca');
+
+Route::get('/guarantee', function () {
+    return view('pages.guarantee');
+})->name('guarantee');
+Route::redirect('/money-back-guarantee', '/guarantee', 301);
+
+
 /*
 |--------------------------------------------------------------------------
 | Google OAuth Routes
