@@ -177,16 +177,7 @@
                 @endphp
                 <div class="flex items-center">
                     <a href="{{ url('/') }}" class="flex items-center py-1 group">
-                        @if($currentSite && !empty($currentSite->logo))
-                            <img src="{{ $primaryLogo }}" alt="{{ $activeBrandName }}" class="h-10 sm:h-11 md:h-12 w-auto max-w-[210px] md:max-w-[240px] object-contain transition-all duration-300">
-                        @elseif(!empty($globalSettings['site_logo']))
-                            <img src="{{ $primaryLogo }}" alt="{{ $activeBrandName }}" class="h-10 sm:h-11 md:h-12 w-auto max-w-[210px] md:max-w-[240px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_2px_12px_rgba(0,212,170,0.2)]">
-                        @else
-                            <span class="text-xl font-black tracking-tight text-white flex items-center gap-2">
-                                <span class="w-8 h-8 rounded-lg bg-cyan text-navy flex items-center justify-center font-black text-sm">{{ strtoupper(substr($activeBrandName, 0, 2)) }}</span>
-                                <span>{{ $activeBrandName }}</span>
-                            </span>
-                        @endif
+                        <img src="{{ $primaryLogo }}" alt="{{ $activeBrandName }}" class="h-10 sm:h-11 md:h-12 w-auto max-w-[210px] md:max-w-[250px] object-contain transition-all duration-300 group-hover:brightness-110 drop-shadow-[0_2px_12px_rgba(0,212,170,0.2)]">
                     </a>
                 </div>
 
@@ -198,14 +189,6 @@
                         <span>Test Engine</span>
                         <span class="bg-cyan text-navy font-extrabold text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-wide">New</span>
                     </a>
-
-                    <a href="{{ url('/free-demo') }}" class="text-gray-300 hover:text-cyan transition font-semibold text-cyan">Free Demo</a>
-                    <a href="{{ url('/guarantee') }}" class="text-emerald-400 hover:text-emerald-300 transition font-semibold flex items-center gap-1.5 group" title="100% Money-Back Guarantee">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>Guarantee</span>
-                    </a>
-                    <a href="{{ url('/blog') }}" class="text-gray-300 hover:text-cyan transition">Blog</a>
-                    <a href="{{ url('/faq') }}" class="text-gray-300 hover:text-cyan transition">FAQ</a>
                     <a href="{{ url('/contact') }}" class="text-gray-300 hover:text-cyan transition">Contact</a>
                 </nav>
 
@@ -276,19 +259,10 @@
                     <span class="bg-cyan text-navy font-extrabold text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-wide">New</span>
                 </a>
 
-                <a href="{{ url('/free-demo') }}" class="block px-3 py-2 rounded-md text-base font-medium text-cyan hover:bg-gray-800">Free Demo</a>
-                <a href="{{ url('/guarantee') }}" class="block px-3 py-2 rounded-md text-base font-semibold text-emerald-400 hover:bg-gray-800 flex items-center justify-between">
-                    <span class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>100% Guarantee</span>
-                    </span>
-                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-black uppercase">Risk-Free</span>
-                </a>
-                <a href="{{ url('/blog') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Blog</a>
-                <a href="{{ url('/faq') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">FAQ</a>
                 <a href="{{ url('/contact') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Contact</a>
                 <div class="pt-2 border-t border-gray-800/80 my-2">
                     <div class="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">Policies &amp; Legal</div>
+                    <a href="{{ url('/guarantee') }}" class="block px-3 py-1.5 rounded-md text-sm font-medium text-emerald-400 hover:bg-gray-800">100% Guarantee</a>
                     <a href="{{ url('/privacy-policy') }}" class="block px-3 py-1.5 rounded-md text-sm font-medium text-gray-300 hover:text-cyan hover:bg-gray-800">Privacy Policy</a>
                     <a href="{{ url('/dmca') }}" class="block px-3 py-1.5 rounded-md text-sm font-medium text-gray-300 hover:text-cyan hover:bg-gray-800">DMCA Policy</a>
                 </div>
