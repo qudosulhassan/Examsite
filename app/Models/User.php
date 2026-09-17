@@ -24,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'name',
+        'slug',
         'first_name',
         'last_name',
         'email',
@@ -60,6 +61,52 @@ class User extends Authenticatable implements MustVerifyEmail
             'last_login_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Bootstrap model events for automatic slug generation.
+     */
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (empty($user->slug) && !empty($user->name)) {
+                $user->slug = static::generateUniqueSlug($user->name);
+            }
+        });
+
+        static::updating(function ($user) {
+            if (empty($user->slug) && !empty($user->name)) {
+                $user->slug = static::generateUniqueSlug($user->name, $user->id);
+            }
+        });
+    }
+
+    /**
+     * Generate a unique slug from a user name.
+     */
+    public static function generateUniqueSlug(string $name, $excludeId = null): string
+    {
+        $baseSlug = Str::slug(trim($name));
+        if (empty($baseSlug)) {
+            $baseSlug = 'user';
+        }
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (static::where('slug', $slug)->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))->withTrashed()->exists()) {
+            $counter++;
+            $slug = "{$baseSlug}-{$counter}";
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Get public author profile URL.
+     */
+    public function getAuthorUrlAttribute(): string
+    {
+        return route('blog.author', $this->slug ?: $this->id);
     }
 
     /**

@@ -187,7 +187,7 @@
         <div class="flex items-center justify-center space-x-6 text-sm text-gray-300">
             <div class="flex items-center">
                 <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }}" class="w-8 h-8 rounded-full border border-gray-600 mr-2 object-cover">
-                <a href="{{ route('blog.author', $post->user->id) }}" class="hover:text-white transition">{{ $post->user->name }}</a>
+                <a href="{{ route('blog.author', $post->user->slug ?: $post->user->id) }}" class="hover:text-white transition">{{ $post->user->name }}</a>
             </div>
             <div class="flex items-center">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -246,7 +246,7 @@
             <div class="bg-gray-50 p-8 border-t border-gray-200 flex flex-col sm:flex-row items-start sm:items-center">
                 <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }}" class="w-20 h-20 rounded-full border-2 border-white shadow-sm mb-4 sm:mb-0 sm:mr-6 object-cover flex-shrink-0">
                 <div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-1">Written by <a href="{{ route('blog.author', $post->user->id) }}" class="text-cyan hover:underline">{{ $post->user->name }}</a></h3>
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">Written by <a href="{{ route('blog.author', $post->user->slug ?: $post->user->id) }}" class="text-cyan hover:underline">{{ $post->user->name }}</a></h3>
                     <p class="text-gray-600 text-sm leading-relaxed">{{ $post->user->bio ?: 'Instructor and tech enthusiast dedicated to helping students achieve their IT certification goals.' }}</p>
                 </div>
             </div>

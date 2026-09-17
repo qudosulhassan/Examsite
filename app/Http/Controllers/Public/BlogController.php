@@ -112,9 +112,9 @@ class BlogController extends Controller
 
     public function author(string $slug)
     {
-        // For simplicity, assuming user slug is their name sluggified, or passing ID
-        // Let's use ID for author URL or add slug to User. Assuming ID for now.
-        $author = User::findOrFail($slug);
+        $author = User::where('slug', $slug)
+            ->orWhere('id', is_numeric($slug) ? (int)$slug : 0)
+            ->firstOrFail();
         
         $posts = BlogPost::with(['user', 'category'])
             ->where('status', 'published')

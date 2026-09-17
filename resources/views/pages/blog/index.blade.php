@@ -49,7 +49,7 @@
                                 <div class="flex items-center">
                                     <img src="{{ $featuredPost->user->avatar_url }}" alt="{{ $featuredPost->user->name }}" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
                                     <div class="ml-3">
-                                        <a href="{{ route('blog.author', $featuredPost->user->id) }}" class="text-sm font-bold text-gray-900 hover:text-cyan">{{ $featuredPost->user->name }}</a>
+                                        <a href="{{ route('blog.author', $featuredPost->user->slug ?: $featuredPost->user->id) }}" class="text-sm font-bold text-gray-900 hover:text-cyan">{{ $featuredPost->user->name }}</a>
                                         <p class="text-xs text-gray-500">{{ $featuredPost->published_at->format('M d, Y') }}</p>
                                     </div>
                                 </div>
@@ -119,7 +119,7 @@
                                     <div class="flex items-center">
                                         <img src="{{ $post->user->avatar_url }}" class="w-8 h-8 rounded-full border border-gray-200 object-cover" alt="{{ $post->user->name }}">
                                         <div class="ml-2">
-                                            <a href="{{ route('blog.author', $post->user->id) }}" class="text-xs font-bold text-gray-900 hover:text-cyan">{{ $post->user->name }}</a>
+                                            <a href="{{ route('blog.author', $post->user->slug ?: $post->user->id) }}" class="text-xs font-bold text-gray-900 hover:text-cyan">{{ $post->user->name }}</a>
                                             <p class="text-[10px] text-gray-500">{{ $post->published_at->format('M d, Y') }}</p>
                                         </div>
                                     </div>

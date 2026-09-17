@@ -188,6 +188,7 @@ class UserAdminController extends Controller
 
         $user = User::create([
             'name' => $fullName,
+            'slug' => User::generateUniqueSlug($fullName),
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => strtolower(trim($request->email)),
@@ -304,6 +305,11 @@ class UserAdminController extends Controller
             'role' => $request->role,
             'status' => $request->status,
         ];
+
+        // Regenerate slug if name has changed or slug is missing
+        if (empty($user->slug) || $fullName !== $user->name) {
+            $updateData['slug'] = User::generateUniqueSlug($fullName, $user->id);
+        }
 
         // Only update password if provided
         if ($request->filled('password')) {
