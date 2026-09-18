@@ -46,10 +46,12 @@ class RegisteredUserController extends Controller
 
         // Fires SendEmailVerificationNotification listener automatically
         event(new Registered($user));
+        \Illuminate\Support\Facades\Log::emergency("Registration verification email dispatched for user #{$user->id} ({$user->email})");
 
         // Send welcome email
         try {
             \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeMail($user));
+            \Illuminate\Support\Facades\Log::emergency("Registration welcome email dispatched for user #{$user->id} ({$user->email})");
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error("Welcome email failed for user #{$user->id} ({$user->email}): " . $e->getMessage());
         }
