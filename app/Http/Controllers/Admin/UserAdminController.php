@@ -348,11 +348,11 @@ class UserAdminController extends Controller
     }
 
     /**
-     * Soft delete user with safety protections.
+     * Permanently delete user from database with safety protections.
      */
     public function destroy(int $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::withTrashed()->findOrFail($id);
 
         // Security check: cannot delete self
         if (auth()->id() === $user->id) {
@@ -373,11 +373,30 @@ class UserAdminController extends Controller
         $userEmail = $user->email;
         $userId = $user->id;
 
-        $user->delete(); // Soft delete
+        // Clean up avatar from disk if local
+        if ($user->avatar && !Str::startsWith($user->avatar, ['http://', 'https://'])) {
+            Storage::disk('public')->delete($user->avatar);
+        }
 
-        AuditLogService::log('user_deleted', "Soft deleted user {$userName} ({$userEmail})", $userId);
+        // Clean up user relations safely before permanent delete
+        try {
+            $user->roles()->detach();
+            $user->permissions()->detach();
+            $user->userExams()->delete();
+            $user->userPackages()->delete();
+            $user->testAttempts()->delete();
+            $user->bookmarks()->delete();
+            $user->reviews()->delete();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("User cleanup warning for #{$userId}: " . $e->getMessage());
+        }
 
-        return redirect()->route('admin.users.index')->with('success', "User '{$userName}' has been soft-deleted successfully.");
+        // Permanently vanish from database
+        $user->forceDelete();
+
+        AuditLogService::log('user_deleted', "Permanently deleted user {$userName} ({$userEmail})", $userId);
+
+        return redirect()->route('admin.users.index')->with('success', "User '{$userName}' ({$userEmail}) has been permanently deleted from the database.");
     }
 
     /**
@@ -439,13 +458,25 @@ class UserAdminController extends Controller
 
             case 'delete':
                 foreach ($users as $u) {
-                    if ($u->isSuperAdmin()) {
-                        continue; // Skip deleting super admins in bulk
+                    if ($u->isSuperAdmin() || $u->id === auth()->id()) {
+                        continue; // Skip deleting super admins and self in bulk
                     }
-                    $u->delete();
+                    if ($u->avatar && !Str::startsWith($u->avatar, ['http://', 'https://'])) {
+                        Storage::disk('public')->delete($u->avatar);
+                    }
+                    try {
+                        $u->roles()->detach();
+                        $u->permissions()->detach();
+                        $u->userExams()->delete();
+                        $u->userPackages()->delete();
+                        $u->testAttempts()->delete();
+                        $u->bookmarks()->delete();
+                        $u->reviews()->delete();
+                    } catch (\Throwable $e) {}
+                    $u->forceDelete();
                 }
-                AuditLogService::log('bulk_delete', "Bulk soft-deleted {$count} users", null, ['ids' => $userIds]);
-                return back()->with('success', "Bulk delete completed for selected users.");
+                AuditLogService::log('bulk_delete', "Bulk permanently deleted {$count} users", null, ['ids' => $userIds]);
+                return back()->with('success', "Selected users have been permanently deleted from the database.");
         }
 
         return back();

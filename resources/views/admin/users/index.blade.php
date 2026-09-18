@@ -563,10 +563,10 @@
                                     Edit
                                 </a>
                                 <span class="text-gray-300">|</span>
-                                <form action="{{ route('admin.users.destroy', $usr->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete user \'{{ addslashes($usr->name) }}\' ({{ addslashes($usr->email) }})? This will soft-delete the account.');">
+                                <form action="{{ route('admin.users.destroy', $usr->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to permanently delete user \'{{ addslashes($usr->name) }}\' ({{ addslashes($usr->email) }})? This will completely vanish the user from the database and cannot be undone.');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-500 font-bold hover:underline" title="Delete User">
+                                    <button type="submit" class="text-red-500 font-bold hover:underline" title="Permanently Delete User">
                                         Delete
                                     </button>
                                 </form>
