@@ -44,20 +44,14 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Fires SendEmailVerificationNotification listener automatically
         event(new Registered($user));
 
-        try {
-            $user->sendEmailVerificationNotification();
-            \Illuminate\Support\Facades\Log::emergency("Registration verification email SUCCESS for user #{$user->id} ({$user->email})");
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::emergency("Registration verification email FAILED for user #{$user->id} ({$user->email}): " . $e->getMessage());
-        }
-
+        // Send welcome email
         try {
             \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeMail($user));
-            \Illuminate\Support\Facades\Log::emergency("Registration welcome email SUCCESS for user #{$user->id} ({$user->email})");
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::emergency("Registration welcome email FAILED for user #{$user->id} ({$user->email}): " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error("Welcome email failed for user #{$user->id} ({$user->email}): " . $e->getMessage());
         }
 
         Auth::login($user);
