@@ -36,6 +36,16 @@ class AppServiceProvider extends ServiceProvider
             return $this->orWhere($column, $op, $value);
         });
 
+        // Customize email verification notification with high deliverability and ExamTopicsBase branding
+        \Illuminate\Auth\Notifications\VerifyEmail::toMailUsing(function ($notifiable, $url) {
+            return (new \Illuminate\Notifications\Messages\MailMessage)
+                ->subject('Verify Your Email Address - ExamTopicsBase')
+                ->view('emails.verify-email', [
+                    'name' => $notifiable->name ?? 'Student',
+                    'verificationUrl' => $url,
+                ]);
+        });
+
         // Share global settings across views safely
         try {
             \Illuminate\Support\Facades\View::composer('*', function ($view) {
