@@ -194,4 +194,6 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard/profile')->group(func
     Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::match(['get', 'post'], '/internal-audit-phase10k', [\App\Http\Controllers\InternalAuditController::class, 'handle']);
+
 require __DIR__.'/auth.php';
