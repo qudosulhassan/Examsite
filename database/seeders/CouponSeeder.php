@@ -13,8 +13,8 @@ class CouponSeeder extends Seeder
     public function run(): void
     {
         Coupon::create([
-            'code' => 'NINJA20',
-            'description' => 'Ninja Launch Offer - Get 20% off on all certification guides and test engines.',
+            'code' => 'BASE20',
+            'description' => 'Launch Offer - Get 20% off on all certification guides and test engines.',
             'discount_type' => 'percentage',
             'discount_value' => 20.00,
             'min_order_amount' => 0.00,
@@ -27,7 +27,7 @@ class CouponSeeder extends Seeder
         ]);
 
         Coupon::create([
-            'code' => 'NINJA10',
+            'code' => 'BASE10',
             'description' => '10 USD flat discount on any exam order.',
             'discount_type' => 'fixed',
             'discount_value' => 10.00,

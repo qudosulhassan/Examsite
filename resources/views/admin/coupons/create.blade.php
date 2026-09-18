@@ -18,7 +18,7 @@
                 <!-- Code -->
                 <div>
                     <label for="code" class="block text-xs font-bold text-gray-400 uppercase mb-2">Coupon Code</label>
-                    <input type="text" name="code" id="code" required placeholder="e.g. NINJA50"
+                    <input type="text" name="code" id="code" required placeholder="e.g. SAVE50"
                            class="w-full border-gray-300 rounded text-sm px-3 py-2 uppercase focus:border-cyan focus:ring-cyan">
                     @error('code')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>

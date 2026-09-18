@@ -31,7 +31,7 @@ class SettingsAdminController extends Controller
 
         // Defaults if not set
         $settings['site_name'] = $settings['site_name'] ?? config('app.name', 'Exam Topics Base');
-        $settings['site_tagline'] = $settings['site_tagline'] ?? 'Pass Like a Ninja. First Attempt Guaranteed.';
+        $settings['site_tagline'] = $settings['site_tagline'] ?? 'Pass Your IT Certification Exam First Attempt. Guaranteed.';
         $settings['site_url'] = $settings['site_url'] ?? config('app.url', 'http://127.0.0.1:8000');
         $settings['contact_email'] = $settings['contact_email'] ?? 'contact@examtopicsbase.com';
         $settings['support_email'] = $settings['support_email'] ?? 'support@examtopicsbase.com';

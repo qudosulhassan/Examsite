@@ -72,7 +72,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Exams<span>Ninja</span></h1>
+            <h1>ExamTopics<span>Base</span></h1>
         </div>
         <div class="body">
             <h2>Your Simulator Access Has Been Extended!</h2>

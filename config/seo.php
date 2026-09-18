@@ -13,7 +13,7 @@ return [
     */
 
     'site_name' => 'Exam Topics Base',
-    'tagline' => 'Pass Like a Ninja. First Attempt Guaranteed.',
+    'tagline' => 'Pass Your IT Certification Exam First Attempt. Guaranteed.',
     'title_separator' => '|',
     
     'defaults' => [

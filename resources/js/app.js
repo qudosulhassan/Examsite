@@ -11,10 +11,10 @@ Alpine.data('countdownTimer', () => {
         minutes: '00',
         seconds: '00',
         init() {
-            let endTime = localStorage.getItem('ninja_sale_end');
+            let endTime = localStorage.getItem('examtopics_sale_end');
             if (!endTime) {
                 endTime = new Date().getTime() + (12 * 60 * 60 * 1000);
-                localStorage.setItem('ninja_sale_end', endTime);
+                localStorage.setItem('examtopics_sale_end', endTime);
             }
             
             const update = () => {
@@ -23,7 +23,7 @@ Alpine.data('countdownTimer', () => {
                 
                 if (distance < 0) {
                     endTime = new Date().getTime() + (12 * 60 * 60 * 1000);
-                    localStorage.setItem('ninja_sale_end', endTime);
+                    localStorage.setItem('examtopics_sale_end', endTime);
                     distance = endTime - now;
                 }
                 

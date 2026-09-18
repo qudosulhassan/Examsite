@@ -1180,7 +1180,7 @@ function settingsCenter() {
                             <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Live Header Preview</div>
                             <div class="bg-gradient-to-r from-orange to-red-500 text-white py-2.5 px-4 text-center text-xs sm:text-sm shadow-md rounded-xl flex items-center justify-center flex-wrap gap-2 transition-all"
                                  :class="bannerActive == '1' ? 'opacity-100' : 'opacity-40 grayscale'">
-                                <span class="font-bold" x-text="bannerText || '🔥 FLASH SALE! Use coupon NINJA50 for 50% off all bundles!'"></span>
+                                <span class="font-bold" x-text="bannerText || '🔥 FLASH SALE! Use coupon SAVE50 for 50% off all bundles!'"></span>
                                 <template x-if="bannerCoupon">
                                     <span class="bg-white text-orange px-2 py-0.5 rounded font-mono font-black text-xs mx-1" x-text="bannerCoupon"></span>
                                 </template>
@@ -1215,7 +1215,7 @@ function settingsCenter() {
                                 <label for="home_banner_coupon" class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
                                     Highlight Coupon Code (Optional)
                                 </label>
-                                <input type="text" name="home_banner_coupon" id="home_banner_coupon" x-model="bannerCoupon" @input="markDirty()" value="{{ old('home_banner_coupon', $settings['home_banner_coupon'] ?? '') }}" placeholder="e.g. NINJA50" class="w-full text-sm border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-mono uppercase font-bold text-orange">
+                                <input type="text" name="home_banner_coupon" id="home_banner_coupon" x-model="bannerCoupon" @input="markDirty()" value="{{ old('home_banner_coupon', $settings['home_banner_coupon'] ?? '') }}" placeholder="e.g. SAVE50" class="w-full text-sm border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-mono uppercase font-bold text-orange">
                             </div>
 
                             <div>

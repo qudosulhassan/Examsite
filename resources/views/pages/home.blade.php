@@ -470,7 +470,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-20">
-            <h2 class="text-3xl font-black text-white sm:text-4xl mb-4 tracking-tight">What Our Ninja Students Say</h2>
+            <h2 class="text-3xl font-black text-white sm:text-4xl mb-4 tracking-tight">What Our Students Say</h2>
             <p class="text-lg text-gray-400 max-w-2xl mx-auto">Over 200,000 students successfully certified using our study materials.</p>
         </div>
 

@@ -43,7 +43,7 @@ class PlanSeeder extends Seeder
 
         // Seed other general settings too as a senior developer move
         Setting::set('site_name', 'Exam Topics Base');
-        Setting::set('site_tagline', 'Pass Like a Ninja. First Attempt Guaranteed.');
+        Setting::set('site_tagline', 'Pass Your IT Certification Exam First Attempt. Guaranteed.');
         Setting::set('contact_email', 'contact@examtopicsbase.com');
         Setting::set('support_email', 'support@examtopicsbase.com');
         Setting::set('maintenance_mode', 'false');

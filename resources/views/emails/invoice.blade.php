@@ -74,7 +74,7 @@
                     <table>
                         <tr>
                             <td class="title">
-                                Exams<span class="cyan-text">Ninja</span>
+                                ExamTopics<span class="cyan-text">Base</span>
                             </td>
                             <td>
                                 Invoice #: {{ $order->order_number }}<br>
