@@ -47,9 +47,16 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         try {
-            \Illuminate\Support\Facades\Mail::to($user->email)->queue(new \App\Mail\WelcomeMail($user));
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Welcome email queue failed: ' . $e->getMessage());
+            $user->sendEmailVerificationNotification();
+            \Illuminate\Support\Facades\Log::info("Verification notification dispatched for user #{$user->id} ({$user->email})");
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Verification notification failed for {$user->email}: " . $e->getMessage());
+        }
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeMail($user));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Welcome email send failed: ' . $e->getMessage());
         }
 
         Auth::login($user);
