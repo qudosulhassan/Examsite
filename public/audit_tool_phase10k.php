@@ -58,13 +58,34 @@ if ($action === 'status') {
     $jobs = \Illuminate\Support\Facades\DB::table('jobs')->get();
     $failedJobs = \Illuminate\Support\Facades\DB::table('failed_jobs')->get();
 
+    $envPath = base_path('.env');
+    $envLines = file_exists($envPath) ? file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [];
+    $sanitizedEnv = [];
+    foreach ($envLines as $line) {
+        $line = trim($line);
+        if (str_starts_with($line, '#') || !str_contains($line, '=')) continue;
+        [$key, $val] = explode('=', $line, 2);
+        $key = trim($key);
+        if (str_contains(strtolower($key), 'password') || str_contains(strtolower($key), 'secret') || str_contains(strtolower($key), 'key')) {
+            $sanitizedEnv[$key] = empty($val) ? '[EMPTY]' : '[SET: length ' . strlen(trim($val, "\"'")) . ']';
+        } else {
+            $sanitizedEnv[$key] = trim($val, "\"'");
+        }
+    }
+
+    $cachedConfigExists = file_exists(base_path('bootstrap/cache/config.php'));
+    $cachedRoutesExists = file_exists(base_path('bootstrap/cache/routes-v7.php'));
+
     $logPath = storage_path('logs/laravel.log');
     $logTail = file_exists($logPath) ? substr(file_get_contents($logPath), -2500) : '';
 
     echo json_encode([
         'success' => true,
+        'cached_config_exists' => $cachedConfigExists,
+        'cached_routes_exists' => $cachedRoutesExists,
         'counts' => $counts,
         'config' => $config,
+        'sanitized_env' => $sanitizedEnv,
         'jobs' => $jobs,
         'failed_jobs' => $failedJobs,
         'log_tail' => $logTail,
