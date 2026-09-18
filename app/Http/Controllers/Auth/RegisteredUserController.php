@@ -48,15 +48,16 @@ class RegisteredUserController extends Controller
 
         try {
             $user->sendEmailVerificationNotification();
-            \Illuminate\Support\Facades\Log::info("Verification notification dispatched for user #{$user->id} ({$user->email})");
+            \Illuminate\Support\Facades\Log::emergency("Registration verification email SUCCESS for user #{$user->id} ({$user->email})");
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Verification notification failed for {$user->email}: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::emergency("Registration verification email FAILED for user #{$user->id} ({$user->email}): " . $e->getMessage());
         }
 
         try {
             \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeMail($user));
+            \Illuminate\Support\Facades\Log::emergency("Registration welcome email SUCCESS for user #{$user->id} ({$user->email})");
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Welcome email send failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::emergency("Registration welcome email FAILED for user #{$user->id} ({$user->email}): " . $e->getMessage());
         }
 
         Auth::login($user);
