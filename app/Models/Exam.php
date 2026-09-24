@@ -170,8 +170,9 @@ class Exam extends Model
      */
     public function getUrlAttribute(): string
     {
-        $vendorSlug = $this->vendor ? $this->vendor->slug : 'exam';
-        return route('exams.show', ['vendor' => $vendorSlug, 'slug' => $this->slug]);
+        $vendorSlug = ($this->vendor && !empty($this->vendor->slug)) ? $this->vendor->slug : 'exam';
+        $slug = !empty($this->slug) ? $this->slug : (!empty($this->exam_code) ? strtolower($this->exam_code) : 'exam');
+        return route('exams.show', ['vendor' => $vendorSlug, 'slug' => $slug]);
     }
 
     /**

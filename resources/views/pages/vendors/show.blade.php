@@ -7,41 +7,36 @@
 @section('og_type', 'website')
 
 @section('seo_tags')
-<script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
+@php
+    $seoService = app(\App\Services\TechnicalSeoService::class);
+    $vendorDesc = !empty(trim(strip_tags($vendor->description ?? ''))) 
+        ? trim(strip_tags($vendor->description)) 
+        : (!empty($vendor->meta_description) 
+            ? $vendor->meta_description 
+            : "Official {$vendor->name} certification exams, study guides, and verified question banks.");
+@endphp
+
+@if(($globalSettings['seo_schema_master_enabled'] ?? '1') === '1')
+    @if(($globalSettings['seo_schema_breadcrumbs_enabled'] ?? '1') === '1')
+    <script type="application/ld+json">
+    {!! json_encode($seoService->generateBreadcrumbSchema([
+        'Home' => url('/'),
+        'Vendors' => url('/vendors'),
+        $vendor->name => route('vendors.show', $vendor->slug),
+    ]), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
+    @endif
+
+    <script type="application/ld+json">
     {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "{{ url('/') }}"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Vendors",
-      "item": "{{ url('/vendors') }}"
-    },
-    {
-      "@type": "ListItem",
-      "position": 3,
-      "name": "{{ $vendor->name }}",
-      "item": "{{ route('vendors.show', $vendor->slug) }}"
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": {!! json_encode($vendor->name) !!},
+      "description": {!! json_encode($vendorDesc) !!},
+      "url": "{{ route('vendors.show', $vendor->slug) }}"
     }
-  ]
-}
-</script>
-<script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "{{ $vendor->name }}",
-  "description": "{{ strip_tags($vendor->description) }}",
-  "url": "{{ route('vendors.show', $vendor->slug) }}"
-}
-</script>
+    </script>
+@endif
 @endsection
 
 @section('content')

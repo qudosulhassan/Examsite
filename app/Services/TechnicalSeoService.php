@@ -267,40 +267,48 @@ TXT;
     public function generateOrganizationSchema(): array
     {
         $site = app()->bound('current_site') ? app('current_site') : null;
-        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'Exam Topics Base'));
+        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'ExamTopicsBase'));
         $siteUrl = url('/');
         $logoPath = ($site && !empty($site->logo)) ? $site->logo : Setting::get('site_logo');
-        $logo = $logoPath ? asset($logoPath) : asset('images/logo.png');
+        $logo = $logoPath ? (str_starts_with($logoPath, 'http') ? $logoPath : asset($logoPath)) : asset('images/logo.png');
 
         $contactEmail = ($site && !empty($site->contact_email)) ? $site->contact_email : Setting::get('contact_email', 'support@examtopicsbase.com');
 
-        $socialLinks = array_filter([
+        $socialLinks = array_values(array_filter([
             Setting::get('social_twitter'),
             Setting::get('social_facebook'),
             Setting::get('social_linkedin'),
             Setting::get('social_youtube'),
             Setting::get('social_github'),
-        ]);
+        ]));
 
-        return [
+        $schema = [
             '@context' => 'https://schema.org',
             '@type' => 'Organization',
             'name' => $siteName,
             'url' => $siteUrl,
             'logo' => $logo,
-            'contactPoint' => [
+        ];
+
+        if (!empty($contactEmail)) {
+            $schema['contactPoint'] = [
                 '@type' => 'ContactPoint',
                 'email' => $contactEmail,
                 'contactType' => 'customer support',
-            ],
-            'sameAs' => array_values($socialLinks),
-        ];
+            ];
+        }
+
+        if (!empty($socialLinks)) {
+            $schema['sameAs'] = $socialLinks;
+        }
+
+        return $schema;
     }
 
     public function generateWebSiteSchema(): array
     {
         $site = app()->bound('current_site') ? app('current_site') : null;
-        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'Exam Topics Base'));
+        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'ExamTopicsBase'));
         $siteUrl = url('/');
 
         return [
@@ -310,7 +318,10 @@ TXT;
             'url' => $siteUrl,
             'potentialAction' => [
                 '@type' => 'SearchAction',
-                'target' => $siteUrl . '/search?q={search_term_string}',
+                'target' => [
+                    '@type' => 'EntryPoint',
+                    'urlTemplate' => rtrim($siteUrl, '/') . '/search?q={search_term_string}',
+                ],
                 'query-input' => 'required name=search_term_string',
             ],
         ];
@@ -325,7 +336,7 @@ TXT;
             $elements[] = [
                 '@type' => 'ListItem',
                 'position' => $position++,
-                'name' => $name,
+                'name' => (string) $name,
                 'item' => $url ?: url('/'),
             ];
         }
@@ -340,29 +351,45 @@ TXT;
     public function generateArticleSchema($post): array
     {
         $site = app()->bound('current_site') ? app('current_site') : null;
-        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'Exam Topics Base'));
+        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'ExamTopicsBase'));
         $logoPath = ($site && !empty($site->logo)) ? $site->logo : Setting::get('site_logo', 'images/logo.png');
+        $logoUrl = $logoPath ? (str_starts_with($logoPath, 'http') ? $logoPath : asset($logoPath)) : asset('images/logo.png');
+
+        $imageUrl = !empty($post->featured_image) 
+            ? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . ltrim($post->featured_image, '/'))) 
+            : asset('images/og-default.png');
+
+        $authorName = $post->author->name ?? $post->user->name ?? 'ExamTopicsBase Editorial Team';
+
+        $description = !empty($post->meta_description) 
+            ? $post->meta_description 
+            : (!empty($post->excerpt) ? strip_tags($post->excerpt) : substr(strip_tags($post->content ?? ''), 0, 160));
+        if (empty(trim($description))) {
+            $description = 'In-depth guide and preparation tips for IT certification exams.';
+        }
 
         return [
             '@context' => 'https://schema.org',
             '@type' => 'BlogPosting',
-            'headline' => $post->title ?? 'Blog Post',
-            'image' => !empty($post->featured_image) ? asset($post->featured_image) : asset('images/og-default.png'),
-            'datePublished' => $post->published_at ? $post->published_at->toIso8601String() : now()->toIso8601String(),
+            'headline' => mb_substr($post->title ?? 'IT Certification Guide', 0, 110),
+            'description' => trim($description),
+            'image' => [$imageUrl],
+            'datePublished' => $post->published_at ? $post->published_at->toIso8601String() : ($post->created_at ? $post->created_at->toIso8601String() : now()->toIso8601String()),
             'dateModified' => $post->updated_at ? $post->updated_at->toIso8601String() : now()->toIso8601String(),
             'author' => [
-                '@type' => 'Person',
-                'name' => $post->author->name ?? 'Editorial Team',
+                [
+                    '@type' => 'Person',
+                    'name' => $authorName,
+                ]
             ],
             'publisher' => [
                 '@type' => 'Organization',
                 'name' => $siteName,
                 'logo' => [
                     '@type' => 'ImageObject',
-                    'url' => asset($logoPath),
+                    'url' => $logoUrl,
                 ],
             ],
-            'description' => $post->meta_description ?? substr(strip_tags($post->excerpt ?? $post->content ?? ''), 0, 160),
             'mainEntityOfPage' => [
                 '@type' => 'WebPage',
                 '@id' => route('blog.show', $post->slug ?? 'post'),
@@ -372,30 +399,72 @@ TXT;
 
     public function generateExamProductSchema($exam): array
     {
-        $price = $exam->price ?? 29.99;
-        $vendorName = $exam->vendor ? $exam->vendor->name : 'IT';
+        $site = app()->bound('current_site') ? app('current_site') : null;
+        $price = $exam->price_bundle > 0 ? $exam->price_bundle : ($exam->price_pdf > 0 ? $exam->price_pdf : ($exam->price ?? 29.99));
+        $vendorName = $exam->vendor ? $exam->vendor->name : 'IT Certification';
+        $examCode = $exam->exam_code ?: $exam->code ?: '';
+        $examName = $exam->exam_name ?: $exam->title ?: '';
+        $title = trim(($examCode ? $examCode . ' - ' : '') . ($examName ?: 'Certification Practice Exam') . ' Practice Questions & Dumps');
+
+        $rawDesc = '';
+        if (!empty(trim(strip_tags($exam->description ?? '')))) {
+            $rawDesc = trim(strip_tags($exam->description));
+        } else {
+            try {
+                if (!empty($exam->resolved_meta_description)) {
+                    $rawDesc = $exam->resolved_meta_description;
+                }
+            } catch (\Throwable $th) {}
+
+            if (empty($rawDesc) && !empty($exam->meta_description)) {
+                $rawDesc = $exam->meta_description;
+            }
+            if (empty($rawDesc)) {
+                $rawDesc = "Pass your {$examCode} {$examName} certification exam with our verified practice test questions and dumps.";
+            }
+        }
+
+        $imagePath = ($site && !empty($site->logo)) ? $site->logo : Setting::get('site_logo');
+        $imageUrl = !empty(Setting::get('default_og_image')) ? asset(Setting::get('default_og_image')) : ($imagePath ? asset($imagePath) : asset('images/og-default.png'));
+
+        $ratingVal = '4.9';
+        if (method_exists($exam, 'averageRating')) {
+            try {
+                $avg = $exam->averageRating();
+                if ($avg) {
+                    $ratingVal = number_format((float)$avg, 1, '.', '');
+                }
+            } catch (\Throwable $th) {
+                $ratingVal = '4.9';
+            }
+        }
 
         return [
             '@context' => 'https://schema.org',
             '@type' => 'Product',
-            'name' => ($exam->code ? $exam->code . ' - ' : '') . $exam->title,
-            'description' => $exam->meta_description ?: ($exam->description ? substr(strip_tags($exam->description), 0, 200) : 'Verified practice questions and exam dumps.'),
+            'name' => $title,
+            'description' => substr($rawDesc, 0, 300),
+            'image' => [$imageUrl],
             'category' => 'IT Certification Study Materials',
             'brand' => [
                 '@type' => 'Brand',
                 'name' => $vendorName,
             ],
+            'sku' => $examCode ?: 'ETB-' . ($exam->id ?? '1'),
+            'mpn' => $examCode ?: 'ETB-' . ($exam->id ?? '1'),
             'offers' => [
                 '@type' => 'Offer',
                 'price' => number_format((float)$price, 2, '.', ''),
                 'priceCurrency' => 'USD',
                 'availability' => 'https://schema.org/InStock',
-                'url' => url()->current(),
+                'itemCondition' => 'https://schema.org/NewCondition',
+                'priceValidUntil' => date('Y-12-31', strtotime('+1 year')),
+                'url' => $exam->url ?? url()->current(),
             ],
             'aggregateRating' => [
                 '@type' => 'AggregateRating',
-                'ratingValue' => '4.9',
-                'reviewCount' => (string)(120 + ($exam->id % 80)),
+                'ratingValue' => $ratingVal,
+                'reviewCount' => (string)max(15, ($exam->reviews_count ?? 0) > 0 ? $exam->reviews_count : (110 + (($exam->id ?? 1) % 75))),
                 'bestRating' => '5',
                 'worstRating' => '1',
             ],
@@ -404,22 +473,62 @@ TXT;
 
     public function generateCourseSchema($exam): array
     {
-        $vendorName = $exam->vendor ? $exam->vendor->name : 'IT Provider';
-
         $site = app()->bound('current_site') ? app('current_site') : null;
-        $siteName = $site ? $site->name : Setting::get('site_name', 'Exam Topics Base');
+        $siteName = $site ? $site->name : Setting::get('site_name', config('app.name', 'ExamTopicsBase'));
+        $vendorName = $exam->vendor ? $exam->vendor->name : $siteName;
+        $vendorUrl = ($exam->vendor && !empty($exam->vendor->slug)) ? route('vendors.show', $exam->vendor->slug) : url('/');
+        $examCode = $exam->exam_code ?: $exam->code ?: '';
+        $examName = $exam->exam_name ?: $exam->title ?: '';
+
+        $title = trim(($examCode ? $examCode . ': ' : '') . ($examName ?: 'Certification Preparation Course'));
+
+        $rawDesc = '';
+        if (!empty(trim(strip_tags($exam->description ?? '')))) {
+            $rawDesc = trim(strip_tags($exam->description));
+        } else {
+            try {
+                if (!empty($exam->resolved_meta_description)) {
+                    $rawDesc = $exam->resolved_meta_description;
+                }
+            } catch (\Throwable $th) {}
+
+            if (empty($rawDesc) && !empty($exam->meta_description)) {
+                $rawDesc = $exam->meta_description;
+            }
+            if (empty($rawDesc)) {
+                $rawDesc = "Comprehensive {$examCode} {$examName} certification course, verified exam dumps, and real practice questions.";
+            }
+        }
+
+        $price = $exam->price_engine > 0 ? $exam->price_engine : ($exam->price_bundle > 0 ? $exam->price_bundle : 29.99);
 
         return [
             '@context' => 'https://schema.org',
             '@type' => 'Course',
-            'name' => ($exam->code ? $exam->code . ': ' : '') . $exam->title,
-            'description' => $exam->meta_description ?: ($exam->description ? substr(strip_tags($exam->description), 0, 200) : 'Comprehensive exam preparation course and practice test questions.'),
+            'name' => $title,
+            'description' => substr($rawDesc, 0, 300),
             'provider' => [
                 '@type' => 'Organization',
-                'name' => $siteName,
-                'sameAs' => url('/'),
+                'name' => $vendorName,
+                'sameAs' => $vendorUrl,
             ],
-            'educationalCredentialAwarded' => $exam->code ? $exam->code . ' Certification' : 'Professional Certification',
+            'educationalCredentialAwarded' => $examCode ? "{$examCode} Certification" : 'Professional IT Certification',
+            'hasCourseInstance' => [
+                [
+                    '@type' => 'CourseInstance',
+                    'courseMode' => 'Online',
+                    'courseWorkload' => 'PT15H',
+                ]
+            ],
+            'offers' => [
+                [
+                    '@type' => 'Offer',
+                    'category' => 'Paid',
+                    'price' => number_format((float)$price, 2, '.', ''),
+                    'priceCurrency' => 'USD',
+                    'url' => $exam->url ?? url()->current(),
+                ]
+            ],
         ];
     }
 
@@ -434,32 +543,40 @@ TXT;
                 return json_encode($this->generateBreadcrumbSchema([
                     'Home' => url('/'),
                     'Vendors' => url('/vendors'),
-                    'Cisco' => url('/vendors/cisco'),
-                    '200-301 CCNA' => url('/exams/cisco/200-301'),
+                    'Microsoft' => url('/vendors/microsoft'),
+                    'AZ-900' => url('/exams/microsoft/az-900'),
                 ]), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             case 'product':
                 $mockExam = new Exam([
                     'id' => 101,
-                    'exam_code' => 'AZ-104',
-                    'exam_name' => 'Microsoft Azure Administrator',
-                    'price_bundle' => 39.99,
-                    'description' => 'Latest and real AZ-104 practice questions, verified answers, and simulation test engine.',
+                    'exam_code' => 'AZ-900',
+                    'exam_name' => 'Microsoft Azure Fundamentals',
+                    'slug' => 'az-900',
+                    'price_bundle' => 29.99,
+                    'description' => 'Real and updated AZ-900 practice questions, verified answers, and simulation test engine.',
                 ]);
+                $mockVendor = new Vendor(['name' => 'Microsoft', 'slug' => 'microsoft']);
+                $mockExam->setRelation('vendor', $mockVendor);
                 return json_encode($this->generateExamProductSchema($mockExam), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             case 'course':
                 $mockExam = new Exam([
                     'id' => 101,
-                    'exam_code' => 'AZ-104',
-                    'exam_name' => 'Microsoft Azure Administrator',
+                    'exam_code' => 'AZ-900',
+                    'exam_name' => 'Microsoft Azure Fundamentals',
+                    'slug' => 'az-900',
+                    'price_engine' => 29.99,
+                    'description' => 'Comprehensive AZ-900 certification exam preparation course and test engine.',
                 ]);
+                $mockVendor = new Vendor(['name' => 'Microsoft', 'slug' => 'microsoft']);
+                $mockExam->setRelation('vendor', $mockVendor);
                 return json_encode($this->generateCourseSchema($mockExam), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             case 'article':
                 $mockPost = new BlogPost([
                     'id' => 1,
-                    'title' => 'How to Pass Your AWS Solutions Architect Exam on First Try',
-                    'slug' => 'how-to-pass-aws-solutions-architect',
-                    'excerpt' => 'Step-by-step preparation plan and key topics to master.',
-                    'published_at' => now()->subDays(5),
+                    'title' => 'How to Pass Your AZ-900 Certification on First Attempt',
+                    'slug' => 'how-to-pass-az-900',
+                    'excerpt' => 'Complete preparation roadmap and essential tips to master the AZ-900 exam.',
+                    'published_at' => now()->subDays(3),
                     'updated_at' => now()->subDay(),
                 ]);
                 return json_encode($this->generateArticleSchema($mockPost), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

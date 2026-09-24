@@ -16,6 +16,31 @@
     @section('og_image', $post->og_image ?? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . $post->featured_image)))
 @endif
 
+@section('seo_tags')
+@php
+    $seoService = app(\App\Services\TechnicalSeoService::class);
+@endphp
+@if(($globalSettings['seo_schema_master_enabled'] ?? '1') === '1')
+    {{-- BreadcrumbList Schema --}}
+    @if(($globalSettings['seo_schema_breadcrumbs_enabled'] ?? '1') === '1')
+    <script type="application/ld+json">
+    {!! json_encode($seoService->generateBreadcrumbSchema([
+        'Home' => url('/'),
+        'Blog' => route('blog.index'),
+        $post->title => route('blog.show', $post->slug),
+    ]), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
+    @endif
+
+    {{-- Article & BlogPosting Schema --}}
+    @if(($globalSettings['seo_schema_article_enabled'] ?? '1') === '1')
+    <script type="application/ld+json">
+    {!! json_encode($seoService->generateArticleSchema($post), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
+    @endif
+@endif
+@endsection
+
 @section('styles')
 <style>
     /* Public article rich content formatting */

@@ -7,21 +7,6 @@
 
 @section('title', $homeTitle)
 
-@section('seo_tags')
-<script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Exam Topics Base",
-  "url": "{{ url('/') }}",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "{{ url('/search') }}?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
-@endsection
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->

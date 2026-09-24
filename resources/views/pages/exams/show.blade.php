@@ -11,57 +11,37 @@
 @endsection
 
 @section('seo_tags')
-<script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "{{ url('/') }}"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Vendors",
-      "item": "{{ url('/vendors') }}"
-    },
-    {
-      "@type": "ListItem",
-      "position": 3,
-      "name": "{{ $exam->vendor->name ?? 'Vendor' }}",
-      "item": "{{ !empty($exam->vendor) ? route('vendors.show', $exam->vendor->slug) : url('/vendors') }}"
-    },
-    {
-      "@type": "ListItem",
-      "position": 4,
-      "name": "{{ $exam->exam_code }}",
-      "item": "{{ $exam->url }}"
-    }
-  ]
-}
-</script>
-<script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@type": "Course",
-  "name": "{{ $exam->exam_code }} - {{ $exam->exam_name }}",
-  "description": "{{ strip_tags($exam->description) }}",
-  "provider": {
-    "@type": "Organization",
-    "name": "{{ $exam->vendor->name }}",
-    "sameAs": "{{ route('vendors.show', $exam->vendor->slug) }}"
-  },
-  "offers": {
-    "@type": "Offer",
-    "price": "{{ $exam->price_engine }}",
-    "priceCurrency": "USD",
-    "category": "Test Preparation"
-  }
-}
-</script>
+@php
+    $seoService = app(\App\Services\TechnicalSeoService::class);
+@endphp
+
+@if(($globalSettings['seo_schema_master_enabled'] ?? '1') === '1')
+    {{-- BreadcrumbList Schema --}}
+    @if(($globalSettings['seo_schema_breadcrumbs_enabled'] ?? '1') === '1')
+    <script type="application/ld+json">
+    {!! json_encode($seoService->generateBreadcrumbSchema([
+        'Home' => url('/'),
+        'Vendors' => url('/vendors'),
+        $exam->vendor->name ?? 'Vendor' => !empty($exam->vendor) ? route('vendors.show', $exam->vendor->slug) : url('/vendors'),
+        $exam->exam_code => $exam->url,
+    ]), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
+    @endif
+
+    {{-- Product & Offer Schema --}}
+    @if(($globalSettings['seo_schema_product_enabled'] ?? '1') === '1')
+    <script type="application/ld+json">
+    {!! json_encode($seoService->generateExamProductSchema($exam), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
+    @endif
+
+    {{-- Course / Certification Schema --}}
+    @if(($globalSettings['seo_schema_course_enabled'] ?? '1') === '1')
+    <script type="application/ld+json">
+    {!! json_encode($seoService->generateCourseSchema($exam), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
+    @endif
+@endif
 @php
     $schemaFaqs = $exam->resolved_faqs;
 @endphp

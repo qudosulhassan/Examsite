@@ -4,6 +4,45 @@
 @section('meta_description', $certification->meta_description ?? 'Study and practice for the ' . $certification->name . ' certification exams.')
 @section('canonical_url', route('certifications.show', $certification->slug))
 
+@section('seo_tags')
+@php
+    $seoService = app(\App\Services\TechnicalSeoService::class);
+    $certDesc = !empty(trim(strip_tags($certification->description ?? ''))) 
+        ? trim(strip_tags($certification->description)) 
+        : (!empty($certification->meta_description) 
+            ? $certification->meta_description 
+            : "Study and practice for the {$certification->name} certification exams.");
+@endphp
+@if(($globalSettings['seo_schema_master_enabled'] ?? '1') === '1')
+    @if(($globalSettings['seo_schema_breadcrumbs_enabled'] ?? '1') === '1')
+    <script type="application/ld+json">
+    {!! json_encode($seoService->generateBreadcrumbSchema([
+        'Home' => url('/'),
+        'Certifications' => url('/certifications'),
+        $certification->name => route('certifications.show', $certification->slug),
+    ]), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
+    @endif
+
+    @if(($globalSettings['seo_schema_course_enabled'] ?? '1') === '1')
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": {!! json_encode($certification->name . ' Certification') !!},
+      "description": {!! json_encode($certDesc) !!},
+      "provider": {
+        "@type": "Organization",
+        "name": {!! json_encode($certification->vendor->name ?? 'IT Provider') !!},
+        "sameAs": "{{ !empty($certification->vendor) ? route('vendors.show', $certification->vendor->slug) : url('/') }}"
+      },
+      "educationalCredentialAwarded": {!! json_encode($certification->name . ' Certification') !!}
+    }
+    </script>
+    @endif
+@endif
+@endsection
+
 @section('content')
 
 <!-- Hero Section (Premium Deep Space) -->
