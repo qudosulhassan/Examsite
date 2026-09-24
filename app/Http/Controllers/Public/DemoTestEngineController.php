@@ -7,7 +7,6 @@ use App\Models\Exam;
 use App\Models\Question;
 use App\Models\TestAttempt;
 use App\Models\TestAnswer;
-use App\Services\TestEngine\EngineSession;
 use Illuminate\Http\Request;
 
 class DemoTestEngineController extends Controller
@@ -93,8 +92,8 @@ class DemoTestEngineController extends Controller
             }
         }
 
-        // The demo shows the exam's opening questions, in order
-        $questions = $questionsQuery->orderBy('id')->limit($count)->get();
+        // Fetch random questions up to count limit
+        $questions = $questionsQuery->inRandomOrder()->limit($count)->get();
 
         if ($questions->isEmpty()) {
             return back()->with('status', 'No questions available for this exam attempt parameters.');
@@ -141,35 +140,24 @@ class DemoTestEngineController extends Controller
 
         $exam = Exam::findOrFail($attempt->exam_id);
 
+        // Load all answers with their associated questions
         $answers = TestAnswer::where('attempt_id', $attempt->id)
-            ->with('question.options', 'question.answers', 'question.media', 'question.references')
-            ->orderBy('id')
+            ->with('question')
             ->get();
 
-        $config = EngineSession::config($attempt, $answers, [
-            'save'    => route('public.demo-test-engine.answer'),
-            'flag'    => route('public.demo-test-engine.flag'),
-            'submit'  => route('public.demo-test-engine.submit', $attempt->id),
-            'restart' => route('public.demo-test-engine.lobby', $exam->slug),
-        ]);
-
-        return view('test-engine.engine', [
-            'exam'      => $exam,
-            'config'    => $config,
-            'backUrl'   => $exam->url ?? url('/'),
-            'backLabel' => 'Exit demo',
-        ]);
+        return view('pages.demo-test-engine.session', compact('attempt', 'exam', 'answers'));
     }
 
     /**
-     * Save one question's engine state from the page (AJAX) and grade it on the server.
+     * Save answer choice from frontend (AJAX).
      */
     public function saveAnswerAjax(Request $request)
     {
         $request->validate([
-            'attempt_id' => 'required|integer',
-            'question_id' => 'required|integer',
-            'response' => 'nullable|array',
+            'attempt_id' => 'required|exists:test_attempts,id',
+            'question_id' => 'required|exists:questions,id',
+            'selected_option' => 'nullable|string',
+            'time_spent' => 'nullable|integer',
         ]);
 
         $attempt = TestAttempt::where('id', $request->attempt_id)
@@ -183,18 +171,43 @@ class DemoTestEngineController extends Controller
 
         $answer = TestAnswer::where('attempt_id', $attempt->id)
             ->where('question_id', $request->question_id)
-            ->with('question.options', 'question.answers', 'question.media', 'question.references')
             ->first();
 
-        if (!$answer || !$answer->question) {
+        if (!$answer) {
             return response()->json(['error' => 'Question answer placeholder not found.'], 404);
         }
 
-        $status = EngineSession::record($attempt, $answer, (array) $request->input('response', []));
+        $question = Question::findOrFail($request->question_id);
+        $selected = $request->selected_option;
+
+        // Check correctness (trim arrays to handle multi-select spacing)
+        $isCorrect = false;
+        if (!empty($selected)) {
+            $selectedArr = array_map('trim', explode(',', $selected));
+            $correctArr = array_map('trim', explode(',', $question->correct_option));
+            sort($selectedArr);
+            sort($correctArr);
+            $isCorrect = ($selectedArr === $correctArr);
+        }
+
+        // Save progress
+        $answer->update([
+            'selected_option' => $selected,
+            'is_correct' => $isCorrect,
+            'time_spent_seconds' => $answer->time_spent_seconds + ($request->time_spent ?? 0),
+        ]);
+
+        // Auto calculate running metrics
+        $answeredCount = TestAnswer::where('attempt_id', $attempt->id)->whereNotNull('selected_option')->count();
+        $attempt->update([
+            'answered' => $answeredCount,
+        ]);
 
         return response()->json([
             'success' => true,
-            'status' => $attempt->mode === 'exam' ? null : $status,
+            'is_correct' => $attempt->mode === 'exam' ? null : $isCorrect,
+            'correct_option' => $attempt->mode === 'exam' ? null : $question->correct_option,
+            'explanation' => $attempt->mode === 'exam' ? null : $question->explanation,
         ]);
     }
 
@@ -271,9 +284,9 @@ class DemoTestEngineController extends Controller
 
         $exam = Exam::findOrFail($attempt->exam_id);
 
+        // Load all graded questions
         $answers = TestAnswer::where('attempt_id', $attempt->id)
-            ->with('question.options', 'question.answers', 'question.media', 'question.references')
-            ->orderBy('id')
+            ->with('question')
             ->get();
 
         return view('pages.demo-test-engine.results', compact('attempt', 'exam', 'answers'));

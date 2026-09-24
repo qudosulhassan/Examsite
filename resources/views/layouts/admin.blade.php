@@ -90,8 +90,14 @@
                                 <a href="{{ route('admin.questions.create') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.create') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                                     + Add Question
                                 </a>
-                                <a href="{{ route('admin.questions.import') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.import*') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
-                                    Import Exam File
+                                <a href="{{ route('admin.questions.import-form') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.import-form') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Import JSON
+                                </a>
+                                <a href="{{ route('admin.questions.import-pdf-form') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.import-pdf*') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Import PDF
+                                </a>
+                                <a href="{{ route('admin.questions.import-history') }}" class="group flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition {{ request()->routeIs('admin.questions.import-history') ? 'text-cyan font-bold bg-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                                    Import History
                                 </a>
                             </div>
                         </div>
@@ -302,7 +308,9 @@
                         <a href="{{ url('/admin/questions') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Questions</a>
                         <div class="pl-6 space-y-1">
                             <a href="{{ route('admin.questions.create') }}" class="block text-xs text-gray-400 hover:text-white">+ Add Question</a>
-                            <a href="{{ route('admin.questions.import') }}" class="block text-xs text-gray-400 hover:text-white">Import Exam File</a>
+                            <a href="{{ route('admin.questions.import-form') }}" class="block text-xs text-gray-400 hover:text-white">Import JSON</a>
+                            <a href="{{ route('admin.questions.import-pdf-form') }}" class="block text-xs text-gray-400 hover:text-white">Import PDF</a>
+                            <a href="{{ route('admin.questions.import-history') }}" class="block text-xs text-gray-400 hover:text-white">Import History</a>
                         </div>
                         <div x-data="{ mUsersOpen: {{ (request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/audit-logs*')) ? 'true' : 'false' }} }">
                             <button type="button" @click="mUsersOpen = !mUsersOpen" class="w-full group flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">
