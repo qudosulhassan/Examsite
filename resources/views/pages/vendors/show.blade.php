@@ -28,13 +28,7 @@
     @endif
 
     <script type="application/ld+json">
-    {!! json_encode([
-      '@context' => 'https://schema.org',
-      '@type' => 'Organization',
-      'name' => $vendor->name,
-      'description' => $vendorDesc,
-      'url' => route('vendors.show', $vendor->slug),
-    ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    {!! json_encode($seoService->generateVendorSchema($vendor), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
 @endif
 @endsection

@@ -1,23 +1,15 @@
 @props(['links' => [], 'renderSchema' => false])
 
 @php
-    $schemaList = [];
-    $position = 1;
-    foreach ($links as $link) {
-        $schemaList[] = [
-            '@type' => 'ListItem',
-            'position' => $position,
-            'name' => $link['name'],
-            'item' => $link['url'] ? url($link['url']) : url()->current(),
-        ];
-        $position++;
+    $schema = null;
+    if ($renderSchema) {
+        $breadcrumbItems = [];
+        foreach ($links as $link) {
+            $breadcrumbItems[$link['name']] = $link['url'] ? url($link['url']) : url()->current();
+        }
+        $seoService = app(\App\Services\TechnicalSeoService::class);
+        $schema = $seoService->generateBreadcrumbSchema($breadcrumbItems);
     }
-
-    $schema = [
-        '@context' => 'https://schema.org',
-        '@type' => 'BreadcrumbList',
-        'itemListElement' => $schemaList,
-    ];
 @endphp
 
 <!-- Visual Breadcrumbs -->

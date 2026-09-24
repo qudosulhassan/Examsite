@@ -47,22 +47,7 @@
 @endphp
 @if(!empty($schemaFaqs) && is_array($schemaFaqs) && count($schemaFaqs) > 0)
 <script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    @foreach($schemaFaqs as $faqIndex => $faq)
-    {
-      "@type": "Question",
-      "name": {!! json_encode($faq['question'] ?? '') !!},
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": {!! json_encode(strip_tags($faq['answer'] ?? '')) !!}
-      }
-    }{{ $faqIndex < count($schemaFaqs) - 1 ? ',' : '' }}
-    @endforeach
-  ]
-}
+{!! json_encode($seoService->generateFaqSchema($schemaFaqs), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
 </script>
 @endif
 @endsection

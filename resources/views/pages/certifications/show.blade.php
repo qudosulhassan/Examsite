@@ -26,18 +26,7 @@
 
     @if(($globalSettings['seo_schema_course_enabled'] ?? '1') === '1')
     <script type="application/ld+json">
-    {!! json_encode([
-      '@context' => 'https://schema.org',
-      '@type' => 'Course',
-      'name' => $certification->name . ' Certification',
-      'description' => $certDesc,
-      'provider' => [
-        '@type' => 'Organization',
-        'name' => $certification->vendor->name ?? 'IT Provider',
-        'sameAs' => !empty($certification->vendor) ? route('vendors.show', $certification->vendor->slug) : url('/'),
-      ],
-      'educationalCredentialAwarded' => $certification->name . ' Certification',
-    ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    {!! json_encode($seoService->generateCertificationSchema($certification), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
     @endif
 @endif

@@ -532,6 +532,77 @@ TXT;
         ];
     }
 
+    public function generateVendorSchema($vendor): array
+    {
+        $vendorDesc = !empty(trim(strip_tags($vendor->description ?? ''))) 
+            ? trim(strip_tags($vendor->description)) 
+            : (!empty($vendor->meta_description) 
+                ? $vendor->meta_description 
+                : "Official {$vendor->name} certification exams, study guides, and verified question banks.");
+
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            'name' => $vendor->name,
+            'description' => substr($vendorDesc, 0, 300),
+            'url' => route('vendors.show', $vendor->slug),
+        ];
+    }
+
+    public function generateCertificationSchema($certification): array
+    {
+        $vendorName = $certification->vendor ? $certification->vendor->name : Setting::get('site_name', 'ExamTopicsBase');
+        $desc = !empty(trim(strip_tags($certification->description ?? '')))
+            ? trim(strip_tags($certification->description))
+            : (!empty($certification->meta_description)
+                ? $certification->meta_description
+                : "Study and practice for the {$certification->name} certification exams.");
+
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'Course',
+            'name' => $certification->name . ' Certification',
+            'description' => substr($desc, 0, 300),
+            'provider' => [
+                '@type' => 'Organization',
+                'name' => $vendorName,
+                'sameAs' => !empty($certification->vendor) ? route('vendors.show', $certification->vendor->slug) : url('/'),
+            ],
+            'educationalCredentialAwarded' => $certification->name . ' Certification',
+            'hasCourseInstance' => [
+                [
+                    '@type' => 'CourseInstance',
+                    'courseMode' => 'Online',
+                ]
+            ],
+        ];
+    }
+
+    public function generateFaqSchema(array $faqs): array
+    {
+        $mainEntity = [];
+        foreach ($faqs as $faq) {
+            $question = $faq['question'] ?? '';
+            $answer = strip_tags($faq['answer'] ?? '');
+            if (!empty($question) && !empty($answer)) {
+                $mainEntity[] = [
+                    '@type' => 'Question',
+                    'name' => $question,
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => $answer,
+                    ]
+                ];
+            }
+        }
+
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            'mainEntity' => $mainEntity,
+        ];
+    }
+
     public function getPreviewSchema(string $type): string
     {
         switch ($type) {
