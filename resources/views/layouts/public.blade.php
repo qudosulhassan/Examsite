@@ -28,10 +28,10 @@
         $yieldRobots = trim($__env->yieldContent('robots'));
         $computedRobots = !empty($yieldRobots) ? $yieldRobots : (($currentSite && !empty($currentSite->robots_directive) && $currentSite->id > 1) ? $currentSite->robots_directive : $seoService->getRobotsMetaDirective());
 
-        $defaultSiteTitle = ($currentSite && !empty($currentSite->default_seo_title)) ? $currentSite->default_seo_title : ($globalSettings['default_seo_title'] ?? config('seo.defaults.title'));
-        $defaultSiteDesc = ($currentSite && !empty($currentSite->default_meta_description)) ? $currentSite->default_meta_description : ($globalSettings['default_meta_description'] ?? config('seo.defaults.description'));
-        $defaultSiteKeywords = ($currentSite && !empty($currentSite->primary_keyword_strategy)) ? $currentSite->primary_keyword_strategy : ($globalSettings['default_meta_keywords'] ?? config('seo.defaults.keywords'));
-        $activeSiteName = $currentSite ? $currentSite->name : ($globalSettings['site_name'] ?? config('seo.site_name', 'Exam Topics Base'));
+        $defaultSiteTitle = ($currentSite && !empty($currentSite->default_seo_title)) ? $currentSite->default_seo_title : (!empty($globalSettings['default_seo_title']) ? $globalSettings['default_seo_title'] : config('seo.defaults.title'));
+        $defaultSiteDesc = ($currentSite && !empty($currentSite->default_meta_description)) ? $currentSite->default_meta_description : (!empty($globalSettings['default_meta_description']) ? $globalSettings['default_meta_description'] : config('seo.defaults.description'));
+        $defaultSiteKeywords = ($currentSite && !empty($currentSite->primary_keyword_strategy)) ? $currentSite->primary_keyword_strategy : (!empty($globalSettings['default_meta_keywords']) ? $globalSettings['default_meta_keywords'] : config('seo.defaults.keywords'));
+        $activeSiteName = $currentSite ? $currentSite->name : (!empty($globalSettings['site_name']) ? $globalSettings['site_name'] : config('seo.site_name', 'Exam Topics Base'));
     @endphp
     @if(!empty($gscVerification))
         <meta name="google-site-verification" content="{{ $gscVerification }}">
@@ -71,12 +71,12 @@
     <meta name="twitter:site" content="{{ $globalSettings['social_twitter'] ?? config('seo.social.twitter_handle', '@ExamTopicsBase') }}">
     <meta name="twitter:creator" content="{{ $globalSettings['social_twitter'] ?? config('seo.social.twitter_handle', '@ExamTopicsBase') }}">
     <meta name="twitter:url" content="@yield('canonical_url', $computedCanonical)">
-    <meta name="twitter:title" content="@yield('title', $globalSettings['default_og_title'] ?? ($globalSettings['default_seo_title'] ?? config('seo.defaults.title')))">
-    <meta name="twitter:description" content="@yield('meta_description', $globalSettings['default_og_description'] ?? ($globalSettings['default_meta_description'] ?? config('seo.defaults.description')))">
+    <meta name="twitter:title" content="@yield('title', $defaultSiteTitle)">
+    <meta name="twitter:description" content="@yield('meta_description', $defaultSiteDesc)">
     <meta name="twitter:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')))">
     <meta property="twitter:card" content="{{ $globalSettings['seo_twitter_card'] ?? 'summary_large_image' }}">
-    <meta property="twitter:title" content="@yield('title', $globalSettings['default_og_title'] ?? ($globalSettings['default_seo_title'] ?? config('seo.defaults.title')))">
-    <meta property="twitter:description" content="@yield('meta_description', $globalSettings['default_og_description'] ?? ($globalSettings['default_meta_description'] ?? config('seo.defaults.description')))">
+    <meta property="twitter:title" content="@yield('title', $defaultSiteTitle)">
+    <meta property="twitter:description" content="@yield('meta_description', $defaultSiteDesc)">
     <meta property="twitter:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')))">
 
     <!-- Structured Data (JSON-LD) -->
