@@ -1,4 +1,4 @@
-@props(['links' => []])
+@props(['links' => [], 'renderSchema' => false])
 
 @php
     $schemaList = [];
@@ -49,7 +49,9 @@
     </ol>
 </nav>
 
+@if($renderSchema && ($globalSettings['seo_schema_master_enabled'] ?? '1') === '1' && ($globalSettings['seo_schema_breadcrumbs_enabled'] ?? '1') === '1')
 <!-- JSON-LD Breadcrumbs -->
 <script type="application/ld+json">
     {!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
 </script>
+@endif
