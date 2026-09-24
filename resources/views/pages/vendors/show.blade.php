@@ -28,13 +28,13 @@
     @endif
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": {!! json_encode($vendor->name) !!},
-      "description": {!! json_encode($vendorDesc) !!},
-      "url": "{{ route('vendors.show', $vendor->slug) }}"
-    }
+    {!! json_encode([
+      '@context' => 'https://schema.org',
+      '@type' => 'Organization',
+      'name' => $vendor->name,
+      'description' => $vendorDesc,
+      'url' => route('vendors.show', $vendor->slug),
+    ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
 @endif
 @endsection

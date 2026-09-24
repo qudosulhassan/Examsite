@@ -26,18 +26,18 @@
 
     @if(($globalSettings['seo_schema_course_enabled'] ?? '1') === '1')
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Course",
-      "name": {!! json_encode($certification->name . ' Certification') !!},
-      "description": {!! json_encode($certDesc) !!},
-      "provider": {
-        "@type": "Organization",
-        "name": {!! json_encode($certification->vendor->name ?? 'IT Provider') !!},
-        "sameAs": "{{ !empty($certification->vendor) ? route('vendors.show', $certification->vendor->slug) : url('/') }}"
-      },
-      "educationalCredentialAwarded": {!! json_encode($certification->name . ' Certification') !!}
-    }
+    {!! json_encode([
+      '@context' => 'https://schema.org',
+      '@type' => 'Course',
+      'name' => $certification->name . ' Certification',
+      'description' => $certDesc,
+      'provider' => [
+        '@type' => 'Organization',
+        'name' => $certification->vendor->name ?? 'IT Provider',
+        'sameAs' => !empty($certification->vendor) ? route('vendors.show', $certification->vendor->slug) : url('/'),
+      ],
+      'educationalCredentialAwarded' => $certification->name . ' Certification',
+    ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
     @endif
 @endif
