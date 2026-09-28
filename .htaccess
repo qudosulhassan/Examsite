@@ -9,6 +9,13 @@
     RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
     RewriteRule ^(.*)$ https://%1/$1 [L,R=301]
 
+    # /index.php as a real external redirect (not the Laravel route -- when Apache serves
+    # this file because it physically exists, it bypasses the internal "send to public/"
+    # rewrite entirely, and the resulting SCRIPT_NAME/PATH_INFO confusion was leaking
+    # /public/index.php into the page's own canonical tag). Must fire before the
+    # "send to public directory" rule below.
+    RewriteRule ^index\.php$ / [L,R=301]
+
     # Block access to sensitive files (.env, .git, composer.json, etc.)
     RewriteRule (^|/)\.(?!well-known) - [F]
     RewriteRule ^composer\.(json|lock) - [F]

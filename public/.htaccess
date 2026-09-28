@@ -9,6 +9,10 @@
     RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
     RewriteRule ^(.*)$ https://%1/$1 [L,R=301]
 
+    # /index.php -> / as a real external redirect (see matching rule + comment in the
+    # repo-root .htaccess for why this can't be a Laravel-level route here).
+    RewriteRule ^index\.php$ / [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
