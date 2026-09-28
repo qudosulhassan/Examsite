@@ -86,8 +86,10 @@ class SecurityHeaders
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
         }
 
-        // Basic CSP allowing Stripe, PayPal, Google Tag Manager, Google Fonts, and internal assets
-        $csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.paypal.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://*.stripe.com; frame-src 'self' https://js.stripe.com https://www.paypal.com;";
+        // Basic CSP allowing Stripe, PayPal, Google Tag Manager, Google Fonts, and internal assets.
+        // ui-avatars.com is the permanent fallback avatar for any user without an uploaded one
+        // (User::avatar_url) -- without it here, every admin/user header avatar is a broken image.
+        $csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.paypal.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://*.stripe.com https://ui-avatars.com; frame-src 'self' https://js.stripe.com https://www.paypal.com;";
         $response->headers->set('Content-Security-Policy', $csp);
 
         return $response;
