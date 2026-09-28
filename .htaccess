@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # Canonical hostname: force non-www. Runs first so it applies to every request.
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [L,R=301]
+
     # Block access to sensitive files (.env, .git, composer.json, etc.)
     RewriteRule (^|/)\.(?!well-known) - [F]
     RewriteRule ^composer\.(json|lock) - [F]

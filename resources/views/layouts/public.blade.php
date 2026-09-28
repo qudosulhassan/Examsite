@@ -350,7 +350,7 @@
 
                 <!-- Top Vendors -->
                 <div class="lg:col-span-3">
-                    <h3 class="text-white font-bold text-lg mb-6">Top Vendors</h3>
+                    <p class="text-white font-bold text-lg mb-6">Top Vendors</p>
                     <ul class="grid grid-cols-1 gap-y-3">
                         @foreach(App\Models\Vendor::where('is_active', true)->orderBy('name')->take(5)->get() as $footerVendor)
                             <li>
@@ -365,7 +365,7 @@
 
                 <!-- Quick Links -->
                 <div class="lg:col-span-2">
-                    <h3 class="text-white font-bold text-lg mb-6">Quick Links</h3>
+                    <p class="text-white font-bold text-lg mb-6">Quick Links</p>
                     <ul class="space-y-3">
                         <li>
                             <a href="{{ url('/test-engine') }}" class="text-gray-400 hover:text-cyan text-sm font-medium transition-colors flex items-center group">
@@ -402,7 +402,7 @@
 
                 <!-- Policies & Trust -->
                 <div class="lg:col-span-2">
-                    <h3 class="text-white font-bold text-lg mb-6">Policies &amp; Trust</h3>
+                    <p class="text-white font-bold text-lg mb-6">Policies &amp; Trust</p>
                     <ul class="space-y-3">
                         <li>
                             <a href="{{ url('/guarantee') }}" class="text-emerald-400 hover:text-emerald-300 text-sm font-semibold transition-colors flex items-center group">
@@ -433,7 +433,7 @@
 
                 <!-- Guaranteed Satisfaction Card -->
                 <div class="lg:col-span-2">
-                    <h3 class="text-white font-bold text-lg mb-6">Guaranteed</h3>
+                    <p class="text-white font-bold text-lg mb-6">Guaranteed</p>
                     <a href="{{ url('/guarantee') }}" class="block group">
                         <div class="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm shadow-xl group-hover:border-cyan/50 group-hover:bg-white/[0.08] transition duration-300">
                             <div class="flex items-start mb-2.5">
@@ -441,9 +441,9 @@
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-white text-xs mb-0.5 group-hover:text-cyan transition-colors">
+                                    <p class="font-bold text-white text-xs mb-0.5 group-hover:text-cyan transition-colors">
                                         Money Back
-                                    </h4>
+                                    </p>
                                     <p class="text-[11px] text-gray-400 font-medium leading-tight">100% full refund if you fail.</p>
                                 </div>
                             </div>

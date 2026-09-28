@@ -160,9 +160,10 @@ class Exam extends Model
     /**
      * Get the average rating of the exam reviews.
      */
-    public function averageRating()
+    public function averageRating(): ?float
     {
-        return $this->reviews()->where('is_approved', true)->avg('rating') ?: 5.0;
+        $avg = $this->reviews()->where('is_approved', true)->avg('rating');
+        return $avg ? (float) $avg : null;
     }
 
     /**

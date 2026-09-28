@@ -36,7 +36,11 @@
     @endif
 
     {{-- Course / Certification Schema --}}
-    @if(($globalSettings['seo_schema_course_enabled'] ?? '1') === '1')
+    {{-- Defaults OFF: practice-test/exam-dump products are not accredited courses, and
+         Course schema here previously misrepresented the certifying vendor (e.g. "Cisco")
+         as the course provider via a self-referencing sameAs URL -- a Google structured
+         data policy violation. Admins can still opt back in via Settings if ever justified. --}}
+    @if(($globalSettings['seo_schema_course_enabled'] ?? '0') === '1')
     <script type="application/ld+json">
     {!! json_encode($seoService->generateCourseSchema($exam), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
@@ -277,7 +281,7 @@
                                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
                             </div>
                         </div>
-                        <h3 class="text-2xl font-black text-white leading-tight">{{ $exam->exam_code }} Certification Prep</h3>
+                        <p class="text-2xl font-black text-white leading-tight">{{ $exam->exam_code }} Certification Prep</p>
                     </div>
 
                     @if($isBundleActive)
@@ -298,7 +302,7 @@
                             
                             <div class="flex justify-between items-start mb-6 pt-3">
                                 <div>
-                                    <h4 class="font-black text-xl text-white leading-tight">PDF + Test Engine Bundle</h4>
+                                    <p class="font-black text-xl text-white leading-tight">PDF + Test Engine Bundle</p>
                                 </div>
                                 <div class="text-right pr-2">
                                     @if($originalCombined > $bundlePrice)
@@ -513,7 +517,7 @@
                 <div class="space-y-6 pt-4" x-data="{ activeFaq: null }">
                     <div class="text-center mb-8">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-3 inline-block">Got Questions?</span>
-                        <h3 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Frequently Asked Questions</h3>
+                        <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Frequently Asked Questions</h2>
                         <p class="text-base sm:text-lg text-gray-600 font-normal max-w-2xl mx-auto mt-2">Everything you need to know about the {{ $exam->exam_code }} certification exam, preparation materials, and practice resources.</p>
                     </div>
 
@@ -554,7 +558,7 @@
                 <div class="space-y-10 pt-8">
                     <div class="text-center mb-12">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-4 inline-block">Free Trial</span>
-                        <h3 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Interactive Sample Questions</h3>
+                        <h2 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Interactive Sample Questions</h2>
                         <p class="text-lg text-gray-600 font-normal max-w-2xl mx-auto">Try solving these actual questions from the latest {{ $exam->exam_code }} exam pool to test your knowledge.</p>
                     </div>
                     
@@ -776,7 +780,7 @@
                         <div class="absolute -right-20 -top-20 bg-white/20 w-80 h-80 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000 pointer-events-none"></div>
                         <div class="absolute -left-20 -bottom-20 bg-yellow-400/20 w-60 h-60 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000 pointer-events-none"></div>
                         
-                        <h4 class="text-3xl sm:text-4xl font-black text-white relative z-10 leading-tight">Ready to master all {{ $exam->question_count }} questions?</h4>
+                        <h3 class="text-3xl sm:text-4xl font-black text-white relative z-10 leading-tight">Ready to master all {{ $exam->question_count }} questions?</h3>
                         <p class="text-lg text-white/90 font-normal max-w-2xl mx-auto relative z-10 leading-relaxed">Unlock full access to the timed Test Engine and downloadable PDF study guides. Practice under real exam conditions.</p>
                         
                         <a href="#purchase-card" class="inline-block bg-white text-orange hover:bg-gray-50 hover:text-red-500 text-lg font-black py-5 px-12 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all transform hover:-translate-y-1 relative z-10 uppercase tracking-widest hover:shadow-[0_15px_40px_rgba(0,0,0,0.2)]">
@@ -789,7 +793,7 @@
                 <div class="bg-white border border-gray-100 rounded-[32px] p-8 sm:p-10 space-y-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] mt-12">
                     <div class="text-center">
                         <span class="text-[11px] font-black text-orange uppercase tracking-widest bg-orange/10 px-3 py-1.5 rounded-full border border-orange/20 mb-4 inline-block">Testimonials</span>
-                        <h3 class="text-3xl font-black text-navy tracking-tight">Verified Customer Reviews</h3>
+                        <h2 class="text-3xl font-black text-navy tracking-tight">Verified Customer Reviews</h2>
                     </div>
                     
                     @if(count($reviews) > 0)

@@ -427,19 +427,15 @@ TXT;
         $imagePath = ($site && !empty($site->logo)) ? $site->logo : Setting::get('site_logo');
         $imageUrl = !empty(Setting::get('default_og_image')) ? asset(Setting::get('default_og_image')) : ($imagePath ? asset($imagePath) : asset('images/og-default.png'));
 
-        $ratingVal = '4.9';
-        if (method_exists($exam, 'averageRating')) {
-            try {
-                $avg = $exam->averageRating();
-                if ($avg) {
-                    $ratingVal = number_format((float)$avg, 1, '.', '');
-                }
-            } catch (\Throwable $th) {
-                $ratingVal = '4.9';
-            }
-        }
+        // Only claim a rating when real, approved reviews actually back it up -- Google's
+        // structured data policy requires aggregateRating to correspond to genuine,
+        // visible reviews. No fabricated numbers here.
+        $approvedReviews = method_exists($exam, 'reviews')
+            ? $exam->reviews()->where('is_approved', true)->get()
+            : collect();
+        $reviewCount = $approvedReviews->count();
 
-        return [
+        $schema = [
             '@context' => 'https://schema.org',
             '@type' => 'Product',
             'name' => $title,
@@ -461,14 +457,19 @@ TXT;
                 'priceValidUntil' => date('Y-12-31', strtotime('+1 year')),
                 'url' => $exam->url ?? url()->current(),
             ],
-            'aggregateRating' => [
+        ];
+
+        if ($reviewCount > 0) {
+            $schema['aggregateRating'] = [
                 '@type' => 'AggregateRating',
-                'ratingValue' => $ratingVal,
-                'reviewCount' => (string)max(15, ($exam->reviews_count ?? 0) > 0 ? $exam->reviews_count : (110 + (($exam->id ?? 1) % 75))),
+                'ratingValue' => number_format((float) $approvedReviews->avg('rating'), 1, '.', ''),
+                'reviewCount' => (string) $reviewCount,
                 'bestRating' => '5',
                 'worstRating' => '1',
-            ],
-        ];
+            ];
+        }
+
+        return $schema;
     }
 
     public function generateCourseSchema($exam): array

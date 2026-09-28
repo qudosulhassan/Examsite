@@ -29,7 +29,7 @@
         
         <!-- Left: Branding & Info -->
         <div class="bg-white border border-gray-100 rounded-3xl p-10 shadow-[0_10px_40px_rgba(0,0,0,0.04)] h-full flex flex-col">
-            <h3 class="text-2xl font-black text-navy mb-4">What's in the Demo?</h3>
+            <h2 class="text-2xl font-black text-navy mb-4">What's in the Demo?</h2>
             <p class="text-sm font-medium text-gray-500 leading-relaxed mb-8">Our free demo guide gives you a sneak peek into the quality of our premium material. Unlike other platforms, we never hide our detailed explanations behind watermarks. You'll receive:</p>
             
             <ul class="space-y-6 text-[13px] text-navy font-bold mb-8 flex-1">
@@ -62,7 +62,7 @@
             <!-- decorative background -->
             <div class="absolute top-0 right-0 w-32 h-32 bg-cyan rounded-full mix-blend-multiply filter blur-[50px] opacity-10 pointer-events-none"></div>
 
-            <h3 class="text-2xl font-black text-navy mb-8 relative z-10">Request Demo</h3>
+            <h2 class="text-2xl font-black text-navy mb-8 relative z-10">Request Demo</h2>
             
             @if(session('status'))
                 <div class="mb-8 bg-green-50 border-l-4 border-green-400 text-green-700 p-4 rounded-r text-[13px] font-bold shadow-sm relative z-10">

@@ -17,6 +17,12 @@ class SecurityHeaders
     {
         $response = $next($request);
 
+        // Don't fingerprint the server-side runtime to the outside world.
+        $response->headers->remove('X-Powered-By');
+        if (function_exists('header_remove')) {
+            header_remove('X-Powered-By');
+        }
+
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-XSS-Protection', '1; mode=block');

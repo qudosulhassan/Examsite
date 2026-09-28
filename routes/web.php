@@ -29,6 +29,8 @@ use App\Http\Controllers\Webhook\PayPalWebhookController;
 | Public Routes
 |--------------------------------------------------------------------------
 */
+Route::redirect('/index.php', '/', 301);
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/vendors', [VendorController::class, 'index'])->name('vendors.index');
 Route::get('/vendors/{slug}', [App\Http\Controllers\Public\VendorController::class, 'show'])->name('vendors.show');
