@@ -4,8 +4,8 @@
 --}}
 @php
     $isExam = $config['mode'] === 'exam';
-    $cssVer = @filemtime(public_path('test-engine/engine.css')) ?: 1;
-    $jsVer = @filemtime(public_path('test-engine/engine.js')) ?: 1;
+    $cssVer = @filemtime(public_path('engine-assets/engine.css')) ?: 1;
+    $jsVer = @filemtime(public_path('engine-assets/engine.js')) ?: 1;
     $siteName = app(\App\Services\SiteContext::class)->branding()['name'] ?? config('app.name');
 @endphp
 <!DOCTYPE html>
@@ -18,7 +18,7 @@
 <title>{{ $exam->exam_code }} {{ $isExam ? 'Exam Simulation' : 'Practice Test' }} — {{ $siteName }}</title>
 <link rel="icon" href="{{ asset('favicon-32x32.png') }}">
 <script>try{var t=localStorage.getItem("etb-engine-theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
-<link rel="stylesheet" href="{{ asset('test-engine/engine.css') }}?v={{ $cssVer }}">
+<link rel="stylesheet" href="{{ asset('engine-assets/engine.css') }}?v={{ $cssVer }}">
 </head>
 <body>
 <header class="header">
@@ -83,6 +83,6 @@
 </div>
 
 <script>window.ETB_ENGINE = @json($config, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);</script>
-<script src="{{ asset('test-engine/engine.js') }}?v={{ $jsVer }}"></script>
+<script src="{{ asset('engine-assets/engine.js') }}?v={{ $jsVer }}"></script>
 </body>
 </html>
