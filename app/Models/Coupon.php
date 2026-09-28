@@ -34,6 +34,20 @@ class Coupon extends Model
     ];
 
     /**
+     * The discount amount this coupon takes off a given subtotal, capped so it can
+     * never exceed the subtotal itself (a $10-off coupon on a $5 order takes $5, not $10).
+     * Single source of truth for this math -- previously duplicated across Cart/Checkout.
+     */
+    public function calculateDiscount(float $subtotal): float
+    {
+        $discount = $this->discount_type === 'percentage'
+            ? ($subtotal * (float) $this->discount_value) / 100
+            : (float) $this->discount_value;
+
+        return min($discount, $subtotal);
+    }
+
+    /**
      * Check if coupon is valid for use.
      */
     public function isValid(float $orderTotal = 0.00): bool

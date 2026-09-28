@@ -62,12 +62,7 @@ class CheckoutController extends Controller
         if ($couponCode) {
             $coupon = Coupon::where('code', $couponCode)->where('is_active', true)->first();
             if ($coupon && $coupon->isValid($subtotal)) {
-                if ($coupon->discount_type === 'percentage') {
-                    $discount = ($subtotal * $coupon->discount_value) / 100;
-                } else {
-                    $discount = $coupon->discount_value;
-                }
-                $discount = min($discount, $subtotal);
+                $discount = $coupon->calculateDiscount($subtotal);
             }
         }
 
@@ -156,9 +151,7 @@ class CheckoutController extends Controller
             return redirect()->route('cart')->with('error', 'Invalid discount coupon.');
         }
 
-        $discount = $coupon->discount_type === 'percentage' 
-            ? ($subtotal * $coupon->discount_value) / 100 
-            : $coupon->discount_value;
+        $discount = $coupon->calculateDiscount($subtotal);
         $total = max(0, $subtotal - $discount);
 
         if ($total > 0) {
@@ -281,10 +274,7 @@ class CheckoutController extends Controller
         if ($couponCode) {
             $coupon = Coupon::where('code', $couponCode)->where('is_active', true)->first();
             if ($coupon && $coupon->isValid($subtotal)) {
-                $discount = $coupon->discount_type === 'percentage' 
-                    ? ($subtotal * $coupon->discount_value) / 100 
-                    : $coupon->discount_value;
-                $discount = min($discount, $subtotal);
+                $discount = $coupon->calculateDiscount($subtotal);
             }
         }
 
@@ -325,10 +315,7 @@ class CheckoutController extends Controller
                 if ($couponCode) {
                     $coupon = Coupon::where('code', $couponCode)->where('is_active', true)->first();
                     if ($coupon && $coupon->isValid($subtotal)) {
-                        $discount = $coupon->discount_type === 'percentage' 
-                            ? ($subtotal * $coupon->discount_value) / 100 
-                            : $coupon->discount_value;
-                        $discount = min($discount, $subtotal);
+                        $discount = $coupon->calculateDiscount($subtotal);
                     }
                 }
 
@@ -490,10 +477,7 @@ class CheckoutController extends Controller
                     if ($couponCode) {
                         $coupon = Coupon::where('code', $couponCode)->where('is_active', true)->first();
                         if ($coupon && $coupon->isValid($subtotal)) {
-                            $discount = $coupon->discount_type === 'percentage' 
-                                ? ($subtotal * $coupon->discount_value) / 100 
-                                : $coupon->discount_value;
-                            $discount = min($discount, $subtotal);
+                            $discount = $coupon->calculateDiscount($subtotal);
                         }
                     }
                     $total = max(0, $subtotal - $discount);

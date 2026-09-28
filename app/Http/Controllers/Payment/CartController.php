@@ -31,13 +31,7 @@ class CartController extends Controller
         if ($couponCode) {
             $coupon = Coupon::where('code', $couponCode)->where('is_active', true)->first();
             if ($coupon && $coupon->isValid($subtotal)) {
-                if ($coupon->discount_type === 'percentage') {
-                    $discount = ($subtotal * $coupon->discount_value) / 100;
-                } else {
-                    $discount = $coupon->discount_value;
-                }
-                // Cap discount at subtotal
-                $discount = min($discount, $subtotal);
+                $discount = $coupon->calculateDiscount($subtotal);
             } else {
                 // Invalid coupon, remove it
                 session()->forget('cart_coupon');
