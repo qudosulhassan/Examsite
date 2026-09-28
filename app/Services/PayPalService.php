@@ -56,6 +56,31 @@ class PayPalService
     }
 
     /**
+     * Verify an incoming webhook actually came from PayPal (RSA-SHA256 signature
+     * check against PayPal's own cert, done in-process). Returns false if the
+     * gateway isn't configured for real payments, PAYPAL_WEBHOOK_ID is unset, or
+     * the signature doesn't check out.
+     *
+     * @param array<string,string> $headers  raw webhook request headers
+     * @param string $rawBody unmodified request body bytes
+     */
+    public function verifyWebhookSignature(array $headers, string $rawBody): bool
+    {
+        $webhookId = config('services.paypal.webhook_id');
+
+        if ($this->isMocked || $this->provider === null || empty($webhookId)) {
+            return false;
+        }
+
+        try {
+            return $this->provider->verifyWebHookLocally($headers, $webhookId, $rawBody);
+        } catch (\Throwable $e) {
+            Log::error('PayPal webhook signature verification failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Create a PayPal order for one-time purchases.
      */
     public function createOrder(float $amount, string $returnUrl = '', string $cancelUrl = ''): array

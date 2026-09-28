@@ -35,23 +35,29 @@ class StripeWebhookController extends Controller
         $endpointSecret = config('services.stripe.webhook_secret');
 
         $event = null;
+        $isConfigured = !empty($endpointSecret) && $endpointSecret !== 'whsec_test_placeholder';
 
-        // Graceful signature validation bypass for local testing
-        if ($endpointSecret === 'whsec_test_placeholder' || empty($sigHeader)) {
+        if (!$isConfigured) {
+            // No real webhook secret set up -- local/dev testing only. Once a real
+            // secret is configured this branch is never reached, signature
+            // verification below is mandatory for every request.
             $data = json_decode($payload, true);
             if ($data && isset($data['type'])) {
                 $event = json_decode($payload);
             }
         } else {
+            // A real secret is configured: every request, signed or not, must pass
+            // verification. Never fall back to trusting an unsigned payload here --
+            // that would let anyone forge "payment succeeded" events.
             try {
                 $event = Webhook::constructEvent(
-                    $payload, $sigHeader, $endpointSecret
+                    $payload, (string) $sigHeader, $endpointSecret
                 );
             } catch (\UnexpectedValueException $e) {
                 // Invalid payload
                 return response()->json(['error' => 'Invalid payload'], 400);
             } catch (\Stripe\Exception\SignatureVerificationException $e) {
-                // Invalid signature
+                // Invalid or missing signature
                 return response()->json(['error' => 'Invalid signature'], 400);
             }
         }

@@ -6,15 +6,18 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Subscription;
 use App\Services\SubscriptionService;
+use App\Services\PayPalService;
 use Illuminate\Support\Facades\Log;
 
 class PayPalWebhookController extends Controller
 {
     protected SubscriptionService $subscriptionService;
+    protected PayPalService $paypalService;
 
-    public function __construct(SubscriptionService $subscriptionService)
+    public function __construct(SubscriptionService $subscriptionService, PayPalService $paypalService)
     {
         $this->subscriptionService = $subscriptionService;
+        $this->paypalService = $paypalService;
     }
 
     /**
@@ -27,6 +30,30 @@ class PayPalWebhookController extends Controller
 
         if (!$eventType) {
             return response()->json(['error' => 'Invalid webhook payload'], 400);
+        }
+
+        $webhookId = config('services.paypal.webhook_id');
+        $isConfigured = !empty($webhookId) && !$this->paypalService->isMocked();
+
+        if ($isConfigured) {
+            // A real webhook ID is configured: every request must pass signature
+            // verification. Never trust an unverified payload here -- that would
+            // let anyone forge subscription-activated / payment-captured events.
+            $headers = [
+                'PayPal-Transmission-Id' => $request->header('PayPal-Transmission-Id'),
+                'PayPal-Transmission-Time' => $request->header('PayPal-Transmission-Time'),
+                'PayPal-Cert-Url' => $request->header('PayPal-Cert-Url'),
+                'PayPal-Auth-Algo' => $request->header('PayPal-Auth-Algo'),
+                'PayPal-Transmission-Sig' => $request->header('PayPal-Transmission-Sig'),
+            ];
+
+            if (!$this->paypalService->verifyWebhookSignature($headers, $request->getContent())) {
+                Log::warning('PayPal webhook signature verification failed', ['event_type' => $eventType]);
+                return response()->json(['error' => 'Invalid signature'], 400);
+            }
+        } else {
+            // No PAYPAL_WEBHOOK_ID configured yet -- local/dev testing only.
+            Log::warning('PayPal webhook received with no PAYPAL_WEBHOOK_ID configured; signature NOT verified (dev/test mode only)', ['event_type' => $eventType]);
         }
 
         $startTime = microtime(true);

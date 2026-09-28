@@ -213,7 +213,7 @@ class ExamFileImportTest extends TestCase
         $attempt = $this->startAttempt('practice');
 
         $page = $this->get(route('dashboard.test-engine.session', $attempt->id));
-        $page->assertOk()->assertSee('window.ETB_ENGINE', false)->assertSee('test-engine/engine.js', false);
+        $page->assertOk()->assertSee('window.ETB_ENGINE', false)->assertSee('engine-assets/engine.js', false);
         $config = $page->viewData('config');
         $this->assertCount(6, $config['questions']);
         $this->assertArrayNotHasKey('answer', $config['questions'][0]);
