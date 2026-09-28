@@ -78,15 +78,28 @@
                 </div>
 
                 <!-- Length Selection -->
-                <div class="space-y-4" x-data="{ count: 10 }">
+                @php $minCount = min(5, max(1, $questionCount)); @endphp
+                <div class="space-y-4" x-data="{ count: {{ $questionCount }}, order: 'sequential' }">
                     <label class="block text-sm font-black text-white uppercase tracking-widest">Number of Questions</label>
                     <div class="flex items-center space-x-6 bg-white/5 p-6 rounded-2xl border border-white/10">
-                        <input type="range" name="count" min="5" max="{{ min($questionCount, 100) }}" x-model="count" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan">
-                        <span class="text-3xl font-black text-cyan w-16 text-center" x-text="count"></span>
+                        <input type="range" name="count" min="{{ $minCount }}" max="{{ max($questionCount, $minCount) }}" x-model="count" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan">
+                        <span class="text-3xl font-black text-cyan w-20 text-center" x-text="count"></span>
                     </div>
                     <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider text-gray-500 px-2">
-                        <span>Min: 5 Questions</span>
-                        <span>Max: {{ min($questionCount, 100) }} (Total Available: {{ $questionCount }})</span>
+                        <span>Min: {{ $minCount }} Questions</span>
+                        <span>All {{ $questionCount }} questions available</span>
+                    </div>
+
+                    <label class="block text-sm font-black text-white uppercase tracking-widest pt-4">Question Order</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="order" value="sequential" x-model="order" class="peer sr-only">
+                            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 text-xs text-gray-300 font-bold peer-checked:border-cyan peer-checked:text-cyan">In order (Question 1, 2, 3…)</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="order" value="random" x-model="order" class="peer sr-only">
+                            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 text-xs text-gray-300 font-bold peer-checked:border-cyan peer-checked:text-cyan">Random order</div>
+                        </label>
                     </div>
                 </div>
 

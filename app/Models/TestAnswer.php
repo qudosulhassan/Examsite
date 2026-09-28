@@ -13,12 +13,14 @@ class TestAnswer extends Model
         'attempt_id',
         'question_id',
         'selected_option',
+        'response',
         'is_correct',
         'is_flagged',
         'time_spent_seconds',
     ];
 
     protected $casts = [
+        'response' => 'array',
         'is_correct' => 'boolean',
         'is_flagged' => 'boolean',
         'time_spent_seconds' => 'integer',

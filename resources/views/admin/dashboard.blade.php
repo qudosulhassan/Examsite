@@ -821,7 +821,7 @@
                 <a href="{{ route('admin.questions.create') }}" class="px-3 py-1.5 bg-cyan text-navy font-black text-xs rounded-xl shadow-sm hover:opacity-90 transition">
                     + Add Question
                 </a>
-                <a href="{{ route('admin.questions.import-form') }}" class="px-3 py-1.5 bg-navy text-white font-bold text-xs rounded-xl shadow-sm hover:opacity-90 transition">
+                <a href="{{ route('admin.questions.import') }}" class="px-3 py-1.5 bg-navy text-white font-bold text-xs rounded-xl shadow-sm hover:opacity-90 transition">
                     Import Questions
                 </a>
             </div>

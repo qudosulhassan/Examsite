@@ -9,12 +9,9 @@
             <p class="text-xs text-gray-500 mt-1">Total Questions in Bank: <strong>{{ $questions->total() }}</strong></p>
         </div>
         <div class="flex items-center space-x-2">
-            <a href="{{ route('admin.questions.import-pdf-form') }}" class="bg-navy hover:bg-opacity-90 text-cyan text-xs font-bold py-2 px-4 rounded shadow transition flex items-center space-x-1 border border-cyan/30">
+            <a href="{{ route('admin.questions.import') }}" class="bg-navy hover:bg-opacity-90 text-cyan text-xs font-bold py-2 px-4 rounded shadow transition flex items-center space-x-1 border border-cyan/30">
                 <svg class="w-4 h-4 text-cyan mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                <span>Import PDF</span>
-            </a>
-            <a href="{{ route('admin.questions.import-form') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-2 px-4 rounded shadow transition">
-                Import JSON
+                <span>Import Exam File</span>
             </a>
             <a href="{{ route('admin.questions.create') }}" class="bg-orange hover:bg-opacity-90 text-white text-xs font-bold py-2 px-4 rounded shadow transition">
                 + Add New Question
@@ -31,14 +28,8 @@
             <a href="{{ route('admin.questions.create') }}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-bold text-xs">
                 + Add Question
             </a>
-            <a href="{{ route('admin.questions.import-pdf-form') }}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-bold text-xs">
-                Import PDF
-            </a>
-            <a href="{{ route('admin.questions.import-form') }}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-bold text-xs">
-                Import JSON
-            </a>
-            <a href="{{ route('admin.questions.import-history') }}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-bold text-xs">
-                Import History
+            <a href="{{ route('admin.questions.import') }}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-bold text-xs">
+                Import Exam File
             </a>
         </nav>
     </div>
@@ -54,7 +45,7 @@
                         <option value="">-- All Certification Exams ({{ $exams->sum('questions_count') ?? '' }}) --</option>
                         @foreach($exams as $exam)
                             <option value="{{ $exam->id }}" {{ $examId == $exam->id ? 'selected' : '' }}>
-                                {{ $exam->exam_code }} — {{ $exam->exam_name }} ({{ $exam->questions_count ?? $exam->questions()->count() }} questions)
+                                {{ $exam->exam_code }} — {{ $exam->exam_name }} ({{ $exam->questions_count }} questions)
                             </option>
                         @endforeach
                     </select>
@@ -169,7 +160,7 @@
                                 </a>
                             </td>
                             <td class="px-4 py-4 text-gray-700 max-w-md">
-                                <div class="font-medium line-clamp-2 leading-relaxed">{{ $question->question_text }}</div>
+                                <div class="font-medium line-clamp-2 leading-relaxed">{{ \Illuminate\Support\Str::limit(trim(html_entity_decode(strip_tags($question->question_text))), 160) }}</div>
                             </td>
                             <td class="px-4 py-4 text-gray-500 font-semibold whitespace-nowrap">
                                 {{ $question->topic ?: 'General' }}
@@ -185,7 +176,7 @@
                                     $ansText = !empty($answers) ? implode(', ', $answers) : ($question->correct_option ?? '—');
                                 @endphp
                                 <span class="px-2 py-0.5 rounded bg-cyan/15 text-navy font-bold font-mono text-xs">
-                                    {{ $ansText }}
+                                    {{ \Illuminate\Support\Str::limit($ansText, 60) }}
                                 </span>
                             </td>
                             <td class="px-4 py-4 whitespace-nowrap">
@@ -210,7 +201,7 @@
                                 <div class="max-w-xs mx-auto space-y-3">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                     <p class="text-sm font-medium">No certification questions found matching criteria.</p>
-                                    <a href="{{ route('admin.questions.import-pdf-form') }}" class="inline-block text-xs font-bold text-cyan hover:underline">Import PDF Questions</a>
+                                    <a href="{{ route('admin.questions.import') }}" class="inline-block text-xs font-bold text-cyan hover:underline">Import an Exam File</a>
                                 </div>
                             </td>
                         </tr>
