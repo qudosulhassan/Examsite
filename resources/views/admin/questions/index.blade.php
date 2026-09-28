@@ -296,5 +296,15 @@ function questionsManager() {
         }
     };
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.TomSelect) {
+        new TomSelect('#exam_id', {
+            placeholder: 'Search exams by code or name…',
+            maxOptions: null,
+            sortField: [],
+        });
+    }
+});
 </script>
 @endsection
