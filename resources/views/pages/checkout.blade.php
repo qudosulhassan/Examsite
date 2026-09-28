@@ -140,7 +140,7 @@
 
                         <!-- PayPal Form Container -->
                         <div x-show="paymentMethod === 'paypal'" class="space-y-4">
-                            @if(config('services.paypal.client_id') === 'sandbox_client_id_placeholder')
+                            @if(empty($paypalClientId))
                                 <!-- PayPal Mock Testing Card -->
                                 <div class="border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 text-center">
                                     <span class="text-2xl mb-2 block">💰</span>
@@ -312,11 +312,11 @@
 @endif
 
 <!-- PayPal SDK & JS Setup -->
-@if(config('services.paypal.client_id') !== 'sandbox_client_id_placeholder' && $total > 0)
+@if(!empty($paypalClientId) && $total > 0)
     @if($itemType === 'subscription')
-        <script src="https://www.paypal.com/sdk/js?client-id={{ config('services.paypal.client_id') }}&vault=true&intent=subscription&currency=USD"></script>
+        <script src="https://www.paypal.com/sdk/js?client-id={{ $paypalClientId }}&vault=true&intent=subscription&currency=USD"></script>
     @else
-        <script src="https://www.paypal.com/sdk/js?client-id={{ config('services.paypal.client_id') }}&currency=USD"></script>
+        <script src="https://www.paypal.com/sdk/js?client-id={{ $paypalClientId }}&currency=USD"></script>
     @endif
 <script>
     document.addEventListener('DOMContentLoaded', function() {

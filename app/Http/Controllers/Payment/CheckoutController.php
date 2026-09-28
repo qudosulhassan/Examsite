@@ -122,10 +122,15 @@ class CheckoutController extends Controller
             $stripeKey = null; // Mark as mock in view if placeholder
         }
 
+        $paypalClientId = config('services.paypal.client_id');
+        if (empty($paypalClientId) || $paypalClientId === 'sandbox_client_id_placeholder') {
+            $paypalClientId = null; // Mark as mock in view if unset or placeholder
+        }
+
         return view('pages.checkout', compact(
-            'cart', 'subtotal', 'coupon', 'discount', 'total', 
-            'stripeKey', 'stripeClientSecret', 'stripeSubscriptionId', 
-            'paypalPlanId', 'itemType'
+            'cart', 'subtotal', 'coupon', 'discount', 'total',
+            'stripeKey', 'stripeClientSecret', 'stripeSubscriptionId',
+            'paypalPlanId', 'paypalClientId', 'itemType'
         ));
     }
 
