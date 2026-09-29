@@ -100,6 +100,10 @@
                             </div>
                         </div>
 
+                        <a href="{{ url('/admin/reviews') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/reviews') }}">
+                            Reviews
+                        </a>
+
                         <!-- Users & RBAC Submenu -->
                         <div x-data="{ usersOpen: {{ (request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/audit-logs*')) ? 'true' : 'false' }} }">
                             <button type="button" @click="usersOpen = !usersOpen" class="w-full group flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-md transition {{ (request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/audit-logs*')) ? 'bg-gray-800 text-cyan border-l-4 border-cyan' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
@@ -351,6 +355,11 @@
                         <!-- Certifications -->
                         <a href="{{ route('admin.certifications.index') }}" class="{{ request()->routeIs('admin.certifications.*') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                             Certifications
+                        </a>
+
+                        <!-- Reviews -->
+                        <a href="{{ route('admin.reviews.index') }}" class="{{ request()->routeIs('admin.reviews.*') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                            Reviews
                         </a>
 
                         <a href="{{ url('/admin/media') }}" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white">Media Gallery</a>

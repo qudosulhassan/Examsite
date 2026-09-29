@@ -11,11 +11,21 @@ class Review extends Model
 
     protected $fillable = [
         'user_id',
+        'reviewer_name',
         'exam_id',
         'rating',
         'review_text',
         'is_approved',
     ];
+
+    /**
+     * Display name for public rendering: the admin-entered override if set,
+     * otherwise the linked account's name.
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->reviewer_name ?: ($this->user->name ?? 'Verified Customer');
+    }
 
     protected $casts = [
         'rating' => 'integer',

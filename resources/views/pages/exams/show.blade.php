@@ -808,9 +808,9 @@
                                 <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 hover:border-cyan/30 hover:shadow-lg transition-all duration-300 flex flex-col h-full group">
                                     <div class="flex items-center justify-between mb-6">
                                         <div class="flex items-center space-x-4">
-                                            <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-cyan to-blue-500 text-white flex items-center justify-center font-black shadow-md text-lg">{{ substr($review->user->name, 0, 2) }}</div>
+                                            <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-cyan to-blue-500 text-white flex items-center justify-center font-black shadow-md text-lg">{{ substr($review->display_name, 0, 2) }}</div>
                                             <div>
-                                                <span class="block text-base font-black text-navy leading-tight">{{ $review->user->name }}</span>
+                                                <span class="block text-base font-black text-navy leading-tight">{{ $review->display_name }}</span>
                                                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $review->created_at->format('M d, Y') }}</span>
                                             </div>
                                         </div>

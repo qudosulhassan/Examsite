@@ -33,6 +33,7 @@ Route::get('sites/{site}', [App\Http\Controllers\Admin\SiteAdminController::clas
 Route::resource('packages', PackageAdminController::class);
 Route::resource('vendors', VendorAdminController::class);
 Route::resource('certifications', App\Http\Controllers\Admin\CertificationController::class);
+Route::resource('reviews', App\Http\Controllers\Admin\ReviewAdminController::class)->except(['show']);
 Route::get('exams/search-suggestions', [ExamAdminController::class, 'searchSuggestions'])->name('exams.search-suggestions');
 Route::get('exams/{exam}/download-pdf/{type}', [ExamAdminController::class, 'downloadPdf'])->name('exams.download-pdf');
 Route::resource('exams', ExamAdminController::class);
