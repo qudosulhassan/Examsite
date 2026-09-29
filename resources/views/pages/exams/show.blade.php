@@ -558,8 +558,7 @@
                 <div class="space-y-10 pt-8">
                     <div class="text-center mb-12">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-4 inline-block">Free Trial</span>
-                        <h2 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Interactive Sample Questions</h2>
-                        <p class="text-lg text-gray-600 font-normal max-w-2xl mx-auto">Actual Free {{ $exam->vendor->name }} {{ $exam->exam_code }} Practice Questions</p>
+                        <h2 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Actual Free {{ $exam->vendor->name }} {{ $exam->exam_code }} Practice Questions</h2>
                     </div>
                     
                     @foreach($sampleQuestions as $index => $question)
@@ -770,7 +769,7 @@
                                     <svg class="w-4 h-4 mr-2 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                                     Expert Explanation
                                 </div>
-                                <p class="text-gray-600 leading-relaxed text-base font-normal relative z-10">{{ $question->explanation }}</p>
+                                <div class="text-gray-600 leading-relaxed text-base font-normal relative z-10 space-y-3">{!! $question->explanation !!}</div>
                             </div>
                             @endif
                         </div>
