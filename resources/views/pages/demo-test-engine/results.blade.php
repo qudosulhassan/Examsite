@@ -103,8 +103,21 @@
             </div>
         </div>
 
+        <!-- Unlock Full Access CTA -->
+        <div class="pt-10 border-t border-white/10 relative z-10">
+            <div class="bg-gradient-to-r from-cyan/10 to-blue-500/10 border border-cyan/30 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-5">
+                <div class="text-center sm:text-left">
+                    <p class="text-white font-black text-lg">This was just a {{ $attempt->total_questions }}-question free demo.</p>
+                    <p class="text-gray-400 text-sm mt-1">Unlock all {{ $exam->calculated_question_count ?? $exam->question_count }} {{ $exam->exam_code }} questions with the full Test Engine and PDF guide.</p>
+                </div>
+                <a href="{{ $exam->url }}#purchase-card" class="shrink-0 bg-cyan hover:bg-opacity-90 text-navy text-xs font-black uppercase tracking-widest py-4 px-8 rounded-xl shadow-[0_4px_15px_rgba(0,212,170,0.3)] transition-all transform hover:-translate-y-0.5">
+                    Unlock Full Test Engine
+                </a>
+            </div>
+        </div>
+
         <!-- Quick actions -->
-        <div class="pt-10 flex flex-wrap justify-center gap-6 relative z-10">
+        <div class="pt-6 flex flex-wrap justify-center gap-6 relative z-10">
             <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="bg-gradient-to-r from-orange to-red-500 hover:from-orange hover:to-red-600 text-white text-xs font-black uppercase tracking-widest py-3 px-8 rounded-xl shadow-[0_4px_15px_rgba(249,115,22,0.4)] transition-all transform hover:-translate-y-0.5">
                 Retake Demo Exam
             </a>
