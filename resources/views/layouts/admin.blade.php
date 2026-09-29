@@ -71,6 +71,10 @@
                             Vendors
                         </a>
 
+                        <a href="{{ url('/admin/certifications') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/certifications') }}">
+                            Certifications
+                        </a>
+
                         <a href="{{ url('/admin/exams') }}" class="group flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition {{ $isActive('/admin/exams') }}">
                             Exams
                         </a>
