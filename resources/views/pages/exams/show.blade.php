@@ -418,12 +418,17 @@
                     </div>
                     @endif
 
-                    <!-- Free Demo Button Link -->
-                    <div class="pt-2">
+                    <!-- Free Demo Button Links -->
+                    <div class="pt-2 space-y-3">
                         <button x-on:click="$dispatch('open-demo-modal')" class="relative z-10 w-full bg-transparent border-2 border-white/10 hover:border-cyan hover:bg-cyan/10 text-gray-300 hover:text-cyan text-xs font-black py-4 rounded-xl text-center transition-all duration-300 uppercase tracking-widest flex items-center justify-center space-x-2 group">
                             <svg class="w-4 h-4 text-gray-400 group-hover:text-cyan group-hover:-translate-y-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             <span>Download Free Demo</span>
                         </button>
+
+                        <a href="{{ route('public.demo-test-engine.lobby', $exam->slug) }}" class="relative z-10 w-full bg-transparent border-2 border-white/10 hover:border-orange hover:bg-orange/10 text-gray-300 hover:text-orange text-xs font-black py-4 rounded-xl text-center transition-all duration-300 uppercase tracking-widest flex items-center justify-center space-x-2 group">
+                            <svg class="w-4 h-4 text-gray-400 group-hover:text-orange group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Try Test Engine Demo</span>
+                        </a>
                     </div>
 
                     <!-- Trust info -->
