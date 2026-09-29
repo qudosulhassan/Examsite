@@ -37,17 +37,14 @@ class SendDemoPdfEmail implements ShouldQueue
             return;
         }
 
-        // Generate temporary URL from Cloudflare R2 bucket (expires in 24 hours for demo requests)
-        // Note: For local testing we check if the file exists on the disk first, or generate fallback URL
-        try {
-            $downloadUrl = Storage::disk('r2')->temporaryUrl(
-                'demos/' . $exam->demo_pdf_filename,
-                now()->addHours(24)
-            );
-        } catch (\Exception $e) {
-            // Fallback for local testing if R2 is not fully configured yet
-            $downloadUrl = url('/storage/demos/' . $exam->demo_pdf_filename);
+        // Demo PDFs are free/public content and only ever live on the public disk
+        // (see ExamAdminController) - no R2 involvement needed for this one.
+        if (!Storage::disk('public')->exists('demos/' . $exam->demo_pdf_filename)) {
+            \Illuminate\Support\Facades\Log::error("Demo PDF file missing from storage for exam {$exam->exam_code} (demo request #{$this->demoRequest->id})");
+            return;
         }
+
+        $downloadUrl = Storage::disk('public')->url('demos/' . $exam->demo_pdf_filename);
 
         // Send email
         Mail::to($this->demoRequest->email)->send(

@@ -174,11 +174,7 @@ class ExamAdminController extends Controller
         if ($request->hasFile('demo_pdf')) {
             $demoFile = $request->file('demo_pdf');
             $demoFilename = Str::slug($request->exam_code) . '-demo.pdf';
-            try {
-                Storage::disk('r2')->putFileAs('demos', $demoFile, $demoFilename);
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::error('R2 upload failed for demo PDF: ' . $e->getMessage());
-            }
+            // Demo PDF is intentionally public (free sample), so it lives on the public disk only.
             Storage::disk('public')->putFileAs('demos', $demoFile, $demoFilename);
         }
 
@@ -186,12 +182,16 @@ class ExamAdminController extends Controller
         if ($request->hasFile('full_pdf')) {
             $fullFile = $request->file('full_pdf');
             $fullFilename = Str::slug($request->exam_code) . '-full.pdf';
+            // Full PDF is paid content: store only on the private "local" disk (storage/app/private,
+            // never web-served) plus an opportunistic R2 copy. Never write it to the public disk -
+            // that would make it downloadable by anyone who guesses the filename, bypassing purchase
+            // checks entirely.
             try {
                 Storage::disk('r2')->putFileAs('full', $fullFile, $fullFilename);
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::error('R2 upload failed for full PDF: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::info('R2 not available for full PDF upload, relying on private local storage: ' . $e->getMessage());
             }
-            Storage::disk('public')->putFileAs('full', $fullFile, $fullFilename);
+            Storage::disk('local')->putFileAs('full', $fullFile, $fullFilename);
         }
 
         $isActive = $request->input('action') === 'draft' ? false : ($request->has('is_active') ? true : false);
@@ -414,7 +414,12 @@ class ExamAdminController extends Controller
         // Handle Removal of Full Access PDF
         if ($request->boolean('remove_full_pdf')) {
             if ($exam->full_pdf_filename) {
-                Storage::disk('public')->delete('full/' . $exam->full_pdf_filename);
+                Storage::disk('local')->delete('full/' . $exam->full_pdf_filename);
+                try {
+                    Storage::disk('r2')->delete('full/' . $exam->full_pdf_filename);
+                } catch (\Throwable $e) {
+                    // R2 optional; ignore.
+                }
             }
             $updateData['full_pdf_filename'] = null;
         }
@@ -422,10 +427,10 @@ class ExamAdminController extends Controller
         if ($request->hasFile('demo_pdf')) {
             $demoFile = $request->file('demo_pdf');
             $demoFilename = Str::slug($request->exam_code) . '-demo.pdf';
-            try {
-                Storage::disk('r2')->putFileAs('demos', $demoFile, $demoFilename);
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::error('R2 upload failed for demo PDF: ' . $e->getMessage());
+            // Clean up the old file if the generated filename is changing (e.g. exam_code edited),
+            // otherwise a replacement upload leaves the previous file orphaned on disk forever.
+            if ($exam->demo_pdf_filename && $exam->demo_pdf_filename !== $demoFilename) {
+                Storage::disk('public')->delete('demos/' . $exam->demo_pdf_filename);
             }
             Storage::disk('public')->putFileAs('demos', $demoFile, $demoFilename);
             $updateData['demo_pdf_filename'] = $demoFilename;
@@ -434,12 +439,20 @@ class ExamAdminController extends Controller
         if ($request->hasFile('full_pdf')) {
             $fullFile = $request->file('full_pdf');
             $fullFilename = Str::slug($request->exam_code) . '-full.pdf';
+            if ($exam->full_pdf_filename && $exam->full_pdf_filename !== $fullFilename) {
+                Storage::disk('local')->delete('full/' . $exam->full_pdf_filename);
+                try {
+                    Storage::disk('r2')->delete('full/' . $exam->full_pdf_filename);
+                } catch (\Throwable $e) {
+                    // R2 optional; ignore.
+                }
+            }
             try {
                 Storage::disk('r2')->putFileAs('full', $fullFile, $fullFilename);
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::error('R2 upload failed for full PDF: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::info('R2 not available for full PDF upload, relying on private local storage: ' . $e->getMessage());
             }
-            Storage::disk('public')->putFileAs('full', $fullFile, $fullFilename);
+            Storage::disk('local')->putFileAs('full', $fullFile, $fullFilename);
             $updateData['full_pdf_filename'] = $fullFilename;
         }
 
@@ -486,6 +499,7 @@ class ExamAdminController extends Controller
     {
         $filename = $type === 'demo' ? $exam->demo_pdf_filename : $exam->full_pdf_filename;
         $folder = $type === 'demo' ? 'demos' : 'full';
+        $disk = $type === 'demo' ? 'public' : 'local';
 
         if (!$filename) {
             return back()->with('error', 'No PDF file configured for this exam.');
@@ -493,14 +507,14 @@ class ExamAdminController extends Controller
 
         $path = $folder . '/' . $filename;
 
-        if (Storage::disk('public')->exists($path)) {
-            return Storage::disk('public')->response($path, $filename, [
+        if (Storage::disk($disk)->exists($path)) {
+            return Storage::disk($disk)->response($path, $filename, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'inline; filename="' . $filename . '"',
             ]);
         }
 
-        return back()->with('error', 'The requested PDF file was not found in local storage.');
+        return back()->with('error', 'The requested PDF file was not found in storage.');
     }
 
     public function destroy(int $id)
@@ -517,6 +531,18 @@ class ExamAdminController extends Controller
         $code = $exam->exam_code;
         $name = $exam->exam_name;
         $examId = $exam->id;
+
+        if ($exam->demo_pdf_filename) {
+            Storage::disk('public')->delete('demos/' . $exam->demo_pdf_filename);
+        }
+        if ($exam->full_pdf_filename) {
+            Storage::disk('local')->delete('full/' . $exam->full_pdf_filename);
+            try {
+                Storage::disk('r2')->delete('full/' . $exam->full_pdf_filename);
+            } catch (\Throwable $e) {
+                // R2 optional; ignore.
+            }
+        }
 
         $exam->delete();
 
@@ -539,16 +565,17 @@ class ExamAdminController extends Controller
             return null;
         }
 
+        $disk = $folder === 'demos' ? 'public' : 'local';
         $path = $folder . '/' . $filename;
         $sizeBytes = 0;
         $lastModified = null;
         $exists = false;
 
-        if (Storage::disk('public')->exists($path)) {
+        if (Storage::disk($disk)->exists($path)) {
             $exists = true;
             try {
-                $sizeBytes = Storage::disk('public')->size($path);
-                $lastModified = date('M d, Y g:i A', Storage::disk('public')->lastModified($path));
+                $sizeBytes = Storage::disk($disk)->size($path);
+                $lastModified = date('M d, Y g:i A', Storage::disk($disk)->lastModified($path));
             } catch (\Throwable $e) {
                 // Ignore storage inspection errors
             }
