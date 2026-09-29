@@ -115,6 +115,8 @@
                     <td>
                         @if($item->item_type === 'subscription')
                             Subscription Plan: {{ $item->plan_name }}
+                        @elseif($item->item_type === 'package')
+                            {{ $item->plan_name ?? optional($item->package)->name ?? 'Vendor Bundle' }}
                         @elseif($item->exam)
                             {{ $item->exam->exam_code }} - {{ $item->exam->exam_name }} ({{ strtoupper($item->item_type) }})
                         @else

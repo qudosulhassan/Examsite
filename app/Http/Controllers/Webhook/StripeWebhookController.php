@@ -216,11 +216,11 @@ class StripeWebhookController extends Controller
                             'purchased_at' => now(),
                         ]);
                     } elseif ($item->item_type === 'package') {
-                        $pkg = \App\Models\Package::find($item->exam_id);
+                        $pkg = \App\Models\Package::find($item->package_id);
                         if ($pkg) {
                             \App\Models\UserPackage::firstOrCreate([
                                 'user_id' => $order->user_id,
-                                'package_id' => $item->exam_id,
+                                'package_id' => $item->package_id,
                                 'order_id' => $order->id,
                             ], [
                                 'status' => 'active',

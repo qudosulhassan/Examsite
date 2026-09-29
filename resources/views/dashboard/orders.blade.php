@@ -79,6 +79,8 @@
                                             <li>
                                                 @if($item->item_type === 'subscription')
                                                     Subscription ({{ $item->plan_name }})
+                                                @elseif($item->item_type === 'package')
+                                                    {{ $item->plan_name ?? optional($item->package)->name ?? 'Vendor Bundle' }} (BUNDLE)
                                                 @elseif($item->exam)
                                                     {{ $item->exam->exam_code }} ({{ strtoupper($item->item_type) }})
                                                 @else

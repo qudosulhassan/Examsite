@@ -85,21 +85,74 @@ class AccessManager
             }
         }
 
-        // 3. Check Single Exam purchase (from `user_exams` table)
+        // 3. Check Single Exam purchase (from `user_exams` table).
+        // access_type is a strict pdf/engine enum - a PDF-only purchase must
+        // never grant Test Engine access (and vice versa), since they're sold
+        // as separate products at separate prices.
+        $requiredAccessType = $type === 'pdf' ? 'pdf' : 'engine';
         $hasSingleExam = $user->userExams()
             ->where('exam_id', $exam->id)
+            ->where('access_type', $requiredAccessType)
             ->where(function ($query) use ($now) {
                 $query->whereNull('expires_at')
                       ->orWhere('expires_at', '>', $now);
             })
-            // we could check access_type here if we want (e.g. 'both', 'pdf', 'te')
-            // For now, if they bought the single exam, they get access based on what they bought.
             ->exists();
 
-        if ($hasSingleExam) {
-            return true; // Simplified: assumes user_exam record = full access to that exam
+        return $hasSingleExam;
+    }
+
+    /**
+     * Resolve which exam IDs a user can access for the given type ('pdf' or 'te').
+     * Returns null when access is unrestricted (active global subscription, or an
+     * active global package with vendor_id = null), otherwise the specific exam
+     * IDs covered by individual purchases and/or vendor-scoped active packages.
+     */
+    public function getAccessibleExamIds(User $user, string $type): ?array
+    {
+        $now = Carbon::now();
+
+        $hasGlobalSub = $user->subscriptions()
+            ->whereIn('status', ['active', 'trialing'])
+            ->where(function ($query) use ($now) {
+                $query->whereNull('current_period_end')
+                      ->orWhere('current_period_end', '>', $now);
+            })->exists();
+
+        if ($hasGlobalSub) {
+            return null;
         }
 
-        return false;
+        $validPackages = $user->userPackages()
+            ->where('status', 'active')
+            ->where(function ($query) use ($now) {
+                $query->whereNull('expires_at')
+                      ->orWhere('expires_at', '>', $now);
+            })
+            ->with('package')
+            ->get()
+            ->pluck('package')
+            ->filter(function ($package) use ($type) {
+                if (!$package) return false;
+                return $type === 'pdf' ? (bool) $package->includes_pdf : (bool) $package->includes_te;
+            });
+
+        if ($validPackages->contains(fn ($p) => is_null($p->vendor_id))) {
+            return null;
+        }
+
+        $vendorIds = $validPackages->pluck('vendor_id')->filter()->unique()->values();
+
+        $examIdsFromVendors = $vendorIds->isNotEmpty()
+            ? Exam::whereIn('vendor_id', $vendorIds)->where('is_active', true)->pluck('id')->all()
+            : [];
+
+        $requiredAccessType = $type === 'pdf' ? 'pdf' : 'engine';
+        $examIdsFromSingles = $user->userExams()
+            ->where('access_type', $requiredAccessType)
+            ->pluck('exam_id')
+            ->all();
+
+        return array_values(array_unique(array_merge($examIdsFromVendors, $examIdsFromSingles)));
     }
 }

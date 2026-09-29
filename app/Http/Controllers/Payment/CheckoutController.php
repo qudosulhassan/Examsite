@@ -178,8 +178,9 @@ class CheckoutController extends Controller
         foreach ($cart as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'package', 'combo']) ? $item['id'] : null,
-                    'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : null,
+                    'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'combo']) ? $item['id'] : null,
+                    'package_id' => $item['type'] === 'package' ? $item['id'] : null,
+                    'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : ($item['type'] === 'package' ? ($item['name'] ?? null) : null),
                     'item_type' => $item['type'],
                     'price' => $item['price'] ?? 0.00,
                 ]);
@@ -342,8 +343,9 @@ class CheckoutController extends Controller
                 foreach ($cart as $item) {
                     OrderItem::create([
                         'order_id' => $order->id,
-                        'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'package', 'combo']) ? $item['id'] : null,
-                        'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : null,
+                        'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'combo']) ? $item['id'] : null,
+                    'package_id' => $item['type'] === 'package' ? $item['id'] : null,
+                        'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : ($item['type'] === 'package' ? ($item['name'] ?? null) : null),
                         'item_type' => $item['type'],
                         'price' => $item['price'],
                     ]);
@@ -505,8 +507,9 @@ class CheckoutController extends Controller
                     foreach ($cart as $item) {
                         OrderItem::create([
                             'order_id' => $order->id,
-                            'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'package', 'combo']) ? $item['id'] : null,
-                            'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : null,
+                            'exam_id' => in_array($item['type'], ['pdf', 'engine_single', 'combo']) ? $item['id'] : null,
+                    'package_id' => $item['type'] === 'package' ? $item['id'] : null,
+                            'plan_name' => $item['type'] === 'subscription' ? $item['plan_name'] : ($item['type'] === 'package' ? ($item['name'] ?? null) : null),
                             'item_type' => $item['type'],
                             'price' => $item['price'],
                         ]);

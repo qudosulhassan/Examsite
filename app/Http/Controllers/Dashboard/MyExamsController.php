@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\Exam;
+use App\Models\User;
 use App\Models\UserExam;
 use App\Models\ActivityLog;
+use App\Services\AccessManager;
 use Illuminate\Support\Facades\Storage;
 
 class MyExamsController extends Controller
@@ -14,13 +17,66 @@ class MyExamsController extends Controller
      */
     public function index()
     {
-        $purchasedExams = UserExam::where('user_id', auth()->id())
+        $user = auth()->user();
+
+        $this->materializePackagePdfAccess($user);
+
+        $purchasedExams = UserExam::where('user_id', $user->id)
             ->where('access_type', 'pdf')
             ->with('exam.vendor')
             ->orderBy('purchased_at', 'desc')
             ->get();
 
         return view('dashboard.my-exams', compact('purchasedExams'));
+    }
+
+    /**
+     * A package purchase (e.g. "Microsoft Ultimate Package") only creates a
+     * UserPackage row, not per-exam UserExam rows. This list, and the download
+     * route it links to, are both built around UserExam - so for a user with
+     * active PDF-enabled package/subscription access, create the missing
+     * UserExam rows for exams they're now entitled to but haven't touched yet.
+     * This is a no-op query for the vast majority of users who never bought a
+     * package (single early exists() check), and idempotent for repeat visits.
+     */
+    protected function materializePackagePdfAccess(User $user): void
+    {
+        $hasBroadAccess = $user->subscriptions()->where('status', 'active')->exists()
+            || $user->userPackages()
+                ->where('status', 'active')
+                ->where(function ($q) {
+                    $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                })
+                ->whereHas('package', fn ($q) => $q->where('includes_pdf', true))
+                ->exists();
+
+        if (!$hasBroadAccess) {
+            return;
+        }
+
+        $examIds = app(AccessManager::class)->getAccessibleExamIds($user, 'pdf');
+        $examIds = $examIds ?? Exam::where('is_active', true)->pluck('id')->all();
+
+        if (empty($examIds)) {
+            return;
+        }
+
+        $existingIds = UserExam::where('user_id', $user->id)
+            ->where('access_type', 'pdf')
+            ->whereIn('exam_id', $examIds)
+            ->pluck('exam_id')
+            ->all();
+
+        foreach (array_diff($examIds, $existingIds) as $examId) {
+            UserExam::create([
+                'user_id' => $user->id,
+                'exam_id' => $examId,
+                'access_type' => 'pdf',
+                'download_count' => 0,
+                'max_downloads' => 3,
+                'purchased_at' => now(),
+            ]);
+        }
     }
 
     /**

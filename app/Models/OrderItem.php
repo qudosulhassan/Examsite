@@ -12,6 +12,7 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'exam_id',
+        'package_id',
         'plan_name',
         'item_type',
         'price',
@@ -35,5 +36,13 @@ class OrderItem extends Model
     public function exam()
     {
         return $this->belongsTo(Exam::class);
+    }
+
+    /**
+     * Get the package associated with the item (if item_type is 'package').
+     */
+    public function package()
+    {
+        return $this->belongsTo(Package::class);
     }
 }

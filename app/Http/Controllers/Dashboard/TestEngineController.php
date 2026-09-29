@@ -23,22 +23,15 @@ class TestEngineController extends Controller
         $user = auth()->user();
         $activeSub = $user->subscriptions()->where('status', 'active')->first();
 
-        if ($activeSub) {
-            // Subscription has access to all active exams
-            $exams = Exam::where('is_active', true)->with('vendor')->orderBy('exam_code')->get();
-        } else {
-            // Get explicitly purchased engine exams
-            $purchasedIds = UserExam::where('user_id', $user->id)
-                ->where('access_type', 'engine')
-                ->pluck('exam_id')
-                ->toArray();
+        // Resolves individual purchases, active subscriptions, and vendor-scoped
+        // or global Test-Engine-enabled packages (e.g. "Microsoft Ultimate Package").
+        $examIds = app(\App\Services\AccessManager::class)->getAccessibleExamIds($user, 'te');
 
-            $exams = Exam::whereIn('id', $purchasedIds)
-                ->where('is_active', true)
-                ->with('vendor')
-                ->orderBy('exam_code')
-                ->get();
+        $query = Exam::where('is_active', true);
+        if ($examIds !== null) {
+            $query->whereIn('id', $examIds);
         }
+        $exams = $query->with('vendor')->orderBy('exam_code')->get();
 
         return view('dashboard.test-engine.index', compact('exams', 'activeSub'));
     }
@@ -333,16 +326,14 @@ class TestEngineController extends Controller
     private function checkEngineAccess(int $examId): bool
     {
         $user = auth()->user();
-        
-        // Subscription check
-        if ($user->subscriptions()->where('status', 'active')->exists()) {
-            return true;
+        $exam = Exam::find($examId);
+
+        if (!$exam) {
+            return false;
         }
 
-        // Single exam purchase check
-        return UserExam::where('user_id', $user->id)
-            ->where('exam_id', $examId)
-            ->where('access_type', 'engine')
-            ->exists();
+        // Covers active subscriptions, single-exam engine purchases, and
+        // vendor-scoped or global Test-Engine-enabled packages.
+        return app(\App\Services\AccessManager::class)->canAccessTestEngine($user, $exam);
     }
 }
