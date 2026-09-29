@@ -62,12 +62,23 @@ class ExamController extends Controller
             ], 301);
         }
 
-        // Get first 3 questions for preview without correct answers or explanations exposed
+        // Get the first 10 well-formed single-choice questions for the free preview.
+        // The A-D radio card UI only supports classic single-choice questions, so
+        // drag-drop/hotspot/multi-select types (and rows with a stray non A-D answer
+        // key) are excluded here - otherwise they render as blank/unanswerable cards.
         $sampleQuestions = Question::where('exam_id', $exam->id)
             ->where('is_active', true)
+            ->where('question_type', 'single_choice')
+            ->with(['options', 'answers'])
             ->orderBy('id')
-            ->limit(3)
-            ->get();
+            ->limit(50)
+            ->get()
+            ->filter(function ($question) {
+                return $question->answers->count() === 1
+                    && in_array($question->answers->first()->answer_value, ['A', 'B', 'C', 'D'], true);
+            })
+            ->take(10)
+            ->values();
 
         // Get approved customer reviews
         $reviews = Review::where('exam_id', $exam->id)

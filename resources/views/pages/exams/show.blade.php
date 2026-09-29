@@ -559,7 +559,7 @@
                     <div class="text-center mb-12">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-4 inline-block">Free Trial</span>
                         <h2 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Interactive Sample Questions</h2>
-                        <p class="text-lg text-gray-600 font-normal max-w-2xl mx-auto">Try solving these actual questions from the latest {{ $exam->exam_code }} exam pool to test your knowledge.</p>
+                        <p class="text-lg text-gray-600 font-normal max-w-2xl mx-auto">Actual Free {{ $exam->vendor->name }} {{ $exam->exam_code }} Practice Questions</p>
                     </div>
                     
                     @foreach($sampleQuestions as $index => $question)
@@ -757,12 +757,13 @@
                             </div>
 
                             <!-- Explanation slide down -->
-                            <div x-show="checked" 
+                            @if(!empty($question->explanation))
+                            <div x-show="checked"
                                  x-transition:enter="transition ease-out duration-500"
                                  x-transition:enter-start="opacity-0 transform -translate-y-4 scale-95"
                                  x-transition:enter-end="opacity-100 transform translate-y-0 scale-100"
                                  class="mt-8 bg-gradient-to-r from-gray-50 to-white border-l-4 border-cyan p-6 sm:p-8 rounded-r-2xl shadow-sm space-y-3 relative overflow-hidden">
-                                
+
                                 <div class="absolute -right-8 -top-8 w-24 h-24 bg-cyan/10 rounded-full blur-xl pointer-events-none"></div>
 
                                 <div class="font-black text-navy text-[11px] uppercase tracking-widest flex items-center">
@@ -771,6 +772,7 @@
                                 </div>
                                 <p class="text-gray-600 leading-relaxed text-base font-normal relative z-10">{{ $question->explanation }}</p>
                             </div>
+                            @endif
                         </div>
                     @endforeach
 
