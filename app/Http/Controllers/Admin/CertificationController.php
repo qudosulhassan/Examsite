@@ -11,10 +11,47 @@ use Illuminate\Support\Str;
 
 class CertificationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $certifications = Certification::with('vendor')->latest()->paginate(15);
-        return view('admin.certifications.index', compact('certifications'));
+        $query = Certification::with('vendor')->withCount('exams');
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhereHas('vendor', function ($vq) use ($search) {
+                      $vq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('vendor_id')) {
+            $query->where('vendor_id', $request->vendor_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
+        }
+
+        $certifications = $query->latest()->paginate(15)->appends($request->query());
+
+        $vendors = Vendor::orderBy('name')->get();
+
+        $totalCertifications = Certification::count();
+        $activeCertifications = Certification::where('is_active', true)->count();
+        $inactiveCertifications = $totalCertifications - $activeCertifications;
+        $vendorsCovered = Certification::distinct('vendor_id')->count('vendor_id');
+
+        return view('admin.certifications.index', compact(
+            'certifications',
+            'vendors',
+            'totalCertifications',
+            'activeCertifications',
+            'inactiveCertifications',
+            'vendorsCovered'
+        ));
     }
 
     public function create()
