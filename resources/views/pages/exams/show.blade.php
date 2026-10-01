@@ -141,9 +141,9 @@
                                     </div>
                                     Exam Code
                                 </span>
-                                <div class="pl-[40px] flex items-center space-x-2 mt-1 whitespace-nowrap">
-                                    <span class="text-xl font-black text-white">{{ $exam->exam_code }}</span>
-                                    <span class="bg-gradient-to-r from-cyan/20 to-blue-500/20 text-cyan text-[10px] px-2.5 py-1 rounded-md border border-cyan/30 font-bold uppercase tracking-wider">{{ $exam->difficulty }}</span>
+                                <div class="pl-[40px] flex items-center flex-wrap gap-2 mt-1">
+                                    <span class="text-xl font-black text-white whitespace-nowrap">{{ $exam->exam_code }}</span>
+                                    <span class="bg-gradient-to-r from-cyan/20 to-blue-500/20 text-cyan text-[10px] px-2.5 py-1 rounded-md border border-cyan/30 font-bold uppercase tracking-wider whitespace-nowrap">{{ $exam->difficulty }}</span>
                                 </div>
                             </div>
                             
