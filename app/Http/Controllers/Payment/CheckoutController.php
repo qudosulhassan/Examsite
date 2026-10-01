@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmationMail;
+use App\Models\Setting;
 
 class CheckoutController extends Controller
 {
@@ -67,7 +68,10 @@ class CheckoutController extends Controller
         }
 
         $total = max(0, $subtotal - $discount);
-        
+
+        $stripeEnabled = Setting::get('payment_gateway_stripe_enabled', '1') === '1';
+        $paypalEnabled = Setting::get('payment_gateway_paypal_enabled', '1') === '1';
+
         // Generate Stripe keys & client secret if not free
         $stripeClientSecret = null;
         $stripeSubscriptionId = null;
@@ -78,27 +82,35 @@ class CheckoutController extends Controller
                 $subItem = reset($cart);
                 $planName = $itemType === 'package' ? $subItem['name'] : $subItem['plan_name'];
                 $billingCycle = $itemType === 'package' ? 'monthly' : $subItem['billing_cycle']; // simplify for package
-                
-                try {
-                    $stripeSub = $this->stripeService->createSubscription(
-                        $user,
-                        $planName,
-                        $billingCycle,
-                        $total,
-                        ['email' => $user->email]
-                    );
-                    $stripeClientSecret = $stripeSub['client_secret'];
-                    $stripeSubscriptionId = $stripeSub['id'];
 
-                    $paypalPlanId = $this->paypalService->getOrCreateSubscriptionPlan(
-                        $planName,
-                        $billingCycle,
-                        $total
-                    );
-                } catch (\Exception $e) {
-                    Log::error('Checkout subscription setup failed: ' . $e->getMessage());
+                if ($stripeEnabled) {
+                    try {
+                        $stripeSub = $this->stripeService->createSubscription(
+                            $user,
+                            $planName,
+                            $billingCycle,
+                            $total,
+                            ['email' => $user->email]
+                        );
+                        $stripeClientSecret = $stripeSub['client_secret'];
+                        $stripeSubscriptionId = $stripeSub['id'];
+                    } catch (\Exception $e) {
+                        Log::error('Checkout subscription setup failed: ' . $e->getMessage());
+                    }
                 }
-            } else {
+
+                if ($paypalEnabled) {
+                    try {
+                        $paypalPlanId = $this->paypalService->getOrCreateSubscriptionPlan(
+                            $planName,
+                            $billingCycle,
+                            $total
+                        );
+                    } catch (\Exception $e) {
+                        Log::error('Checkout PayPal subscription plan setup failed: ' . $e->getMessage());
+                    }
+                }
+            } elseif ($stripeEnabled) {
                 // PDF Guides or One-Time Packages
                 try {
                     $stripeIntent = $this->stripeService->createPaymentIntent($total, [
@@ -112,12 +124,12 @@ class CheckoutController extends Controller
             }
         }
 
-        $stripeKey = config('services.stripe.key');
+        $stripeKey = $stripeEnabled ? config('services.stripe.key') : null;
         if ($stripeKey === 'pk_test_placeholder') {
             $stripeKey = null; // Mark as mock in view if placeholder
         }
 
-        $paypalClientId = config('services.paypal.client_id');
+        $paypalClientId = $paypalEnabled ? config('services.paypal.client_id') : null;
         if (empty($paypalClientId) || $paypalClientId === 'sandbox_client_id_placeholder') {
             $paypalClientId = null; // Mark as mock in view if unset or placeholder
         }
@@ -125,7 +137,8 @@ class CheckoutController extends Controller
         return view('pages.checkout', compact(
             'cart', 'subtotal', 'coupon', 'discount', 'total',
             'stripeKey', 'stripeClientSecret', 'stripeSubscriptionId',
-            'paypalPlanId', 'paypalClientId', 'itemType'
+            'paypalPlanId', 'paypalClientId', 'itemType',
+            'stripeEnabled', 'paypalEnabled'
         ));
     }
 

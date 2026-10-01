@@ -65,7 +65,7 @@
                 </div>
 
                 <!-- Payment Option Selection Card -->
-                <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-[0_10px_40px_rgba(0,0,0,0.04)]" x-data="{ paymentMethod: 'stripe' }">
+                <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-[0_10px_40px_rgba(0,0,0,0.04)]" x-data="{ paymentMethod: '{{ $stripeEnabled ? 'stripe' : ($paypalEnabled ? 'paypal' : '') }}' }">
                     <div class="flex items-center space-x-3 border-b border-gray-100 pb-5 mb-6">
                         <div class="w-8 h-8 rounded-full bg-navy text-white flex items-center justify-center font-black text-sm">2</div>
                         <h3 class="text-xl font-black text-navy">Payment Method</h3>
@@ -83,10 +83,16 @@
                                 </button>
                             </form>
                         </div>
+                    @elseif(!$stripeEnabled && !$paypalEnabled)
+                        <div class="p-6 bg-red-50 border border-red-200 rounded text-center">
+                            <h4 class="font-bold text-red-700 mb-2">No Payment Methods Available</h4>
+                            <p class="text-xs text-red-600">Online checkout is temporarily unavailable. Please contact support to complete your purchase.</p>
+                        </div>
                     @else
                         <!-- Payment Methods Toggle -->
                         <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0 mb-8">
                             <!-- Stripe Select -->
+                            @if($stripeEnabled)
                             <label class="flex-1 flex items-center justify-between border rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition"
                                    :class="paymentMethod === 'stripe' ? 'border-cyan bg-cyan bg-opacity-5' : 'border-gray-200'">
                                 <div class="flex items-center space-x-3">
@@ -95,8 +101,10 @@
                                 </div>
                                 <span class="text-xs text-gray-400 font-bold uppercase">Stripe</span>
                             </label>
-                            
+                            @endif
+
                             <!-- PayPal Select -->
+                            @if($paypalEnabled)
                             <label class="flex-1 flex items-center justify-between border rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition"
                                    :class="paymentMethod === 'paypal' ? 'border-cyan bg-cyan bg-opacity-5' : 'border-gray-200'">
                                 <div class="flex items-center space-x-3">
@@ -105,8 +113,10 @@
                                 </div>
                                 <span class="text-xs text-gray-400 font-bold uppercase">PayPal</span>
                             </label>
+                            @endif
                         </div>
 
+                        @if($stripeEnabled)
                         <!-- Stripe Form Container -->
                         <div x-show="paymentMethod === 'stripe'" class="space-y-6">
                             @if(empty($stripeKey) || empty($stripeClientSecret))
@@ -137,7 +147,9 @@
                                 </form>
                             @endif
                         </div>
+                        @endif
 
+                        @if($paypalEnabled)
                         <!-- PayPal Form Container -->
                         <div x-show="paymentMethod === 'paypal'" class="space-y-4">
                             @if(empty($paypalClientId))
@@ -146,7 +158,7 @@
                                     <span class="text-2xl mb-2 block">💰</span>
                                     <h4 class="font-bold text-navy text-sm mb-1">PayPal Sandbox (Simulator Mode)</h4>
                                     <p class="text-xs text-gray-500 mb-6">No PayPal Client ID configured. Use this simulator to test redirects and callback processing.</p>
-                                    
+
                                     @if($itemType === 'subscription')
                                         <a href="{{ route('checkout.success') }}?method=paypal_sub&subscription_id=sub_paypal_mock_{{ Str::random(16) }}"
                                            class="inline-block bg-yellow-400 hover:bg-yellow-500 text-navy text-xs font-extrabold py-3 px-8 rounded shadow transition">
@@ -166,6 +178,7 @@
                                 </div>
                             @endif
                         </div>
+                        @endif
                     @endif
                 </div>
 
