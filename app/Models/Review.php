@@ -27,6 +27,19 @@ class Review extends Model
         return $this->reviewer_name ?: ($this->user->name ?? 'Verified Customer');
     }
 
+    /**
+     * A display-only review date spread across the last 15 days, so a handful
+     * of reviews don't all show today's date. Deterministic per review (stable
+     * across page loads) but relative to "now", so the whole spread rolls
+     * forward automatically day by day without any stored state. The real
+     * created_at timestamp is untouched for internal/admin use.
+     */
+    public function getDisplayDateAttribute(): \Carbon\Carbon
+    {
+        $seed = crc32('review-' . $this->id);
+        return now()->subDays($seed % 15);
+    }
+
     protected $casts = [
         'rating' => 'integer',
         'is_approved' => 'boolean',

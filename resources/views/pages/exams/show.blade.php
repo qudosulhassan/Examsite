@@ -811,7 +811,7 @@
                                             <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-cyan to-blue-500 text-white flex items-center justify-center font-black shadow-md text-lg">{{ substr($review->display_name, 0, 2) }}</div>
                                             <div>
                                                 <span class="block text-base font-black text-navy leading-tight">{{ $review->display_name }}</span>
-                                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $review->created_at->format('M d, Y') }}</span>
+                                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $review->display_date->format('M d, Y') }}</span>
                                             </div>
                                         </div>
                                         <div class="flex items-center space-x-0.5 text-yellow-400 drop-shadow-sm">
