@@ -182,7 +182,7 @@
                                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan opacity-75"></span>
                                         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan"></span>
                                     </span>
-                                    {{ $exam->last_updated_at ? $exam->last_updated_at->format('M d, Y') : 'Recently Updated' }}
+                                    {{ $exam->display_last_updated->format('M d, Y') }}
                                 </span>
                             </div>
 

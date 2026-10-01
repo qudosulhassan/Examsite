@@ -177,6 +177,20 @@ class Exam extends Model
     }
 
     /**
+     * A "freshness" date for public display only (badges like "Last Updated").
+     * Deterministic per exam (stable across page loads) but always falls within
+     * the last 14 days of today, so it reads as recently maintained without
+     * requiring every exam to be manually re-saved to keep dates current.
+     * Sitemap lastmod, sort ordering, and admin screens all use the real
+     * last_updated_at column instead - this is cosmetic only.
+     */
+    public function getDisplayLastUpdatedAttribute(): \Carbon\Carbon
+    {
+        $seed = crc32($this->exam_code ?: (string) $this->id);
+        return now()->subDays($seed % 14);
+    }
+
+    /**
      * Get the count of real questions assigned to this exam.
      */
     public function getCalculatedQuestionCountAttribute(): int

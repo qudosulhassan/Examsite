@@ -31,7 +31,7 @@
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan"></span>
             </span>
-            <span class="tracking-wider uppercase">June 2026 Verified Updates</span>
+            <span class="tracking-wider uppercase">{{ now()->format('F Y') }} Verified Updates</span>
         </div>
 
         <!-- H1 / H2 -->
@@ -423,7 +423,7 @@
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange opacity-75"></span>
                                   <span class="relative inline-flex rounded-full h-2 w-2 bg-orange"></span>
                                 </span>
-                                {{ $exam->last_updated_at ? $exam->last_updated_at->format('M Y') : 'June 2026' }}
+                                {{ $exam->display_last_updated->format('M Y') }}
                             </span>
                         </div>
                         <h3 class="font-black text-navy text-base mb-2 line-clamp-2 h-12 leading-snug group-hover:text-cyan transition-colors">{{ $exam->exam_name }}</h3>

@@ -484,7 +484,7 @@
                                 <span class="bg-gray-50 text-gray-500 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border border-gray-100">{{ $exam->difficulty }}</span>
                                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center">
                                     <span class="w-1.5 h-1.5 rounded-full bg-cyan mr-1.5 animate-pulse"></span>
-                                    Updated: {{ $exam->last_updated_at ? $exam->last_updated_at->format('M d, Y') : 'June 19, 2026' }}
+                                    Updated: {{ $exam->display_last_updated->format('M d, Y') }}
                                 </span>
                             </div>
                             <h2 class="text-xl sm:text-2xl font-black text-navy group-hover:text-cyan transition-colors leading-tight">
