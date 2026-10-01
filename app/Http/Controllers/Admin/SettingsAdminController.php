@@ -307,6 +307,7 @@ class SettingsAdminController extends Controller
             'home_banner_link' => 'nullable|string|max:255',
             'home_banner_button_text' => 'nullable|string|max:50',
             'home_banner_coupon' => 'nullable|string|max:50',
+            'home_banner_discount_percent' => 'nullable|required_with:home_banner_coupon|numeric|min:1|max:100',
             'home_banner_start_date' => 'nullable|date',
             'home_banner_end_date' => 'nullable|date|after_or_equal:home_banner_start_date',
 
@@ -378,6 +379,33 @@ class SettingsAdminController extends Controller
                     'new' => $value,
                 ];
                 Setting::set($key, $value);
+            }
+        }
+
+        // The Promotion Banner's "Highlight Coupon Code" previously only changed the
+        // marketing text shown in the banner - it never created a real, usable coupon,
+        // so customers typing it at checkout got "invalid code". Saving a code here now
+        // creates/updates an actual Coupon row to match, for any whole-number percentage.
+        if ($request->has('home_banner_coupon')) {
+            $bannerCode = strtoupper(trim((string) $request->input('home_banner_coupon')));
+            $bannerPercent = $request->input('home_banner_discount_percent');
+
+            if ($bannerCode !== '' && is_numeric($bannerPercent) && $bannerPercent > 0) {
+                $endDate = $request->filled('home_banner_end_date')
+                    ? \Illuminate\Support\Carbon::parse($request->input('home_banner_end_date'))
+                    : null;
+
+                \App\Models\Coupon::updateOrCreate(
+                    ['code' => $bannerCode],
+                    [
+                        'description' => 'Auto-synced from the homepage promotion banner.',
+                        'discount_type' => 'percentage',
+                        'discount_value' => (float) $bannerPercent,
+                        'applicable_to' => 'all',
+                        'is_active' => $request->boolean('home_banner_active'),
+                        'expires_at' => $endDate,
+                    ]
+                );
             }
         }
 

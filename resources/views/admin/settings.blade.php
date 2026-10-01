@@ -1216,6 +1216,14 @@ function settingsCenter() {
                                     Highlight Coupon Code (Optional)
                                 </label>
                                 <input type="text" name="home_banner_coupon" id="home_banner_coupon" x-model="bannerCoupon" @input="markDirty()" value="{{ old('home_banner_coupon', $settings['home_banner_coupon'] ?? '') }}" placeholder="e.g. SAVE50" class="w-full text-sm border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-mono uppercase font-bold text-orange">
+                                <p class="text-[11px] text-gray-400 mt-1">Saving with a code here creates/updates a real, working coupon customers can apply at checkout.</p>
+                            </div>
+
+                            <div>
+                                <label for="home_banner_discount_percent" class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                                    Coupon Discount % (Required if code set)
+                                </label>
+                                <input type="number" name="home_banner_discount_percent" id="home_banner_discount_percent" min="1" max="100" step="1" @input="markDirty()" value="{{ old('home_banner_discount_percent', $settings['home_banner_discount_percent'] ?? '') }}" placeholder="e.g. 10, 20, 50" class="w-full text-sm border-gray-300 rounded-lg focus:border-cyan focus:ring-cyan font-bold">
                             </div>
 
                             <div>
