@@ -1,14 +1,27 @@
 <style>
     /* Rich TipTap Content Styles */
+    /* Admin-authored tables keep whatever column widths/overall table width
+       were set in the editor as inline styles (often captured at desktop
+       width, e.g. style="width: 1130px"). Inline styles beat plain CSS, so
+       without !important here a table like that silently forces the whole
+       page into horizontal scroll on mobile - the !important + the
+       overflow-x:auto safety net on the wrapper below are both needed. */
+    .blog-content-body {
+        overflow-x: auto;
+    }
     .blog-content-body table {
         border-collapse: collapse;
-        width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
         margin: 2rem 0;
         table-layout: fixed;
         display: block;
         overflow-x: auto;
         border-radius: 0.5rem;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .blog-content-body table col {
+        width: auto !important;
     }
     .blog-content-body th {
         background-color: #0A1628;

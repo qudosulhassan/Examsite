@@ -76,15 +76,28 @@
         border-radius: 0 0.5rem 0.5rem 0;
     }
     /* Tables */
+    /* Admin-authored tables keep whatever width TipTap captured as an inline
+       style (often the editor's desktop width, e.g. style="width: 1130px").
+       Inline styles beat plain CSS, so !important here (plus the overflow-x
+       safety net on the wrapper) is needed to stop that from forcing the
+       whole page into horizontal scroll on mobile. */
+    .blog-content-body {
+        overflow-x: auto;
+    }
     .blog-content-body table {
-        width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
         border-collapse: collapse;
         margin: 1.75rem 0;
         font-size: 0.925rem;
         overflow-x: auto;
         display: block;
+        table-layout: fixed;
         border-radius: 0.5rem;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .blog-content-body table col {
+        width: auto !important;
     }
     .blog-content-body th {
         background-color: #0A1628;
