@@ -6,8 +6,36 @@
     $homeDesc = ($currentSite && !empty($currentSite->default_meta_description)) ? $currentSite->default_meta_description : (!empty($globalSettings['default_meta_description']) ? $globalSettings['default_meta_description'] : "Pass your IT certification exams on first attempt with {$siteBrand}. Verified PDF study guides, interactive web test engines, and real practice exam questions.");
 @endphp
 
+@php
+    $homeFaqs = [
+        ['q' => 'What is ExamTopicsBase?', 'a' => 'ExamTopicsBase provides up-to-date study guides and practice test software to help you master essential exam topics and pass your IT certification on the first try.'],
+        ['q' => 'Are free practice questions available before buying?', 'a' => 'Yes, we offer free practice questions on selected certification pages so you can test our content quality before making a purchase.'],
+        ['q' => 'Does ExamTopicsBase offer real exam questions?', 'a' => 'Yes, our preparation materials feature real exam questions sourced directly from updated IT vendor certification pools.'],
+        ['q' => 'How does the web-based practice test engine work?', 'a' => 'Our online test engine simulates the real exam environment with timed modes, instant scoring, and clear explanations across all core exam topics.'],
+        ['q' => 'What payment methods do you accept?', 'a' => 'We accept major credit cards, including Visa, MasterCard, and American Express, as well as PayPal and encrypted online payments.'],
+        ['q' => 'Do you offer a 100% pass guarantee?', 'a' => 'Yes, we offer a 100% pass guarantee on our premium practice materials covering all official exam topics.'],
+        ['q' => 'What is your refund policy?', 'a' => 'If you study our guides and do not pass your official exam, send us your score report within 30 days of purchase for a 100% refund.'],
+        ['q' => 'How fast do I get access to my purchase?', 'a' => 'You get instant access to your downloadable PDF study guides and free practice questions right after completing payment.'],
+        ['q' => 'Can I access ExamTopicsBase on my phone or tablet?', 'a' => 'Yes, you can read PDF study materials and solve real exam questions on any smartphone, tablet, or web browser.'],
+        ['q' => 'How often are exam topics and questions updated?', 'a' => 'We update our question banks continuously whenever vendor blueprints change so you always practice with current exam topics.'],
+    ];
+    $homeFaqSchema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => array_map(fn ($f) => [
+            '@type' => 'Question',
+            'name' => $f['q'],
+            'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['a']],
+        ], $homeFaqs),
+    ];
+@endphp
+
 @section('title', $homeTitle)
 @section('meta_description', $homeDesc)
+
+@section('seo_tags')
+<script type="application/ld+json">{!! json_encode($homeFaqSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endsection
 
 
 @section('content')
@@ -543,57 +571,19 @@
         </div>
 
         <div class="space-y-4" x-data="{ active: null }">
-            <!-- FAQ 1 -->
-            <div class="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-cyan/30 transition-colors">
-                <button @click="active !== 1 ? active = 1 : active = null" class="w-full text-left px-6 py-5 flex items-center justify-between focus:outline-none">
-                    <span class="font-black text-navy text-lg">Are the exam questions actually updated?</span>
-                    <svg class="w-5 h-5 text-cyan transform transition-transform duration-300" :class="{ 'rotate-180': active === 1 }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div x-show="active === 1" x-collapse x-cloak>
-                    <div class="px-6 pb-5 text-gray-500 font-medium leading-relaxed">
-                        Yes! Our team of certified IT professionals monitors vendor curriculum changes constantly. We update our question banks weekly to ensure you are studying the exact material you will see on the test.
+            @foreach($homeFaqs as $faq)
+                <div class="bg-white border border-gray-100 rounded-xl overflow-hidden transition-colors {{ $loop->odd ? 'hover:border-cyan/30' : 'hover:border-purple-500/30' }}">
+                    <button @click="active !== {{ $loop->iteration }} ? active = {{ $loop->iteration }} : active = null" class="w-full text-left px-6 py-5 flex items-center justify-between gap-4 focus:outline-none" :aria-expanded="active === {{ $loop->iteration }}">
+                        <span class="font-black text-navy text-lg">{{ $faq['q'] }}</span>
+                        <svg class="w-5 h-5 shrink-0 {{ $loop->odd ? 'text-cyan' : 'text-purple-500' }} transform transition-transform duration-300" :class="{ 'rotate-180': active === {{ $loop->iteration }} }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div x-show="active === {{ $loop->iteration }}" x-collapse x-cloak>
+                        <div class="px-6 pb-5 text-gray-500 font-medium leading-relaxed">
+                            {{ $faq['a'] }}
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- FAQ 2 -->
-            <div class="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-purple-500/30 transition-colors">
-                <button @click="active !== 2 ? active = 2 : active = null" class="w-full text-left px-6 py-5 flex items-center justify-between focus:outline-none">
-                    <span class="font-black text-navy text-lg">How does the Web-Based Test Engine work?</span>
-                    <svg class="w-5 h-5 text-purple-500 transform transition-transform duration-300" :class="{ 'rotate-180': active === 2 }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div x-show="active === 2" x-collapse x-cloak>
-                    <div class="px-6 pb-5 text-gray-500 font-medium leading-relaxed">
-                        Our proprietary test engine runs entirely in your browser (no downloads required). It simulates the real exam environment with timed modes, randomized questions, and detailed score reports to pinpoint your weak areas.
-                    </div>
-                </div>
-            </div>
-
-            <!-- FAQ 3 -->
-            <div class="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-cyan/30 transition-colors">
-                <button @click="active !== 3 ? active = 3 : active = null" class="w-full text-left px-6 py-5 flex items-center justify-between focus:outline-none">
-                    <span class="font-black text-navy text-lg">Do I have to pay for updates?</span>
-                    <svg class="w-5 h-5 text-cyan transform transition-transform duration-300" :class="{ 'rotate-180': active === 3 }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div x-show="active === 3" x-collapse x-cloak>
-                    <div class="px-6 pb-5 text-gray-500 font-medium leading-relaxed">
-                        No. When you purchase an Exam Topics Base study pack, you receive 90 days of free updates automatically. If the vendor changes the exam during that time, you'll instantly get the new questions in your account.
-                    </div>
-                </div>
-            </div>
-            
-            <!-- FAQ 4 -->
-            <div class="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-purple-500/30 transition-colors">
-                <button @click="active !== 4 ? active = 4 : active = null" class="w-full text-left px-6 py-5 flex items-center justify-between focus:outline-none">
-                    <span class="font-black text-navy text-lg">What if I fail the exam?</span>
-                    <svg class="w-5 h-5 text-purple-500 transform transition-transform duration-300" :class="{ 'rotate-180': active === 4 }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div x-show="active === 4" x-collapse x-cloak>
-                    <div class="px-6 pb-5 text-gray-500 font-medium leading-relaxed">
-                        We have a 99.8% pass rate, but if you happen to fail, we've got your back. We offer a 100% money-back guarantee. Just send us your official failure transcript within 30 days of purchase, and we will refund you in full.
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
