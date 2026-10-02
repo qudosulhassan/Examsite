@@ -18,8 +18,8 @@ return [
     
     'defaults' => [
         'title' => 'ExamTopicsBase - Pass Your IT Certification Exam First Attempt',
-        'description' => 'Prepare for any IT certification exam with ExamTopicsBase. Download verified PDF dumps or practice online with our test engine. 3,500+ exams. 99.6% pass rate.',
-        'keywords' => 'IT certification, exam dumps, study guides, practice tests, exam engine',
+        'description' => 'Prepare for any IT certification exam with ExamTopicsBase. Download verified PDF study guides or practice online with our test engine. 3,500+ exams. 99.6% pass rate.',
+        'keywords' => 'IT certification, exam questions, study guides, practice tests, exam engine',
         'og_image' => 'images/og-default.png',
         'og_type' => 'website',
         'robots' => env('SEO_ROBOTS', 'index, follow'),

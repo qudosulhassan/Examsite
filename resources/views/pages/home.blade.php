@@ -67,7 +67,7 @@
             Pass Your IT Certification Exam on the <span class="text-cyan">First Attempt</span>
         </h1>
         <p class="text-lg sm:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-            Exam Topics Base delivers verified exam dumps, PDF study guides, and a powerful web-based test engine for every major vendor.
+            Exam Topics Base delivers verified exam questions, PDF study guides, and a powerful web-based test engine for every major vendor.
         </p>
 
         <!-- Search Bar with Live Suggestions (Alpine.js) -->
@@ -220,7 +220,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
             <h2 class="text-3xl font-black text-navy sm:text-4xl mb-4 tracking-tight">Supported Certification Providers</h2>
-            <p class="text-lg text-gray-500 max-w-2xl mx-auto font-medium">Get access to premium dumps and testing tools for all major IT certification vendors.</p>
+            <p class="text-lg text-gray-500 max-w-2xl mx-auto font-medium">Get access to premium study guides and testing tools for all major IT certification vendors.</p>
         </div>
 
         <!-- Vendors Grid -->
@@ -381,7 +381,7 @@
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <h3 class="text-xl font-black text-navy mb-3">100% Accurate Answers</h3>
-                <p class="text-sm text-gray-500 leading-relaxed">Our dumps are verified by certified IT professionals to ensure absolute accuracy for your actual exam.</p>
+                <p class="text-sm text-gray-500 leading-relaxed">Our exam questions are verified by certified IT professionals to ensure absolute accuracy for your actual exam.</p>
             </div>
             
             <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-gray-100 group">
@@ -421,7 +421,7 @@
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                 </div>
                 <h3 class="text-xl font-black text-navy mb-3">Money-Back Guarantee</h3>
-                <p class="text-sm text-gray-500 leading-relaxed">We are so confident in our dumps that if you fail your exam, we will refund 100% of your money. No questions asked.</p>
+                <p class="text-sm text-gray-500 leading-relaxed">We are so confident in our study materials that if you fail your exam, we will refund 100% of your money. No questions asked.</p>
             </div>
         </div>
     </div>
@@ -434,7 +434,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
             <h2 class="text-3xl font-black text-navy sm:text-4xl mb-4 tracking-tight">Latest Updated Exams</h2>
-            <p class="text-lg text-gray-500 max-w-2xl mx-auto font-medium">We dynamically update our exam dumps weekly to match the latest vendor certification blueprints.</p>
+            <p class="text-lg text-gray-500 max-w-2xl mx-auto font-medium">We dynamically update our exam questions weekly to match the latest vendor certification blueprints.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
@@ -503,7 +503,7 @@
                     <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                     <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                 </div>
-                <p class="text-base text-gray-300 mb-8 italic leading-relaxed font-light">"I was skeptical about dumps, but Exam Topics Base's AZ-104 study guide was 100% accurate. 42 out of 45 questions on my exam were identical to the guide. Highly recommended!"</p>
+                <p class="text-base text-gray-300 mb-8 italic leading-relaxed font-light">"I was skeptical about online exam prep, but Exam Topics Base's AZ-104 study guide was 100% accurate. 42 out of 45 questions on my exam were identical to the guide. Highly recommended!"</p>
                 <div class="flex items-center space-x-4 pt-4 border-t border-white/10">
                     <div class="h-12 w-12 rounded-full bg-gradient-to-br from-cyan to-blue-600 text-white flex items-center justify-center font-black text-sm shadow-[0_0_15px_rgba(0,212,170,0.5)]">MA</div>
                     <div>

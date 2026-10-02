@@ -37,4 +37,11 @@ class HomepageFaqTest extends TestCase
         $this->assertMatchesRegularExpression('/"@type":"FAQPage"/', $html);
         $this->assertSame(10, substr_count($html, '"@type":"Question"'));
     }
+
+    public function test_homepage_does_not_use_the_word_dumps(): void
+    {
+        $html = $this->get(route('home'))->getContent();
+
+        $this->assertStringNotContainsStringIgnoringCase('dump', $html);
+    }
 }
