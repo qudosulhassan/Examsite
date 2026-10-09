@@ -52,7 +52,7 @@ class GenerateSitemap extends Command
             ->with('vendor')
             ->get()
             ->each(function (Exam $exam) use ($examSitemap) {
-                $url = "/exams/{$exam->vendor->slug}/{$exam->slug}";
+                $url = '/' . Exam::publicPath($exam->vendor->slug, $exam->slug);
                 $examSitemap->add(
                     Url::create($url)
                         ->setPriority(0.9)

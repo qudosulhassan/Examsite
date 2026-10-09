@@ -110,17 +110,13 @@ class CartController extends Controller
             $price = 0;
             $name = '';
             if ($type === 'pdf') {
-                $price = (float)$exam->price_pdf;
+                $price = (float)$exam->resolved_price_pdf;
                 $name = $exam->vendor->name . ' ' . $exam->exam_code . ' Study Guide (PDF)';
             } elseif ($type === 'engine_single') {
-                $price = (float)$exam->price_engine;
+                $price = (float)$exam->resolved_price_engine;
                 $name = $exam->vendor->name . ' ' . $exam->exam_code . ' Test Engine Simulator';
             } elseif ($type === 'combo') {
-                if ($exam->price_bundle !== null && (float)$exam->price_bundle > 0) {
-                    $price = (float)$exam->price_bundle;
-                } else {
-                    $price = round(((float)$exam->price_pdf + (float)$exam->price_engine) * 0.90, 2);
-                }
+                $price = (float)$exam->effective_bundle_price;
                 $name = $exam->vendor->name . ' ' . $exam->exam_code . ' PDF & Test Engine Combo';
             }
 
@@ -128,13 +124,13 @@ class CartController extends Controller
             $updatePeriod = $request->input('update_period', '3');
             $updatePrice = 0;
             if ($updatePeriod === '6') {
-                $updatePrice = (float)($exam->update_price_6_months ?? 10);
+                $updatePrice = $exam->resolveUpdatePrice($type, 6);
                 $name .= ' (6 Months Updates)';
             } elseif ($updatePeriod === '12') {
-                $updatePrice = (float)($exam->update_price_12_months ?? 20);
+                $updatePrice = $exam->resolveUpdatePrice($type, 12);
                 $name .= ' (12 Months Updates)';
             } else {
-                $updatePrice = (float)($exam->update_price_3_months ?? 0);
+                $updatePrice = $exam->resolveUpdatePrice($type, 3);
                 $name .= ' (3 Months Updates)';
             }
             $price += $updatePrice;
@@ -178,7 +174,7 @@ class CartController extends Controller
             // Clear entire cart because subscription checkout is handled individually
             $cart = [];
             $cart[$cartKey] = [
-                'name' => 'Exam Topics Base ' . $targetPlan['name'] . ' Subscription (' . ucfirst($billingCycle) . ')',
+                'name' => \App\Services\SiteContext::brandName('Exam Topics Base') . ' ' . $targetPlan['name'] . ' Subscription (' . ucfirst($billingCycle) . ')',
                 'key' => $cartKey,
                 'plan_name' => $targetPlan['name'],
                 'billing_cycle' => $billingCycle,
@@ -224,8 +220,9 @@ class CartController extends Controller
         }
 
         // Add additional options pricing
-        $updatePeriod = $request->input('update_period', '6');
-        $licenseType = $request->input('license_type', 'trainer');
+        $isCoreSite = (int) config('site.id', 1) === 1;
+        $updatePeriod = $request->input('update_period', $isCoreSite ? '6' : '3');
+        $licenseType = $request->input('license_type', $isCoreSite ? 'trainer' : 'individual');
         
         $extraPrice = 0;
         if ($updatePeriod === '3') $extraPrice += $package->update_price_3_months ?? 0;
@@ -246,10 +243,26 @@ class CartController extends Controller
         // but for now we'll just clear it like the old subscription logic did for safety.
         $cart = [];
 
+        $displayName = $package->name;
+        if (!$isCoreSite) {
+            $periodLabel = match($updatePeriod) {
+                '6' => '6 Months Updates',
+                '12' => '12 Months Updates',
+                default => '3 Months Updates',
+            };
+            $licenseLabel = match($licenseType) {
+                'corporate' => 'Corporate (10 PCs)',
+                'trainer' => 'Trainer (25 PCs)',
+                default => 'Personal (2 PCs)',
+            };
+            $displayName = $package->name . " ({$periodLabel} - {$licenseLabel})";
+        }
+
         $cart[$cartKey] = [
             'id' => $package->id,
             'key' => $cartKey,
-            'name' => $package->name,
+            'name' => $displayName,
+            'package_name' => $package->name,
             'type' => 'package',
             'package_type' => $package->type, // 'subscription' or 'bundle'
             'price' => (float)$totalPrice,

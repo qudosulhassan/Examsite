@@ -85,7 +85,7 @@ class DynamicSeoController extends Controller
                 $slug = ($overlay && !empty($overlay->custom_slug)) ? $overlay->custom_slug : $e->slug;
 
                 $urls[] = [
-                    'loc' => rtrim($host, '/') . "/exams/{$vendorSlug}/{$slug}",
+                    'loc' => rtrim($host, '/') . '/' . \App\Models\Exam::publicPath($vendorSlug, $slug),
                     'priority' => '0.9',
                     'changefreq' => 'weekly',
                     'lastmod' => $e->last_updated_at ? $e->last_updated_at->format('Y-m-d') : ($e->updated_at ? $e->updated_at->format('Y-m-d') : now()->format('Y-m-d')),

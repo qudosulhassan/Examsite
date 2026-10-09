@@ -193,19 +193,85 @@ class SiteContext
     }
 
     /**
-     * Get comprehensive branding array for the site.
+     * Get all settings merged with site-specific overrides and isolated defaults.
      */
+    public function getAllSettings(): array
+    {
+        $site = $this->site();
+        $global = Setting::allAsAssoc();
+
+        if ($site && $site->id > 1) {
+            // Site B overrides and brand isolation
+            $global['site_name'] = $site->name ?: 'ProExamTopics';
+            if (!empty($site->logo) && $site->logo !== 'images/logo.png') {
+                $global['site_logo'] = $site->logo;
+            } else {
+                $global['site_logo'] = null;
+            }
+            if (!empty($site->favicon)) {
+                $global['site_favicon'] = $site->favicon;
+            }
+            if (!empty($site->contact_email)) {
+                $global['contact_email'] = $site->contact_email;
+                $global['support_email'] = $site->contact_email;
+            } else {
+                $global['contact_email'] = 'support@proexamtopics.com';
+                $global['support_email'] = 'support@proexamtopics.com';
+            }
+            if (!empty($site->default_seo_title)) {
+                $global['default_seo_title'] = $site->default_seo_title;
+                $global['default_og_title'] = $site->default_seo_title;
+            } else {
+                $global['default_seo_title'] = 'ProExamTopics - Master Your IT Certification Exams with Real Practice Tests';
+                $global['default_og_title'] = 'ProExamTopics - Master Your IT Certification Exams with Real Practice Tests';
+            }
+            if (!empty($site->default_meta_description)) {
+                $global['default_meta_description'] = $site->default_meta_description;
+                $global['default_og_description'] = $site->default_meta_description;
+            } else {
+                $global['default_meta_description'] = 'Master your IT certification exams with ProExamTopics. Download verified PDF study guides and interactive practice test engine with real exam questions.';
+                $global['default_og_description'] = 'Master your IT certification exams with ProExamTopics. Download verified PDF study guides and interactive practice test engine with real exam questions.';
+            }
+            if (!empty($site->primary_keyword_strategy)) {
+                $global['default_meta_keywords'] = $site->primary_keyword_strategy;
+            }
+            if (!empty($site->twitter_handle)) {
+                $global['social_twitter'] = $site->twitter_handle;
+            } else {
+                $global['social_twitter'] = '@ProExamTopics';
+            }
+
+            // Clean any leaks from promotional banner or taglines if they mention Site A or Ninja
+            if (isset($global['home_banner_text'])) {
+                $global['home_banner_text'] = str_ireplace(['ExamTopicsBase', 'Exam Topics Base', 'ExamsNinja', 'NINJA50', 'CertPass Master'], ['ProExamTopics', 'ProExamTopics', 'ProExamTopics', 'PRO50', 'ProExamTopics'], $global['home_banner_text']);
+            }
+            if (isset($global['home_banner_coupon'])) {
+                $global['home_banner_coupon'] = str_ireplace(['NINJA50', 'MASTER50'], ['PRO50', 'PRO50'], $global['home_banner_coupon']);
+            }
+            if (isset($global['site_tagline'])) {
+                $global['site_tagline'] = str_ireplace(['Ninja', 'ExamTopicsBase', 'Exam Topics Base', 'ExamsNinja', 'CertPass Master'], ['ProExamTopics', 'ProExamTopics', 'ProExamTopics', 'ProExamTopics', 'ProExamTopics'], $global['site_tagline']);
+            }
+        }
+
+        return $global;
+    }
     public function branding(): array
     {
         $site = $this->site();
+        $isSiteB = ($site && $site->id > 1) || (int) config('site.id', 1) === 2;
+
+        $logo = (!empty($site?->logo)) ? $site->logo : ($isSiteB ? null : Setting::get('site_logo', 'images/logo.png'));
+        if ($isSiteB && $logo === 'images/logo.png') {
+            $logo = null;
+        }
 
         return [
-            'name'            => $site?->name ?? Setting::get('site_name', config('app.name', 'ExamTopicsBase')),
-            'logo'            => (!empty($site?->logo)) ? $site->logo : Setting::get('site_logo', 'images/logo.png'),
+            'name'            => $site?->name ?? Setting::get('site_name', config('app.name', 'ProExamTopics')),
+            'logo'            => $logo,
             'favicon'         => (!empty($site?->favicon)) ? $site->favicon : Setting::get('site_favicon', 'favicon-32x32.png'),
             'primary_color'   => $site?->primary_color ?: '#2563eb',
             'secondary_color' => $site?->secondary_color ?: '#1e40af',
-            'contact_email'   => $site?->contact_email ?: Setting::get('contact_email', 'support@examtopicsbase.com'),
+            'contact_email'   => $site?->contact_email ?: ($isSiteB ? 'support@proexamtopics.com' : Setting::get('contact_email', 'support@examtopicsbase.com')),
             'contact_phone'   => $site?->contact_phone ?: Setting::get('contact_phone', ''),
             'contact_address' => $site?->contact_address ?: Setting::get('contact_address', ''),
         ];
@@ -261,6 +327,16 @@ class SiteContext
      * - On Root Site (ID 1): Exam is visible unless an overlay explicitly sets is_active = 0.
      * - On Secondary Sites (ID > 1): Exam is ONLY visible if an active overlay exists.
      */
+    /**
+     * Whether every active exam is shown on this site unless its overlay hides it.
+     * True for the core site, and for any site configured with SITE_CATALOG_MODE=all.
+     * Otherwise a site only shows exams that were individually assigned to it.
+     */
+    public function showsFullCatalog(): bool
+    {
+        return $this->isRoot() || config('site.catalog_mode', 'assigned') === 'all';
+    }
+
     public function isExamVisible(Exam|int $exam): bool
     {
         $examModel = $exam instanceof Exam ? $exam : Exam::find($exam);
@@ -270,7 +346,7 @@ class SiteContext
 
         $overlay = $this->getOverlayForExam($examModel);
 
-        if ($this->isRoot()) {
+        if ($this->showsFullCatalog()) {
             return $overlay ? (bool)$overlay->is_active : true;
         }
 
@@ -283,7 +359,7 @@ class SiteContext
     public function scopeVisibleExams(Builder $query, bool $indexedOnly = false): Builder
     {
         $site = $this->site();
-        $isRoot = $this->isRoot();
+        $isRoot = $this->showsFullCatalog();
 
         $query->where('is_active', true);
 
@@ -376,5 +452,55 @@ class SiteContext
         }
 
         \Illuminate\Support\Facades\Cache::flush();
+    }
+
+    /**
+     * Brand name for text that is hard-coded for the core site (ExamTopicsBase).
+     * Core site keeps its literal wording; other sites get their own app name.
+     */
+    public static function brandName(string $coreName): string
+    {
+        return (int) config('site.id', 1) === 1 ? $coreName : (string) config('app.name', $coreName);
+    }
+
+    /**
+     * Default support address for the active site (used where no setting is stored).
+     */
+    public static function supportEmail(): string
+    {
+        if ((int) config('site.id', 1) === 1) {
+            return 'support@examtopicsbase.com';
+        }
+
+        $domain = preg_replace('/^www\./', '', (string) parse_url((string) config('app.url'), PHP_URL_HOST));
+
+        return 'support@' . $domain;
+    }
+
+    /**
+     * Compile-time rebranding of Blade templates for non-core sites, so shared
+     * templates that spell out "Exam Topics Base" read correctly on other sites.
+     * The core site's templates are compiled untouched.
+     */
+    public static function rebrandTemplate(string $template): string
+    {
+        if ((int) config('site.id', 1) === 1) {
+            return $template;
+        }
+
+        $brand = (string) config('app.name', 'ProExamTopics');
+        $domain = preg_replace('/^www\./', '', (string) parse_url((string) config('app.url'), PHP_URL_HOST));
+
+        $pairs = [
+            'https://examtopicsbase.com' => rtrim((string) config('app.url'), '/'),
+            'support@examtopicsbase.com' => 'support@' . $domain,
+            'contact@examtopicsbase.com' => 'contact@' . $domain,
+            'noreply@examtopicsbase.com' => 'noreply@' . $domain,
+            'examtopicsbase.com' => $domain,
+            'Exam Topics Base' => $brand,
+            'ExamTopicsBase' => $brand,
+        ];
+
+        return strtr($template, $pairs);
     }
 }

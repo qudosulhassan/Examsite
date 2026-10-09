@@ -23,11 +23,39 @@ use Illuminate\Support\Carbon;
 class SettingsAdminController extends Controller
 {
     /**
+     * Settings form keys that live on the `sites` table for secondary sites.
+     */
+    private const SITE_COLUMN_SETTINGS = [
+        'site_name' => 'name',
+        'contact_email' => 'contact_email',
+        'contact_phone' => 'contact_phone',
+        'business_address' => 'contact_address',
+        'default_seo_title' => 'default_seo_title',
+        'default_meta_description' => 'default_meta_description',
+        'default_meta_keywords' => 'primary_keyword_strategy',
+        'robots_setting' => 'robots_directive',
+        'default_og_image' => 'og_image',
+        'social_twitter' => 'twitter_handle',
+    ];
+
+    /**
      * Display the Settings Center.
      */
     public function index(Request $request)
     {
-        $settings = Setting::all()->pluck('value', 'key')->toArray();
+        $settings = Setting::freshAssoc();
+
+        // Secondary sites keep their identity on the sites table; show it in the form.
+        $currentAppSiteId = (int) config('site.id', 1);
+        if ($currentAppSiteId > 1 && ($site = \App\Models\Site::find($currentAppSiteId))) {
+            foreach (self::SITE_COLUMN_SETTINGS as $settingKey => $column) {
+                if (!empty($site->{$column})) {
+                    $settings[$settingKey] = $site->{$column};
+                }
+            }
+            if (!empty($site->logo)) $settings['site_logo'] = $site->logo;
+            if (!empty($site->favicon)) $settings['site_favicon'] = $site->favicon;
+        }
 
         // Defaults if not set
         $settings['site_name'] = $settings['site_name'] ?? config('app.name', 'Exam Topics Base');
@@ -363,12 +391,25 @@ class SettingsAdminController extends Controller
             }
         }
 
-        $allPrevious = Setting::all()->pluck('value', 'key')->toArray();
+        $allPrevious = Setting::freshAssoc();
         $changes = [];
+
+        $currentAppSiteId = (int) config('site.id', 1);
+        $site = $currentAppSiteId > 1 ? \App\Models\Site::find($currentAppSiteId) : null;
 
         foreach ($validated as $key => $value) {
             // Only update settings that were actually submitted in this request
             if (!$request->has($key)) {
+                continue;
+            }
+
+            // Secondary sites store identity fields on the sites table.
+            if ($site && isset(self::SITE_COLUMN_SETTINGS[$key])) {
+                $column = self::SITE_COLUMN_SETTINGS[$key];
+                if ($site->{$column} !== $value) {
+                    $changes[$key] = ['old' => $site->{$column}, 'new' => $value];
+                    $site->{$column} = $value;
+                }
                 continue;
             }
 
@@ -380,6 +421,11 @@ class SettingsAdminController extends Controller
                 ];
                 Setting::set($key, $value);
             }
+        }
+
+        if ($site && $site->isDirty()) {
+            $site->save();
+            \App\Services\SiteContext::flushSiteCache();
         }
 
         // The Promotion Banner's "Highlight Coupon Code" previously only changed the

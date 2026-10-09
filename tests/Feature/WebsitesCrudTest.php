@@ -38,7 +38,7 @@ class WebsitesCrudTest extends TestCase
         // Create admin user using the 'role' column (not is_admin)
         $this->admin = User::factory()->create([
             'email' => 'admin@examtopicsbase.com',
-            'role'  => 'admin',
+            'role'  => 'super_admin',
         ]);
 
         // Seed root Site A (examtopicsbase)

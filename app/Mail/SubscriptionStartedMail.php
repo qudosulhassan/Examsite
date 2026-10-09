@@ -29,7 +29,7 @@ class SubscriptionStartedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Exam Topics Base Simulator Subscription is Active!',
+            subject: 'Your ' . \App\Services\SiteContext::brandName('Exam Topics Base') . ' Simulator Subscription is Active!',
         );
     }
 

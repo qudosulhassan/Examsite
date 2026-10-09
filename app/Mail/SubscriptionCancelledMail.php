@@ -29,7 +29,7 @@ class SubscriptionCancelledMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Subscription Cancelled - Exam Topics Base',
+            subject: 'Subscription Cancelled - ' . \App\Services\SiteContext::brandName('Exam Topics Base'),
         );
     }
 

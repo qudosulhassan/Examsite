@@ -272,7 +272,7 @@ TXT;
         $logoPath = ($site && !empty($site->logo)) ? $site->logo : Setting::get('site_logo');
         $logo = $logoPath ? (str_starts_with($logoPath, 'http') ? $logoPath : asset($logoPath)) : asset('images/logo.png');
 
-        $contactEmail = ($site && !empty($site->contact_email)) ? $site->contact_email : Setting::get('contact_email', 'support@examtopicsbase.com');
+        $contactEmail = ($site && !empty($site->contact_email)) ? $site->contact_email : Setting::get('contact_email', \App\Services\SiteContext::supportEmail());
 
         $socialLinks = array_values(array_filter([
             Setting::get('social_twitter'),

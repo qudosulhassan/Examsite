@@ -25,4 +25,28 @@ return [
     */
     'mode' => env('APP_SITE_MODE', 'standalone'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Public Exam URL Style
+    |--------------------------------------------------------------------------
+    |
+    | 'prefixed': /exams/{vendor}/{slug}   (ExamTopicsBase)
+    | 'root':     /{vendor}/{slug}-exam    (ProExamTopics)
+    |
+    */
+    /*
+    |--------------------------------------------------------------------------
+    | Catalog Mode
+    |--------------------------------------------------------------------------
+    |
+    | 'all':      every active exam appears automatically (hide one with its overlay)
+    | 'assigned': only exams assigned to this site in the Websites admin appear
+    |
+    | The core site always shows the full catalog.
+    |
+    */
+    'catalog_mode' => env('SITE_CATALOG_MODE', 'assigned'),
+
+    'exam_url_style' => env('EXAM_URL_STYLE', 'prefixed'),
+
 ];

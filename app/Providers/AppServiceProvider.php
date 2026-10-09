@@ -25,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Shared templates are written for the core site; rebrand them for any other site.
+        \Illuminate\Support\Facades\Blade::prepareStringsForCompilationUsing(
+            fn (string $template) => \App\Services\SiteContext::rebrandTemplate($template)
+        );
+
         // Register cross-database case-insensitive LIKE/ILIKE macros
         \Illuminate\Database\Query\Builder::macro('whereLike', function ($column, $value) {
             $op = ($this->getConnection()->getDriverName() === 'pgsql') ? 'ilike' : 'like';
@@ -39,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
         // Customize email verification notification with high deliverability and ExamTopicsBase branding
         \Illuminate\Auth\Notifications\VerifyEmail::toMailUsing(function ($notifiable, $url) {
             return (new \Illuminate\Notifications\Messages\MailMessage)
-                ->subject('Verify Your Email Address - ExamTopicsBase')
+                ->subject('Verify Your Email Address - ' . \App\Services\SiteContext::brandName('ExamTopicsBase'))
                 ->view('emails.verify-email', [
                     'name' => $notifiable->name ?? 'Student',
                     'verificationUrl' => $url,
@@ -49,7 +54,8 @@ class AppServiceProvider extends ServiceProvider
         // Share global settings across views safely
         try {
             \Illuminate\Support\Facades\View::composer('*', function ($view) {
-                $view->with('globalSettings', \App\Models\Setting::allAsAssoc());
+                $siteContext = app(\App\Services\SiteContext::class);
+                $view->with('globalSettings', $siteContext->getAllSettings());
             });
         } catch (\Throwable $e) {
             // Ignore during migrations or initial bootstrap
