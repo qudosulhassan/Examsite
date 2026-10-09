@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Coupon extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\BelongsToSite;
 
     protected $fillable = [
+        'site_id',
         'code',
         'description',
         'discount_type',

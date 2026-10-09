@@ -22,7 +22,7 @@ class CouponAdminController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|unique:coupons,code|max:50',
+            'code' => ['required', 'string', 'max:50', \Illuminate\Validation\Rule::unique('coupons', 'code')->where('site_id', Coupon::currentSiteId())],
             'discount_type' => 'required|in:percentage,fixed',
             'discount_value' => 'required|numeric|min:0',
             'min_order_amount' => 'required|numeric|min:0',
@@ -59,7 +59,7 @@ class CouponAdminController extends Controller
         $coupon = Coupon::findOrFail($id);
 
         $request->validate([
-            'code' => 'required|string|max:50|unique:coupons,code,' . $coupon->id,
+            'code' => ['required', 'string', 'max:50', \Illuminate\Validation\Rule::unique('coupons', 'code')->where('site_id', Coupon::currentSiteId())->ignore($coupon->id)],
             'discount_type' => 'required|in:percentage,fixed',
             'discount_value' => 'required|numeric|min:0',
             'min_order_amount' => 'required|numeric|min:0',

@@ -20,7 +20,7 @@ return new class extends Migration
         });
 
         // Backfill slugs for all existing users
-        $users = User::withTrashed()->whereNull('slug')->orWhere('slug', '')->get();
+        $users = User::withoutGlobalScopes()->withTrashed()->whereNull('slug')->orWhere('slug', '')->get();
         foreach ($users as $user) {
             $name = trim($user->name ?: '');
             if (empty($name)) {
@@ -36,7 +36,7 @@ return new class extends Migration
 
             $slug = $baseSlug;
             $counter = 1;
-            while (User::withTrashed()->where('slug', $slug)->where('id', '!=', $user->id)->exists()) {
+            while (User::withoutGlobalScopes()->withTrashed()->where('slug', $slug)->where('id', '!=', $user->id)->exists()) {
                 $counter++;
                 $slug = "{$baseSlug}-{$counter}";
             }

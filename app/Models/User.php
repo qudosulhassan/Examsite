@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasFactory, Notifiable, HasRoles, SoftDeletes, \App\Models\Concerns\BelongsToSite;
 
     /**
      * The attributes that are mass assignable.
@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var list<string>
      */
     protected $fillable = [
+        'site_id',
         'name',
         'slug',
         'first_name',
@@ -93,7 +94,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $slug = $baseSlug;
         $counter = 1;
 
-        while (static::where('slug', $slug)->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))->withTrashed()->exists()) {
+        while (static::withoutGlobalScope('site')->where('slug', $slug)->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))->withTrashed()->exists()) {
             $counter++;
             $slug = "{$baseSlug}-{$counter}";
         }
