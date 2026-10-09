@@ -49,7 +49,8 @@ class AppServiceProvider extends ServiceProvider
         // Share global settings across views safely
         try {
             \Illuminate\Support\Facades\View::composer('*', function ($view) {
-                $view->with('globalSettings', \App\Models\Setting::allAsAssoc());
+                $siteContext = app(\App\Services\SiteContext::class);
+                $view->with('globalSettings', $siteContext->getAllSettings());
             });
         } catch (\Throwable $e) {
             // Ignore during migrations or initial bootstrap

@@ -30,12 +30,17 @@ class ExamController extends Controller
             abort(404);
         }
 
+        // Root-style sites append "-exam" to the public slug; accept the bare slug too.
+        $baseSlug = Exam::usesRootUrls() ? preg_replace('/-exam$/', '', $slugClean) : $slugClean;
+
         // 2. Query Exam strictly belonging to this vendor
         $exam = Exam::where('is_active', true)
             ->where('vendor_id', $vendorModel->id)
-            ->where(function ($q) use ($slugClean) {
+            ->where(function ($q) use ($slugClean, $baseSlug) {
                 $q->where('slug', $slugClean)
-                  ->orWhere('exam_code', $slugClean);
+                  ->orWhere('slug', $baseSlug)
+                  ->orWhere('exam_code', $slugClean)
+                  ->orWhere('exam_code', $baseSlug);
             })
             ->with(['vendor', 'overlays'])
             ->first();
@@ -52,7 +57,7 @@ class ExamController extends Controller
         $overlay = $siteContext->getOverlayForExam($exam);
 
         $canonicalVendor = $exam->vendor ? $exam->vendor->slug : $vendorModel->slug;
-        $canonicalSlug = $exam->slug;
+        $canonicalSlug = Exam::urlSlug($exam->slug);
 
         // 3. Canonical 301 URL redirect if URL does not match canonical /exams/{vendor}/{slug}
         if ($vendor !== $canonicalVendor || $slug !== $canonicalSlug) {
@@ -89,5 +94,38 @@ class ExamController extends Controller
 
         return app(ThemeManager::class)->view('exams.show', compact('exam', 'sampleQuestions', 'reviews', 'overlay'));
     }
-}
 
+    /**
+     * Root-style sites only: 301 the legacy /exams/{vendor}/{slug} URL to /{vendor}/{slug}-exam.
+     */
+    public function showLegacy(string $vendor, string $slug)
+    {
+        $vendorClean = strtolower(trim($vendor));
+        $slugClean = strtolower(trim($slug));
+        $baseSlug = preg_replace('/-exam$/', '', $slugClean);
+
+        $vendorModel = Vendor::where('slug', $vendorClean)->first();
+        if ($vendorModel) {
+            $exam = Exam::where('vendor_id', $vendorModel->id)
+                ->where(function ($q) use ($slugClean, $baseSlug) {
+                    $q->where('slug', $slugClean)
+                      ->orWhere('slug', $baseSlug)
+                      ->orWhere('exam_code', $slugClean)
+                      ->orWhere('exam_code', $baseSlug);
+                })
+                ->first();
+
+            if ($exam) {
+                return redirect()->route('exams.show', [
+                    'vendor' => $exam->vendor ? $exam->vendor->slug : $vendorModel->slug,
+                    'slug' => Exam::urlSlug($exam->slug),
+                ], 301);
+            }
+        }
+
+        return redirect()->route('exams.show', [
+            'vendor' => $vendorClean,
+            'slug' => Exam::urlSlug($slugClean),
+        ], 301);
+    }
+}

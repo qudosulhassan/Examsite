@@ -31,7 +31,7 @@ class SiteContextStandaloneTest extends TestCase
         // Admin user
         $this->admin = User::factory()->create([
             'email' => 'admin@examtopicsbase.com',
-            'role'  => 'admin',
+            'role'  => 'super_admin',
         ]);
 
         // Seed Site 1 (ExamTopicsBase - Root)

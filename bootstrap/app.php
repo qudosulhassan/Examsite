@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            Route::middleware(['web', 'auth', 'admin'])
+            Route::middleware(['web', 'auth', 'admin', \App\Http\Middleware\EnsureSiteScopedAdmin::class])
                 ->prefix('admin')
                 ->name('admin.')
                 ->group(base_path('routes/admin.php'));

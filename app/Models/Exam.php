@@ -11,13 +11,37 @@ class Exam extends Model
 {
     use HasFactory;
 
+    /**
+     * Whether this site serves exams at /{vendor}/{slug}-exam instead of /exams/{vendor}/{slug}.
+     */
+    public static function usesRootUrls(): bool
+    {
+        return config('site.exam_url_style', 'prefixed') === 'root';
+    }
+
+    /**
+     * The slug as it appears in this site's public URL.
+     */
+    public static function urlSlug(string $slug): string
+    {
+        return static::usesRootUrls() && !str_ends_with($slug, '-exam') ? $slug . '-exam' : $slug;
+    }
+
+    /**
+     * Public path (no leading slash) of an exam on this site.
+     */
+    public static function publicPath(string $vendorSlug, string $slug): string
+    {
+        return (static::usesRootUrls() ? '' : 'exams/') . $vendorSlug . '/' . static::urlSlug($slug);
+    }
+
     protected static function booted()
     {
         static::updating(function ($exam) {
             if ($exam->isDirty('slug') && !empty($exam->getOriginal('slug')) && !empty($exam->slug) && $exam->is_active && $exam->vendor) {
                 $vendorSlug = $exam->vendor->slug;
-                $oldPath = 'exams/' . $vendorSlug . '/' . $exam->getOriginal('slug');
-                $newPath = 'exams/' . $vendorSlug . '/' . $exam->slug;
+                $oldPath = static::publicPath($vendorSlug, $exam->getOriginal('slug'));
+                $newPath = static::publicPath($vendorSlug, $exam->slug);
 
                 if ($oldPath !== $newPath && !Redirect::wouldCauseLoop($oldPath, $newPath)) {
                     Redirect::updateOrCreate(
@@ -51,7 +75,7 @@ class Exam extends Model
 
             // Remove any redirect rules that point to this deleted exam
             if ($exam->vendor && !empty($exam->slug)) {
-                $targetPath = 'exams/' . $exam->vendor->slug . '/' . $exam->slug;
+                $targetPath = static::publicPath($exam->vendor->slug, $exam->slug);
                 Redirect::where('new_url', $targetPath)
                     ->orWhere('new_url', '/' . $targetPath)
                     ->delete();
@@ -117,15 +141,109 @@ class Exam extends Model
     ];
 
     /**
-     * Get effective bundle price (explicit price_bundle or fallback 10% discount).
+     * Get effective bundle price (site overlay override or explicit price_bundle or fallback 10% discount).
      */
     public function getEffectiveBundlePriceAttribute(): float
     {
+        $overlay = $this->getOverlayForSite();
+        if ($overlay && $overlay->custom_price_bundle !== null && (float)$overlay->custom_price_bundle > 0) {
+            return (float)$overlay->custom_price_bundle;
+        }
+
         if ($this->price_bundle !== null && (float)$this->price_bundle > 0) {
             return (float)$this->price_bundle;
         }
 
-        return round(((float)$this->price_pdf + (float)$this->price_engine) * 0.90, 2);
+        $pdfPrice = $this->resolved_price_pdf;
+        $enginePrice = $this->resolved_price_engine;
+
+        return round(((float)$pdfPrice + (float)$enginePrice) * 0.90, 2);
+    }
+
+    /**
+     * Get resolved site-specific or global PDF price.
+     */
+    public function getResolvedPricePdfAttribute(): float
+    {
+        if (app()->bound(\App\Services\SiteContext::class)) {
+            return app(\App\Services\SiteContext::class)->resolveExamPrice($this, 'pdf');
+        }
+
+        $overlay = $this->getOverlayForSite();
+        if ($overlay && $overlay->custom_price_pdf !== null) {
+            return (float)$overlay->custom_price_pdf;
+        }
+
+        return (float)($this->price_pdf ?? 29.99);
+    }
+
+    /**
+     * Get resolved site-specific or global Engine price.
+     */
+    public function getResolvedPriceEngineAttribute(): float
+    {
+        if (app()->bound(\App\Services\SiteContext::class)) {
+            return app(\App\Services\SiteContext::class)->resolveExamPrice($this, 'engine');
+        }
+
+        $overlay = $this->getOverlayForSite();
+        if ($overlay && $overlay->custom_price_engine !== null) {
+            return (float)$overlay->custom_price_engine;
+        }
+
+        return (float)($this->price_engine ?? 39.99);
+    }
+
+    /**
+     * Resolve site-specific or fallback update price for a specific product and period.
+     *
+     * @param string $productType 'combo'|'bundle', 'pdf', or 'engine'|'engine_single'
+     * @param string|int $period '3', '6', or '12'
+     * @return float
+     */
+    public function resolveUpdatePrice(string $productType, string|int $period = '3'): float
+    {
+        $period = (string)$period;
+        $overlay = $this->getOverlayForSite();
+
+        $field = match (strtolower($productType)) {
+            'combo', 'bundle' => 'custom_update_price_bundle_' . $period,
+            'pdf' => 'custom_update_price_pdf_' . $period,
+            'engine', 'engine_single' => 'custom_update_price_engine_' . $period,
+            default => null,
+        };
+
+        if ($overlay && $field && $overlay->{$field} !== null) {
+            return (float)$overlay->{$field};
+        }
+
+        return match ($period) {
+            '6' => (float)($this->update_price_6_months ?? 10),
+            '12' => (float)($this->update_price_12_months ?? 20),
+            default => (float)($this->update_price_3_months ?? 0),
+        };
+    }
+
+    /**
+     * Get resolved site-specific or fallback H1.
+     */
+    public function getResolvedH1Attribute(): string
+    {
+        $overlay = $this->getOverlayForSite();
+        if ($overlay && !empty(trim((string)$overlay->custom_h1))) {
+            return trim($overlay->custom_h1);
+        }
+
+        if ($overlay && !empty(trim((string)$overlay->custom_header_title))) {
+            return trim($overlay->custom_header_title);
+        }
+
+        if (!empty(trim((string)($this->header_title ?? '')))) {
+            return trim($this->header_title);
+        }
+
+        $vendorName = $this->vendor ? $this->vendor->name : '';
+        return trim("{$vendorName} {$this->exam_code} Study Guide & Practice Questions");
     }
 
     /**
@@ -173,7 +291,7 @@ class Exam extends Model
     {
         $vendorSlug = ($this->vendor && !empty($this->vendor->slug)) ? $this->vendor->slug : 'exam';
         $slug = !empty($this->slug) ? $this->slug : (!empty($this->exam_code) ? strtolower($this->exam_code) : 'exam');
-        return route('exams.show', ['vendor' => $vendorSlug, 'slug' => $slug]);
+        return route('exams.show', ['vendor' => $vendorSlug, 'slug' => static::urlSlug($slug)]);
     }
 
     /**

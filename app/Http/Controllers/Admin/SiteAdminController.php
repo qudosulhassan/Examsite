@@ -455,6 +455,19 @@ class SiteAdminController extends Controller
             'custom_price_bundle'    => 'nullable|numeric|min:0',
             'custom_price_engine'    => 'nullable|numeric|min:0',
             'custom_price_pdf'       => 'nullable|numeric|min:0',
+            'custom_update_price_bundle_3' => 'nullable|numeric|min:0',
+            'custom_update_price_bundle_6' => 'nullable|numeric|min:0',
+            'custom_update_price_bundle_12' => 'nullable|numeric|min:0',
+            'custom_update_price_pdf_3' => 'nullable|numeric|min:0',
+            'custom_update_price_pdf_6' => 'nullable|numeric|min:0',
+            'custom_update_price_pdf_12' => 'nullable|numeric|min:0',
+            'custom_update_price_engine_3' => 'nullable|numeric|min:0',
+            'custom_update_price_engine_6' => 'nullable|numeric|min:0',
+            'custom_update_price_engine_12' => 'nullable|numeric|min:0',
+            'custom_topics'               => 'nullable|array',
+            'custom_topics.*.name'        => 'nullable|string|max:255',
+            'custom_topics.*.description' => 'nullable|string|max:1000',
+            'custom_topics.*.percentage'  => 'nullable|string|max:50',
             'is_active'              => 'nullable|boolean',
             'is_indexed'             => 'nullable|boolean',
             'faqs'                   => 'nullable|array',
@@ -482,6 +495,21 @@ class SiteAdminController extends Controller
             }
         }
 
+        // Process and clean Topics array
+        $cleanedTopics = [];
+        if (!empty($validated['custom_topics']) && is_array($validated['custom_topics'])) {
+            foreach ($validated['custom_topics'] as $topic) {
+                $name = trim((string)($topic['name'] ?? ''));
+                if ($name !== '') {
+                    $cleanedTopics[] = [
+                        'name'        => $name,
+                        'description' => trim((string)($topic['description'] ?? '')),
+                        'percentage'  => trim((string)($topic['percentage'] ?? '')),
+                    ];
+                }
+            }
+        }
+
         // Sanitize TipTap rich text
         $sanitizedArticle = null;
         if (!empty($validated['custom_article_content'])) {
@@ -498,6 +526,16 @@ class SiteAdminController extends Controller
         $overlay->custom_price_bundle    = $request->filled('custom_price_bundle') ? (float)$validated['custom_price_bundle'] : null;
         $overlay->custom_price_engine    = $request->filled('custom_price_engine') ? (float)$validated['custom_price_engine'] : null;
         $overlay->custom_price_pdf       = $request->filled('custom_price_pdf') ? (float)$validated['custom_price_pdf'] : null;
+        $overlay->custom_topics          = !empty($cleanedTopics) ? $cleanedTopics : null;
+        $overlay->custom_update_price_bundle_3 = $request->filled('custom_update_price_bundle_3') ? (float)$validated['custom_update_price_bundle_3'] : null;
+        $overlay->custom_update_price_bundle_6 = $request->filled('custom_update_price_bundle_6') ? (float)$validated['custom_update_price_bundle_6'] : null;
+        $overlay->custom_update_price_bundle_12 = $request->filled('custom_update_price_bundle_12') ? (float)$validated['custom_update_price_bundle_12'] : null;
+        $overlay->custom_update_price_pdf_3 = $request->filled('custom_update_price_pdf_3') ? (float)$validated['custom_update_price_pdf_3'] : null;
+        $overlay->custom_update_price_pdf_6 = $request->filled('custom_update_price_pdf_6') ? (float)$validated['custom_update_price_pdf_6'] : null;
+        $overlay->custom_update_price_pdf_12 = $request->filled('custom_update_price_pdf_12') ? (float)$validated['custom_update_price_pdf_12'] : null;
+        $overlay->custom_update_price_engine_3 = $request->filled('custom_update_price_engine_3') ? (float)$validated['custom_update_price_engine_3'] : null;
+        $overlay->custom_update_price_engine_6 = $request->filled('custom_update_price_engine_6') ? (float)$validated['custom_update_price_engine_6'] : null;
+        $overlay->custom_update_price_engine_12 = $request->filled('custom_update_price_engine_12') ? (float)$validated['custom_update_price_engine_12'] : null;
         $overlay->is_active              = $request->boolean('is_active');
         $overlay->is_indexed             = $request->boolean('is_indexed');
 

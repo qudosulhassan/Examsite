@@ -249,7 +249,7 @@ class MultiSiteIsolationTest extends TestCase
         // Test login/session persistence for Site A
         $user = \App\Models\User::factory()->create([
             'email' => 'admin@examtopicsbase.com',
-            'role' => 'admin',
+            'role' => 'super_admin',
         ]);
 
         $response = $this->actingAs($user)->get('http://localhost/admin/sites');

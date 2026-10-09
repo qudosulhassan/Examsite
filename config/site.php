@@ -25,4 +25,15 @@ return [
     */
     'mode' => env('APP_SITE_MODE', 'standalone'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Public Exam URL Style
+    |--------------------------------------------------------------------------
+    |
+    | 'prefixed': /exams/{vendor}/{slug}   (ExamTopicsBase)
+    | 'root':     /{vendor}/{slug}-exam    (ProExamTopics)
+    |
+    */
+    'exam_url_style' => env('EXAM_URL_STYLE', 'prefixed'),
+
 ];

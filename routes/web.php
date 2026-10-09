@@ -36,7 +36,17 @@ Route::get('/vendors', [VendorController::class, 'index'])->name('vendors.index'
 Route::get('/vendors/{slug}', [App\Http\Controllers\Public\VendorController::class, 'show'])->name('vendors.show');
 Route::get('/certifications', [App\Http\Controllers\Public\CertificationController::class, 'index'])->name('certifications.index');
 Route::get('/certifications/{slug}', [App\Http\Controllers\Public\CertificationController::class, 'show'])->name('certifications.show');
-Route::get('/exams/{vendor}/{slug}', [App\Http\Controllers\Public\ExamController::class, 'show'])->name('exams.show');
+if (config('site.exam_url_style', 'prefixed') === 'root') {
+    // Root style: /{vendor}/{slug}-exam, with the old /exams/... URLs 301ing to it.
+    Route::redirect('/exams', '/certifications', 301);
+    Route::get('/exams/{vendor}/{slug}', [App\Http\Controllers\Public\ExamController::class, 'showLegacy'])
+        ->name('exams.legacy.show');
+    Route::get('/{vendor}/{slug}', [App\Http\Controllers\Public\ExamController::class, 'show'])
+        ->where('vendor', '^(?!dashboard|admin|api|webhook|auth|cart|checkout|blog|vendors|certifications|exams|demo-test-engine|test-engine|free-demo|about|contact|faq|pricing|search|sitemap|robots).*$')
+        ->name('exams.show');
+} else {
+    Route::get('/exams/{vendor}/{slug}', [App\Http\Controllers\Public\ExamController::class, 'show'])->name('exams.show');
+}
 
 Route::get('/free-demo', [DemoController::class, 'index'])->name('free-demo.index');
 Route::post('/free-demo', [DemoController::class, 'request'])->name('free-demo.request');
