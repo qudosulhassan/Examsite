@@ -6,11 +6,11 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <!-- Favicon -->
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v={{ filemtime(public_path('favicon-32x32.png')) }}">
-        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-32x32.png') }}?v={{ filemtime(public_path('favicon-32x32.png')) }}">
-        <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v={{ filemtime(public_path('favicon.png')) }}">
-        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ filemtime(public_path('favicon.ico')) }}">
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}?v={{ filemtime(public_path('apple-touch-icon.png')) }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('sites/proexamtopics/favicon-32x32.png') }}?v={{ filemtime(public_path('sites/proexamtopics/favicon-32x32.png')) }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('sites/proexamtopics/favicon-32x32.png') }}?v={{ filemtime(public_path('sites/proexamtopics/favicon-32x32.png')) }}">
+        <link rel="icon" type="image/png" href="{{ asset('sites/proexamtopics/favicon.png') }}?v={{ filemtime(public_path('sites/proexamtopics/favicon.png')) }}">
+        <link rel="shortcut icon" href="{{ asset('sites/proexamtopics/favicon.ico') }}?v={{ filemtime(public_path('sites/proexamtopics/favicon.ico')) }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('sites/proexamtopics/apple-touch-icon.png') }}?v={{ filemtime(public_path('sites/proexamtopics/apple-touch-icon.png')) }}">
 
         @php
             $guestSite = app(\App\Services\SiteContext::class)->site();

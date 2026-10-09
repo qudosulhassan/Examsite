@@ -135,4 +135,24 @@ class SharedCodebaseSiteTwoTest extends TestCase
         $out = SiteContext::rebrandTemplate($text);
         $this->assertSame('Welcome to ProExamTopics - write to support@proexamtopics.com or ProExamTopics', $out);
     }
+
+    public function test_secondary_site_shows_only_assigned_exams_unless_catalog_mode_is_all(): void
+    {
+        $exam = $this->makeExam();
+        $site2 = $this->actAsSiteTwo();
+        $ctx = app(SiteContext::class);
+
+        config(['site.catalog_mode' => 'assigned']);
+        $this->assertFalse($ctx->isExamVisible($exam));
+        $this->assertSame(0, $ctx->scopeVisibleExams(Exam::query())->count());
+
+        config(['site.catalog_mode' => 'all']);
+        $this->assertTrue($ctx->isExamVisible($exam));
+        $this->assertSame(1, $ctx->scopeVisibleExams(Exam::query())->count());
+
+        // An overlay can still hide one exam from this site.
+        SiteExamOverlay::create(['site_id' => $site2->id, 'exam_id' => $exam->id, 'is_active' => false]);
+        $this->assertFalse($ctx->isExamVisible($exam->fresh()));
+        $this->assertSame(0, $ctx->scopeVisibleExams(Exam::query())->count());
+    }
 }

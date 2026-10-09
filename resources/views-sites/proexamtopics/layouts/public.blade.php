@@ -7,11 +7,11 @@
 
     <!-- Favicon -->
     @php
-        $siteFavicon32 = file_exists(public_path('favicon-32x32.png')) ? asset('favicon-32x32.png') : (($currentSite && !empty($currentSite->favicon)) ? asset($currentSite->favicon) : asset('favicon-32x32.png'));
-        $siteFavicon16 = file_exists(public_path('favicon-16x16.png')) ? asset('favicon-16x16.png') : $siteFavicon32;
-        $siteFaviconIco = file_exists(public_path('favicon.ico')) ? asset('favicon.ico') : $siteFavicon32;
-        $customAppleIcon = file_exists(public_path('apple-touch-icon.png')) ? asset('apple-touch-icon.png') : (!empty($globalSettings['apple_touch_icon']) ? asset($globalSettings['apple_touch_icon']) : asset('apple-touch-icon.png'));
-        $faviconVer = file_exists(public_path('favicon-32x32.png')) ? filemtime(public_path('favicon-32x32.png')) : time();
+        $siteFavicon32 = file_exists(public_path('sites/proexamtopics/favicon-32x32.png')) ? asset('sites/proexamtopics/favicon-32x32.png') : (($currentSite && !empty($currentSite->favicon)) ? asset($currentSite->favicon) : asset('sites/proexamtopics/favicon-32x32.png'));
+        $siteFavicon16 = file_exists(public_path('sites/proexamtopics/favicon-16x16.png')) ? asset('sites/proexamtopics/favicon-16x16.png') : $siteFavicon32;
+        $siteFaviconIco = file_exists(public_path('sites/proexamtopics/favicon.ico')) ? asset('sites/proexamtopics/favicon.ico') : $siteFavicon32;
+        $customAppleIcon = file_exists(public_path('sites/proexamtopics/apple-touch-icon.png')) ? asset('sites/proexamtopics/apple-touch-icon.png') : (!empty($globalSettings['apple_touch_icon']) ? asset($globalSettings['apple_touch_icon']) : asset('sites/proexamtopics/apple-touch-icon.png'));
+        $faviconVer = file_exists(public_path('sites/proexamtopics/favicon-32x32.png')) ? filemtime(public_path('sites/proexamtopics/favicon-32x32.png')) : time();
     @endphp
     <link rel="icon" type="image/png" sizes="32x32" href="{{ $siteFavicon32 }}?v={{ $faviconVer }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ $siteFavicon16 }}?v={{ $faviconVer }}">

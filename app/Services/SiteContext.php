@@ -327,6 +327,16 @@ class SiteContext
      * - On Root Site (ID 1): Exam is visible unless an overlay explicitly sets is_active = 0.
      * - On Secondary Sites (ID > 1): Exam is ONLY visible if an active overlay exists.
      */
+    /**
+     * Whether every active exam is shown on this site unless its overlay hides it.
+     * True for the core site, and for any site configured with SITE_CATALOG_MODE=all.
+     * Otherwise a site only shows exams that were individually assigned to it.
+     */
+    public function showsFullCatalog(): bool
+    {
+        return $this->isRoot() || config('site.catalog_mode', 'assigned') === 'all';
+    }
+
     public function isExamVisible(Exam|int $exam): bool
     {
         $examModel = $exam instanceof Exam ? $exam : Exam::find($exam);
@@ -336,7 +346,7 @@ class SiteContext
 
         $overlay = $this->getOverlayForExam($examModel);
 
-        if ($this->isRoot()) {
+        if ($this->showsFullCatalog()) {
             return $overlay ? (bool)$overlay->is_active : true;
         }
 
@@ -349,7 +359,7 @@ class SiteContext
     public function scopeVisibleExams(Builder $query, bool $indexedOnly = false): Builder
     {
         $site = $this->site();
-        $isRoot = $this->isRoot();
+        $isRoot = $this->showsFullCatalog();
 
         $query->where('is_active', true);
 
@@ -451,6 +461,20 @@ class SiteContext
     public static function brandName(string $coreName): string
     {
         return (int) config('site.id', 1) === 1 ? $coreName : (string) config('app.name', $coreName);
+    }
+
+    /**
+     * Default support address for the active site (used where no setting is stored).
+     */
+    public static function supportEmail(): string
+    {
+        if ((int) config('site.id', 1) === 1) {
+            return 'support@examtopicsbase.com';
+        }
+
+        $domain = preg_replace('/^www\./', '', (string) parse_url((string) config('app.url'), PHP_URL_HOST));
+
+        return 'support@' . $domain;
     }
 
     /**
