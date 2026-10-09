@@ -32,7 +32,7 @@ class TechnicalSeoAdminController extends Controller
         }
 
         $activeTab = $request->get('tab', $request->get('section', 'overview'));
-        $settings = Setting::all()->pluck('value', 'key')->toArray();
+        $settings = Setting::freshAssoc();
 
         // Ensure defaults
         $settings['site_name'] = $settings['site_name'] ?? config('app.name', 'Exam Topics Base');

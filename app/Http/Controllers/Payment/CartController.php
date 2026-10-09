@@ -174,7 +174,7 @@ class CartController extends Controller
             // Clear entire cart because subscription checkout is handled individually
             $cart = [];
             $cart[$cartKey] = [
-                'name' => 'Exam Topics Base ' . $targetPlan['name'] . ' Subscription (' . ucfirst($billingCycle) . ')',
+                'name' => \App\Services\SiteContext::brandName('Exam Topics Base') . ' ' . $targetPlan['name'] . ' Subscription (' . ucfirst($billingCycle) . ')',
                 'key' => $cartKey,
                 'plan_name' => $targetPlan['name'],
                 'billing_cycle' => $billingCycle,

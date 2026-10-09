@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Review extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\BelongsToSite;
 
     protected $fillable = [
+        'site_id',
         'user_id',
         'reviewer_name',
         'exam_id',

@@ -443,4 +443,40 @@ class SiteContext
 
         \Illuminate\Support\Facades\Cache::flush();
     }
+
+    /**
+     * Brand name for text that is hard-coded for the core site (ExamTopicsBase).
+     * Core site keeps its literal wording; other sites get their own app name.
+     */
+    public static function brandName(string $coreName): string
+    {
+        return (int) config('site.id', 1) === 1 ? $coreName : (string) config('app.name', $coreName);
+    }
+
+    /**
+     * Compile-time rebranding of Blade templates for non-core sites, so shared
+     * templates that spell out "Exam Topics Base" read correctly on other sites.
+     * The core site's templates are compiled untouched.
+     */
+    public static function rebrandTemplate(string $template): string
+    {
+        if ((int) config('site.id', 1) === 1) {
+            return $template;
+        }
+
+        $brand = (string) config('app.name', 'ProExamTopics');
+        $domain = preg_replace('/^www\./', '', (string) parse_url((string) config('app.url'), PHP_URL_HOST));
+
+        $pairs = [
+            'https://examtopicsbase.com' => rtrim((string) config('app.url'), '/'),
+            'support@examtopicsbase.com' => 'support@' . $domain,
+            'contact@examtopicsbase.com' => 'contact@' . $domain,
+            'noreply@examtopicsbase.com' => 'noreply@' . $domain,
+            'examtopicsbase.com' => $domain,
+            'Exam Topics Base' => $brand,
+            'ExamTopicsBase' => $brand,
+        ];
+
+        return strtr($template, $pairs);
+    }
 }

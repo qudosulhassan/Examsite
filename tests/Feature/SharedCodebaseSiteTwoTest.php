@@ -89,4 +89,50 @@ class SharedCodebaseSiteTwoTest extends TestCase
         $this->assertSame('microsoft/az-900-exam', Exam::publicPath('microsoft', 'az-900'));
         $this->assertSame('microsoft/az-900-exam', Exam::publicPath('microsoft', 'az-900-exam'));
     }
+
+    public function test_settings_are_stored_per_site(): void
+    {
+        $this->actAsSiteTwo();
+        config(['site.id' => 1]);
+        \App\Models\Setting::set('payment_gateway_stripe_enabled', '1');
+
+        config(['site.id' => 2]);
+        $this->assertNull(\App\Models\Setting::get('payment_gateway_stripe_enabled'));
+        \App\Models\Setting::set('payment_gateway_stripe_enabled', '0');
+        $this->assertSame('0', \App\Models\Setting::get('payment_gateway_stripe_enabled'));
+
+        config(['site.id' => 1]);
+        $this->assertSame('1', \App\Models\Setting::get('payment_gateway_stripe_enabled'));
+        $this->assertDatabaseHas('site_settings', ['site_id' => 2, 'key' => 'payment_gateway_stripe_enabled', 'value' => '0']);
+    }
+
+    public function test_orders_and_reviews_are_scoped_to_the_current_site(): void
+    {
+        $exam = $this->makeExam();
+        config(['site.id' => 1]);
+        $u1 = \App\Models\User::factory()->create();
+        \App\Models\Review::create(['user_id' => $u1->id, 'exam_id' => $exam->id, 'rating' => 5, 'comment' => 'site one', 'is_approved' => true]);
+
+        $this->actAsSiteTwo();
+        $this->assertSame(0, \App\Models\Review::count());
+        $u2 = \App\Models\User::factory()->create();
+        \App\Models\Review::create(['user_id' => $u2->id, 'exam_id' => $exam->id, 'rating' => 4, 'comment' => 'site two', 'is_approved' => true]);
+        $this->assertSame(1, \App\Models\Review::count());
+        $this->assertSame(2, (int) \App\Models\Review::first()->site_id);
+
+        config(['site.id' => 1]);
+        $this->assertSame(1, \App\Models\Review::count());
+    }
+
+    public function test_core_site_templates_are_not_rebranded_but_other_sites_are(): void
+    {
+        $text = 'Welcome to Exam Topics Base - write to support@examtopicsbase.com or ExamTopicsBase';
+
+        config(['site.id' => 1]);
+        $this->assertSame($text, SiteContext::rebrandTemplate($text));
+
+        config(['site.id' => 2, 'app.name' => 'ProExamTopics', 'app.url' => 'https://www.proexamtopics.com']);
+        $out = SiteContext::rebrandTemplate($text);
+        $this->assertSame('Welcome to ProExamTopics - write to support@proexamtopics.com or ProExamTopics', $out);
+    }
 }

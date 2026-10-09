@@ -29,7 +29,7 @@ class SubscriptionRenewalReminderMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Exam Topics Base Subscription Renewal Confirmation',
+            subject: 'Your ' . \App\Services\SiteContext::brandName('Exam Topics Base') . ' Subscription Renewal Confirmation',
         );
     }
 

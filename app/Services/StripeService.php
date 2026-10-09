@@ -164,7 +164,7 @@ class StripeService
      */
     protected function getOrCreateStripePrice(string $planName, string $billingCycle, float $price): string
     {
-        $productName = "Exam Topics Base " . ucfirst($planName) . " Plan";
+        $productName = \App\Services\SiteContext::brandName('Exam Topics Base') . ' ' . ucfirst($planName) . ' Plan';
         $priceCode = strtolower($planName) . "_" . strtolower($billingCycle);
         
         try {

@@ -78,8 +78,22 @@ Route::get('/faq', function () {
 })->name('faq');
 
 Route::get('/pricing', function () {
+    // Sites that ship their own pricing page render it; the core site sends visitors to the vendor bundles.
+    if (\Illuminate\Support\Facades\View::exists('pages.pricing')) {
+        $packages = \App\Models\Package::where('is_active', true)->with('vendor')->orderBy('sort_order')->get();
+        return view('pages.pricing', compact('packages'));
+    }
+
     return redirect()->route('vendors.index', [], 301);
 })->name('pricing');
+
+// Terms of service exists only for sites that ship the template.
+if (\Illuminate\Support\Facades\View::exists('pages.terms')) {
+    Route::get('/terms', function () {
+        return view('pages.terms');
+    })->name('terms');
+    Route::redirect('/terms-of-service', '/terms', 301);
+}
 
 Route::get('/test-engine', [HomeController::class, 'testEngine'])->name('public.test-engine');
 
