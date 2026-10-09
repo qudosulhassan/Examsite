@@ -477,7 +477,7 @@ class BlogAdminController extends Controller
     public function quickCategory(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:blog_categories,name',
+            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('blog_categories', 'name')->where('site_id', \App\Models\User::currentSiteId())],
             'description' => 'nullable|string|max:500',
         ]);
 

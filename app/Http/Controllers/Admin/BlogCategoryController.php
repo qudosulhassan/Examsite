@@ -29,8 +29,8 @@ class BlogCategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:blog_categories,name',
-            'slug' => 'nullable|string|max:255|unique:blog_categories,slug',
+            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('blog_categories', 'name')->where('site_id', \App\Models\User::currentSiteId())],
+            'slug' => ['nullable', 'string', 'max:255', \Illuminate\Validation\Rule::unique('blog_categories', 'slug')->where('site_id', \App\Models\User::currentSiteId())],
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -57,8 +57,8 @@ class BlogCategoryController extends Controller
         $category = BlogCategory::findOrFail($id);
 
         $request->validate([
-            'name' => "required|string|max:255|unique:blog_categories,name,{$category->id}",
-            'slug' => "nullable|string|max:255|unique:blog_categories,slug,{$category->id}",
+            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('blog_categories', 'name')->where('site_id', \App\Models\User::currentSiteId())->ignore($category->id)],
+            'slug' => ['nullable', 'string', 'max:255', \Illuminate\Validation\Rule::unique('blog_categories', 'slug')->where('site_id', \App\Models\User::currentSiteId())->ignore($category->id)],
             'description' => 'nullable|string|max:1000',
         ]);
 

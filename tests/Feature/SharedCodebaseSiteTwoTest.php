@@ -155,4 +155,29 @@ class SharedCodebaseSiteTwoTest extends TestCase
         $this->assertFalse($ctx->isExamVisible($exam->fresh()));
         $this->assertSame(0, $ctx->scopeVisibleExams(Exam::query())->count());
     }
+
+    public function test_each_site_has_its_own_blog_and_the_same_slug_can_repeat(): void
+    {
+        $author = \App\Models\User::factory()->create();
+        $make = fn (string $title) => \App\Models\BlogPost::create([
+            'user_id' => $author->id, 'title' => $title, 'slug' => 'study-tips', 'content' => 'x', 'status' => 'published', 'published_at' => now(),
+        ]);
+
+        config(['site.id' => 1]);
+        $make('Site one post');
+        \App\Models\BlogCategory::create(['name' => 'Tips', 'slug' => 'tips']);
+
+        $this->actAsSiteTwo();
+        $this->assertSame(0, \App\Models\BlogPost::count());
+        $this->assertSame(0, \App\Models\BlogCategory::count());
+        $author2 = \App\Models\User::factory()->create();
+        \App\Models\BlogPost::create([
+            'user_id' => $author2->id, 'title' => 'Site two post', 'slug' => 'study-tips', 'content' => 'y', 'status' => 'published', 'published_at' => now(),
+        ]);
+        $this->assertSame('Site two post', \App\Models\BlogPost::where('slug', 'study-tips')->value('title'));
+
+        config(['site.id' => 1]);
+        $this->assertSame('Site one post', \App\Models\BlogPost::where('slug', 'study-tips')->value('title'));
+        $this->assertSame(2, \App\Models\BlogPost::withoutGlobalScope('site')->count());
+    }
 }

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Media extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\BelongsToSite;
 
     protected $fillable = [
         'user_id',

@@ -176,6 +176,8 @@ class ExamAdminController extends Controller
             $demoFilename = Str::slug($request->exam_code) . '-demo.pdf';
             // Demo PDF is intentionally public (free sample), so it lives on the public disk only.
             Storage::disk('public')->putFileAs('demos', $demoFile, $demoFilename);
+            // Mirror to R2 (when configured) so other sites on other servers can serve the same sample.
+            \App\Services\PdfStorage::put('demos', $demoFile, $demoFilename);
         }
 
         $fullFilename = null;
@@ -186,11 +188,7 @@ class ExamAdminController extends Controller
             // never web-served) plus an opportunistic R2 copy. Never write it to the public disk -
             // that would make it downloadable by anyone who guesses the filename, bypassing purchase
             // checks entirely.
-            try {
-                Storage::disk('r2')->putFileAs('full', $fullFile, $fullFilename);
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::info('R2 not available for full PDF upload, relying on private local storage: ' . $e->getMessage());
-            }
+            \App\Services\PdfStorage::put('full', $fullFile, $fullFilename);
             Storage::disk('local')->putFileAs('full', $fullFile, $fullFilename);
         }
 
@@ -407,6 +405,7 @@ class ExamAdminController extends Controller
         if ($request->boolean('remove_demo_pdf')) {
             if ($exam->demo_pdf_filename) {
                 Storage::disk('public')->delete('demos/' . $exam->demo_pdf_filename);
+                \App\Services\PdfStorage::delete('demos/' . $exam->demo_pdf_filename);
             }
             $updateData['demo_pdf_filename'] = null;
         }
@@ -415,11 +414,7 @@ class ExamAdminController extends Controller
         if ($request->boolean('remove_full_pdf')) {
             if ($exam->full_pdf_filename) {
                 Storage::disk('local')->delete('full/' . $exam->full_pdf_filename);
-                try {
-                    Storage::disk('r2')->delete('full/' . $exam->full_pdf_filename);
-                } catch (\Throwable $e) {
-                    // R2 optional; ignore.
-                }
+                \App\Services\PdfStorage::delete('full/' . $exam->full_pdf_filename);
             }
             $updateData['full_pdf_filename'] = null;
         }
@@ -431,8 +426,10 @@ class ExamAdminController extends Controller
             // otherwise a replacement upload leaves the previous file orphaned on disk forever.
             if ($exam->demo_pdf_filename && $exam->demo_pdf_filename !== $demoFilename) {
                 Storage::disk('public')->delete('demos/' . $exam->demo_pdf_filename);
+                \App\Services\PdfStorage::delete('demos/' . $exam->demo_pdf_filename);
             }
             Storage::disk('public')->putFileAs('demos', $demoFile, $demoFilename);
+            \App\Services\PdfStorage::put('demos', $demoFile, $demoFilename);
             $updateData['demo_pdf_filename'] = $demoFilename;
         }
 
@@ -441,17 +438,9 @@ class ExamAdminController extends Controller
             $fullFilename = Str::slug($request->exam_code) . '-full.pdf';
             if ($exam->full_pdf_filename && $exam->full_pdf_filename !== $fullFilename) {
                 Storage::disk('local')->delete('full/' . $exam->full_pdf_filename);
-                try {
-                    Storage::disk('r2')->delete('full/' . $exam->full_pdf_filename);
-                } catch (\Throwable $e) {
-                    // R2 optional; ignore.
-                }
+                \App\Services\PdfStorage::delete('full/' . $exam->full_pdf_filename);
             }
-            try {
-                Storage::disk('r2')->putFileAs('full', $fullFile, $fullFilename);
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::info('R2 not available for full PDF upload, relying on private local storage: ' . $e->getMessage());
-            }
+            \App\Services\PdfStorage::put('full', $fullFile, $fullFilename);
             Storage::disk('local')->putFileAs('full', $fullFile, $fullFilename);
             $updateData['full_pdf_filename'] = $fullFilename;
         }
@@ -514,6 +503,14 @@ class ExamAdminController extends Controller
             ]);
         }
 
+        // Not on this server's disk - it may live in the shared R2 bucket (uploaded from another site).
+        if (\App\Services\PdfStorage::exists($path)) {
+            return Storage::disk('r2')->response($path, $filename, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            ]);
+        }
+
         return back()->with('error', 'The requested PDF file was not found in storage.');
     }
 
@@ -534,14 +531,11 @@ class ExamAdminController extends Controller
 
         if ($exam->demo_pdf_filename) {
             Storage::disk('public')->delete('demos/' . $exam->demo_pdf_filename);
+            \App\Services\PdfStorage::delete('demos/' . $exam->demo_pdf_filename);
         }
         if ($exam->full_pdf_filename) {
             Storage::disk('local')->delete('full/' . $exam->full_pdf_filename);
-            try {
-                Storage::disk('r2')->delete('full/' . $exam->full_pdf_filename);
-            } catch (\Throwable $e) {
-                // R2 optional; ignore.
-            }
+            \App\Services\PdfStorage::delete('full/' . $exam->full_pdf_filename);
         }
 
         $exam->delete();
@@ -578,6 +572,16 @@ class ExamAdminController extends Controller
                 $lastModified = date('M d, Y g:i A', Storage::disk($disk)->lastModified($path));
             } catch (\Throwable $e) {
                 // Ignore storage inspection errors
+            }
+        }
+
+        if (!$exists && \App\Services\PdfStorage::exists($path)) {
+            $exists = true;
+            try {
+                $sizeBytes = Storage::disk('r2')->size($path);
+                $lastModified = date('M d, Y g:i A', Storage::disk('r2')->lastModified($path));
+            } catch (\Throwable $e) {
+                // size/date are cosmetic
             }
         }
 

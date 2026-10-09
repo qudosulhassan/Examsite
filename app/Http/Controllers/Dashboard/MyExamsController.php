@@ -96,12 +96,7 @@ class MyExamsController extends Controller
 
         $path = 'full/' . $exam->full_pdf_filename;
 
-        $hasR2 = false;
-        try {
-            $hasR2 = Storage::disk('r2')->exists($path);
-        } catch (\Throwable $e) {
-            $hasR2 = false;
-        }
+        $hasR2 = \App\Services\PdfStorage::exists($path);
         $hasLocal = Storage::disk('local')->exists($path);
 
         if (!$hasR2 && !$hasLocal) {
@@ -126,12 +121,14 @@ class MyExamsController extends Controller
 
         // Prefer a short-lived signed R2 URL when available.
         if ($hasR2) {
-            try {
-                $downloadUrl = Storage::disk('r2')->temporaryUrl($path, now()->addMinutes(15));
+            $downloadUrl = \App\Services\PdfStorage::temporaryUrl($path, now()->addMinutes(15), $downloadFilename);
+            if ($downloadUrl) {
                 return redirect($downloadUrl);
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::info('R2 signed URL generation failed, falling back to private local storage: ' . $e->getMessage());
             }
+        }
+
+        if (!$hasLocal) {
+            return back()->with('error', 'This study guide file is temporarily unavailable. Our team has been notified - please contact support.');
         }
 
         // Stream directly from the private "local" disk (storage/app/private, never web-served)
