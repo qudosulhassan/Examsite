@@ -16,7 +16,7 @@ class BlogCommentController extends Controller
         }
 
         $validated = $request->validate([
-            'blog_post_id' => 'required|exists:blog_posts,id',
+            'blog_post_id' => ['required', \Illuminate\Validation\Rule::exists('blog_posts', 'id')->where('site_id', \App\Models\User::currentSiteId())],
             'author_name' => 'required|string|max:255',
             'author_email' => 'required|email|max:255',
             'comment_text' => 'required|string',

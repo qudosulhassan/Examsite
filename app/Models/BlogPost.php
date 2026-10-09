@@ -10,7 +10,7 @@ use App\Models\Redirect;
 
 class BlogPost extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, \App\Models\Concerns\BelongsToSite;
 
     protected static function booted()
     {

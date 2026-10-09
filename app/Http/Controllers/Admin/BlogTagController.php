@@ -28,8 +28,8 @@ class BlogTagController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:blog_tags,name',
-            'slug' => 'nullable|string|max:255|unique:blog_tags,slug',
+            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('blog_tags', 'name')->where('site_id', \App\Models\User::currentSiteId())],
+            'slug' => ['nullable', 'string', 'max:255', \Illuminate\Validation\Rule::unique('blog_tags', 'slug')->where('site_id', \App\Models\User::currentSiteId())],
         ]);
 
         $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);
@@ -53,8 +53,8 @@ class BlogTagController extends Controller
         $tag = BlogTag::findOrFail($id);
 
         $request->validate([
-            'name' => "required|string|max:255|unique:blog_tags,name,{$tag->id}",
-            'slug' => "nullable|string|max:255|unique:blog_tags,slug,{$tag->id}",
+            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('blog_tags', 'name')->where('site_id', \App\Models\User::currentSiteId())->ignore($tag->id)],
+            'slug' => ['nullable', 'string', 'max:255', \Illuminate\Validation\Rule::unique('blog_tags', 'slug')->where('site_id', \App\Models\User::currentSiteId())->ignore($tag->id)],
         ]);
 
         $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);

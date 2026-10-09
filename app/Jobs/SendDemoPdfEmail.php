@@ -37,14 +37,17 @@ class SendDemoPdfEmail implements ShouldQueue
             return;
         }
 
-        // Demo PDFs are free/public content and only ever live on the public disk
-        // (see ExamAdminController) - no R2 involvement needed for this one.
-        if (!Storage::disk('public')->exists('demos/' . $exam->demo_pdf_filename)) {
+        // Demo PDFs are free/public content: served from this server's public disk, or - when the
+        // sample was uploaded on another site - from the shared R2 bucket via a signed link.
+        $demoPath = 'demos/' . $exam->demo_pdf_filename;
+        if (Storage::disk('public')->exists($demoPath)) {
+            $downloadUrl = Storage::disk('public')->url($demoPath);
+        } elseif ($r2Url = \App\Services\PdfStorage::temporaryUrl($demoPath, now()->addDays(6))) {
+            $downloadUrl = $r2Url;
+        } else {
             \Illuminate\Support\Facades\Log::error("Demo PDF file missing from storage for exam {$exam->exam_code} (demo request #{$this->demoRequest->id})");
             return;
         }
-
-        $downloadUrl = Storage::disk('public')->url('demos/' . $exam->demo_pdf_filename);
 
         // Send email
         Mail::to($this->demoRequest->email)->send(

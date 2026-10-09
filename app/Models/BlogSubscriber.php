@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BlogSubscriber extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\BelongsToSite;
 
     protected $fillable = [
         'first_name',

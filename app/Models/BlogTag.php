@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BlogTag extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\BelongsToSite;
 
     protected $fillable = ['name', 'slug'];
 
