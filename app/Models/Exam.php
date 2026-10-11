@@ -239,7 +239,7 @@ class Exam extends Model
         }
 
         if (!empty(trim((string)($this->header_title ?? '')))) {
-            return trim($this->header_title);
+            return \App\Services\SiteContext::rebrandTemplate(trim($this->header_title));
         }
 
         $vendorName = $this->vendor ? $this->vendor->name : '';
@@ -321,7 +321,7 @@ class Exam extends Model
      */
     public function getResolvedSeoTitleAttribute(): string
     {
-        return app(\App\Services\TechnicalSeoService::class)->resolveExamSeoTitle($this);
+        return \App\Services\SiteContext::rebrandTemplate(app(\App\Services\TechnicalSeoService::class)->resolveExamSeoTitle($this));
     }
 
     /**
@@ -329,7 +329,7 @@ class Exam extends Model
      */
     public function getResolvedMetaDescriptionAttribute(): string
     {
-        return app(\App\Services\TechnicalSeoService::class)->resolveExamMetaDescription($this);
+        return \App\Services\SiteContext::rebrandTemplate(app(\App\Services\TechnicalSeoService::class)->resolveExamMetaDescription($this));
     }
 
     public function overlays()

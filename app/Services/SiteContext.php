@@ -413,8 +413,10 @@ class SiteContext
             $html
         );
 
-        // Any other link or mention of the core domain.
-        return preg_replace('#https?://(?:www\.)?examtopicsbase\.com#i', $base, $html);
+        // Any other link or mention of the core domain, then the brand name in running text.
+        $html = preg_replace('#https?://(?:www\.)?examtopicsbase\.com#i', $base, $html);
+
+        return static::rebrandTemplate($html);
     }
 
     /**
@@ -426,7 +428,13 @@ class SiteContext
         if ($overlay && !empty($overlay->custom_faqs)) {
             return is_array($overlay->custom_faqs) ? $overlay->custom_faqs : (json_decode($overlay->custom_faqs, true) ?: []);
         }
-        return is_array($exam->faqs) ? $exam->faqs : (json_decode($exam->faqs, true) ?: []);
+        $faqs = is_array($exam->faqs) ? $exam->faqs : (json_decode($exam->faqs, true) ?: []);
+
+        // Shared FAQs are written for the core site; rebrand their text on other sites.
+        return array_map(
+            fn ($faq) => is_array($faq) ? array_map(fn ($v) => is_string($v) ? static::rebrandTemplate($v) : $v, $faq) : $faq,
+            $faqs
+        );
     }
 
     /**
