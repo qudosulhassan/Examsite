@@ -388,9 +388,33 @@ class SiteContext
     {
         $overlay = $this->getOverlayForExam($exam);
         if ($overlay && !empty(trim($overlay->custom_article_content ?? ''))) {
-            return $overlay->custom_article_content;
+            return static::rewriteCoreSiteLinks($overlay->custom_article_content);
         }
-        return $exam->article_content;
+        return static::rewriteCoreSiteLinks($exam->article_content);
+    }
+
+    /**
+     * Shared exam articles are written on the core site and may link to it. On any other
+     * site, point those links at this site's own pages instead.
+     */
+    public static function rewriteCoreSiteLinks(?string $html): ?string
+    {
+        if ($html === null || $html === '' || (int) config('site.id', 1) === 1) {
+            return $html;
+        }
+
+        $base = rtrim((string) config('app.url'), '/');
+        $root = config('site.exam_url_style', 'prefixed') === 'root';
+
+        // Exam pages: /exams/{vendor}/{slug}  ->  this site's exam URL style.
+        $html = preg_replace_callback(
+            '#https?://(?:www\.)?examtopicsbase\.com/exams/([a-z0-9\-]+)/([a-z0-9\-]+)#i',
+            fn ($m) => $root ? "{$base}/{$m[1]}/" . Exam::urlSlug($m[2]) : "{$base}/exams/{$m[1]}/{$m[2]}",
+            $html
+        );
+
+        // Any other link or mention of the core domain.
+        return preg_replace('#https?://(?:www\.)?examtopicsbase\.com#i', $base, $html);
     }
 
     /**

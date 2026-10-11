@@ -404,6 +404,18 @@ class Exam extends Model
     }
 
     /**
+     * Resolve site-specific or fallback topics / syllabus domains.
+     */
+    public function getResolvedTopicsAttribute(): array
+    {
+        $overlay = $this->getOverlayForSite();
+        if ($overlay && !empty($overlay->custom_topics)) {
+            return is_array($overlay->custom_topics) ? $overlay->custom_topics : (json_decode($overlay->custom_topics, true) ?: []);
+        }
+        return is_array($this->topics) ? $this->topics : (json_decode($this->topics, true) ?: []);
+    }
+
+    /**
      * Accessor aliases for compatibility with general SEO and schema builders.
      */
     public function getTitleAttribute(): string
