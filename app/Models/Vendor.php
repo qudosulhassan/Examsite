@@ -74,6 +74,21 @@ class Vendor extends Model
     /**
      * Get the exams for the vendor.
      */
+    /**
+     * Vendor descriptions are shared across sites and were written for the core site;
+     * on any other site its own brand name and domain are shown instead.
+     */
+    public function getDescriptionAttribute($value): ?string
+    {
+        // Never rebrand inside the admin: saving the edit form would write the other site's
+        // brand name back into the shared catalog row.
+        if ($value === null || request()->is('admin', 'admin/*')) {
+            return $value;
+        }
+
+        return \App\Services\SiteContext::rebrandTemplate((string) $value);
+    }
+
     public function exams()
     {
         return $this->hasMany(Exam::class)->orderBy('sort_order');
