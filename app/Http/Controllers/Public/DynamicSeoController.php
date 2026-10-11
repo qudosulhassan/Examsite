@@ -120,6 +120,12 @@ class DynamicSeoController extends Controller
         $site = app()->bound('current_site') ? app('current_site') : null;
         $host = $request->getSchemeAndHttpHost();
 
+        // Sites other than the core one serve their own full rule set (edited in Technical SEO,
+        // or the default) with their own sitemap URL.
+        if ((int) config('site.id', 1) !== 1) {
+            return response(app(\App\Services\TechnicalSeoService::class)->getRobotsTxtContent(), 200, ['Content-Type' => 'text/plain']);
+        }
+
         $lines = [
             'User-agent: *',
             'Allow: /',

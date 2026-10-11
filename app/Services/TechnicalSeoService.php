@@ -206,8 +206,10 @@ TXT;
             return $settingContent;
         }
 
+        // public/robots.txt is the core site's file (it names the core site's sitemap), so only
+        // the core site may fall back to it; other sites get a default built for their own host.
         $filePath = public_path('robots.txt');
-        if (File::exists($filePath)) {
+        if ((int) config('site.id', 1) === 1 && File::exists($filePath)) {
             return File::get($filePath);
         }
 
