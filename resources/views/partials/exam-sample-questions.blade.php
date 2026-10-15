@@ -1,6 +1,6 @@
 {{-- Free sample questions + unlock CTA for an exam page. Needs $exam and $sampleQuestions. --}}
                 <!-- Sample Questions -->
-                <div class="space-y-10 pt-8">
+                <div id="free-practice-questions" class="scroll-mt-32 space-y-10 pt-2 lg:pt-8">
                     <div class="text-center mb-12">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-4 inline-block">Free Trial</span>
                         <h2 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Actual Free {{ $exam->vendor->name }} {{ $exam->exam_code }} Practice Questions</h2>

@@ -58,7 +58,7 @@
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->
-<section class="bg-gradient-to-br from-[#07101E] via-[#0A1628] to-[#0F172A] text-white pt-12 pb-28 relative overflow-hidden" x-data="{ demoModalOpen: false }">
+<section class="bg-gradient-to-br from-[#07101E] via-[#0A1628] to-[#0F172A] text-white pt-12 pb-14 lg:pb-16 relative overflow-hidden" x-data="{ demoModalOpen: false }">
     <!-- Abstract glowing orbs -->
     <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-cyan rounded-full mix-blend-screen filter blur-[150px] opacity-15 animate-pulse pointer-events-none"></div>
     <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-600 rounded-full mix-blend-screen filter blur-[150px] opacity-20 pointer-events-none"></div>
@@ -219,7 +219,74 @@
                             <p class="text-[12px] text-gray-400 font-medium leading-relaxed">Pass on your first attempt or get a full refund within 30 days. No questions asked.</p>
                         </div>
                     </div>
-                </div>
+
+                    @php
+                        $heroHasArticle = !empty($exam->resolved_article_content);
+                        $heroFaqs = $exam->resolved_faqs;
+                        $heroHasFaqs = !empty($heroFaqs) && is_array($heroFaqs) && count($heroFaqs) > 0;
+                    @endphp
+                    <!-- What's included + jump links (fills the hero's left column next to the tall purchase box) -->
+                    <div class="hidden lg:block bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-7 mt-8 shadow-xl">
+                        <h2 class="text-[11px] font-black text-cyan uppercase tracking-widest mb-5">What's included with {{ $exam->exam_code }}</h2>
+                        <ul class="grid grid-cols-3 gap-5">
+                            @if($exam->is_pdf_available)
+                                <li class="space-y-1.5">
+                                    <p class="text-sm font-black text-white">PDF Study Guide</p>
+                                    <p class="text-[12px] text-gray-400 leading-relaxed">{{ $exam->question_count }} questions with answers. Read on any device or print it.</p>
+                                </li>
+                            @endif
+                            @if($exam->is_engine_available)
+                                <li class="space-y-1.5">
+                                    <p class="text-sm font-black text-white">Interactive Test Engine</p>
+                                    <p class="text-[12px] text-gray-400 leading-relaxed">Timed exam mode and practice mode, with instant scoring and review.</p>
+                                </li>
+                            @endif
+                            <li class="space-y-1.5">
+                                <p class="text-sm font-black text-white">3 Months of Free Updates</p>
+                                <p class="text-[12px] text-gray-400 leading-relaxed">Included with every purchase, so your material stays current.</p>
+                            </li>
+                        </ul>
+                        <nav aria-label="On this page" class="mt-6 pt-5 border-t border-white/10 flex flex-wrap items-center gap-2">
+                            <span class="text-[11px] font-black text-gray-500 uppercase tracking-widest mr-1">Jump to</span>
+                            <a href="#free-practice-questions" class="text-[12px] font-bold text-gray-200 bg-white/5 hover:bg-cyan/20 hover:text-white border border-white/10 rounded-full px-3 py-1.5 transition-colors">Free Questions</a>
+                            @if($heroHasArticle)
+                                <a href="#exam-details" class="text-[12px] font-bold text-gray-200 bg-white/5 hover:bg-cyan/20 hover:text-white border border-white/10 rounded-full px-3 py-1.5 transition-colors">Exam Details</a>
+                            @endif
+                            <a href="#exam-topics" class="text-[12px] font-bold text-gray-200 bg-white/5 hover:bg-cyan/20 hover:text-white border border-white/10 rounded-full px-3 py-1.5 transition-colors">Topics Covered</a>
+                            @if($heroHasFaqs)
+                                <a href="#exam-faq" class="text-[12px] font-bold text-gray-200 bg-white/5 hover:bg-cyan/20 hover:text-white border border-white/10 rounded-full px-3 py-1.5 transition-colors">FAQ</a>
+                            @endif
+                            <a href="#exam-reviews" class="text-[12px] font-bold text-gray-200 bg-white/5 hover:bg-cyan/20 hover:text-white border border-white/10 rounded-full px-3 py-1.5 transition-colors">Reviews</a>
+                        </nav>
+                    </div>
+
+                    <!-- How it works (desktop only, balances the tall purchase box) -->
+                    <div class="hidden lg:block bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-7 mt-8 shadow-xl">
+                        <h2 class="text-[11px] font-black text-cyan uppercase tracking-widest mb-5">How it works</h2>
+                        <ol class="grid grid-cols-3 gap-5">
+                            <li class="flex items-start gap-3">
+                                <span class="flex-shrink-0 w-8 h-8 rounded-full bg-cyan/15 border border-cyan/30 text-cyan text-sm font-black flex items-center justify-center">1</span>
+                                <div class="space-y-1">
+                                    <p class="text-sm font-black text-white">Choose your format</p>
+                                    <p class="text-[12px] text-gray-400 leading-relaxed">PDF guide, Test Engine, or the bundle of both.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="flex-shrink-0 w-8 h-8 rounded-full bg-cyan/15 border border-cyan/30 text-cyan text-sm font-black flex items-center justify-center">2</span>
+                                <div class="space-y-1">
+                                    <p class="text-sm font-black text-white">Pay securely</p>
+                                    <p class="text-[12px] text-gray-400 leading-relaxed">Checkout is encrypted. Access appears in your dashboard.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="flex-shrink-0 w-8 h-8 rounded-full bg-cyan/15 border border-cyan/30 text-cyan text-sm font-black flex items-center justify-center">3</span>
+                                <div class="space-y-1">
+                                    <p class="text-sm font-black text-white">Practice and pass</p>
+                                    <p class="text-[12px] text-gray-400 leading-relaxed">Study, take timed tests, and review every answer.</p>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>                </div>
 
                 <!-- Sticky Purchase Box (Mobile only) -->
                 <div class="block lg:hidden mt-10">
@@ -446,14 +513,14 @@
 </section>
 
 <!-- Content Section -->
-<section class="bg-slate-50 py-20 relative overflow-hidden">
+<section class="bg-slate-50 py-12 lg:py-20 relative overflow-hidden">
     <!-- Soft Background Blobs -->
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div class="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-cyan/5 blur-[120px]"></div>
         <div class="absolute top-[40%] -left-[10%] w-[30%] h-[50%] rounded-full bg-blue-500/5 blur-[120px]"></div>
     </div>
 
-    <div class="container-custom relative z-10 space-y-16">
+    <div class="container-custom relative z-10 space-y-10 lg:space-y-16">
                 
 
                 {{-- Free sample questions come first: right after the hero, before the exam details/article. --}}
@@ -466,7 +533,7 @@
                 @endphp
                 @if(!empty($renderedArticleContent))
                 <!-- Comprehensive Exam Article & Study Guide -->
-                <div class="bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
+                <div id="exam-details" class="scroll-mt-32 bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
                     <div class="blog-content-body prose prose-base sm:prose-lg prose-cyan max-w-none text-gray-700 leading-relaxed">
                         {!! $renderedArticleContent !!}
                     </div>
@@ -474,7 +541,7 @@
                 @endif
 
                 <!-- Collapsible Topics covered -->
-                <div class="space-y-4" x-data="{ open: true }">
+                <div id="exam-topics" class="scroll-mt-32 space-y-4" x-data="{ open: true }">
                     <button x-on:click="open = !open" class="flex justify-between items-center w-full bg-white border border-gray-100 hover:border-cyan/50 rounded-3xl p-6 sm:p-8 font-black text-navy text-xl sm:text-2xl text-left focus:outline-none shadow-[0_5px_20px_rgba(0,0,0,0.02)] transition-all group">
                         <div class="flex items-center space-x-4">
                             <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-cyan/10 transition-colors">
@@ -524,7 +591,7 @@
                 @endphp
                 @if(!empty($renderedFaqs) && is_array($renderedFaqs) && count($renderedFaqs) > 0)
                 <!-- Frequently Asked Questions (FAQ) Section -->
-                <div class="space-y-6 pt-4" x-data="{ activeFaq: null }">
+                <div id="exam-faq" class="scroll-mt-32 space-y-6 pt-4" x-data="{ activeFaq: null }">
                     <div class="text-center mb-8">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-3 inline-block">Got Questions?</span>
                         <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Frequently Asked Questions</h2>
@@ -569,7 +636,7 @@
                 @endif
 
                 <!-- Customer Reviews Section -->
-                <div class="bg-white border border-gray-100 rounded-[32px] p-8 sm:p-10 space-y-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] mt-12">
+                <div id="exam-reviews" class="scroll-mt-32 bg-white border border-gray-100 rounded-[32px] p-8 sm:p-10 space-y-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] mt-12">
                     <div class="text-center">
                         <span class="text-[11px] font-black text-orange uppercase tracking-widest bg-orange/10 px-3 py-1.5 rounded-full border border-orange/20 mb-4 inline-block">Testimonials</span>
                         <h2 class="text-3xl font-black text-navy tracking-tight">Verified Customer Reviews</h2>
