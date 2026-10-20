@@ -39,11 +39,11 @@
     <div class="mt-5 flex flex-wrap items-center gap-3">
         <button type="button" @click="checked = true" :disabled="picked === null || checked"
                 class="rounded-xl px-5 py-2.5 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-40" style="background: var(--brand);">Check answer</button>
-        <p x-show="checked" x-cloak class="text-sm font-bold" :class="picked === correct ? 'text-green-700' : 'text-red-600'"
+        <p x-cloak class="text-sm font-bold" :class="[checked ? '' : 'hidden', picked === correct ? 'text-green-700' : 'text-red-600']"
            x-text="picked === correct ? 'Correct.' : 'Not quite. The correct answer is ' + correct + '.'"></p>
     </div>
 
-    <div x-show="checked" x-cloak class="mt-5 rounded-xl bg-slate-50 p-5 ring-1 ring-slate-200">
+    <div x-cloak :class="checked ? '' : 'hidden'" class="mt-5 rounded-xl bg-slate-50 p-5 ring-1 ring-slate-200">
         <p class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Answer and explanation</p>
         <p class="mt-2 text-sm font-bold text-slate-900">Correct answer: {{ $correct }}</p>
         @if(!empty(trim(strip_tags((string) $question->explanation))))

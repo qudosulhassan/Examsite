@@ -124,9 +124,7 @@
                             <span class="pb-1 text-sm font-semibold text-slate-500">one-time</span>
                         </p>
                         <p class="mt-1 min-h-[1.25rem] text-xs text-slate-500">
-                            <template x-if="period !== 3">
-                                <span>includes <span x-text="money(addons['{{ $plan['key'] }}'][period] || 0)"></span> for <span x-text="period"></span> months of updates</span>
-                            </template>
+                            <span x-cloak :class="period !== 3 ? '' : 'hidden'">includes <span x-text="money(addons['{{ $plan['key'] }}'][period] || 0)"></span> for <span x-text="period"></span> months of updates</span>
                         </p>
 
                         <ul class="mt-5 flex-1 space-y-2.5 text-sm text-slate-700">
@@ -170,7 +168,7 @@
         @if($hasPdf && $hasEngine)
         <section aria-labelledby="compare">
             <h2 id="compare" class="text-2xl font-extrabold text-slate-900">Compare the formats</h2>
-            <div class="mt-5 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+            <div class="relative mt-5 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
                 <table class="w-full min-w-[560px] text-left text-sm">
                     <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
                         <tr><th class="px-5 py-3 font-bold">&nbsp;</th><th class="px-5 py-3 font-bold">PDF guide</th><th class="px-5 py-3 font-bold">Test engine</th><th class="px-5 py-3 font-bold">Bundle</th></tr>
@@ -226,7 +224,7 @@
                                 <svg class="h-5 w-5 flex-none text-slate-400 transition" :class="open === {{ $i }} ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                             </button>
                         </h3>
-                        <div x-show="open === {{ $i }}" x-cloak class="border-t border-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-600">{{ $faq['a'] }}</div>
+                        <div x-cloak :class="open === {{ $i }} ? '' : 'hidden'" class="border-t border-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-600">{{ $faq['a'] }}</div>
                     </div>
                 @endforeach
             </div>

@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Redirect extends Model
 {
+    protected static function booted()
+    {
+        // A rule belongs to the site that created it, so one site's URL history never rewrites another's.
+        static::creating(function ($redirect) {
+            if (empty($redirect->site_id)) {
+                $redirect->site_id = (int) config('site.id', 1);
+            }
+        });
+    }
+
     protected $fillable = [
         'old_url',
         'new_url',

@@ -700,7 +700,16 @@ TXT;
             $path = rtrim($path, '/');
         }
 
-        return $scheme . '://' . $host . $port . $path;
+        // Paginated pages (?page=N, N > 1) are separate documents and canonicalise to themselves.
+        $query = '';
+        if (!empty($parts['query'])) {
+            parse_str($parts['query'], $params);
+            if (isset($params['page']) && ctype_digit((string) $params['page']) && (int) $params['page'] > 1) {
+                $query = '?page=' . (int) $params['page'];
+            }
+        }
+
+        return $scheme . '://' . $host . $port . $path . $query;
     }
 
     public function getRobotsMetaDirective(): string

@@ -135,7 +135,9 @@
             @foreach($siteTracks as $track)
                 @php
                     $searchPrefix = $track['prefixes'][0] ?? null;
-                    $trackUrl = $searchPrefix ? url('/search') . '?q=' . urlencode($searchPrefix . '-') : $vendorUrl;
+                    $trackUrl = \Illuminate\Support\Facades\Route::has('tracks.show') && !empty($track['slug'])
+                        ? route('tracks.show', $track['slug'])
+                        : ($searchPrefix ? url('/search') . '?q=' . urlencode($searchPrefix . '-') : $vendorUrl);
                 @endphp
                 <a href="{{ $trackUrl }}" class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
                     <div class="flex items-start justify-between">
@@ -273,7 +275,7 @@
                         <span class="font-bold text-slate-900">{{ $faq['q'] }}</span>
                         <svg class="h-5 w-5 flex-none text-slate-400 transition" :class="open === {{ $i }} ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
-                    <div x-show="open === {{ $i }}" x-cloak class="border-t border-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-600">{{ $faq['a'] }}</div>
+                    <div x-cloak :class="open === {{ $i }} ? '' : 'hidden'" class="border-t border-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-600">{{ $faq['a'] }}</div>
                 </div>
             @endforeach
         </div>
