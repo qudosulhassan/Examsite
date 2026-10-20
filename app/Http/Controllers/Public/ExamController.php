@@ -222,7 +222,7 @@ class ExamController extends Controller
         $exam = $this->findHubExam($slug, 'exams.questions');
 
         $free = $this->freeQuestionsFor($exam);
-        $perPage = self::FREE_QUESTIONS_PER_PAGE;
+        $perPage = max(1, $free->count());   // every free question on one page
         $lastPage = max(1, (int) ceil($free->count() / $perPage));
         $page = max(1, (int) $request->query('page', 1));
 

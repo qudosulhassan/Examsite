@@ -113,20 +113,17 @@ class HubExamPagesTest extends TestCase
         $plans->assertSee('DP-800 practice test plans');
     }
 
-    public function test_free_questions_are_paginated_with_self_canonical_pages_and_full_content_in_the_html(): void
+    public function test_all_free_questions_are_on_one_page_with_explanations_in_the_html(): void
     {
         $exam = $this->exam('DP-800', 7);
 
-        $page1 = $this->get($exam->questions_url)->assertOk();
-        $page1->assertSee('Question text number 1')->assertSee('Question text number 5')->assertDontSee('Question text number 6');
-        $page1->assertSee('Because reason 1.', false);   // explanation is in the HTML, not withheld
-        $page1->assertSee($exam->questions_url . '?page=2', false);
+        $page = $this->get($exam->questions_url)->assertOk();
+        foreach (range(1, 7) as $i) {
+            $page->assertSee("Question text number {$i}")->assertSee("Because reason {$i}.", false);
+        }
+        $page->assertDontSee('?page=2', false);
 
-        $page2 = $this->get($exam->questions_url . '?page=2')->assertOk();
-        $page2->assertSee('Question text number 6')->assertSee('Question text number 7');
-        $page2->assertSee('<link rel="canonical" href="' . preg_replace('#^http:#', 'https:', $exam->questions_url) . '?page=2">', false);
-
-        $this->get($exam->questions_url . '?page=3')->assertNotFound();
+        $this->get($exam->questions_url . '?page=2')->assertNotFound();
     }
 
     public function test_alternative_urls_301_to_the_canonical_one(): void
