@@ -89,21 +89,21 @@
              }">
 
             <div class="mx-auto max-w-3xl text-center">
-                <h2 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">Pick how you want to practise</h2>
-                <p class="mt-2 text-slate-600">All plans include 3 months of updates. Add more time if you plan to study for longer.</p>
+                <p class="text-slate-600">All plans include 3 months of updates. Add more time if you plan to study for longer.</p>
             </div>
 
-            <div class="mx-auto mt-6 flex max-w-xl flex-wrap items-center justify-center gap-2" role="radiogroup" aria-label="Update period">
-                @foreach($periodLabels as $months => $label)
-                    <button type="button" role="radio" :aria-checked="period === {{ $months }}" @click="period = {{ $months }}"
-                            class="rounded-full border px-4 py-2 text-sm font-bold transition"
-                            :class="period === {{ $months }} ? 'text-white border-transparent' : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'"
-                            :style="period === {{ $months }} ? 'background: var(--brand);' : ''">
-                        {{ $label }} of updates
-                        @if($months === 3) <span class="font-semibold opacity-80">(included)</span> @endif
-                    </button>
-                @endforeach
+            <div class="mx-auto mt-6 flex w-full max-w-md justify-center">
+                <div class="inline-flex w-full rounded-2xl bg-slate-200/70 p-1" role="radiogroup" aria-label="Update period">
+                    @foreach($periodLabels as $months => $label)
+                        <button type="button" role="radio" :aria-checked="period === {{ $months }}" @click="period = {{ $months }}"
+                                class="flex-1 rounded-xl px-3 py-2.5 text-sm font-bold transition"
+                                :class="period === {{ $months }} ? 'bg-white text-slate-900 shadow' : 'text-slate-600 hover:text-slate-900'">
+                            {{ $label }}@if($months === 3)<span class="block text-[11px] font-semibold text-slate-500">included</span>@endif
+                        </button>
+                    @endforeach
+                </div>
             </div>
+            <p class="mt-2 text-center text-xs text-slate-500">Months of updates</p>
 
             <div class="mt-8 grid grid-cols-1 gap-5 {{ ($hasPdf && $hasEngine) ? 'lg:grid-cols-3' : 'lg:grid-cols-2' }}">
                 @foreach([
@@ -112,7 +112,7 @@
                     ['key' => 'combo', 'on' => $hasBundle, 'name' => 'Bundle: PDF and test engine', 'blurb' => 'Study from the guide, then test yourself.', 'features' => ['Everything in the PDF plan', 'Everything in the test engine plan', $saving > 0 ? 'Saves ' . $money($saving) . ' compared with buying both' : 'One purchase for both formats', '3 months of updates included'], 'best' => true],
                 ] as $plan)
                     @continue(!$plan['on'])
-                    <div class="relative flex flex-col rounded-2xl border bg-white p-6 shadow-sm {{ !empty($plan['best']) ? 'border-2 shadow-lg' : 'border-slate-200' }}" @if(!empty($plan['best'])) style="border-color: var(--brand);" @endif>
+                    <div class="relative flex flex-col rounded-3xl border bg-white p-7 shadow-sm {{ !empty($plan['best']) ? 'border-2 shadow-2xl lg:-my-3 lg:py-10' : 'border-slate-200' }}" @if(!empty($plan['best'])) style="border-color: var(--brand);" @endif>
                         @if(!empty($plan['best']))
                             <span class="absolute -top-3 left-6 rounded-full px-3 py-1 text-xs font-extrabold text-white" style="background: var(--brand);">Best value{{ $savingPct ? ' - save ' . $savingPct . '%' : '' }}</span>
                         @endif

@@ -100,6 +100,17 @@
 
         <aside class="lg:col-span-4">
             <div class="space-y-4 lg:sticky lg:top-24">
+                @if($questions->isNotEmpty())
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <p class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Jump to question</p>
+                    <div class="mt-3 grid grid-cols-5 gap-2">
+                        @foreach($questions as $i => $q)
+                            <a href="#question-{{ $firstNumber + $i }}" class="flex h-10 items-center justify-center rounded-lg border border-slate-200 text-sm font-bold text-slate-700 transition hover:text-white" onmouseover="this.style.background='var(--brand)'" onmouseout="this.style.background=''">{{ $firstNumber + $i }}</a>
+                        @endforeach
+                    </div>
+                    <p class="mt-3 text-xs text-slate-500">Page {{ $page }} of {{ $lastPage }} &middot; {{ $freeCount }} free questions</p>
+                </div>
+                @endif
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <p class="text-xs font-extrabold uppercase tracking-widest text-slate-500">How to use this page</p>
                     <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-600">

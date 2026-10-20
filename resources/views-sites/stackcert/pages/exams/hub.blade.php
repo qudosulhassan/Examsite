@@ -93,7 +93,7 @@
             {{-- At a glance --}}
             <section aria-labelledby="glance">
                 <h2 id="glance" class="text-2xl font-extrabold text-slate-900">{{ $code }} at a glance</h2>
-                <dl class="mt-5 divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white text-sm">
+                <dl class="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                     @foreach(array_filter([
                         'Exam code' => $code,
                         'Exam title' => $examName,
@@ -106,9 +106,9 @@
                         'Formats' => implode(' and ', array_filter([$exam->is_pdf_available ? 'PDF study guide' : null, $exam->is_engine_available ? 'online test engine' : null])),
                         'Last updated' => $fmtDate($realUpdated),
                     ]) as $label => $value)
-                        <div class="grid grid-cols-3 gap-4 px-5 py-3.5 sm:grid-cols-4">
-                            <dt class="font-semibold text-slate-500 sm:col-span-1">{{ $label }}</dt>
-                            <dd class="col-span-2 font-semibold text-slate-900 sm:col-span-3">{{ $value }}</dd>
+                        <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+                            <dt class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $label }}</dt>
+                            <dd class="mt-1 font-extrabold text-slate-900">{{ $value }}</dd>
                         </div>
                     @endforeach
                 </dl>
@@ -223,7 +223,7 @@
         {{-- ================= SIDEBAR ================= --}}
         <aside class="lg:col-span-4">
             <div class="space-y-4 lg:sticky lg:top-24">
-                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70">
                     <p class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Start practising</p>
                     <a href="{{ $exam->questions_url }}" class="mt-4 block rounded-xl px-5 py-3.5 text-center text-sm font-bold text-white shadow-md transition hover:opacity-90" style="background: var(--brand);">
                         Try {{ $freeCount ?: 'the' }} free questions

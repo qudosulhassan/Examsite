@@ -6,7 +6,7 @@
     $options = ['A' => $question->option_a, 'B' => $question->option_b, 'C' => $question->option_c, 'D' => $question->option_d];
     $correct = $question->correct_option;
 @endphp
-<article id="question-{{ $number }}" class="scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+<article id="question-{{ $number }}" class="scroll-mt-28 rounded-3xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/60 sm:p-8"
          x-data="{ picked: null, checked: false, correct: '{{ $correct }}' }">
     <header class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
         <h3 class="text-base font-extrabold text-slate-900">Question {{ $number }}</h3>
