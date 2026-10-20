@@ -17,6 +17,11 @@ class VendorController extends Controller
         $vendorsQuery = Vendor::where('is_active', true)->withCount('exams')->orderBy('sort_order');
         $vendors = $vendorsQuery->get();
 
+        // A single-vendor site has nothing to browse: send visitors straight to that vendor's page.
+        if (count((array) config('site.vendors', [])) === 1 && $vendors->count() === 1) {
+            return redirect()->route('vendors.show', $vendors->first()->slug, 301);
+        }
+
         return view('pages.vendors.index', compact('vendors'));
     }
 

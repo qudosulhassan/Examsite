@@ -9,7 +9,7 @@ use App\Models\Redirect;
 
 class Exam extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\RestrictedToSiteVendors;
 
     /**
      * Whether this site serves exams at /{vendor}/{slug}-exam instead of /exams/{vendor}/{slug}.

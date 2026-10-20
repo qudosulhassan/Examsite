@@ -47,6 +47,18 @@ return [
     */
     'catalog_mode' => env('SITE_CATALOG_MODE', 'assigned'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Vendor Restriction
+    |--------------------------------------------------------------------------
+    |
+    | Comma separated vendor slugs this site is limited to (SITE_VENDORS=microsoft).
+    | Empty = no restriction. When set, only these vendors' exams, certifications and
+    | bundles exist on this site (lists, search, sitemap and direct URLs alike).
+    |
+    */
+    'vendors' => array_values(array_filter(array_map('trim', explode(',', (string) env('SITE_VENDORS', ''))))),
+
     'exam_url_style' => env('EXAM_URL_STYLE', 'prefixed'),
 
 ];
