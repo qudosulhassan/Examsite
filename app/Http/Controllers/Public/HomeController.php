@@ -26,7 +26,23 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
-        return view('pages.home', compact('vendors', 'latestExams'));
+        // Single-vendor sites (SITE_VENDORS) build their homepage from the vendor's whole catalog,
+        // grouped into tracks. Other sites skip this, so their homepage query count is unchanged.
+        $siteVendor = null;
+        $siteTracks = [];
+        $siteQuestionCount = 0;
+        $siteBundle = null;
+
+        if (count((array) config('site.vendors', [])) === 1 && $vendors->count() === 1) {
+            $siteVendor = $vendors->first();
+            $siteExams = Exam::where('is_active', true)->with(['vendor', 'overlays'])->orderBy('exam_code')->get();
+            $siteTracks = \App\Support\ExamTracks::group($siteExams, $siteVendor->slug);
+            $siteQuestionCount = \App\Models\Question::where('is_active', true)->whereIn('exam_id', $siteExams->pluck('id'))->count();
+            $siteBundle = \App\Models\Package::where('is_active', true)->where('type', 'bundle')->orderBy('sort_order')->first();
+            $latestExams = $siteExams->sortByDesc('last_updated_at')->take(8)->values();
+        }
+
+        return view('pages.home', compact('vendors', 'latestExams', 'siteVendor', 'siteTracks', 'siteQuestionCount', 'siteBundle'));
     }
 
     /**

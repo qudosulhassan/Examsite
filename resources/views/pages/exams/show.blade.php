@@ -2,7 +2,7 @@
 
 @section('title', $exam->resolved_seo_title)
 @section('meta_description', $exam->resolved_meta_description)
-@section('meta_keywords', $exam->meta_keywords ?? "{$exam->exam_code}, {$exam->exam_code} exam dumps, {$exam->exam_code} practice test, {$exam->vendor->name} certification")
+@section('meta_keywords', $exam->meta_keywords ?? "{$exam->exam_code}, {$exam->exam_code} " . (config('site.avoid_dumps') ? 'exam questions' : 'exam dumps') . ", {$exam->exam_code} practice test, {$exam->vendor->name} certification")
 @section('canonical_url', $exam->url)
 @section('og_type', 'product')
 
@@ -206,6 +206,7 @@
                         </div>
                     </div>
                     
+                    @if(config('site.show_guarantee', true))
                     <!-- Guarantee card info (Moved to balance layout) -->
                     <div class="bg-white/5 backdrop-blur-md border border-orange/20 rounded-2xl p-6 flex items-start space-x-4 shadow-xl relative overflow-hidden group mt-8">
                         <div class="absolute -right-10 -top-10 text-orange/10 group-hover:scale-150 transition-transform duration-700 pointer-events-none">
@@ -219,6 +220,7 @@
                             <p class="text-[12px] text-gray-400 font-medium leading-relaxed">Pass on your first attempt or get a full refund within 30 days. No questions asked.</p>
                         </div>
                     </div>
+                    @endif
 
                     @php
                         $heroHasArticle = !empty($exam->resolved_article_content);

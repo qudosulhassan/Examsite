@@ -406,7 +406,7 @@ TXT;
         $vendorName = $exam->vendor ? $exam->vendor->name : 'IT Certification';
         $examCode = $exam->exam_code ?: $exam->code ?: '';
         $examName = $exam->exam_name ?: $exam->title ?: '';
-        $title = trim(($examCode ? $examCode . ' - ' : '') . ($examName ?: 'Certification Practice Exam') . ' Practice Questions & Dumps');
+        $title = trim(($examCode ? $examCode . ' - ' : '') . ($examName ?: 'Certification Practice Exam') . (config('site.avoid_dumps') ? ' Practice Questions & Study Guide' : ' Practice Questions & Dumps'));
 
         $rawDesc = '';
         if (!empty(trim(strip_tags($exam->description ?? '')))) {
@@ -422,7 +422,9 @@ TXT;
                 $rawDesc = $exam->meta_description;
             }
             if (empty($rawDesc)) {
-                $rawDesc = "Pass your {$examCode} {$examName} certification exam with our verified practice test questions and dumps.";
+                $rawDesc = config('site.avoid_dumps')
+                    ? "Prepare for your {$examCode} {$examName} certification exam with practice questions, a study guide and a timed test engine."
+                    : "Pass your {$examCode} {$examName} certification exam with our verified practice test questions and dumps.";
             }
         }
 
@@ -499,7 +501,9 @@ TXT;
                 $rawDesc = $exam->meta_description;
             }
             if (empty($rawDesc)) {
-                $rawDesc = "Comprehensive {$examCode} {$examName} certification course, verified exam dumps, and real practice questions.";
+                $rawDesc = config('site.avoid_dumps')
+                    ? "Comprehensive {$examCode} {$examName} certification study guide and practice questions."
+                    : "Comprehensive {$examCode} {$examName} certification course, verified exam dumps, and real practice questions.";
             }
         }
 
@@ -736,7 +740,9 @@ TXT;
         $siteBrand = $site ? $site->name : 'Exam Topics Base';
         $code = trim((string)($exam->exam_code ?? ''));
         if ($code !== '') {
-            return "{$code} Exam Dumps & Study Guide | {$siteBrand}";
+            return config('site.avoid_dumps')
+                ? "{$code} Practice Exam & Study Guide | {$siteBrand}"
+                : "{$code} Exam Dumps & Study Guide | {$siteBrand}";
         }
 
         $name = trim((string)($exam->exam_name ?? ''));

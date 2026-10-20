@@ -536,6 +536,20 @@ class SiteContext
             'ExamTopicsBase' => $brand,
         ];
 
-        return strtr($template, $pairs);
+        $result = strtr($template, $pairs);
+
+        return config('site.avoid_dumps') ? static::scrubDumps($result) : $result;
+    }
+
+    /**
+     * Swap the word "dumps" for neutral wording (SITE_AVOID_DUMPS). Affects shared text only at
+     * display time; nothing stored in the database is changed.
+     */
+    public static function scrubDumps(string $text): string
+    {
+        // "exam dumps" / "real dumps" -> "exam questions"; a bare "dumps" -> "practice questions".
+        $text = preg_replace('/\b(exam|real|latest|actual|free|verified|updated)\s+(braindumps|dumps)\b/i', '$1 questions', $text);
+
+        return preg_replace('/\b(brain)?dumps\b/i', 'practice questions', $text);
     }
 }

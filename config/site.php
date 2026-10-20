@@ -59,6 +59,19 @@ return [
     */
     'vendors' => array_values(array_filter(array_map('trim', explode(',', (string) env('SITE_VENDORS', ''))))),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Wording switches
+    |--------------------------------------------------------------------------
+    |
+    | SITE_AVOID_DUMPS=true   replaces "dumps" in generated exam titles/descriptions/keywords.
+    | SITE_SHOW_GUARANTEE=false  hides the "100% Pass Guarantee" card on exam pages
+    |                            (use it until a refund policy has been agreed for the site).
+    |
+    */
+    'avoid_dumps' => filter_var(env('SITE_AVOID_DUMPS', false), FILTER_VALIDATE_BOOLEAN),
+    'show_guarantee' => filter_var(env('SITE_SHOW_GUARANTEE', true), FILTER_VALIDATE_BOOLEAN),
+
     'exam_url_style' => env('EXAM_URL_STYLE', 'prefixed'),
 
 ];
