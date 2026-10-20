@@ -27,7 +27,9 @@ class StackCertHomepageTest extends TestCase
         Cache::flush();
 
         foreach ([1 => ['ExamTopicsBase', 'examtopicsbase'], 3 => ['StackCert', 'stackcert']] as $id => [$name, $code]) {
-            Site::query()->firstOrCreate(['id' => $id], ['name' => $name, 'code' => $code, 'default_theme' => 'default', 'default_locale' => 'en', 'is_active' => true, 'primary_color' => '#0F6CBD', 'secondary_color' => '#0B3A66']);
+            if (! Site::query()->whereKey($id)->exists()) {
+                Site::query()->insert(['id' => $id, 'name' => $name, 'code' => $code, 'default_theme' => 'default', 'default_locale' => 'en', 'is_active' => true, 'primary_color' => '#0F6CBD', 'secondary_color' => '#0B3A66', 'created_at' => now(), 'updated_at' => now()]);
+            }
         }
 
         $ms = Vendor::factory()->create(['slug' => 'microsoft', 'name' => 'Microsoft', 'is_active' => true, 'description' => 'ExamTopicsBase offers real exam dumps.']);
