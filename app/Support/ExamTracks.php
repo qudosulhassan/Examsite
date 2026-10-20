@@ -19,36 +19,42 @@ class ExamTracks
         return match ($vendorSlug) {
             'microsoft' => [
                 'azure' => [
+                    'slug' => 'azure-cloud',
                     'title' => 'Azure & Cloud',
                     'blurb' => 'Fundamentals, administration, development and architecture on Azure.',
                     'prefixes' => ['AZ'],
                     'icon' => 'cloud',
                 ],
                 'security' => [
+                    'slug' => 'security-identity',
                     'title' => 'Security & Identity',
                     'blurb' => 'Security operations, identity and access, compliance.',
                     'prefixes' => ['SC'],
                     'icon' => 'shield',
                 ],
                 'm365' => [
+                    'slug' => 'microsoft-365',
                     'title' => 'Microsoft 365',
                     'blurb' => 'Teams, endpoints, messaging and productivity administration.',
                     'prefixes' => ['MS', 'MD'],
                     'icon' => 'layers',
                 ],
                 'power' => [
+                    'slug' => 'power-platform',
                     'title' => 'Power Platform',
                     'blurb' => 'Power Apps, Power Automate, Power BI and functional consulting.',
                     'prefixes' => ['PL'],
                     'icon' => 'bolt',
                 ],
                 'dynamics' => [
+                    'slug' => 'dynamics-365',
                     'title' => 'Dynamics 365',
                     'blurb' => 'Sales, customer service, finance and supply chain.',
                     'prefixes' => ['MB'],
                     'icon' => 'chart',
                 ],
                 'data-ai' => [
+                    'slug' => 'data-ai',
                     'title' => 'Data & AI',
                     'blurb' => 'Data engineering, analytics and applied AI.',
                     'prefixes' => ['DP', 'AI'],
@@ -57,6 +63,22 @@ class ExamTracks
             ],
             default => [],
         };
+    }
+
+    /**
+     * The track an exam belongs to, by its code prefix: ['key', 'slug', 'title'] or null.
+     */
+    public static function forExam(string $examCode, string $vendorSlug): ?array
+    {
+        $prefix = strtoupper(strtok($examCode, '-') ?: '');
+
+        foreach (static::definitions($vendorSlug) as $key => $def) {
+            if (in_array($prefix, $def['prefixes'], true)) {
+                return ['key' => $key, 'slug' => $def['slug'], 'title' => $def['title']];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -90,6 +112,7 @@ class ExamTracks
                 'title' => 'More exams',
                 'blurb' => 'Other certification exams in the catalog.',
                 'prefixes' => [],
+                'slug' => 'more-exams',
                 'icon' => 'grid',
                 'exams' => $rest,
             ];

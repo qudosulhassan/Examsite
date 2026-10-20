@@ -44,6 +44,18 @@ if (config('site.exam_url_style', 'prefixed') === 'root') {
     Route::get('/{vendor}/{slug}', [App\Http\Controllers\Public\ExamController::class, 'show'])
         ->where('vendor', '^(?!dashboard|admin|api|webhook|auth|cart|checkout|blog|vendors|certifications|exams|demo-test-engine|test-engine|free-demo|about|contact|faq|pricing|search|sitemap|robots).*$')
         ->name('exams.show');
+} elseif (config('site.exam_url_style', 'prefixed') === 'hub') {
+    // Hub style (single-vendor sites): /exams/{slug} with its free questions and plans beneath it.
+    Route::get('/exams', function () {
+        $only = (array) config('site.vendors', []);
+
+        return redirect(count($only) === 1 ? url('/vendors/' . $only[0]) : url('/vendors'), 301);
+    });
+    Route::get('/exams/{slug}/free-practice-questions', [App\Http\Controllers\Public\ExamController::class, 'questions'])->name('exams.questions');
+    Route::get('/exams/{slug}/plans', [App\Http\Controllers\Public\ExamController::class, 'plans'])->name('exams.plans');
+    Route::get('/exams/{vendor}/{slug}', [App\Http\Controllers\Public\ExamController::class, 'showLegacyHub'])->name('exams.legacy.show');
+    Route::get('/exams/{slug}', [App\Http\Controllers\Public\ExamController::class, 'showHub'])->name('exams.show');
+    Route::get('/tracks/{track}', [App\Http\Controllers\Public\ExamController::class, 'track'])->name('tracks.show');
 } else {
     Route::get('/exams/{vendor}/{slug}', [App\Http\Controllers\Public\ExamController::class, 'show'])->name('exams.show');
 }

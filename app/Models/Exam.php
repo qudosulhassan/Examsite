@@ -32,7 +32,32 @@ class Exam extends Model
      */
     public static function publicPath(string $vendorSlug, string $slug): string
     {
+        if (static::usesHubUrls()) {
+            return 'exams/' . $slug;
+        }
+
         return (static::usesRootUrls() ? '' : 'exams/') . $vendorSlug . '/' . static::urlSlug($slug);
+    }
+
+    /**
+     * "hub" style (single-vendor sites): /exams/{slug}, with the free questions and the plans
+     * under it: /exams/{slug}/free-practice-questions and /exams/{slug}/plans.
+     */
+    public static function usesHubUrls(): bool
+    {
+        return config('site.exam_url_style', 'prefixed') === 'hub';
+    }
+
+    /**
+     * Canonical URL of an exam for the active URL style.
+     */
+    public static function urlFor(string $vendorSlug, string $slug): string
+    {
+        if (static::usesHubUrls()) {
+            return route('exams.show', ['slug' => $slug]);
+        }
+
+        return route('exams.show', ['vendor' => $vendorSlug, 'slug' => static::urlSlug($slug)]);
     }
 
     protected static function booted()
@@ -291,7 +316,31 @@ class Exam extends Model
     {
         $vendorSlug = ($this->vendor && !empty($this->vendor->slug)) ? $this->vendor->slug : 'exam';
         $slug = !empty($this->slug) ? $this->slug : (!empty($this->exam_code) ? strtolower($this->exam_code) : 'exam');
-        return route('exams.show', ['vendor' => $vendorSlug, 'slug' => static::urlSlug($slug)]);
+        return static::urlFor($vendorSlug, $slug);
+    }
+
+    /**
+     * Free practice questions page (hub style); other styles keep them on the exam page.
+     */
+    public function getQuestionsUrlAttribute(): string
+    {
+        if (static::usesHubUrls()) {
+            return route('exams.questions', ['slug' => $this->slug ?: strtolower($this->exam_code)]);
+        }
+
+        return $this->url . '#free-practice-questions';
+    }
+
+    /**
+     * Plans / purchase page (hub style); other styles keep the purchase box on the exam page.
+     */
+    public function getPlansUrlAttribute(): string
+    {
+        if (static::usesHubUrls()) {
+            return route('exams.plans', ['slug' => $this->slug ?: strtolower($this->exam_code)]);
+        }
+
+        return $this->url . '#purchase-card';
     }
 
     /**

@@ -70,6 +70,9 @@ return [
     |
     */
     'avoid_dumps' => filter_var(env('SITE_AVOID_DUMPS', false), FILTER_VALIDATE_BOOLEAN),
+    // Free practice questions shown on a hub-style exam's questions page (5 per page).
+    'free_questions' => max(1, (int) env('SITE_FREE_QUESTIONS', 10)),
+
     'show_guarantee' => filter_var(env('SITE_SHOW_GUARANTEE', true), FILTER_VALIDATE_BOOLEAN),
 
     'exam_url_style' => env('EXAM_URL_STYLE', 'prefixed'),

@@ -66,11 +66,23 @@ class TechnicalSeoService
         $examUrls = [];
         foreach ($exams as $e) {
             $examUrls[] = [
-                'loc' => route('exams.show', ['vendor' => $e->vendor->slug, 'slug' => $e->slug]),
+                'loc' => \App\Models\Exam::urlFor($e->vendor->slug, $e->slug),
                 'priority' => '0.9',
                 'changefreq' => 'weekly',
                 'lastmod' => $e->last_updated_at ? $e->last_updated_at->format('Y-m-d') : ($e->updated_at ? $e->updated_at->format('Y-m-d') : now()->format('Y-m-d')),
             ];
+
+            if (\App\Models\Exam::usesHubUrls()) {
+                // The free-questions and plans pages are indexable pages of their own.
+                foreach ([[$e->questions_url, '0.8'], [$e->plans_url, '0.6']] as [$loc, $priority]) {
+                    $examUrls[] = [
+                        'loc' => $loc,
+                        'priority' => $priority,
+                        'changefreq' => 'weekly',
+                        'lastmod' => $e->last_updated_at ? $e->last_updated_at->format('Y-m-d') : ($e->updated_at ? $e->updated_at->format('Y-m-d') : now()->format('Y-m-d')),
+                    ];
+                }
+            }
         }
 
         // Certifications
@@ -816,7 +828,7 @@ TXT;
                     'vendor_name' => $exam->vendor ? $exam->vendor->name : 'Unknown Vendor',
                     'vendor_slug' => $vendorSlug,
                     'current_title' => $cleanTitle,
-                    'url' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $exam->slug ?: $exam->id]),
+                    'url' => \App\Models\Exam::urlFor($vendorSlug, (string) ($exam->slug ?: $exam->id)),
                     'issue' => $issueReason,
                     'exam' => $exam,
                 ];
@@ -861,7 +873,7 @@ TXT;
                     'vendor_name' => $exam->vendor ? $exam->vendor->name : 'Unknown Vendor',
                     'vendor_slug' => $vendorSlug,
                     'current_description' => $cleanDesc,
-                    'url' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $exam->slug ?: $exam->id]),
+                    'url' => \App\Models\Exam::urlFor($vendorSlug, (string) ($exam->slug ?: $exam->id)),
                     'issue' => $issueReason,
                     'exam' => $exam,
                 ];
@@ -898,7 +910,7 @@ TXT;
                 'exam_name' => $exam->exam_name ?: 'Untitled Exam',
                 'vendor_name' => $exam->vendor ? $exam->vendor->name : 'Unknown Vendor',
                 'vendor_slug' => $vendorSlug,
-                'url' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $exam->slug ?: $exam->id]),
+                'url' => \App\Models\Exam::urlFor($vendorSlug, (string) ($exam->slug ?: $exam->id)),
                 'exam' => $exam,
             ];
         }
