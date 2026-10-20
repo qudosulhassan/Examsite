@@ -63,7 +63,7 @@ class StackCertHomepageTest extends TestCase
     {
         $this->get('http://stackcert.test/')
             ->assertOk()
-            ->assertSee('Practice for Microsoft certification exams with confidence')
+            ->assertSee('Pass your Microsoft exam with')
             ->assertSee('5 Microsoft exams')
             ->assertSee('Azure &amp; Cloud', false)
             ->assertSee('Security &amp; Identity', false)

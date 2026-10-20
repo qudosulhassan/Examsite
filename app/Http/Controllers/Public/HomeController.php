@@ -40,9 +40,27 @@ class HomeController extends Controller
             $siteQuestionCount = \App\Models\Question::where('is_active', true)->whereIn('exam_id', $siteExams->pluck('id'))->count();
             $siteBundle = \App\Models\Package::where('is_active', true)->where('type', 'bundle')->orderBy('sort_order')->first();
             $latestExams = $siteExams->sortByDesc('last_updated_at')->take(8)->values();
+
+            // One short real question for the homepage "try it" card (prefers a fundamentals exam).
+            $starterIds = $siteExams->sortBy(fn ($e) => preg_match('/-900$/', (string) $e->exam_code) ? 0 : 1)->pluck('id');
+            foreach ($starterIds->take(6) as $examId) {
+                $candidate = \App\Models\Question::where('exam_id', $examId)->where('is_active', true)->where('question_type', 'single_choice')
+                    ->with(['options', 'answers'])->orderBy('id')->limit(40)->get()
+                    ->first(fn ($q) => $q->answers->count() === 1 && in_array($q->answers->first()->answer_value, ['A', 'B', 'C', 'D'], true)
+                        && mb_strlen(strip_tags((string) $q->question_text)) <= 260 && mb_strlen(trim((string) $q->option_d)) > 0
+                        && !str_contains((string) $q->question_text, '<img'));
+                if ($candidate) {
+                    $heroQuestion = $candidate;
+                    $heroExam = $siteExams->firstWhere('id', $examId);
+                    break;
+                }
+            }
         }
 
-        return view('pages.home', compact('vendors', 'latestExams', 'siteVendor', 'siteTracks', 'siteQuestionCount', 'siteBundle'));
+        $heroQuestion ??= null;
+        $heroExam ??= null;
+
+        return view('pages.home', compact('vendors', 'latestExams', 'siteVendor', 'siteTracks', 'siteQuestionCount', 'siteBundle', 'heroQuestion', 'heroExam'));
     }
 
     /**
