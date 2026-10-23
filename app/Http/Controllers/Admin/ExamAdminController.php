@@ -519,7 +519,7 @@ class ExamAdminController extends Controller
         $exam = Exam::findOrFail($id);
 
         $hasPurchases = UserExam::where('exam_id', $exam->id)->exists();
-        $hasOrders = OrderItem::where('item_type', 'exam')->where('item_id', $exam->id)->exists();
+        $hasOrders = OrderItem::where('exam_id', $exam->id)->exists();
 
         if ($hasPurchases || $hasOrders) {
             return back()->with('error', "Cannot delete exam {$exam->exam_code}: active customer purchases or order items depend on this exam. You can deactivate it by switching Status to Draft.");
