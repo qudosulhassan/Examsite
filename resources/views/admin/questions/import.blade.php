@@ -2,7 +2,16 @@
 
 @section('content')
 <div class="space-y-6" x-data="{
-        copied: false, uploading: false,
+        copied: false, uploading: false, search: '',
+        allExams: @js($exams->map(fn ($e) => ['id' => (string) $e->id, 'label' => $e->exam_code . ' — ' . $e->exam_name . ' (' . $e->questions_count . ' questions now)'])->values()),
+        get matchCount() {
+            const terms = this.search.toLowerCase().split(/\s+/).filter(Boolean);
+            return this.allExams.filter(e => terms.every(t => e.label.toLowerCase().includes(t))).length;
+        },
+        get filteredExams() {
+            const terms = this.search.toLowerCase().split(/\s+/).filter(Boolean);
+            return this.allExams.filter(e => e.id === String(this.examId) || terms.every(t => e.label.toLowerCase().includes(t)));
+        },
         examId: '{{ old('exam_id', request('exam_id')) }}',
         info: @js($examInfo),
         template: @js($prompt),
@@ -76,14 +85,15 @@
 
         <div>
             <label for="exam_id" class="block text-xs font-bold text-gray-400 uppercase mb-1.5">Exam</label>
+            <input type="search" x-model="search" @keydown.enter.prevent placeholder="Search exams by code or name, e.g. VCS-325 or Veritas" autocomplete="off"
+                   class="w-full border-gray-300 rounded text-sm px-3 py-2.5 mb-2 focus:border-cyan focus:ring-cyan" aria-label="Search exams">
             <select name="exam_id" id="exam_id" required x-model="examId" class="w-full border-gray-300 rounded text-sm px-3 py-2.5 focus:border-cyan focus:ring-cyan">
                 <option value="">— Select the exam these questions belong to —</option>
-                @foreach($exams as $exam)
-                    <option value="{{ $exam->id }}" @selected(old('exam_id', request('exam_id')) == $exam->id)>
-                        {{ $exam->exam_code }} — {{ $exam->exam_name }} ({{ $exam->questions_count }} questions now)
-                    </option>
-                @endforeach
+                <template x-for="e in filteredExams" :key="e.id">
+                    <option :value="e.id" x-text="e.label" :selected="String(examId) === e.id"></option>
+                </template>
             </select>
+            <p class="text-xs text-gray-400 mt-1" x-show="search.trim() !== ''" x-cloak><span x-text="matchCount"></span> of <span x-text="allExams.length"></span> exams shown</p>
             <p class="text-xs text-gray-400 mt-1">Exam not listed? Create it first under <a href="{{ route('admin.exams.create') }}" class="text-cyan underline">Exams → Add</a>.</p>
         </div>
 
