@@ -25,6 +25,7 @@ class ExamImporter
         'multiple-select' => 'multiple_choice',
         'hotspot'         => 'hotspot',
         'drag-drop'       => 'drag_drop',
+        'fill'            => 'fill_blank',
     ];
 
     /**
@@ -106,6 +107,7 @@ class ExamImporter
             'boxCount' => $q['boxCount'],
             'yesNo'    => $q['yesNo'],
             'ia'       => $q['ia'],
+            'fill'     => $q['fill'],
             'answer'   => [
                 'correctAnswer' => $a['correctAnswer'] ?: null,
                 'boxes'         => $a['boxes'],
@@ -116,12 +118,14 @@ class ExamImporter
                 'reference'     => $a['reference'],
                 'answerImages'  => array_values(array_filter(array_map($url, $a['answerImages']))),
                 'rowAnswers'    => $a['rowAnswers'],
+                'fillAnswers'   => $a['fillAnswers'],
             ],
         ];
 
         $correct = match (true) {
             (bool) $a['correctAnswer'] => $a['correctAnswer'],
             (bool) $q['ia'] => $a['rowAnswers'] ?? [],
+            $q['type'] === 'fill' => array_map(fn ($v) => $v[0] ?? '', $a['fillAnswers']),
             default => array_map(fn ($b) => rtrim($b['value'], '.'), $a['boxes']),
         };
 

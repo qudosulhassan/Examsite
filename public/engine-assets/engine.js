@@ -64,11 +64,19 @@ const $ = s => document.querySelector(s);
 function esc(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function paras(arr){ return (arr||[]).map(p=>`<p>${esc(p)}</p>`).join(""); }
 function linkify(u){ const e = esc(u); return /^https?:\/\//.test(u) ? `<a href="${e}" target="_blank" rel="noopener noreferrer">${e}</a>` : e; }
-const TYPE_LABEL = {"multiple-choice":"Multiple Choice","multiple-select":"Multiple Select","hotspot":"Hotspot","drag-drop":"Drag & Drop"};
+const TYPE_LABEL = {"multiple-choice":"Multiple Choice","multiple-select":"Multiple Select","hotspot":"Hotspot","drag-drop":"Drag & Drop","fill":"Fill in the blank"};
 function isDone(st){ return st && st.status !== null; }
-function gradableQ(q){ return q.options.length || (q.boxCount && q.yesNo) || q.ia; }
+function gradableQ(q){ return q.options.length || (q.boxCount && q.yesNo) || q.ia || q.fill; }
+// Typed answers match ignoring case, spacing and surrounding punctuation (same rule as EngineQuestion::normalizeText).
+function normText(s){ return String(s||"").trim().toLowerCase().replace(/\s+/g," ").replace(/^[ .,;:!?"']+|[ .,;:!?"']+$/g,""); }
+function fillCount(q){ return Math.max(1, (q.fill && q.fill.blanks) || 1); }
+function fillResults(q, st, a){
+  const R = st.rows || {};
+  return (a.fillAnswers||[]).map((variants,n)=> variants.some(v=> normText(v) === normText(R[n])));
+}
 function hasResponse(q, st){
   if(q.options.length) return st.sel.length>0;
+  if(q.fill){ for(let n=0;n<fillCount(q);n++){ if(!String((st.rows||{})[n]||"").trim()) return false; } return true; }
   if(q.ia) return q.ia.rows.every((r,n)=>st.rows[n]);
   if(q.boxCount && q.yesNo){ for(let b=1;b<=q.boxCount;b++){ if(!st.boxes[b]) return false; } return true; }
   return false;
@@ -97,7 +105,9 @@ function render(){
     if(multi) h += `<div class="select-hint">Select all answers that apply.</div>`;
   } else {
     h += `<div class="answer-area"><h3>Your Answer</h3>`;
-    if(q.ia){
+    if(q.fill){
+      h += renderFill(q, st, done);
+    } else if(q.ia){
       h += renderIA(q, st, done);
     } else if(q.boxCount && q.yesNo){
       h += `<p class="notice">Select Yes or No for each statement in the exhibit above (Box 1 = first statement, Box 2 = second, …), then press <b>${EXAM?"Save Answer":"Check Answer"}</b>.</p>`;
@@ -139,6 +149,16 @@ function render(){
   bindQuestion();
   updateChrome();
   window.scrollTo({top:0,behavior:"instant" in window ? "instant" : "auto"});
+}
+
+function renderFill(q, st, done){
+  const R = st.rows || {}, n = fillCount(q), labels = (q.fill && q.fill.labels) || [];
+  let h = `<p class="notice">Type your answer${n>1?"s":""} below, then press <b>${EXAM?"Save Answer":"Check Answer"}</b>. Capital letters and spacing do not matter.</p>`;
+  for(let k=0;k<n;k++){
+    h += `<div class="ia-row" data-row="${k}"><div class="ia-label">${esc(labels[k] || (n>1 ? "Blank "+(k+1) : "Your answer"))}</div>
+      <input type="text" class="fill-input" data-row="${k}" value="${esc(R[k]||"")}" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="200" aria-label="Blank ${k+1}" ${done?"disabled":""}><div class="ia-fix"></div></div>`;
+  }
+  return h;
 }
 
 function renderIA(q, st, done){
@@ -193,6 +213,10 @@ function bindQuestion(){
       touched();
     });
   });
+  document.querySelectorAll(".fill-input").forEach(inp=>{
+    inp.addEventListener("input", ()=>{ if(locked()) return; st.rows = st.rows||{}; st.rows[inp.dataset.row] = inp.value; touched(); });
+    inp.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); const b = $("#checkBtn"); if(b && !b.disabled) b.click(); } });
+  });
   const setRow = (n, v)=>{ if(locked()) return; st.rows = st.rows||{}; st.rows[n] = v; const s = document.querySelector(`.ia-select[data-row="${n}"]`); if(s) s.value = v; touched(); };
   document.querySelectorAll(".ia-select").forEach(s=> s.addEventListener("change", ()=> setRow(s.dataset.row, s.value)));
   let picked = null;
@@ -222,6 +246,9 @@ function check(){
   if(q.options.length){
     if(!st.sel.length){ flash("Select an answer before checking."); return; }
     st.status = sameSet(st.sel, a.correctAnswer||[]) ? "correct" : "incorrect";
+  } else if(q.fill){
+    if(!hasResponse(q, st)){ flash("Type an answer for every blank before checking."); return; }
+    st.status = fillResults(q, st, a).every(Boolean) ? "correct" : "incorrect";
   } else if(q.ia){
     const R = st.rows || {};
     if(q.ia.rows.some((r,n)=>!R[n])){ flash("Make a selection for every row before checking."); return; }
@@ -235,13 +262,13 @@ function check(){
 }
 function saveExamAnswer(){
   const q = QUESTIONS[S.cur], st = qs(S.cur);
-  if(!hasResponse(q, st)){ flash(q.options.length ? "Select an answer before saving." : "Make a selection for every row before saving."); return; }
+  if(!hasResponse(q, st)){ flash(q.options.length ? "Select an answer before saving." : q.fill ? "Type an answer for every blank before saving." : "Make a selection for every row before saving."); return; }
   st.status = "answered";
   sync(S.cur); render();
 }
 function reveal(){
   const q = QUESTIONS[S.cur], st = qs(S.cur), a = answerFor(q);
-  st.status = "revealed"; st.hasKey = !!(a.correctAnswer || (a.boxes && a.boxes.length) || (a.rowAnswers && a.rowAnswers.length) || (a.explanation && a.explanation.length) || a.explanationHtml || (a.answerImages && a.answerImages.length));
+  st.status = "revealed"; st.hasKey = !!(a.correctAnswer || (a.boxes && a.boxes.length) || (a.rowAnswers && a.rowAnswers.length) || (a.fillAnswers && a.fillAnswers.length) || (a.explanation && a.explanation.length) || a.explanationHtml || (a.answerImages && a.answerImages.length));
   if(!st.hasKey) st.status = "reviewed";
   finish();
 }
@@ -267,7 +294,8 @@ function showFeedback(){
     cls="warn"; txt="👁 Answer revealed — not scored.";
     const a = answerFor(q);
     let tot=0, right=0;
-    if(q.ia && a.rowAnswers){ const R=st.rows||{}; a.rowAnswers.forEach((ans,n)=>{ if(R[n]){ tot++; if(R[n]===ans) right++; } }); }
+    if(q.fill && a.fillAnswers){ const res = fillResults(q, st, a), R = st.rows||{}; res.forEach((ok,n)=>{ if(String(R[n]||"").trim()){ tot++; if(ok) right++; } }); }
+    else if(q.ia && a.rowAnswers){ const R=st.rows||{}; a.rowAnswers.forEach((ans,n)=>{ if(R[n]){ tot++; if(R[n]===ans) right++; } }); }
     else if(q.boxCount && q.yesNo && a.boxes){ a.boxes.forEach(bx=>{ const m=st.boxes[bx.box]; if(m){ tot++; if(m===bx.value.replace(/\.$/,"").trim()) right++; } }); }
     else if(q.options.length && st.sel.length){ tot=1; right = sameSet(st.sel, a.correctAnswer||[])?1:0; }
     if(tot){ txt += q.options.length ? (right ? " Your selection was correct." : " Your selection was wrong.") : ` ${right} of ${tot} of your selections were correct — wrong ones are marked in red.`; }
@@ -281,7 +309,8 @@ function showAnswerPanel(){
   const q = QUESTIONS[S.cur], st = qs(S.cur), a = answerFor(q);
   let h = `<div class="answer-panel">`;
   h += `<h4>Correct Answer</h4>`;
-  if(a.correctAnswer && a.correctAnswer.length){ h += `<div class="ca">${esc(a.correctAnswer.join(", "))}</div>`; }
+  if(q.fill && a.fillAnswers && a.fillAnswers.length){ h += `<ul>${a.fillAnswers.map((v,n)=>`<li>${a.fillAnswers.length>1?"<b>Blank "+(n+1)+":</b> ":""}${esc(v.join(" / "))}</li>`).join("")}</ul>`; }
+  else if(a.correctAnswer && a.correctAnswer.length){ h += `<div class="ca">${esc(a.correctAnswer.join(", "))}</div>`; }
   else if(q.ia && a.rowAnswers){ h += `<ul>${q.ia.rows.map((r,n)=>`<li>${esc(r.label)} → <b>${esc(a.rowAnswers[n])}</b></li>`).join("")}</ul>`; }
   else if(a.boxes && a.boxes.length){ h += `<ul>${a.boxes.map(b=>`<li><b>Box ${b.box}:</b> ${esc(b.value)}</li>`).join("")}</ul>`; }
   else if((a.answerImages||[]).length){ /* answer shown as image below */ }
@@ -312,6 +341,17 @@ function applyMarks(){
       const L = l.dataset.l;
       if(a.correctAnswer.includes(L)) l.classList.add("is-correct");
       else if(st.sel.includes(L)) l.classList.add("is-wrong");
+    });
+  }
+  if(q.fill && a.fillAnswers){
+    const R = st.rows || {}, res = fillResults(q, st, a);
+    a.fillAnswers.forEach((variants,n)=>{
+      const row = document.querySelector(`.ia-row[data-row="${n}"]`); if(!row) return;
+      const mine = String(R[n]||"").trim(), fix = row.querySelector(".ia-fix");
+      if(mine){
+        row.classList.add(res[n]?"row-ok":"row-bad"); fix.className = "ia-fix " + (res[n]?"ok":"bad");
+        fix.innerHTML = res[n] ? `✓ Your answer is correct` : `✗ Your answer "${esc(mine)}" is wrong — correct answer: <b>${esc(variants[0])}</b>`;
+      } else { fix.className = "ia-fix info"; fix.innerHTML = `Correct answer: <b>${esc(variants[0])}</b>`; }
     });
   }
   if(q.ia && a.rowAnswers){

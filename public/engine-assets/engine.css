@@ -150,6 +150,9 @@ img{max-width:100%;height:auto}
 .ia-label{overflow-wrap:anywhere}
 .ia-select{width:100%;min-height:44px;padding:8px 10px;border:1.5px dashed var(--border);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;font-size:15px}
 .ia-row.droppable .ia-select{border-color:var(--primary)}
+.fill-input{width:100%;min-height:44px;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;font-size:16px}
+.fill-input:focus{outline:2px solid var(--primary);outline-offset:1px}
+.ia-row.row-ok .fill-input{border-color:var(--ok)}
 .ia-row.row-ok{background:var(--ok-50)} .ia-row.row-ok .ia-select{border:1.5px solid var(--ok)}
 .ia-row.row-bad{background:var(--bad-50)} .ia-row.row-bad .ia-select{border:1.5px solid var(--bad)}
 .ia-fix{grid-column:1/-1;font-size:13.5px}

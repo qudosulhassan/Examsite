@@ -2,12 +2,13 @@
 
 @section('content')
 @php
-    $typeLabels = ['multiple-choice' => 'Multiple Choice', 'multiple-select' => 'Multiple Select', 'hotspot' => 'Hotspot', 'drag-drop' => 'Drag & Drop'];
+    $typeLabels = ['multiple-choice' => 'Multiple Choice', 'multiple-select' => 'Multiple Select', 'hotspot' => 'Hotspot', 'drag-drop' => 'Drag & Drop', 'fill' => 'Fill in the blank'];
     $errorsById = collect($report['errors'])->groupBy('id');
     $warningsById = collect($report['warnings'])->groupBy('id');
     $importable = $report['stats']['questions'] - count($report['stats']['bad_ids']);
     $answerText = function (array $q) {
         $a = $q['answer'];
+        if ($q['type'] === 'fill' && !empty($a['fillAnswers'])) return collect($a['fillAnswers'])->map(fn ($v) => implode(' / ', $v))->implode(' | ');
         if (!empty($a['correctAnswer'])) return implode(', ', $a['correctAnswer']);
         if ($q['ia'] && !empty($a['rowAnswers'])) return implode(' | ', $a['rowAnswers']);
         if (!empty($a['boxes'])) return collect($a['boxes'])->map(fn ($b) => "Box {$b['box']}: {$b['value']}")->implode(' | ');
