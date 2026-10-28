@@ -193,6 +193,32 @@ class ExamFileImportTest extends TestCase
         $this->assertNull($grade(''));
     }
 
+    public function test_big_files_import_in_batches_and_a_retry_resumes(): void
+    {
+        config(['exam-import.chunk_seconds' => 0.0001]);   // forces one question per batch
+        $preview = $this->actingAs($this->admin)->post(route('admin.questions.import.preview'), [
+            'exam_id' => $this->exam->id,
+            'exam_file' => UploadedFile::fake()->createWithContent('big.html', $this->sampleHtml()),
+        ]);
+        $body = ['token' => $preview->viewData('token'), 'mode' => 'replace'];
+        $chunk = route('admin.questions.import.chunk');
+
+        $first = $this->actingAs($this->admin)->postJson($chunk, $body)->assertOk()->assertJson(['done' => false, 'total' => 6]);
+        $this->assertGreaterThan(0, Question::count());
+        $this->assertLessThan(6, Question::count());
+
+        // a second "Import" click (or a retry after an error) carries on instead of duplicating
+        $guard = 0;
+        do {
+            $r = $this->actingAs($this->admin)->postJson($chunk, $body)->assertOk();
+        } while (!$r->json('done') && ++$guard < 20);
+
+        $this->assertTrue($r->json('done'));
+        $this->assertSame(6, Question::where('exam_id', $this->exam->id)->count());
+        $this->assertSame(6, $this->exam->fresh()->question_count);
+        $this->actingAs($this->admin)->postJson($chunk, $body)->assertStatus(410);   // already imported
+    }
+
     public function test_file_without_exam_data_is_rejected(): void
     {
         $this->actingAs($this->admin)->post(route('admin.questions.import.preview'), [
