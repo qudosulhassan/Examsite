@@ -102,6 +102,14 @@ class ExamFileValidator
                         $add($warnings, "Question says \"Choose {$m[1]}\" but " . count($correct) . ' answer(s) are marked correct.');
                     }
                 }
+            } elseif ($q['type'] === 'fill') {
+                $blanks = (int) ($q['fill']['blanks'] ?? 0);
+                $accepted = $a['fillAnswers'];
+                if ($blanks < 1) {
+                    $add($errors, 'Fill-in-the-blank question does not say how many blanks it has.');
+                } elseif (count($accepted) !== $blanks || in_array([], $accepted, true)) {
+                    $add($errors, "Has {$blanks} blank(s) but " . count($accepted) . ' answer(s) given.');
+                }
             } elseif ($q['ia']) {
                 $rows = count($q['ia']['rows']);
                 $rowAnswers = $a['rowAnswers'] ?? [];

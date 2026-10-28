@@ -23,7 +23,7 @@ use InvalidArgumentException;
  */
 class ExamFileParser
 {
-    public const TYPES = ['multiple-choice', 'multiple-select', 'hotspot', 'drag-drop'];
+    public const TYPES = ['multiple-choice', 'multiple-select', 'hotspot', 'drag-drop', 'fill'];
 
     public function parse(string $contents): array
     {
@@ -192,6 +192,7 @@ class ExamFileParser
                 'boxCount' => (int) ($q['boxCount'] ?? 0),
                 'yesNo'    => (bool) ($q['yesNo'] ?? false),
                 'ia'       => $this->normalizeIa($q['ia'] ?? null),
+                'fill'     => $this->normalizeFill($q['fill'] ?? null),
                 'answer'   => [
                     'correctAnswer' => isset($answer['correctAnswer']) && is_array($answer['correctAnswer'])
                         ? array_values(array_map(fn ($a) => trim((string) $a), $answer['correctAnswer']))
@@ -206,6 +207,7 @@ class ExamFileParser
                     ), fn ($e) => $e !== null && $e !== '')),
                     'reference'     => array_values(array_filter(array_map(fn ($r) => trim((string) $r), (array) ($answer['reference'] ?? [])))),
                     'answerImages'  => array_values(array_map('strval', $answer['answerImages'] ?? [])),
+                    'fillAnswers'   => $this->normalizeFillAnswers($answer['fillAnswers'] ?? null),
                     'rowAnswers'    => isset($answer['rowAnswers']) && is_array($answer['rowAnswers'])
                         ? array_values(array_map(fn ($a) => trim((string) $a), $answer['rowAnswers']))
                         : null,
@@ -240,8 +242,34 @@ class ExamFileParser
             'multiple-select', 'multi-select', 'multiple-response', 'multi' => 'multiple-select',
             'hotspot', 'hot-spot', 'yes-no' => 'hotspot',
             'drag-drop', 'dragdrop', 'drag--drop', 'drag-and-drop' => 'drag-drop',
+            'fill', 'fill-in', 'fill-in-the-blank', 'fill-blank', 'fill-in-blank', 'blank', 'short-answer' => 'fill',
             default => $t,
         };
+    }
+
+    protected function normalizeFill(mixed $fill): ?array
+    {
+        if (!is_array($fill)) {
+            return null;
+        }
+
+        return [
+            'blanks' => max(0, (int) ($fill['blanks'] ?? 0)),
+            'labels' => array_values(array_map(fn ($l) => trim((string) $l), (array) ($fill['labels'] ?? []))),
+        ];
+    }
+
+    /** One list of accepted spellings per blank. */
+    protected function normalizeFillAnswers(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_map(
+            fn ($variants) => array_values(array_filter(array_map(fn ($v) => trim((string) $v), (array) $variants), fn ($v) => $v !== '')),
+            $value
+        ));
     }
 
     protected function normalizeIa(mixed $ia): ?array

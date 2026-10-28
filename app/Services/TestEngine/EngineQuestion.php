@@ -71,7 +71,7 @@ class EngineQuestion
 
     public static function isGradable(array $p): bool
     {
-        return count($p['options'] ?? []) || (($p['boxCount'] ?? 0) && ($p['yesNo'] ?? false)) || !empty($p['ia']);
+        return count($p['options'] ?? []) || (($p['boxCount'] ?? 0) && ($p['yesNo'] ?? false)) || !empty($p['ia']) || !empty($p['fill']);
     }
 
     /**
@@ -94,6 +94,23 @@ class EngineQuestion
                 return null;
             }
             return static::sameSet($sel, $a['correctAnswer'] ?? []) ? 'correct' : 'incorrect';
+        }
+
+        if (!empty($p['fill'])) {
+            $rows = (array) ($response['rows'] ?? []);
+            $expected = $a['fillAnswers'] ?? [];
+            foreach (array_keys($expected) as $n) {
+                if (trim((string) ($rows[$n] ?? '')) === '') {
+                    return null;
+                }
+            }
+            foreach ($expected as $n => $variants) {
+                $given = static::normalizeText((string) $rows[$n]);
+                if (!in_array($given, array_map(fn ($v) => static::normalizeText((string) $v), (array) $variants), true)) {
+                    return 'incorrect';
+                }
+            }
+            return count($expected) ? 'correct' : 'incorrect';
         }
 
         if (!empty($p['ia'])) {
@@ -148,6 +165,14 @@ class EngineQuestion
         }
         $s = implode(' ; ', $parts);
         return $s === '' ? ($response['status'] ?? null) : mb_substr($s, 0, 250);
+    }
+
+    /** Typed answers are compared ignoring case, spacing and surrounding punctuation (mirrors engine.js). */
+    public static function normalizeText(string $s): string
+    {
+        $s = mb_strtolower(trim($s));
+        $s = preg_replace('/\s+/u', ' ', $s);
+        return trim($s, ' .,;:!?"\'');
     }
 
     protected static function sameSet(array $a, array $b): bool

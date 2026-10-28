@@ -167,6 +167,32 @@ class ExamFileImportTest extends TestCase
         $this->assertSame(['A'], $payload['answer']['correctAnswer']);
     }
 
+
+    public function test_fill_in_the_blank_questions_import_and_grade_typed_answers(): void
+    {
+        $questions = [
+            ['id' => 1, 'topic' => '', 'type' => 'fill', 'question' => ['Fill in the blank. ____ is a ring LAN.'], 'options' => [],
+                'images' => [], 'boxCount' => 0, 'yesNo' => false, 'ia' => null, 'fill' => ['blanks' => 1]],
+        ];
+        $answers = ['1' => ['correctAnswer' => ['Token Ring'], 'boxes' => [], 'explanation' => ['It is Token Ring.'], 'reference' => [], 'answerImages' => [],
+            'rowAnswers' => null, 'fillAnswers' => [['Token Ring', 'TokenRing']]]];
+        $html = '<script>const QUESTIONS = ' . json_encode($questions) . ';const ANSWERS_B64 = "' . base64_encode(json_encode($answers)) . '";</script>';
+
+        $parsed = (new ExamFileParser)->parse($html);
+        $this->assertSame([], (new ExamFileValidator)->validate($parsed)['errors']);
+
+        $this->importSample($html)->assertSessionHas('success');
+        $q = Question::where('exam_id', $this->exam->id)->firstOrFail();
+        $this->assertSame('fill_blank', $q->question_type);
+        $this->assertSame([['Token Ring', 'TokenRing']], $q->question_data['engine']['answer']['fillAnswers']);
+
+        $grade = fn (string $typed) => \App\Services\TestEngine\EngineQuestion::grade($q, ['rows' => [0 => $typed]]);
+        $this->assertSame('correct', $grade('  token RING. '));
+        $this->assertSame('correct', $grade('tokenring'));
+        $this->assertSame('incorrect', $grade('Ethernet'));
+        $this->assertNull($grade(''));
+    }
+
     public function test_file_without_exam_data_is_rejected(): void
     {
         $this->actingAs($this->admin)->post(route('admin.questions.import.preview'), [
