@@ -8,6 +8,7 @@ use App\Services\ExamImport\ExamFileParser;
 use App\Services\ExamImport\ExamFileValidator;
 use App\Services\ExamImport\ExamImporter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -118,6 +119,71 @@ class QuestionImportController extends Controller
         }
 
         return redirect()->route('admin.questions.index', ['exam_id' => $exam->id])->with('success', $msg . '.');
+    }
+
+    /**
+     * Imports a staged file a few seconds at a time (the page calls this in a loop and shows
+     * progress), so a big exam never runs into the web server's time limit. Progress is kept
+     * on the server, so a retry carries on where it stopped instead of starting over.
+     */
+    public function storeChunk(Request $request, ExamImporter $importer)
+    {
+        $request->validate(['token' => 'required|uuid', 'mode' => 'required|in:replace,append']);
+
+        $path = self::STAGING_DIR . '/' . $request->token . '.json';
+        $progressPath = self::STAGING_DIR . '/' . $request->token . '.progress.json';
+        $disk = Storage::disk('local');
+        if (!$disk->exists($path)) {
+            return response()->json(['message' => 'This upload has expired or was already imported. Please upload the file again.'], 410);
+        }
+
+        $lock = Cache::lock('exam-import-' . $request->token, 120);
+        if (!$lock->get()) {
+            return response()->json(['message' => 'The previous step is still running — wait a moment.'], 409);
+        }
+
+        try {
+            @set_time_limit(120);
+            $staged = json_decode($disk->get($path), true);
+            $exam = Exam::findOrFail($staged['exam_id']);
+            $total = count($staged['parsed']['questions']);
+
+            $progress = $disk->exists($progressPath) ? json_decode($disk->get($progressPath), true) : null;
+            if (!$progress) {
+                $progress = ['next' => 0, 'imported' => 0, 'skipped' => 0, 'deleted' => $importer->begin($exam, $request->mode === 'replace')];
+            }
+
+            $step = $importer->chunk($exam, $staged['parsed'], $staged['bad_ids'], $progress['next'], (float) config('exam-import.chunk_seconds', 15), $staged['file_name']);
+            $progress['next'] = $step['next'];
+            $progress['imported'] += $step['imported'];
+            $progress['skipped'] += $step['skipped'];
+            $disk->put($progressPath, json_encode($progress));
+
+            if ($progress['next'] < $total) {
+                return response()->json(['done' => false, 'processed' => $progress['next'], 'total' => $total]);
+            }
+
+            $importer->finish($exam);
+            $disk->delete([$path, $progressPath]);
+
+            $msg = "Imported {$progress['imported']} questions into {$exam->exam_code}";
+            if ($progress['deleted']) {
+                $msg .= " (replaced {$progress['deleted']} old questions)";
+            }
+            if ($progress['skipped']) {
+                $msg .= ". Skipped {$progress['skipped']} questions that had errors";
+            }
+            $request->session()->flash('success', $msg . '.');
+
+            return response()->json([
+                'done'      => true,
+                'processed' => $total,
+                'total'     => $total,
+                'redirect'  => route('admin.questions.index', ['exam_id' => $exam->id]),
+            ]);
+        } finally {
+            $lock->release();
+        }
     }
 
     protected function normalizeCode(string $code): string

@@ -44,6 +44,7 @@ use App\Http\Controllers\Admin\QuestionImportController;
 Route::get('questions/import', [QuestionImportController::class, 'create'])->name('questions.import');
 Route::post('questions/import/preview', [QuestionImportController::class, 'preview'])->name('questions.import.preview');
 Route::post('questions/import/confirm', [QuestionImportController::class, 'store'])->name('questions.import.store');
+Route::post('questions/import/chunk', [QuestionImportController::class, 'storeChunk'])->name('questions.import.chunk');
 Route::get('questions/import/template', [QuestionImportController::class, 'template'])->name('questions.import.template');
 
 Route::get('questions/{question}/preview', [QuestionAdminController::class, 'preview'])->name('questions.preview');

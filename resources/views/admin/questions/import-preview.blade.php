@@ -16,7 +16,28 @@
         return '—';
     };
 @endphp
-<div class="space-y-6" x-data="{ submitting: false, showWarnings: false }">
+<div class="space-y-6" x-data="{
+    submitting: false, showWarnings: false, processed: 0, total: {{ $report['stats']['questions'] }}, error: '',
+    // Imports in short batches so a big exam cannot hit the server's time limit; a retry resumes where it stopped.
+    async run() {
+        this.submitting = true; this.error = '';
+        try {
+            while (true) {
+                const res = await fetch(@js(route('admin.questions.import.chunk')), {
+                    method: 'POST', credentials: 'same-origin', body: new FormData(this.$refs.form),
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) { throw new Error(data.message || ('The server answered with an error (' + res.status + ').')); }
+                this.processed = data.processed; this.total = data.total;
+                if (data.done) { window.location = data.redirect; return; }
+            }
+        } catch (e) {
+            this.error = e.message + ' Click Import again to carry on from where it stopped.';
+            this.submitting = false;
+        }
+    },
+}">
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-800 font-sora">Check before import</h1>
@@ -72,7 +93,7 @@
     @endif
 
     {{-- Confirm --}}
-    <form action="{{ route('admin.questions.import.store') }}" method="POST" @submit="submitting = true"
+    <form action="{{ route('admin.questions.import.store') }}" method="POST" x-ref="form" @submit.prevent="run()"
           class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 space-y-4">
         @csrf
         <input type="hidden" name="token" value="{{ $token }}">
@@ -90,8 +111,12 @@
         <button type="submit" :disabled="submitting || {{ $importable ? 'false' : 'true' }}"
                 class="bg-orange hover:bg-opacity-90 text-white text-sm font-bold py-2.5 px-6 rounded shadow transition disabled:opacity-60">
             <span x-show="!submitting">Import {{ $importable }} questions</span>
-            <span x-show="submitting" x-cloak>Importing… (this can take a minute)</span>
+            <span x-show="submitting" x-cloak>Importing… <span x-text="processed"></span> of <span x-text="total"></span></span>
         </button>
+        <div x-show="submitting" x-cloak class="h-2 bg-gray-100 rounded overflow-hidden" role="progressbar" :aria-valuenow="processed" aria-valuemin="0" :aria-valuemax="total">
+            <div class="h-full bg-orange transition-all" :style="'width:' + (total ? Math.round(processed / total * 100) : 0) + '%'"></div>
+        </div>
+        <p x-show="error" x-cloak x-text="error" class="text-sm text-red-600 font-semibold"></p>
     </form>
 
     {{-- Question list --}}

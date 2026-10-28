@@ -4,6 +4,7 @@ namespace App\Services\ExamImport;
 
 use App\Models\Exam;
 use App\Models\Question;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -37,7 +38,7 @@ class ExamImporter
         $skip = array_flip(array_map('strval', $skipIds));
         $urls = $this->storeImages($exam, $parsed['images']);
 
-        return DB::transaction(function () use ($exam, $parsed, $replaceExisting, $skip, $urls, $sourceName) {
+        $result = DB::transaction(function () use ($exam, $parsed, $replaceExisting, $skip, $urls, $sourceName) {
             $deleted = 0;
             if ($replaceExisting) {
                 $deleted = Question::where('exam_id', $exam->id)->count();
@@ -55,10 +56,79 @@ class ExamImporter
                 $imported++;
             }
 
-            $exam->update(['question_count' => $exam->questions()->count()]);
+            // Query-builder update on purpose: saving the model would fire Exam::saved, which
+            // regenerates the sitemap and rewrites the vendor row while this transaction holds locks.
+            $total = $exam->questions()->count();
+            Exam::whereKey($exam->id)->update(['question_count' => $total]);
+            $exam->question_count = $total;
 
             return ['imported' => $imported, 'skipped' => $skipped, 'deleted' => $deleted, 'images' => count($urls)];
         });
+
+        // The sitemap lists exams by last update; refresh it once, after the data is committed.
+        try {
+            Artisan::call('sitemap:generate');
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Batch import for big files: removes the old questions (replace mode), once, before the first batch.
+     */
+    public function begin(Exam $exam, bool $replaceExisting): int
+    {
+        if (!$replaceExisting) {
+            return 0;
+        }
+
+        return DB::transaction(function () use ($exam) {
+            $deleted = Question::where('exam_id', $exam->id)->count();
+            Question::where('exam_id', $exam->id)->delete();
+            return $deleted;
+        });
+    }
+
+    /**
+     * Save questions from $offset onward until $budget seconds are used, in one short transaction.
+     *
+     * @return array{next:int, imported:int, skipped:int}
+     */
+    public function chunk(Exam $exam, array $parsed, array $skipIds, int $offset, float $budget, ?string $sourceName = null): array
+    {
+        $skip = array_flip(array_map('strval', $skipIds));
+        $urls = $this->storeImages($exam, $parsed['images']);
+        $questions = $parsed['questions'];
+        $started = microtime(true);
+        $imported = $skipped = 0;
+        $next = $offset;
+
+        DB::transaction(function () use ($exam, $questions, $skip, $urls, $sourceName, $budget, $started, $offset, &$imported, &$skipped, &$next) {
+            // always at least one question per batch, so every call makes progress
+            for (; $next < count($questions) && ($next === $offset || (microtime(true) - $started) < $budget); $next++) {
+                if (isset($skip[(string) $questions[$next]['id']])) {
+                    $skipped++;
+                    continue;
+                }
+                $this->saveQuestion($exam, $questions[$next], $urls, $sourceName);
+                $imported++;
+            }
+        });
+
+        return ['next' => $next, 'imported' => $imported, 'skipped' => $skipped];
+    }
+
+    /** Last step of a batch import: refresh the question count and the sitemap. */
+    public function finish(Exam $exam): void
+    {
+        Exam::whereKey($exam->id)->update(['question_count' => $exam->questions()->count()]);
+        try {
+            Artisan::call('sitemap:generate');
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     /**
