@@ -142,7 +142,7 @@
                                     Exam Code
                                 </span>
                                 <div class="pl-[40px] flex items-center flex-wrap gap-2 mt-1">
-                                    <span class="text-xl font-black text-white whitespace-nowrap">{{ $exam->exam_code }}</span>
+                                    <span class="text-xl font-black text-white break-words min-w-0">{{ $exam->exam_code }}</span>
                                     <span class="bg-gradient-to-r from-cyan/20 to-blue-500/20 text-cyan text-[10px] px-2.5 py-1 rounded-md border border-cyan/30 font-bold uppercase tracking-wider whitespace-nowrap">{{ $exam->difficulty }}</span>
                                 </div>
                             </div>
@@ -252,7 +252,9 @@
                             @if($heroHasArticle)
                                 <a href="#exam-details" class="text-[12px] font-bold text-gray-200 bg-white/5 hover:bg-cyan/20 hover:text-white border border-white/10 rounded-full px-3 py-1.5 transition-colors">Exam Details</a>
                             @endif
+                            @if(!empty($exam->resolved_topics))
                             <a href="#exam-topics" class="text-[12px] font-bold text-gray-200 bg-white/5 hover:bg-cyan/20 hover:text-white border border-white/10 rounded-full px-3 py-1.5 transition-colors">Topics Covered</a>
+                            @endif
                             @if($heroHasFaqs)
                                 <a href="#exam-faq" class="text-[12px] font-bold text-gray-200 bg-white/5 hover:bg-cyan/20 hover:text-white border border-white/10 rounded-full px-3 py-1.5 transition-colors">FAQ</a>
                             @endif
@@ -540,6 +542,8 @@
                 </div>
                 @endif
 
+                @php $examTopics = $exam->resolved_topics; @endphp
+                @if(!empty($examTopics))
                 <!-- Collapsible Topics covered -->
                 <div id="exam-topics" class="scroll-mt-32 space-y-4" x-data="{ open: true }">
                     <button x-on:click="open = !open" class="flex justify-between items-center w-full bg-white border border-gray-100 hover:border-cyan/50 rounded-3xl p-6 sm:p-8 font-black text-navy text-xl sm:text-2xl text-left focus:outline-none shadow-[0_5px_20px_rgba(0,0,0,0.02)] transition-all group">
@@ -565,8 +569,8 @@
 
                         <p class="text-base font-normal text-gray-600 mb-8 relative z-10">The study guide addresses all core domains defined in the official vendor certification syllabus:</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 text-base font-normal text-gray-700 relative z-10">
-                            @if(is_array($exam->topics))
-                                @foreach($exam->topics as $topic)
+                            @if(is_array($examTopics))
+                                @foreach($examTopics as $topic)
                                     <div class="flex items-start space-x-3 group/topic">
                                         <div class="mt-1 w-5 h-5 rounded-full bg-cyan/10 flex items-center justify-center flex-shrink-0 group-hover/topic:bg-cyan transition-colors">
                                             <svg class="w-3 h-3 text-cyan group-hover/topic:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
@@ -585,6 +589,8 @@
                         </div>
                     </div>
                 </div>
+
+                @endif
 
                 @php
                     $renderedFaqs = $exam->resolved_faqs;

@@ -70,8 +70,8 @@ class ExamPageSampleQuestionsOrderTest extends TestCase
         $questions = strpos($html, 'Actual Free Microsoft AZ-900 Practice Questions');
         $details = strpos($html, 'Microsoft AZ-900 Exam Details');
 
-        $this->assertNotFalse($questions);
-        $this->assertGreaterThan($details, $questions, 'with no sample questions the page is unchanged');
-        $this->assertSame(1, substr_count($html, 'Actual Free Microsoft AZ-900 Practice Questions'));
+        // no empty "Actual Free ... Practice Questions" heading when there is nothing to show
+        $this->assertFalse($questions);
+        $this->assertStringContainsString('Ready to master all', $html);
     }
 }

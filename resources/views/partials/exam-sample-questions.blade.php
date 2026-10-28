@@ -1,10 +1,12 @@
 {{-- Free sample questions + unlock CTA for an exam page. Needs $exam and $sampleQuestions. --}}
                 <!-- Sample Questions -->
                 <div id="free-practice-questions" class="scroll-mt-32 space-y-10 pt-2 lg:pt-8">
+                    @if($sampleQuestions->isNotEmpty())
                     <div class="text-center mb-12">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-4 inline-block">Free Trial</span>
                         <h2 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Actual Free {{ $exam->vendor->name }} {{ $exam->exam_code }} Practice Questions</h2>
                     </div>
+                    @endif
                     
                     @foreach($sampleQuestions as $index => $question)
                         <div class="bg-white border border-gray-100 rounded-[32px] p-8 sm:p-10 text-navy space-y-8 shadow-[0_15px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,212,170,0.08)] hover:border-cyan/30 transition-all duration-300 relative overflow-hidden" x-data="{ selectedOption: null, checked: false }">
