@@ -16,7 +16,7 @@
             <div class="col-span-2 md:col-span-5 space-y-4">
                 <a href="{{ url('/') }}" class="inline-flex items-center gap-2.5" aria-label="{{ $footBrand }} home">
                     @if($footLogo)
-                        <img src="{{ $footLogo }}" alt="{{ $footBrand }}" class="h-7 w-auto max-w-[260px]" width="260" height="29" loading="lazy">
+                        <img src="{{ $footLogo }}" alt="{{ $footBrand }} logo" class="h-7 w-auto max-w-[260px]" width="260" height="29" loading="lazy">
                     @else
                         <span class="flex h-9 w-9 items-center justify-center rounded-xl text-base font-black text-white" style="background: linear-gradient(135deg, var(--brand), var(--brand-dark));">{{ strtoupper(mb_substr($footBrand, 0, 1)) }}</span>
                     <span class="text-lg font-extrabold tracking-tight text-white">{{ $footBrand }}</span>

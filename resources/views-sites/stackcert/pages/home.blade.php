@@ -27,6 +27,7 @@
 @section('title', $homeMeta['title'])
 @section('meta_description', $homeMeta['description'])
 
+@section('og_type', 'website')
 @section('seo_tags')
 <script type="application/ld+json">
 {!! json_encode([

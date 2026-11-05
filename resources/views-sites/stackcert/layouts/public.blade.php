@@ -22,6 +22,10 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ $siteFavicon }}">
     <link rel="shortcut icon" href="{{ $siteFavicon }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ $customAppleIcon }}">
+    @if($siteIconDir && is_file(public_path($siteIconDir . '/site.webmanifest')))
+        <link rel="manifest" href="{{ asset($siteIconDir . '/site.webmanifest') }}">
+    @endif
+    <meta name="theme-color" content="{{ ($currentSite && !empty($currentSite->primary_color)) ? $currentSite->primary_color : '#0F6CBD' }}">
 
     <!-- Site Verification Tags (Google, Bing, Yandex, Pinterest) -->
     @php
@@ -60,7 +64,6 @@
 
     <title>{!! $pageTitle !!}</title>
     <meta name="description" content="{!! $pageDesc !!}">
-    <meta name="keywords" content="{!! \App\Services\SiteContext::scrubDumps($__env->yieldContent('meta_keywords', $defaultSiteKeywords)) !!}">
     <link rel="canonical" href="{{ $computedCanonical }}">
     <link rel="alternate" hreflang="en" href="{{ $computedCanonical }}">
     <link rel="alternate" hreflang="x-default" href="{{ $computedCanonical }}">

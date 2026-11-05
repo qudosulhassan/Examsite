@@ -1,0 +1,14 @@
+{
+  "name": "AzureExamsHub",
+  "short_name": "AzureExamsHub",
+  "description": "Microsoft certification practice tests, exam guides and a timed test engine.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "theme_color": "#0F6CBD",
+  "background_color": "#ffffff",
+  "icons": [
+    { "src": "/sites/azureexamshub/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/sites/azureexamshub/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

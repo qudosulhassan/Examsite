@@ -35,7 +35,7 @@
         <div class="flex h-[68px] items-center justify-between gap-6">
             <a href="{{ url('/') }}" class="flex items-center gap-2.5" aria-label="{{ $brandName }} home">
                 @if($brandLogo)
-                    <img src="{{ $brandLogo }}" alt="{{ $brandName }}" class="h-6 w-auto max-w-[210px] object-contain sm:h-7 sm:max-w-[270px]" width="270" height="30">
+                    <img src="{{ $brandLogo }}" alt="{{ $brandName }} logo" class="h-6 w-auto max-w-[210px] object-contain sm:h-7 sm:max-w-[270px]" width="270" height="30">
                 @else
                     <span class="flex h-9 w-9 items-center justify-center rounded-xl text-base font-black text-white" style="background: linear-gradient(135deg, var(--brand), var(--brand-dark));">{{ strtoupper(mb_substr($brandName, 0, 1)) }}</span>
                     <span class="text-lg font-extrabold tracking-tight text-slate-900">{{ $brandName }}</span>

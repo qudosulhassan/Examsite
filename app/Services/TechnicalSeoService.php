@@ -197,6 +197,14 @@ Disallow: /webhook/
 Disallow: /login
 Disallow: /register
 Disallow: /password/
+Disallow: /account
+Disallow: /user/
+Disallow: /orders
+Disallow: /downloads
+Disallow: /test-session
+Disallow: /exam-session
+Disallow: /practice-exam
+Disallow: /simulator
 
 # Disallow Filter, Search & Dynamic Session Paths
 Disallow: /search
