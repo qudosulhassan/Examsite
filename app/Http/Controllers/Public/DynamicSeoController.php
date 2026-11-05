@@ -84,6 +84,10 @@ class DynamicSeoController extends Controller
                 }])
                 ->get();
 
+            // Exams with no free (single-choice) question have nothing on their free-questions page yet: leave it out.
+            $withFree = \App\Models\Question::withoutGlobalScopes()->where('is_active', true)->where('question_type', 'single_choice')
+                ->whereIn('exam_id', $exams->pluck('id'))->distinct()->pluck('exam_id')->flip();
+
             foreach ($exams as $e) {
                 $overlay = $site ? $e->overlays->first() : null;
                 // If overlay exists and marked not active or noindex, skip from sitemap
@@ -104,7 +108,9 @@ class DynamicSeoController extends Controller
 
                 // Hub-style sites give every exam its own free-questions and plans pages
                 if (\App\Models\Exam::usesHubUrls()) {
-                    $urls[] = ['loc' => $e->questions_url, 'priority' => '0.8', 'changefreq' => 'weekly', 'lastmod' => $lastmod];
+                    if (isset($withFree[$e->id])) {
+                        $urls[] = ['loc' => $e->questions_url, 'priority' => '0.8', 'changefreq' => 'weekly', 'lastmod' => $lastmod];
+                    }
                     $urls[] = ['loc' => $e->plans_url, 'priority' => '0.6', 'changefreq' => 'monthly', 'lastmod' => $lastmod];
                 }
             }
