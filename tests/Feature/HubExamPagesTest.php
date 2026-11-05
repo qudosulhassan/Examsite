@@ -124,6 +124,58 @@ class HubExamPagesTest extends TestCase
         }
     }
 
+    public function test_guest_page_cache_serves_a_hit_with_the_visitors_own_csrf_token(): void
+    {
+        config(['site.page_cache' => true, 'site.page_cache_ttl' => 600]);
+        $exam = $this->exam();
+
+        $first = $this->get($exam->plans_url)->assertOk();
+        $this->assertSame('MISS', $first->headers->get('X-Page-Cache'));
+        $firstToken = csrf_token();
+        $this->assertStringContainsString($firstToken, $first->getContent());
+
+        // a different visitor (new session) gets the cached page, but with their own token and not the first one
+        $this->flushSession();
+        $this->refreshApplicationSessionToken();
+        $second = $this->get($exam->plans_url)->assertOk();
+        $this->assertSame('HIT', $second->headers->get('X-Page-Cache'));
+        $this->assertStringNotContainsString($firstToken, $second->getContent());
+        $this->assertStringContainsString(csrf_token(), $second->getContent());
+        $this->assertStringNotContainsString('@@CSRF-TOKEN@@', $second->getContent());
+    }
+
+    public function test_guest_page_cache_is_skipped_for_carts_users_queries_and_private_pages(): void
+    {
+        config(['site.page_cache' => true]);
+        $exam = $this->exam();
+        $this->get($exam->url)->assertOk();   // warm it
+
+        $this->withSession(['cart' => [['id' => 1]]])->get($exam->url)->assertOk()->assertHeaderMissing('X-Page-Cache');
+        $this->flushSession();
+        $this->get($exam->url . '?utm_source=mail')->assertOk()->assertHeaderMissing('X-Page-Cache');
+        $this->get('/search?q=dp')->assertHeaderMissing('X-Page-Cache');
+        $this->get('/login')->assertHeaderMissing('X-Page-Cache');
+        $this->actingAs(\App\Models\User::factory()->create())->get($exam->url)->assertOk()->assertHeaderMissing('X-Page-Cache');
+    }
+
+    public function test_flush_command_makes_cached_pages_stale(): void
+    {
+        config(['site.page_cache' => true]);
+        $exam = $this->exam();
+        $this->get($exam->url)->assertHeader('X-Page-Cache', 'MISS');
+        $this->flushSession();
+        $this->get($exam->url)->assertHeader('X-Page-Cache', 'HIT');
+
+        $this->artisan('pagecache:flush')->assertSuccessful();
+        $this->flushSession();
+        $this->get($exam->url)->assertHeader('X-Page-Cache', 'MISS');
+    }
+
+    private function refreshApplicationSessionToken(): void
+    {
+        session()->regenerateToken();
+    }
+
     public function test_each_page_has_its_own_title_h1_and_self_canonical(): void
     {
         $exam = $this->exam();

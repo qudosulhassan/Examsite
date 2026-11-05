@@ -26,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\CheckRedirects::class);
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
 
+        // Needs the session (CSRF token, cart), so it belongs to the web group rather than the global stack
+        $middleware->web(append: [\App\Http\Middleware\CacheGuestPages::class]);
+
         $middleware->alias([
             'admin' => AdminMiddleware::class,
         ]);
