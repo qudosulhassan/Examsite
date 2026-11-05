@@ -13,7 +13,7 @@
 <footer class="mt-auto bg-slate-950 text-slate-300">
     <div class="container-custom py-14">
         <div class="grid grid-cols-2 gap-10 md:grid-cols-12">
-            <div class="col-span-2 md:col-span-5 space-y-4">
+            <div class="col-span-2 md:col-span-3 space-y-4">
                 <a href="{{ url('/') }}" class="inline-flex items-center gap-2.5" aria-label="{{ $footBrand }} home">
                     @if($footLogo)
                         <img src="{{ $footLogo }}" alt="{{ $footBrand }} logo" class="h-7 w-auto max-w-[260px]" width="260" height="29" loading="lazy">
@@ -31,34 +31,44 @@
             </div>
 
             <div class="md:col-span-2 space-y-3">
-                <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Learn</p>
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Tracks</p>
                 <ul class="space-y-2 text-sm">
+                    @foreach(\App\Support\ExamTracks::definitions((string) $footVendorSlug) as $footTrack)
+                        <li><a href="{{ url('/tracks/' . $footTrack['slug']) }}" class="hover:text-white">{{ $footTrack['title'] }}</a></li>
+                    @endforeach
+                    <li><a href="{{ url('/tracks/more-exams') }}" class="hover:text-white">More exams</a></li>
                     <li><a href="{{ $footVendorSlug ? url('/vendors/' . $footVendorSlug) : url('/vendors') }}" class="hover:text-white">All exams</a></li>
-                    <li><a href="{{ url('/') }}#tracks" class="hover:text-white">Exam tracks</a></li>
-                    <li><a href="{{ url('/certifications') }}" class="hover:text-white">Certifications</a></li>
-                    <li><a href="{{ url('/test-engine') }}" class="hover:text-white">Test engine</a></li>
-                    <li><a href="{{ url('/blog') }}" class="hover:text-white">Blog</a></li>
                 </ul>
             </div>
 
             <div class="md:col-span-2 space-y-3">
-                <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Support</p>
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Popular exams</p>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ url('/faq') }}" class="hover:text-white">FAQ</a></li>
-                    <li><a href="{{ url('/contact') }}" class="hover:text-white">Contact</a></li>
+                    @foreach(['az-900', 'az-104', 'az-305', 'sc-900', 'sc-200', 'sc-300', 'pl-300', 'dp-900'] as $footExam)
+                        <li><a href="{{ url('/exams/' . $footExam) }}" class="hover:text-white">{{ strtoupper($footExam) }} exam guide</a></li>
+                    @endforeach
+                </ul>
+            </div>
+
+            <div class="md:col-span-2 space-y-3">
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Company</p>
+                <ul class="space-y-2 text-sm">
                     <li><a href="{{ url('/about') }}" class="hover:text-white">About</a></li>
+                    <li><a href="{{ url('/contact') }}" class="hover:text-white">Contact</a></li>
+                    <li><a href="{{ url('/faq') }}" class="hover:text-white">FAQ</a></li>
+                    <li><a href="{{ url('/blog') }}" class="hover:text-white">Blog</a></li>
+                    <li><a href="{{ url('/test-engine') }}" class="hover:text-white">Test engine</a></li>
                     <li><a href="{{ url('/free-demo') }}" class="hover:text-white">Free sample</a></li>
                 </ul>
             </div>
 
-            <div class="md:col-span-3 space-y-3">
+            <div class="md:col-span-1 space-y-3">
                 <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Legal</p>
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ url('/privacy-policy') }}" class="hover:text-white">Privacy policy</a></li>
-                    @if(\Illuminate\Support\Facades\Route::has('terms'))
-                        <li><a href="{{ route('terms') }}" class="hover:text-white">Terms of service</a></li>
-                    @endif
-                    <li><a href="{{ url('/dmca') }}" class="hover:text-white">DMCA &amp; copyright</a></li>
+                    <li><a href="{{ url('/terms') }}" class="hover:text-white">Terms</a></li>
+                    <li><a href="{{ url('/refund-policy') }}" class="hover:text-white">Refund policy</a></li>
+                    <li><a href="{{ url('/dmca') }}" class="hover:text-white">DMCA</a></li>
                 </ul>
             </div>
         </div>

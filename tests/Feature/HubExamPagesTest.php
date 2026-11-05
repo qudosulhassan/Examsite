@@ -298,8 +298,9 @@ class HubExamPagesTest extends TestCase
         $this->exam('DP-800');
         $this->exam('AZ-900', 1);
 
-        $this->get('/tracks/data-ai')->assertOk()->assertSee('DP-800')->assertDontSee('AZ-900');
-        $this->get('/tracks/azure-cloud')->assertOk()->assertSee('AZ-900');
+        // the footer lists popular exams on every page, so look at the track's own list (its ItemList markup)
+        $this->get('/tracks/data-ai')->assertOk()->assertSee('"name":"DP-800 SQL AI Developer"', false)->assertDontSee('"name":"AZ-900 SQL AI Developer"', false);
+        $this->get('/tracks/azure-cloud')->assertOk()->assertSee('"name":"AZ-900 SQL AI Developer"', false);
         $this->get('/tracks/not-a-track')->assertNotFound();
     }
 

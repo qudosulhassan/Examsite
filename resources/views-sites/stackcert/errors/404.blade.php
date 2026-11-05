@@ -37,7 +37,7 @@
         <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             @foreach($tracks as $t)
                 <li>
-                    <a href="{{ route('tracks.show', $t['slug']) }}" class="block rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-slate-300 hover:shadow-md">
+                    <a href="{{ url('/tracks/' . $t['slug']) }}" class="block rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-slate-300 hover:shadow-md">
                         <span class="font-extrabold text-slate-900">{{ $t['title'] }}</span>
                         <span class="mt-1 block text-sm text-slate-600">{{ $t['exams']->count() }} {{ \Illuminate\Support\Str::plural('exam', $t['exams']->count()) }}</span>
                     </a>
