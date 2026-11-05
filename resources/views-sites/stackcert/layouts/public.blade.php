@@ -38,6 +38,10 @@
 
         $defaultSiteTitle = ($currentSite && !empty($currentSite->default_seo_title)) ? $currentSite->default_seo_title : (!empty($globalSettings['default_seo_title']) ? $globalSettings['default_seo_title'] : config('seo.defaults.title'));
         $defaultSiteDesc = ($currentSite && !empty($currentSite->default_meta_description)) ? $currentSite->default_meta_description : (!empty($globalSettings['default_meta_description']) ? $globalSettings['default_meta_description'] : config('seo.defaults.description'));
+        // Fixed pages (about, contact, faq, ...) get their own hand-written title and description.
+        $staticMeta = \App\Support\SeoMeta::staticPage(request()->path(), $currentSite->name ?? config('app.name'), (string) (\App\Models\Vendor::where('slug', (string) (config('site.vendors')[0] ?? ''))->value('name') ?: 'Microsoft'));
+        $pageTitle = $staticMeta ? e($staticMeta['title']) : $__env->yieldContent('title', $defaultSiteTitle);
+        $pageDesc = $staticMeta ? e($staticMeta['description']) : $__env->yieldContent('meta_description', $defaultSiteDesc);
         $defaultSiteKeywords = ($currentSite && !empty($currentSite->primary_keyword_strategy)) ? $currentSite->primary_keyword_strategy : (!empty($globalSettings['default_meta_keywords']) ? $globalSettings['default_meta_keywords'] : config('seo.defaults.keywords'));
         $activeSiteName = $currentSite ? $currentSite->name : (!empty($globalSettings['site_name']) ? $globalSettings['site_name'] : config('seo.site_name', 'Exam Topics Base'));
     @endphp
@@ -54,8 +58,8 @@
         <meta name="p:domain_verify" content="{{ $pinterestVerification }}">
     @endif
 
-    <title>@yield('title', $defaultSiteTitle)</title>
-    <meta name="description" content="@yield('meta_description', $defaultSiteDesc)">
+    <title>{!! $pageTitle !!}</title>
+    <meta name="description" content="{!! $pageDesc !!}">
     <meta name="keywords" content="{!! \App\Services\SiteContext::scrubDumps($__env->yieldContent('meta_keywords', $defaultSiteKeywords)) !!}">
     <link rel="canonical" href="{{ $computedCanonical }}">
     <link rel="alternate" hreflang="en" href="{{ $computedCanonical }}">
@@ -66,8 +70,8 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', $globalSettings['seo_og_type'] ?? config('seo.defaults.og_type', 'website'))">
     <meta property="og:url" content="{{ $computedCanonical }}">
-    <meta property="og:title" content="@yield('title', $defaultSiteTitle)">
-    <meta property="og:description" content="@yield('meta_description', $defaultSiteDesc)">
+    <meta property="og:title" content="{!! $pageTitle !!}">
+    <meta property="og:description" content="{!! $pageDesc !!}">
     <meta property="og:image" content="@yield('og_image', $ogDefault)">
     <meta property="og:site_name" content="{{ $activeSiteName }}">
     @if(!empty($globalSettings['seo_facebook_app_id']))
@@ -79,12 +83,12 @@
     <meta name="twitter:site" content="{{ $globalSettings['social_twitter'] ?? config('seo.social.twitter_handle', '@ExamTopicsBase') }}">
     <meta name="twitter:creator" content="{{ $globalSettings['social_twitter'] ?? config('seo.social.twitter_handle', '@ExamTopicsBase') }}">
     <meta name="twitter:url" content="@yield('canonical_url', $computedCanonical)">
-    <meta name="twitter:title" content="@yield('title', $defaultSiteTitle)">
-    <meta name="twitter:description" content="@yield('meta_description', $defaultSiteDesc)">
+    <meta name="twitter:title" content="{!! $pageTitle !!}">
+    <meta name="twitter:description" content="{!! $pageDesc !!}">
     <meta name="twitter:image" content="@yield('og_image', $ogDefault)">
     <meta property="twitter:card" content="{{ $globalSettings['seo_twitter_card'] ?? 'summary_large_image' }}">
-    <meta property="twitter:title" content="@yield('title', $defaultSiteTitle)">
-    <meta property="twitter:description" content="@yield('meta_description', $defaultSiteDesc)">
+    <meta property="twitter:title" content="{!! $pageTitle !!}">
+    <meta property="twitter:description" content="{!! $pageDesc !!}">
     <meta property="twitter:image" content="@yield('og_image', $ogDefault)">
 
     <!-- Structured Data (JSON-LD) -->
