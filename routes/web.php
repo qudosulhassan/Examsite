@@ -140,7 +140,9 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
         'message' => 'required|string',
     ]);
     // No mailbox is wired up yet, so keep the message in the application log instead of discarding it.
-    \Illuminate\Support\Facades\Log::info('Contact form message', $request->only('name', 'email', 'subject', 'message') + ['site' => config('site.id'), 'ip' => $request->ip()]);
+    if ((int) config('site.id', 1) !== 1) {
+        \Illuminate\Support\Facades\Log::info('Contact form message', $request->only('name', 'email', 'subject', 'message') + ['site' => config('site.id'), 'ip' => $request->ip()]);
+    }
 
     return back()->with('success', 'Thank you! Your message has been sent to our support queue. We will contact you shortly.');
 });

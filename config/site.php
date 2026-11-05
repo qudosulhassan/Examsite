@@ -85,6 +85,9 @@ return [
         'url'  => env('SITE_EDITOR_URL'),
     ],
 
+    // Seconds to remember redirect-rule lookups (0 = look up on every request). Useful when the database is on another server.
+    'redirect_cache_ttl' => (int) env('SITE_REDIRECT_CACHE_TTL', 0),
+
     // Raster logo for Organization markup (search engines reject SVG there), e.g. SITE_SCHEMA_LOGO=images/logo-primary.png
     'schema_logo' => env('SITE_SCHEMA_LOGO'),
 

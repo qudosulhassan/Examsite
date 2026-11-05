@@ -43,13 +43,17 @@ class CheckRedirects
 
                 // Most paths have no redirect rule, and asking the database costs a round trip on every request (a
                 // network hop when the database is on another server), so remember the answer, including "none".
-                $cacheKey = 'redirect_rule:' . ($site->id ?? 0) . ':' . sha1($path);
-                $found = \Illuminate\Support\Facades\Cache::remember($cacheKey, 600, function () use ($q, $path) {
+                // Off by default (SITE_REDIRECT_CACHE_TTL=0): with it on, a rule edited in the admin applies after the TTL.
+                $lookup = function () use ($q, $path) {
                     return $q->where(function ($query) use ($path) {
                         $query->where('old_url', $path)
                               ->orWhere('old_url', ltrim($path, '/'));
                     })->orderByRaw('CASE WHEN site_id IS NULL THEN 1 ELSE 0 END ASC')->first() ?: false;
-                });
+                };
+                $ttl = (int) config('site.redirect_cache_ttl', 0);
+                $found = $ttl > 0
+                    ? \Illuminate\Support\Facades\Cache::remember('redirect_rule:' . ($site->id ?? 0) . ':' . sha1($path), $ttl, $lookup)
+                    : $lookup();
                 $redirect = $found ?: null;
             } catch (\Throwable $th) {}
         }
