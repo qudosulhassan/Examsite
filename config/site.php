@@ -77,6 +77,14 @@ return [
     'page_cache' => filter_var(env('SITE_PAGE_CACHE', false), FILTER_VALIDATE_BOOLEAN),
     'page_cache_ttl' => (int) env('SITE_PAGE_CACHE_TTL', 900),
 
+    // "Reviewed by" block on exam guides and the About page. Stays hidden until a name is set (SITE_EDITOR_NAME).
+    'editorial' => [
+        'name' => env('SITE_EDITOR_NAME'),
+        'role' => env('SITE_EDITOR_ROLE'),
+        'bio'  => env('SITE_EDITOR_BIO'),
+        'url'  => env('SITE_EDITOR_URL'),
+    ],
+
     // Raster logo for Organization markup (search engines reject SVG there), e.g. SITE_SCHEMA_LOGO=images/logo-primary.png
     'schema_logo' => env('SITE_SCHEMA_LOGO'),
 

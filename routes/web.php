@@ -139,10 +139,22 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
         'subject' => 'required|string|max:255',
         'message' => 'required|string',
     ]);
+    // No mailbox is wired up yet, so keep the message in the application log instead of discarding it.
+    \Illuminate\Support\Facades\Log::info('Contact form message', $request->only('name', 'email', 'subject', 'message') + ['site' => config('site.id'), 'ip' => $request->ip()]);
+
     return back()->with('success', 'Thank you! Your message has been sent to our support queue. We will contact you shortly.');
 });
 
 // Legal, Compliance & Guarantee Policies
+// Terms and refund policy exist only on sites that ship those pages (views-sites/<site>/pages/terms.blade.php)
+Route::get('/terms', function () {
+    abort_unless(view()->exists('pages.terms'), 404);
+    return view('pages.terms');
+})->name('terms');
+Route::get('/refund-policy', function () {
+    abort_unless(view()->exists('pages.refund-policy'), 404);
+    return view('pages.refund-policy');
+})->name('refund-policy');
 Route::get('/privacy-policy', function () {
     return view('pages.privacy');
 })->name('privacy-policy');

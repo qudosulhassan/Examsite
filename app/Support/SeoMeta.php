@@ -173,6 +173,14 @@ class SeoMeta
                 ["{$vendor} Exam Blog: Study Tips & News | {$brand}"],
                 ["Study tips, exam updates and guides for {$vendor} certification exams: how to plan your preparation, what changed in an exam and how to practise.", "Study tips, exam updates and guides for {$vendor} certification exams."],
             ],
+            'terms' => [
+                ["Terms of Service: Practice Tests & Guides | {$brand}"],
+                ["The terms for using {$brand} and the study material you buy from it: your licence, what you may not do, accounts, independence from {$vendor} and liability."],
+            ],
+            'refund-policy' => [
+                ["Refund Policy: Practice Tests & PDF Guides | {$brand}"],
+                ["The {$brand} refund policy for practice test plans, PDF study guides and the online test engine, and how to contact us about an order."],
+            ],
             'free-demo' => [
                 ["Try a Free {$vendor} Practice Test Demo | {$brand}"],
                 ["Try a free {$vendor} practice test demo. Answer sample questions in the test engine and read the explanations before you choose a PDF guide or plan.", "Try a free {$vendor} practice test demo and read the explanations before you choose a plan."],
