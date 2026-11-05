@@ -127,6 +127,7 @@ class SeoMeta
             ]),
             'description' => static::description([
                 "Practice tests and exam guides for {$count} {$vendor} {$track} exams ({$list}). See what each exam covers, try free questions and pick a study order.",
+                "Practice tests and exam guides for {$count} {$vendor} {$track} exams ({$list}). Try free questions, compare the exams and pick a study order.",
                 "Practice tests and exam guides for {$count} {$vendor} {$track} exams ({$list}). Try free questions and pick a study order.",
                 "Practice tests and exam guides for {$count} {$vendor} {$track} exams. Try free questions.",
             ]),

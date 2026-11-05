@@ -178,20 +178,23 @@
                             </div>
                             <p class="mt-3 text-sm leading-relaxed text-slate-600">{{ $domain['explanation'] }}</p>
                             <div class="mt-4 grid gap-4 sm:grid-cols-2">
-                                @foreach($domain['sections'] as $section)
+                                @foreach(array_slice($domain['sections'], 0, 6) as $section)
                                     <div>
                                         <h4 class="text-sm font-extrabold text-slate-800">{{ $section['title'] }}</h4>
                                         <ul class="mt-1.5 list-disc space-y-1 pl-5 text-sm text-slate-600">
-                                            @foreach(array_slice($section['skills'], 0, 4) as $skill)
+                                            @foreach(array_slice($section['skills'], 0, 3) as $skill)
                                                 <li>{{ $skill }}</li>
                                             @endforeach
                                         </ul>
-                                        @if(count($section['skills']) > 4)
-                                            <p class="mt-1 pl-5 text-xs text-slate-500">and {{ count($section['skills']) - 4 }} more in the official guide</p>
+                                        @if(count($section['skills']) > 3)
+                                            <p class="mt-1 pl-5 text-xs text-slate-500">and {{ count($section['skills']) - 3 }} more in the official guide</p>
                                         @endif
                                     </div>
                                 @endforeach
                             </div>
+                            @if(count($domain['sections']) > 6)
+                                <p class="mt-3 text-xs text-slate-500">and {{ count($domain['sections']) - 6 }} more areas in the official study guide</p>
+                            @endif
                         </article>
                     @endforeach
                 </div>
