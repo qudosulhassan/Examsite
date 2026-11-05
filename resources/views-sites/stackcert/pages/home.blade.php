@@ -78,7 +78,7 @@
                 {{ $examCount }} {{ $vendorName }} exams &middot; updated {{ $monthYear }}
             </span>
             <h1 class="mt-6 text-4xl font-extrabold leading-[1.05] sm:text-5xl lg:text-[60px]">
-                Pass your {{ $vendorName }} exam with <span class="bg-gradient-to-r from-white to-sky-300 bg-clip-text text-transparent">real practice</span>
+                {{ $vendorName }} certification practice tests that <span class="bg-gradient-to-r from-white to-sky-300 bg-clip-text text-transparent">explain every answer</span>
             </h1>
             <p class="mt-5 max-w-2xl text-lg leading-relaxed text-slate-300">
                 Free questions with an explanation for every answer, then a timed test engine and PDF guides for the exams you choose. No account needed to start.
@@ -304,6 +304,17 @@
 </section>
 @endif
 
+{{-- ============ ABOUT (keyword copy) ============ --}}
+<section class="border-t border-slate-200 bg-slate-50 py-16 lg:py-20" aria-labelledby="about-practice">
+    <div class="container-custom max-w-4xl">
+        <h2 id="about-practice" class="text-3xl font-extrabold text-slate-900 sm:text-4xl">{{ $vendorName }} practice tests, built around the official skills</h2>
+        <div class="mt-5 space-y-4 text-base leading-relaxed text-slate-700">
+            <p>{{ $brand }} is an independent site for people preparing for {{ $vendorName }} certification exams. Every exam page is organised around {{ $vendorName }}'s own skills outline. The exam guide lists the domains and their weightings, the free practice questions page lets you answer exam-style questions and read why each answer is right, and the plans add a larger question bank with a timed test engine and a PDF study guide.</p>
+            <p>If a subject is new to you, start with a fundamentals exam such as <a href="{{ url('/exams/az-900') }}" class="font-bold underline" style="color: var(--brand);">AZ-900</a>, <a href="{{ url('/exams/sc-900') }}" class="font-bold underline" style="color: var(--brand);">SC-900</a>, <a href="{{ url('/exams/dp-900') }}" class="font-bold underline" style="color: var(--brand);">DP-900</a> or <a href="{{ url('/exams/pl-900') }}" class="font-bold underline" style="color: var(--brand);">PL-900</a>. If you already work with the technology, go straight to a role-based exam such as <a href="{{ url('/exams/az-104') }}" class="font-bold underline" style="color: var(--brand);">AZ-104</a>, <a href="{{ url('/exams/sc-300') }}" class="font-bold underline" style="color: var(--brand);">SC-300</a> or <a href="{{ url('/exams/pl-300') }}" class="font-bold underline" style="color: var(--brand);">PL-300</a>. Browse by track, or search for an exam code.</p>
+            <p>Our practice questions are study material, not official exam content, and {{ $brand }} is not produced, endorsed or approved by {{ $vendorName }}. Always read the current study guide on Microsoft Learn before you book an exam, because Microsoft updates its skills outlines and retires exams from time to time.</p>
+        </div>
+    </div>
+</section>
 {{-- ============ HOW IT WORKS ============ --}}
 <section class="border-t border-slate-200 bg-white py-16 lg:py-20">
     <div class="container-custom">

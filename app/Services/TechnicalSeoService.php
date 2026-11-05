@@ -712,6 +712,30 @@ TXT;
         return $scheme . '://' . $host . $port . $path . $query;
     }
 
+    /** Pages that must never be indexed, whatever the site-wide setting says (accounts, cart, search, test sessions). */
+    public const NOINDEX_PATHS = [
+        'login', 'register', 'password*', 'forgot-password', 'reset-password*', 'verify-email*', 'confirm-password',
+        'dashboard*', 'user*', 'profile*', 'my-account*', 'orders*', 'downloads*',
+        'cart*', 'checkout*', 'search*', 'blog/search*',
+        'demo-test-engine/session*', 'demo-test-engine/results*', 'test-session*', 'exam-session*', 'practice-exam*', 'simulator*',
+    ];
+
+    /**
+     * The robots directive for one request: private and utility pages are always "noindex, follow" (keep the links
+     * crawlable, keep the page out of results); every other page gets the site-wide directive, which is where the
+     * pre-launch noindex lock lives.
+     */
+    public function robotsForRequest(\Illuminate\Http\Request $request, ?object $site = null): string
+    {
+        if ($request->is(static::NOINDEX_PATHS)) {
+            return 'noindex, follow';
+        }
+
+        return ($site && !empty($site->robots_directive) && (int) $site->id > 1)
+            ? $site->robots_directive
+            : $this->getRobotsMetaDirective();
+    }
+
     public function getRobotsMetaDirective(): string
     {
         $index = Setting::get('seo_robots_index', 'index');

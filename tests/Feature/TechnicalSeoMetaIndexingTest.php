@@ -163,19 +163,19 @@ class TechnicalSeoMetaIndexingTest extends TestCase
         $this->assertEquals('index, follow', $certResponse->headers->get('X-Robots-Tag'));
     }
 
-    public function test_private_pages_have_noindex_nofollow_in_headers_and_meta()
+    public function test_private_pages_have_noindex_follow_for_accounts_and_nofollow_for_admin_in_headers_and_meta()
     {
         // 1. Auth / Login page
         $loginResponse = $this->get('/login');
         $loginResponse->assertStatus(200);
-        $this->assertEquals('noindex, nofollow', $loginResponse->headers->get('X-Robots-Tag'));
-        $loginResponse->assertSee('<meta name="robots" content="noindex, nofollow">', false);
+        $this->assertEquals('noindex, follow', $loginResponse->headers->get('X-Robots-Tag'));
+        $loginResponse->assertSee('<meta name="robots" content="noindex, follow">', false);
 
         // 2. Cart page
         $cartResponse = $this->get('/cart');
         $cartResponse->assertStatus(200);
-        $this->assertEquals('noindex, nofollow', $cartResponse->headers->get('X-Robots-Tag'));
-        $cartResponse->assertSee('<meta name="robots" content="noindex, nofollow">', false);
+        $this->assertEquals('noindex, follow', $cartResponse->headers->get('X-Robots-Tag'));
+        $cartResponse->assertSee('<meta name="robots" content="noindex, follow">', false);
 
         // 3. Admin dashboard
         $adminResponse = $this->actingAs($this->admin)->get('/admin');

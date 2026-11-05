@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Secure Checkout - Exam Topics Base')
-@section('robots', 'noindex, nofollow')
+@section('robots', 'noindex, follow')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->

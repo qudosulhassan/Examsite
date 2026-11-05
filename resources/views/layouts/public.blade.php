@@ -34,7 +34,7 @@
         $rawCanonical = trim($__env->yieldContent('canonical_url'));
         $computedCanonical = !empty($rawCanonical) ? $seoService->buildCanonicalUrl($rawCanonical) : $seoService->buildCanonicalUrl();
         $yieldRobots = trim($__env->yieldContent('robots'));
-        $computedRobots = !empty($yieldRobots) ? $yieldRobots : (($currentSite && !empty($currentSite->robots_directive) && $currentSite->id > 1) ? $currentSite->robots_directive : $seoService->getRobotsMetaDirective());
+        $computedRobots = !empty($yieldRobots) ? $yieldRobots : $seoService->robotsForRequest(request(), $currentSite);
 
         $defaultSiteTitle = ($currentSite && !empty($currentSite->default_seo_title)) ? $currentSite->default_seo_title : (!empty($globalSettings['default_seo_title']) ? $globalSettings['default_seo_title'] : config('seo.defaults.title'));
         $defaultSiteDesc = ($currentSite && !empty($currentSite->default_meta_description)) ? $currentSite->default_meta_description : (!empty($globalSettings['default_meta_description']) ? $globalSettings['default_meta_description'] : config('seo.defaults.description'));

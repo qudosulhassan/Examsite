@@ -66,6 +66,19 @@ class ExamTracks
     }
 
     /**
+     * The hand-written introduction (three paragraphs) for a track, by its slug. Empty when there is none.
+     *
+     * @return array<int, string>
+     */
+    public static function intro(string $slug): array
+    {
+        static $all = null;
+        $all ??= json_decode((string) @file_get_contents(resource_path('seo-content/track-intros.json')), true) ?: [];
+
+        return $all[$slug] ?? [];
+    }
+
+    /**
      * The track an exam belongs to, by its code prefix: ['key', 'slug', 'title'] or null.
      */
     public static function forExam(string $examCode, string $vendorSlug): ?array

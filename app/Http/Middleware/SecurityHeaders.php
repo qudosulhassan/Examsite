@@ -72,9 +72,11 @@ class SecurityHeaders
 
         if ($isFeedOrMeta) {
             $response->headers->remove('X-Robots-Tag');
-        } elseif ($isPrivate) {
+        } elseif ($isPrivate && !$request->is(\App\Services\TechnicalSeoService::NOINDEX_PATHS)) {
+            // admin, api, webhooks and error responses: no index and do not follow
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
-        } elseif ($isSearch) {
+        } elseif ($isPrivate || $isSearch || $request->is(\App\Services\TechnicalSeoService::NOINDEX_PATHS)) {
+            // account, cart, checkout, search and test-session pages: out of the index, links still followed
             $response->headers->set('X-Robots-Tag', 'noindex, follow');
         } else {
             // Public SEO pages (exams, vendors, certifications, blog, home, and static pages)

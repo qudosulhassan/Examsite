@@ -106,6 +106,24 @@ class HubExamPagesTest extends TestCase
         $this->get('/guarantee')->assertNotFound();
     }
 
+    public function test_public_pages_are_indexable_and_private_pages_are_noindex_follow(): void
+    {
+        \Illuminate\Support\Facades\DB::table('sites')->where('id', 3)->update(['robots_directive' => 'index, follow']);
+        $exam = $this->exam();
+
+        foreach ([url('/'), $exam->url, $exam->questions_url, $exam->plans_url, url('/vendors/microsoft'), url('/about'), url('/faq')] as $url) {
+            $r = $this->get($url)->assertOk();
+            $this->assertStringContainsString('<meta name="robots" content="index, follow', $r->getContent(), "meta robots on {$url}");
+            $this->assertStringNotContainsString('noindex', (string) $r->headers->get('X-Robots-Tag'), "X-Robots-Tag on {$url}");
+        }
+
+        foreach (['/login', '/register', '/cart', '/search?q=az'] as $path) {
+            $r = $this->get($path);
+            $this->assertStringContainsString('<meta name="robots" content="noindex, follow', $r->getContent(), "meta robots on {$path}");
+            $this->assertSame('noindex, follow', $r->headers->get('X-Robots-Tag'), "X-Robots-Tag on {$path}");
+        }
+    }
+
     public function test_each_page_has_its_own_title_h1_and_self_canonical(): void
     {
         $exam = $this->exam();

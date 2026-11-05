@@ -58,6 +58,20 @@
     </div>
 </section>
 
+@php $intro = \App\Support\ExamTracks::intro($track['slug']); @endphp
+@if($intro)
+<section class="border-b border-slate-200 bg-slate-50" aria-labelledby="track-intro">
+    <div class="container-custom max-w-4xl py-10">
+        <h2 id="track-intro" class="text-2xl font-extrabold text-slate-900">About the {{ $trackTitle }} exams</h2>
+        <div class="mt-4 space-y-4 text-base leading-relaxed text-slate-700">
+            @foreach($intro as $p)
+                <p>{{ $p }}</p>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 <section class="py-10 lg:py-14">
     <div class="container-custom">
         <ul class="grid grid-cols-1 gap-5 md:grid-cols-2">

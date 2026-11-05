@@ -17,7 +17,7 @@
             $guestBrand = $guestSite ? $guestSite->name : config('app.name', 'ProExamTopics');
         @endphp
         <title>{{ $guestBrand }}</title>
-        <meta name="robots" content="noindex, nofollow">
+        <meta name="robots" content="noindex, follow">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
