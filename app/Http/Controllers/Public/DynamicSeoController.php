@@ -39,12 +39,22 @@ class DynamicSeoController extends Controller
                 '/guarantee' => ['priority' => '0.7', 'changefreq' => 'monthly'],
             ];
 
+            // A one-vendor site has no vendor index (/vendors redirects to the vendor page) and may not have a guarantee page.
+            $singleVendor = count((array) config('site.vendors', [])) === 1;
+            if ($singleVendor) {
+                unset($staticRoutes['/vendors']);
+            }
+            if (!config('site.show_guarantee', true)) {
+                unset($staticRoutes['/guarantee']);
+            }
+
             foreach ($staticRoutes as $path => $meta) {
                 $urls[] = [
                     'loc' => rtrim($host, '/') . $path,
                     'priority' => $meta['priority'],
                     'changefreq' => $meta['changefreq'],
-                    'lastmod' => now()->format('Y-m-d'),
+                    // no lastmod: these pages have no real modified date, and a fake "today" teaches crawlers to ignore lastmod
+                    'lastmod' => null,
                 ];
             }
 
@@ -84,12 +94,27 @@ class DynamicSeoController extends Controller
                 $vendorSlug = $e->vendor ? $e->vendor->slug : 'vendor';
                 $slug = ($overlay && !empty($overlay->custom_slug)) ? $overlay->custom_slug : $e->slug;
 
+                $lastmod = $e->last_updated_at ? $e->last_updated_at->format('Y-m-d') : ($e->updated_at ? $e->updated_at->format('Y-m-d') : now()->format('Y-m-d'));
                 $urls[] = [
                     'loc' => rtrim($host, '/') . '/' . \App\Models\Exam::publicPath($vendorSlug, $slug),
                     'priority' => '0.9',
                     'changefreq' => 'weekly',
-                    'lastmod' => $e->last_updated_at ? $e->last_updated_at->format('Y-m-d') : ($e->updated_at ? $e->updated_at->format('Y-m-d') : now()->format('Y-m-d')),
+                    'lastmod' => $lastmod,
                 ];
+
+                // Hub-style sites give every exam its own free-questions and plans pages
+                if (\App\Models\Exam::usesHubUrls()) {
+                    $urls[] = ['loc' => $e->questions_url, 'priority' => '0.8', 'changefreq' => 'weekly', 'lastmod' => $lastmod];
+                    $urls[] = ['loc' => $e->plans_url, 'priority' => '0.6', 'changefreq' => 'monthly', 'lastmod' => $lastmod];
+                }
+            }
+
+            if (\App\Models\Exam::usesHubUrls() && $singleVendor) {
+                foreach (\App\Support\ExamTracks::group($exams, (string) config('site.vendors')[0]) as $track) {
+                    if (!empty($track['slug']) && $track['key'] !== 'more') {
+                        $urls[] = ['loc' => route('tracks.show', $track['slug']), 'priority' => '0.7', 'changefreq' => 'weekly', 'lastmod' => null];
+                    }
+                }
             }
 
             // Generate XML
@@ -99,7 +124,9 @@ class DynamicSeoController extends Controller
             foreach ($urls as $u) {
                 $out .= "  <url>\n";
                 $out .= "    <loc>" . htmlspecialchars($u['loc'], ENT_XML1) . "</loc>\n";
-                $out .= "    <lastmod>{$u['lastmod']}</lastmod>\n";
+                if (!empty($u['lastmod'])) {
+                    $out .= "    <lastmod>{$u['lastmod']}</lastmod>\n";
+                }
                 $out .= "    <changefreq>{$u['changefreq']}</changefreq>\n";
                 $out .= "    <priority>{$u['priority']}</priority>\n";
                 $out .= "  </url>\n";

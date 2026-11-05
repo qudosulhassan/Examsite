@@ -91,6 +91,21 @@ class HubExamPagesTest extends TestCase
         $this->assertSame(url('/exams/dp-800/plans'), $exam->plans_url);
     }
 
+    public function test_sitemap_lists_every_page_a_hub_site_serves_and_nothing_that_redirects(): void
+    {
+        $exam = $this->exam();
+
+        $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
+
+        foreach ([$exam->url, $exam->questions_url, $exam->plans_url] as $url) {
+            $this->assertStringContainsString('<loc>' . $url . '</loc>', $xml);
+        }
+        $this->assertStringNotContainsString('<loc>' . url('/vendors') . '</loc>', $xml, '/vendors redirects on a one-vendor site');
+        $this->assertStringNotContainsString('/guarantee', $xml, 'no guarantee page on a site without the guarantee');
+        $this->assertStringContainsString('<loc>' . url('/vendors/microsoft') . '</loc>', $xml);
+        $this->get('/guarantee')->assertNotFound();
+    }
+
     public function test_each_page_has_its_own_title_h1_and_self_canonical(): void
     {
         $exam = $this->exam();

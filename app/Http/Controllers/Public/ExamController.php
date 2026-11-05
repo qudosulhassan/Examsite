@@ -186,7 +186,7 @@ class ExamController extends Controller
     {
         $prefix = strtoupper(strtok((string) $exam->exam_code, '-') ?: '');
 
-        $others = Exam::where('is_active', true)->where('id', '!=', $exam->id)->orderBy('exam_code')->get();
+        $others = Exam::where('is_active', true)->where('id', '!=', $exam->id)->with('vendor')->orderBy('exam_code')->get();
         $same = $others->filter(fn ($e) => strtoupper(strtok((string) $e->exam_code, '-') ?: '') === $prefix);
 
         return $same->concat($others->diff($same))->take(4)->values();

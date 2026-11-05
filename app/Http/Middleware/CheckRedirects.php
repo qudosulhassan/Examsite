@@ -19,15 +19,22 @@ class CheckRedirects
 
         // Check active redirects
         $redirect = null;
-        if (\Illuminate\Support\Facades\Schema::hasTable('redirects')) {
+        // Table/column checks are information_schema queries; on a site whose database is on another server
+        // each one costs a network round trip, so remember the answers for a day.
+        $schema = \Illuminate\Support\Facades\Cache::remember('schema_redirects_v1', 86400, fn () => [
+            'table'  => \Illuminate\Support\Facades\Schema::hasTable('redirects'),
+            'active' => \Illuminate\Support\Facades\Schema::hasColumn('redirects', 'is_active'),
+            'site'   => \Illuminate\Support\Facades\Schema::hasColumn('redirects', 'site_id'),
+        ]);
+        if ($schema['table']) {
             try {
                 $site = app()->bound('current_site') ? app('current_site') : null;
                 $q = Redirect::query();
-                if (\Illuminate\Support\Facades\Schema::hasColumn('redirects', 'is_active')) {
+                if ($schema['active']) {
                     $q->where('is_active', true);
                 }
 
-                if ($site && \Illuminate\Support\Facades\Schema::hasColumn('redirects', 'site_id')) {
+                if ($site && $schema['site']) {
                     $q->where(function ($query) use ($site) {
                         $query->where('site_id', $site->id)
                               ->orWhereNull('site_id');

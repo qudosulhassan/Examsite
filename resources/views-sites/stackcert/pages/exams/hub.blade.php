@@ -25,7 +25,11 @@
     $h1 = "{$code}: {$examName} exam guide";
     // Opens with a plain definition so search and AI answers can quote it directly.
     $lede = "{$code} is " . ($vendorName ? "{$vendorName}'s " : 'the ') . "{$examName} exam. This guide shows what it covers, how to prepare, and where to practise with " . ($freeCount ? "{$freeCount} free questions with explanations" : 'practice questions') . ($bankCount > $freeCount ? " and a bank of {$bankCount}." : '.');
-    $description = \Illuminate\Support\Str::limit("{$code} {$examName} exam guide: skills covered, how to prepare" . ($freeCount ? ", and {$freeCount} free practice questions with explanations" : ', and practice options') . '. Start free.', 158);
+    $description = "{$code} {$examName} exam guide: skills covered, how to prepare" . ($freeCount ? ", and {$freeCount} free practice questions with explanations" : ', and practice options') . '. Start free.';
+    if (mb_strlen($description) > 158) {   // long exam names: drop the extra clause instead of cutting mid-sentence
+        $description = "{$code} {$examName} exam guide: skills covered, how to prepare" . ($freeCount ? ", and {$freeCount} free practice questions" : ', and practice options') . '. Start free.';
+    }
+    $description = \Illuminate\Support\Str::limit($description, 158);
 
     // Topics: strings (plain list) or arrays with name/description/percentage (weights)
     $rawTopics = $exam->resolved_topics;

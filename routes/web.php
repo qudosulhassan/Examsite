@@ -153,6 +153,8 @@ Route::get('/dmca', function () {
 })->name('dmca');
 
 Route::get('/guarantee', function () {
+    // A site that does not offer the guarantee (SITE_SHOW_GUARANTEE=false) has no guarantee page either.
+    abort_unless(config('site.show_guarantee', true), 404);
     return view('pages.guarantee');
 })->name('guarantee');
 Route::redirect('/money-back-guarantee', '/guarantee', 301);
