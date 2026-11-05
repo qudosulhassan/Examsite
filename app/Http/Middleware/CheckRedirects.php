@@ -41,10 +41,16 @@ class CheckRedirects
                     });
                 }
 
-                $redirect = $q->where(function ($query) use ($path) {
-                    $query->where('old_url', $path)
-                          ->orWhere('old_url', ltrim($path, '/'));
-                })->orderByRaw('CASE WHEN site_id IS NULL THEN 1 ELSE 0 END ASC')->first();
+                // Most paths have no redirect rule, and asking the database costs a round trip on every request (a
+                // network hop when the database is on another server), so remember the answer, including "none".
+                $cacheKey = 'redirect_rule:' . ($site->id ?? 0) . ':' . sha1($path);
+                $found = \Illuminate\Support\Facades\Cache::remember($cacheKey, 600, function () use ($q, $path) {
+                    return $q->where(function ($query) use ($path) {
+                        $query->where('old_url', $path)
+                              ->orWhere('old_url', ltrim($path, '/'));
+                    })->orderByRaw('CASE WHEN site_id IS NULL THEN 1 ELSE 0 END ASC')->first() ?: false;
+                });
+                $redirect = $found ?: null;
             } catch (\Throwable $th) {}
         }
 
