@@ -20,8 +20,54 @@ class TechnicalSeoService
        MODULE 1: XML SITEMAP
        ========================================================================= */
 
+    /**
+     * The sitemap a non-core site really serves (DynamicSeoController), read back as a URL list so the admin page shows
+     * what search engines see, not a second, different list.
+     */
+    protected function servedSitemapData(bool $fresh = false): array
+    {
+        $ctx = app(\App\Services\SiteContext::class);
+        $host = request()->getSchemeAndHttpHost();
+        if ($fresh) {
+            \Illuminate\Support\Facades\Cache::forget('sitemap_site_' . ($ctx->id() ?? 1) . '_' . md5($host));
+        }
+        $xml = (string) app(\App\Http\Controllers\Public\DynamicSeoController::class)->sitemap(request())->getContent();
+
+        $urls = [];
+        $counts = ['static' => 0, 'vendors' => 0, 'exams' => 0, 'blog' => 0];
+        if (preg_match_all('#<url>(.*?)</url>#s', $xml, $blocks)) {
+            foreach ($blocks[1] as $b) {
+                preg_match('#<loc>(.*?)</loc>#', $b, $loc);
+                preg_match('#<lastmod>(.*?)</lastmod>#', $b, $mod);
+                preg_match('#<priority>(.*?)</priority>#', $b, $pri);
+                preg_match('#<changefreq>(.*?)</changefreq>#', $b, $chg);
+                $l = html_entity_decode($loc[1] ?? '');
+                $path = parse_url($l, PHP_URL_PATH) ?: '/';
+                $key = str_starts_with($path, '/exams') ? 'exams' : (str_starts_with($path, '/blog/') ? 'blog' : (str_starts_with($path, '/vendors') || str_starts_with($path, '/tracks') ? 'vendors' : 'static'));
+                $counts[$key]++;
+                $urls[] = ['loc' => $l, 'lastmod' => $mod[1] ?? null, 'priority' => $pri[1] ?? null, 'changefreq' => $chg[1] ?? null];
+            }
+        }
+
+        return [
+            'total' => count($urls),
+            'static_count' => $counts['static'],
+            'vendors_count' => $counts['vendors'],
+            'exams_count' => $counts['exams'],
+            'certs_count' => 0,
+            'blog_count' => $counts['blog'],
+            'urls' => $urls,
+            'sitemap_url' => url('/sitemap.xml'),
+            'last_generated' => Setting::get('seo_sitemap_last_generated', 'Never'),
+        ];
+    }
+
     public function getSitemapData(): array
     {
+        if ((int) config('site.id', 1) !== 1) {
+            return $this->servedSitemapData();
+        }
+
         $staticRoutes = [
             'home' => ['priority' => '1.0', 'changefreq' => 'daily'],
             'vendors.index' => ['priority' => '0.8', 'changefreq' => 'weekly'],
@@ -132,6 +178,17 @@ class TechnicalSeoService
 
     public function regenerateSitemap(): array
     {
+        if ((int) config('site.id', 1) !== 1) {
+            // Nothing to write: the sitemap is built per request. Rebuild it now and clear the page cache.
+            $data = $this->servedSitemapData(true);
+            \Illuminate\Support\Facades\Cache::forever('page_cache_version', (int) \Illuminate\Support\Facades\Cache::get('page_cache_version', 1) + 1);
+            $nowStr = now()->format('Y-m-d H:i:s');
+            Setting::set('seo_sitemap_last_generated', $nowStr);
+            Setting::set('seo_sitemap_count', (string) $data['total']);
+
+            return ['success' => true, 'count' => $data['total'], 'timestamp' => $nowStr, 'url' => url('/sitemap.xml')];
+        }
+
         $data = $this->getSitemapData();
         $urls = $data['urls'];
 
@@ -252,9 +309,11 @@ TXT;
 
         Setting::set('seo_robots_txt_content', $content);
 
-        try {
-            File::put(public_path('robots.txt'), $content);
-        } catch (\Throwable $th) {}
+        if ((int) config('site.id', 1) === 1) {
+            try {
+                File::put(public_path('robots.txt'), $content);
+            } catch (\Throwable $th) {}
+        }
 
         return [
             'success' => true,
@@ -267,9 +326,11 @@ TXT;
     {
         $default = $this->getDefaultRobotsTxt();
         Setting::set('seo_robots_txt_content', $default);
-        try {
-            File::put(public_path('robots.txt'), $default);
-        } catch (\Throwable $th) {}
+        if ((int) config('site.id', 1) === 1) {
+            try {
+                File::put(public_path('robots.txt'), $default);
+            } catch (\Throwable $th) {}
+        }
 
         return $default;
     }
@@ -1271,7 +1332,8 @@ TXT;
      */
     public function verifySearchEngineTokensLive(): array
     {
-        $productionUrl = 'https://examtopicsbase.com';
+        $productionUrl = rtrim(url('/'), '/') . '/';
+        $productionHost = parse_url($productionUrl, PHP_URL_HOST) ?: 'this site';
 
         $tokens = [
             'google' => [
@@ -1307,11 +1369,11 @@ TXT;
         try {
             $response = \Illuminate\Support\Facades\Http::timeout(10)
                 ->withHeaders([
-                    'User-Agent' => 'ExamTopicsBase-Verification-Bot/1.0 (+https://examtopicsbase.com)',
+                    'User-Agent' => 'SiteVerificationCheck/1.0 (+' . $productionUrl . ')',
                     'Cache-Control' => 'no-cache, no-store, must-revalidate',
                     'Pragma' => 'no-cache',
                 ])
-                ->get($productionUrl);
+                ->get($productionUrl . '?verify=' . time());
 
             if ($response->successful()) {
                 $html = $response->body();
@@ -1367,7 +1429,7 @@ TXT;
                         'status' => 'verified',
                         'status_label' => 'Detected on Live Site',
                         'badge_class' => 'bg-emerald-100 text-emerald-800 border border-emerald-300',
-                        'message' => 'Valid meta tag confirmed active on live https://examtopicsbase.com HTML.',
+                        'message' => 'Valid meta tag confirmed active on live ' . $productionHost . ' HTML.',
                     ];
                 } else {
                     $results[$engine] = [

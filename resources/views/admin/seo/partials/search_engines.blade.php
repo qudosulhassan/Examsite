@@ -34,7 +34,7 @@
                 </a>
 
                 <a href="https://pagespeed.web.dev/" target="_blank" class="p-3.5 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition text-center space-y-1 group">
-                    <div class="w-7 h-7 mx-auto rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-black text-xs">&lightning;</div>
+                    <div class="w-7 h-7 mx-auto rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-black text-xs">⚡</div>
                     <div class="text-xs font-bold text-navy group-hover:text-cyan transition">PageSpeed Insights</div>
                     <div class="text-[10px] text-gray-400">Core Web Vitals</div>
                 </a>

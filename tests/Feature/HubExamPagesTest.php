@@ -215,6 +215,36 @@ class HubExamPagesTest extends TestCase
         }
     }
 
+    public function test_admin_seo_center_checks_this_site_and_never_writes_static_seo_files(): void
+    {
+        $this->exam('AZ-104', 1);
+        $admin = \App\Models\User::factory()->create(['role' => 'super_admin', 'email' => 'admin@stackcert.test']);
+
+        // Live verification looks at THIS site's home page (not examtopicsbase.com) and finds the saved tag
+        \App\Models\Setting::set('seo_gsc_verification', 'TOKEN-abc_123');
+        \Illuminate\Support\Facades\Http::fake([
+            'examtopicsbase.com*' => \Illuminate\Support\Facades\Http::response('<meta name="google-site-verification" content="OTHER-SITE-TOKEN">', 200),
+            '*' => \Illuminate\Support\Facades\Http::response('<html><head><meta name="google-site-verification" content="TOKEN-abc_123"></head></html>', 200),
+        ]);
+        $verification = app(\App\Services\TechnicalSeoService::class)->verifySearchEngineTokensLive();
+        $this->assertSame('verified', $verification['google']['status'], json_encode($verification['google']));
+        \Illuminate\Support\Facades\Http::assertNotSent(fn ($r) => str_contains($r->url(), 'examtopicsbase.com'));
+        $this->actingAs($admin)->get('/admin/settings/seo?tab=search_engines')->assertOk()->assertDontSee('&lightning;', false);
+
+        // Sitemap regenerate: no static file, and the admin list is the sitemap that is really served
+        $before = glob(public_path('sitemap*.xml'));
+        $this->actingAs($admin)->post('/admin/settings/seo/sitemap-regenerate')->assertRedirect();
+        $this->assertSame($before, glob(public_path('sitemap*.xml')), 'no sitemap file written');
+        $this->assertGreaterThan(3, (int) \App\Models\Setting::get('seo_sitemap_count'));
+        $this->actingAs($admin)->get('/admin/settings/seo?tab=sitemap')->assertOk()->assertSee('/exams/az-104');
+
+        // Robots: the saved text is what /robots.txt serves, and public/robots.txt is left alone
+        $robotsBefore = is_file(public_path('robots.txt')) ? md5_file(public_path('robots.txt')) : null;
+        $this->actingAs($admin)->post('/admin/settings/seo/robots-save', ['robots_content' => "User-agent: *\nAllow: /\nDisallow: /private-test/"])->assertRedirect();
+        $this->assertSame($robotsBefore, is_file(public_path('robots.txt')) ? md5_file(public_path('robots.txt')) : null);
+        $this->get('/robots.txt')->assertOk()->assertSee('Disallow: /private-test/');
+    }
+
     public function test_each_page_has_its_own_title_h1_and_self_canonical(): void
     {
         $exam = $this->exam();
