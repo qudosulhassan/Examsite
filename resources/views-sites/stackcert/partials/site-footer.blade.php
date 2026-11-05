@@ -5,15 +5,22 @@
     $footVendor = $footVendorSlug ? \App\Models\Vendor::where('slug', $footVendorSlug)->first() : null;
     $footVendorName = $footVendor?->name ?? 'IT vendor';
     $footSupport = $globalSettings['support_email'] ?? $globalSettings['contact_email'] ?? null;
+    // Dark footer: the reversed (white-text) version of the site logo, when the site has one.
+    $footLogo = ($currentSite && !empty($currentSite->logo) && is_file(public_path(str_replace('primary', 'reversed', $currentSite->logo))))
+        ? asset(str_replace('primary', 'reversed', $currentSite->logo)) : null;
 @endphp
 
 <footer class="mt-auto bg-slate-950 text-slate-300">
     <div class="container-custom py-14">
         <div class="grid grid-cols-2 gap-10 md:grid-cols-12">
             <div class="col-span-2 md:col-span-5 space-y-4">
-                <a href="{{ url('/') }}" class="inline-flex items-center gap-2.5">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl text-base font-black text-white" style="background: linear-gradient(135deg, var(--brand), var(--brand-dark));">{{ strtoupper(mb_substr($footBrand, 0, 1)) }}</span>
+                <a href="{{ url('/') }}" class="inline-flex items-center gap-2.5" aria-label="{{ $footBrand }} home">
+                    @if($footLogo)
+                        <img src="{{ $footLogo }}" alt="{{ $footBrand }}" class="h-7 w-auto max-w-[260px]" width="260" height="29" loading="lazy">
+                    @else
+                        <span class="flex h-9 w-9 items-center justify-center rounded-xl text-base font-black text-white" style="background: linear-gradient(135deg, var(--brand), var(--brand-dark));">{{ strtoupper(mb_substr($footBrand, 0, 1)) }}</span>
                     <span class="text-lg font-extrabold tracking-tight text-white">{{ $footBrand }}</span>
+                    @endif
                 </a>
                 <p class="max-w-sm text-sm leading-relaxed text-slate-400">
                     Practice questions, study guides and a timed test engine for {{ $footVendorName }} certification exams, kept up to date as the exams change.

@@ -8,6 +8,9 @@
     $trackTitles = collect($siteTracks)->reject(fn ($t) => $t['key'] === 'more')->pluck('title')->take(2)->all();
     $vendorUrl = $vendorSlug ? url('/vendors/' . $vendorSlug) : url('/vendors');
     $monthYear = now()->format('F Y');
+    // Search engines want a raster logo for the Organization markup, so use the site's 512px app icon when it has one.
+    $iconDir = ($currentSite && !empty($currentSite->favicon)) ? dirname($currentSite->favicon) : null;
+    $orgLogo = ($iconDir && is_file(public_path($iconDir . '/android-chrome-512x512.png'))) ? asset($iconDir . '/android-chrome-512x512.png') : null;
 
     $faqs = [
         ['q' => "What is {$brand}?", 'a' => "{$brand} provides practice questions, PDF study guides and a timed test engine for {$vendorName} certification exams. It is an independent exam-preparation site and is not affiliated with {$vendorName}."],
@@ -31,6 +34,7 @@
     'name' => $brand,
     'url' => url('/'),
     'description' => "Independent {$vendorName} exam preparation: practice questions, study guides and a timed test engine. Not affiliated with {$vendorName}.",
+    'logo' => $orgLogo,
     'email' => $currentSite->contact_email ?? null,
 ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
 </script>

@@ -9,6 +9,14 @@
     @php
         $siteFavicon = ($currentSite && !empty($currentSite->favicon)) ? asset($currentSite->favicon) : (!empty($globalSettings['site_favicon']) ? asset($globalSettings['site_favicon']) : asset('favicon-32x32.png'));
         $customAppleIcon = !empty($globalSettings['apple_touch_icon']) ? asset($globalSettings['apple_touch_icon']) : asset('apple-touch-icon.png');
+        // A site with its own favicon folder (public/sites/<name>/) also brings its own apple-touch icon and share image.
+        $siteIconDir = ($currentSite && !empty($currentSite->favicon)) ? dirname($currentSite->favicon) : null;
+        if ($siteIconDir && is_file(public_path($siteIconDir . '/apple-touch-icon.png'))) {
+            $customAppleIcon = asset($siteIconDir . '/apple-touch-icon.png');
+        }
+        $ogDefault = ($currentSite && !empty($currentSite->og_image))
+            ? asset($currentSite->og_image)
+            : (!empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')));
     @endphp
     <link rel="icon" type="image/png" sizes="32x32" href="{{ $siteFavicon }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ $siteFavicon }}">
@@ -60,7 +68,7 @@
     <meta property="og:url" content="{{ $computedCanonical }}">
     <meta property="og:title" content="@yield('title', $defaultSiteTitle)">
     <meta property="og:description" content="@yield('meta_description', $defaultSiteDesc)">
-    <meta property="og:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')))">
+    <meta property="og:image" content="@yield('og_image', $ogDefault)">
     <meta property="og:site_name" content="{{ $activeSiteName }}">
     @if(!empty($globalSettings['seo_facebook_app_id']))
         <meta property="fb:app_id" content="{{ $globalSettings['seo_facebook_app_id'] }}">
@@ -73,11 +81,11 @@
     <meta name="twitter:url" content="@yield('canonical_url', $computedCanonical)">
     <meta name="twitter:title" content="@yield('title', $defaultSiteTitle)">
     <meta name="twitter:description" content="@yield('meta_description', $defaultSiteDesc)">
-    <meta name="twitter:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')))">
+    <meta name="twitter:image" content="@yield('og_image', $ogDefault)">
     <meta property="twitter:card" content="{{ $globalSettings['seo_twitter_card'] ?? 'summary_large_image' }}">
     <meta property="twitter:title" content="@yield('title', $defaultSiteTitle)">
     <meta property="twitter:description" content="@yield('meta_description', $defaultSiteDesc)">
-    <meta property="twitter:image" content="@yield('og_image', !empty($globalSettings['default_og_image']) ? asset($globalSettings['default_og_image']) : asset(config('seo.defaults.og_image', 'images/og-default.png')))">
+    <meta property="twitter:image" content="@yield('og_image', $ogDefault)">
 
     <!-- Structured Data (JSON-LD) -->
     @if(($globalSettings['seo_schema_master_enabled'] ?? '1') === '1')
