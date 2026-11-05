@@ -26,7 +26,7 @@ class StackCertHomepageTest extends TestCase
         $this->artisan('view:clear');
         Cache::flush();
 
-        foreach ([1 => ['ExamTopicsBase', 'examtopicsbase'], 3 => ['StackCert', 'stackcert']] as $id => [$name, $code]) {
+        foreach ([1 => ['ExamTopicsBase', 'examtopicsbase'], 3 => ['AzureExamsHub', 'stackcert']] as $id => [$name, $code]) {
             if (! Site::query()->whereKey($id)->exists()) {
                 Site::query()->insert(['id' => $id, 'name' => $name, 'code' => $code, 'default_theme' => 'default', 'default_locale' => 'en', 'is_active' => true, 'primary_color' => '#0F6CBD', 'secondary_color' => '#0B3A66', 'created_at' => now(), 'updated_at' => now()]);
             }
@@ -46,7 +46,7 @@ class StackCertHomepageTest extends TestCase
         config([
             'site.id' => 3, 'site.mode' => 'standalone', 'site.catalog_mode' => 'all',
             'site.vendors' => ['microsoft'], 'site.avoid_dumps' => true, 'site.show_guarantee' => false,
-            'app.name' => 'StackCert', 'app.url' => 'http://stackcert.test',
+            'app.name' => 'AzureExamsHub', 'app.url' => 'http://stackcert.test',
         ]);
         Vendor::flushSiteVendorCache();
         app('view')->getFinder()->prependLocation(resource_path('views-sites/stackcert'));
@@ -89,10 +89,10 @@ class StackCertHomepageTest extends TestCase
     {
         $vendorPage = $this->get('http://stackcert.test/vendors/microsoft')->assertOk()->getContent();
         $this->assertDoesNotMatchRegularExpression('/dumps/i', $vendorPage);
-        $this->assertStringContainsString('StackCert', $vendorPage);
+        $this->assertStringContainsString('AzureExamsHub', $vendorPage);
 
         $examPage = $this->get('http://stackcert.test/exams/microsoft/az-900')->assertOk()->getContent();
-        $this->assertStringContainsString('Practice Exam &amp; Study Guide | StackCert', $examPage);
+        $this->assertStringContainsString('Practice Exam &amp; Study Guide | AzureExamsHub', $examPage);
         $this->assertDoesNotMatchRegularExpression('/dumps/i', $examPage);
         $this->assertStringNotContainsString('100% Pass Guarantee', $examPage);
     }

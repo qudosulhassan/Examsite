@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Contact Support - Exam Topics Base')
+@section('meta_description', (optional($currentSite ?? null)->name ?: config('app.name')) . ' support: get help with orders, downloads, your account or practice questions. Send a message and we reply by email.')
 
 @section('content')
 <!-- Header Banner -->

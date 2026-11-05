@@ -45,7 +45,7 @@ class HubExamPagesTest extends TestCase
         $this->artisan('view:clear');
         Cache::flush();
 
-        foreach ([1 => ['ExamTopicsBase', 'examtopicsbase'], 3 => ['StackCert', 'stackcert']] as $id => [$name, $code]) {
+        foreach ([1 => ['ExamTopicsBase', 'examtopicsbase'], 3 => ['AzureExamsHub', 'stackcert']] as $id => [$name, $code]) {
             if (! Site::query()->whereKey($id)->exists()) {
                 Site::query()->insert(['id' => $id, 'name' => $name, 'code' => $code, 'default_theme' => 'default', 'default_locale' => 'en', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()]);
             }
@@ -54,7 +54,7 @@ class HubExamPagesTest extends TestCase
         config([
             'site.id' => 3, 'site.mode' => 'standalone', 'site.catalog_mode' => 'all', 'site.vendors' => ['microsoft'],
             'site.avoid_dumps' => true, 'site.show_guarantee' => false, 'site.free_questions' => 7,
-            'app.name' => 'StackCert', 'app.url' => 'http://stackcert.test',
+            'app.name' => 'AzureExamsHub', 'app.url' => 'http://stackcert.test',
         ]);
         Vendor::flushSiteVendorCache();
         app('view')->getFinder()->prependLocation(resource_path('views-sites/stackcert'));

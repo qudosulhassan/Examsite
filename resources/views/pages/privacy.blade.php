@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Privacy Policy - ExamTopicsBase')
+@section('meta_description', (optional($currentSite ?? null)->name ?: config('app.name')) . ' privacy policy: how we collect, use and protect your personal data, cookies and payment details, and how to contact us.')
 
 @section('content')
 <!-- Header Hero -->

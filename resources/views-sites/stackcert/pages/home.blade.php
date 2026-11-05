@@ -5,7 +5,7 @@
     $vendorName = $siteVendor->name ?? 'IT';
     $vendorSlug = $siteVendor->slug ?? null;
     $examCount = collect($siteTracks)->sum(fn ($t) => $t['exams']->count());
-    $trackTitles = collect($siteTracks)->reject(fn ($t) => $t['key'] === 'more')->pluck('title')->take(4)->all();
+    $trackTitles = collect($siteTracks)->reject(fn ($t) => $t['key'] === 'more')->pluck('title')->take(2)->all();
     $vendorUrl = $vendorSlug ? url('/vendors/' . $vendorSlug) : url('/vendors');
     $monthYear = now()->format('F Y');
 
@@ -19,10 +19,21 @@
     ];
 @endphp
 
-@section('title', "{$vendorName} Certification Practice Exams & Study Guides | {$brand}")
-@section('meta_description', "Practice for {$vendorName} certification exams with study guides, free practice questions and a timed test engine. {$examCount} exams across " . (count($trackTitles) ? implode(', ', $trackTitles) : 'every track') . '.')
+@section('title', "{$vendorName} Practice Exams & Study Guides | {$brand}")
+@section('meta_description', \Illuminate\Support\Str::limit("Practice for {$vendorName} exams with study guides, free practice questions and a timed test engine. {$examCount} exams across " . (count($trackTitles) ? implode(', ', $trackTitles) : 'every track') . '.', 158))
 
 @section('seo_tags')
+<script type="application/ld+json">
+{!! json_encode(array_filter([
+    '@context' => 'https://schema.org',
+    '@type' => 'Organization',
+    '@id' => url('/') . '#organization',
+    'name' => $brand,
+    'url' => url('/'),
+    'description' => "Independent {$vendorName} exam preparation: practice questions, study guides and a timed test engine. Not affiliated with {$vendorName}.",
+    'email' => $currentSite->contact_email ?? null,
+]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
 <script type="application/ld+json">
 {!! json_encode([
     '@context' => 'https://schema.org',

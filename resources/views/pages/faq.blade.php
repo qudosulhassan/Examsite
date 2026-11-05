@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Frequently Asked Questions (FAQ) - Exam Topics Base')
+@section('meta_description', (optional($currentSite ?? null)->name ?: config('app.name')) . ' FAQ: answers about free practice questions, PDF guides, the test engine, payments, access and updates.')
 
 @section('seo_tags')
 <script type="application/ld+json">

@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'DMCA Copyright Policy - ExamTopicsBase')
+@section('meta_description', (optional($currentSite ?? null)->name ?: config('app.name')) . ' DMCA copyright policy: how to report content you believe infringes your copyright and how we handle takedown notices.')
 
 @section('content')
 <!-- Header Hero -->

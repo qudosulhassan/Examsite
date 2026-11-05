@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', '100% Money Back Guarantee - ExamTopicsBase')
+@section('meta_description', (optional($currentSite ?? null)->name ?: config('app.name')) . ' money-back guarantee: how it works, what it covers and how to request a refund.')
 
 @section('content')
 <!-- Header Hero -->

@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'About Us - Exam Topics Base')
+@section('meta_description', (optional($currentSite ?? null)->name ?: config('app.name')) . ': independent exam preparation with practice questions, study guides and a timed test engine. Not affiliated with any exam vendor.')
 
 @section('content')
 <!-- Header Banner -->

@@ -21,7 +21,7 @@
     $title = "{$code} Practice Test: PDF and Test Engine Plans | {$brand}";
     $h1 = "{$code} practice test plans";
     $lede = "Choose a PDF study guide, an online test engine, or both for the {$examName} exam. Every price is shown, and nothing is added at checkout.";
-    $description = \Illuminate\Support\Str::limit("{$code} practice test plans: PDF study guide, online test engine or bundle" . ($lowPrice ? ' from ' . $money($lowPrice) : '') . '. Try the free questions first.', 158);
+    $description = \Illuminate\Support\Str::limit("{$code} practice test plans: PDF study guide, online test engine or bundle" . ($lowPrice ? ' from ' . $money($lowPrice) : '') . '. Explanations for every answer and 3 months of updates included.', 158);
 
     $faqs = [
         ['q' => 'What do I receive after I pay?', 'a' => 'Access is added to your account straight away. Open your dashboard to download the PDF or start the test engine. You will also receive an email confirmation.'],
