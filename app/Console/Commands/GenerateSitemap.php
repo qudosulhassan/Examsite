@@ -17,6 +17,14 @@ class GenerateSitemap extends Command
 
     public function handle()
     {
+        // These are static files in public/, written for the core site. Any other site serves its sitemap from
+        // DynamicSeoController (per host), and a static file here would hide it, so do nothing on those sites.
+        if ((int) config('site.id', 1) !== 1) {
+            $this->info('Not the core site: its sitemap is generated on request, nothing to write.');
+
+            return self::SUCCESS;
+        }
+
         $this->info('Generating sitemaps...');
 
         // 1. Static Pages
