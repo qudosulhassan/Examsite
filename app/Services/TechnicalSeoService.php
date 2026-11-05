@@ -285,6 +285,9 @@ TXT;
         $siteUrl = url('/');
         $logoPath = ($site && !empty($site->logo)) ? $site->logo : Setting::get('site_logo');
         $logo = $logoPath ? (str_starts_with($logoPath, 'http') ? $logoPath : asset($logoPath)) : asset('images/logo.png');
+        if (config('site.schema_logo')) {
+            $logo = asset(config('site.schema_logo'));
+        }
 
         $contactEmail = ($site && !empty($site->contact_email)) ? $site->contact_email : Setting::get('contact_email', \App\Services\SiteContext::supportEmail());
 

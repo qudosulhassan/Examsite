@@ -57,7 +57,7 @@
 @section('og_type', 'product')
 @section('seo_tags')
     @include('partials.schema-breadcrumbs', ['crumbs' => $crumbs])
-    @if($offers)
+    @if($offers && \App\Support\ExamGuideContent::isIndexable((string) $exam->slug))
     <script type="application/ld+json">
     {!! json_encode([
         '@context' => 'https://schema.org',

@@ -11,6 +11,7 @@
 @section('meta_description', \App\Support\SeoMeta::staticPage('faq', $brand, $vendorName)['description'])
 
 @section('seo_tags')
+    @include('partials.schema-breadcrumbs', ['crumbs' => [['name' => 'Home', 'url' => url('/')], ['name' => 'FAQ', 'url' => url('/faq')]]])
     <script type="application/ld+json">
     {!! json_encode(\App\Support\SiteFaq::schema($faqs), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
     </script>

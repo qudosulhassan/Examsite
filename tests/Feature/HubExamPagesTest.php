@@ -209,14 +209,36 @@ class HubExamPagesTest extends TestCase
         $this->assertStringContainsString('"@type":"Product"', str_replace(["\n", ' '], '', $html));
     }
 
-    public function test_guide_page_marks_up_a_product_without_invented_ratings(): void
+    public function test_guide_is_a_course_and_plans_a_product_and_neither_invents_ratings(): void
     {
-        $exam = $this->exam();
+        $exam = $this->exam();   // DP-800 has an official study guide
 
-        $html = $this->get($exam->url)->assertOk()->getContent();
+        $guide = $this->get($exam->url)->assertOk()->getContent();
+        $this->assertStringContainsString('"@type":"Course"', $guide);
+        $this->assertStringNotContainsString('"@type":"Product"', $guide, 'purchase markup belongs on the plans page');
+        $this->assertStringContainsString('"@type":"FAQPage"', $guide);
 
-        $this->assertStringContainsString('AggregateOffer', $html);
-        $this->assertStringNotContainsString('aggregateRating', $html);
+        $plans = $this->get($exam->plans_url)->assertOk()->getContent();
+        $this->assertStringContainsString('"@type":"Product"', $plans);
+        $this->assertStringContainsString('"priceCurrency":"USD"', $plans);
+        $this->assertStringContainsString('https://schema.org/InStock', $plans);
+
+        foreach ([$guide, $plans] as $html) {
+            $this->assertStringNotContainsString('aggregateRating', $html);
+            $this->assertStringNotContainsString('"@type":"Review"', $html);
+        }
+    }
+
+    public function test_retired_and_unlisted_exams_have_no_course_or_product_markup(): void
+    {
+        $exam = $this->exam('AZ-303');   // no study guide on Microsoft Learn
+
+        foreach ([$exam->url, $exam->plans_url] as $url) {
+            $html = $this->get($url)->assertOk()->getContent();
+            $this->assertStringNotContainsString('"@type":"Course"', $html);
+            $this->assertStringNotContainsString('"@type":"Product"', $html);
+            $this->assertStringContainsString('<meta name="robots" content="noindex, follow', $html);
+        }
     }
 
     public function test_track_page_lists_the_exams_of_that_track(): void

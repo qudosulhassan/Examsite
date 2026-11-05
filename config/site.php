@@ -73,6 +73,9 @@ return [
     // Free practice questions shown on a hub-style exam's questions page (5 per page).
     'free_questions' => max(1, (int) env('SITE_FREE_QUESTIONS', 10)),
 
+    // Raster logo for Organization markup (search engines reject SVG there), e.g. SITE_SCHEMA_LOGO=images/logo-primary.png
+    'schema_logo' => env('SITE_SCHEMA_LOGO'),
+
     'show_guarantee' => filter_var(env('SITE_SHOW_GUARANTEE', true), FILTER_VALIDATE_BOOLEAN),
 
     'exam_url_style' => env('EXAM_URL_STYLE', 'prefixed'),

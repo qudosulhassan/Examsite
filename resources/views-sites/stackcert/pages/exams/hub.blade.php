@@ -44,7 +44,7 @@
 @section('title', $title)
 @section('meta_description', $description)
 @section('canonical_url', $exam->url)
-@section('og_type', 'product')
+@section('og_type', 'article')
 @unless(\App\Support\ExamGuideContent::isIndexable((string) $exam->slug))
     @section('robots', 'noindex, follow')
 @endunless
@@ -75,26 +75,18 @@
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
     </script>
     @endif
+    @if($g && \App\Support\ExamGuideContent::isIndexable((string) $exam->slug))
     <script type="application/ld+json">
     {!! json_encode(array_filter([
         '@context' => 'https://schema.org',
-        '@type' => 'Product',
-        'name' => "{$code} {$examName} practice questions and study guide",
-        'description' => $description,
-        'sku' => $code,
+        '@type' => 'Course',
+        'name' => "{$code} {$examName} exam preparation",
+        'description' => "A study guide for the {$code} {$examName} exam: the skills measured with their weightings, a {$g['weeks']}-week study plan and FAQs, based on Microsoft's official study guide.",
         'url' => $exam->url,
-        'brand' => ['@type' => 'Brand', 'name' => $brand],
-        'offers' => $lowPrice ? [
-            '@type' => 'AggregateOffer',
-            'priceCurrency' => 'USD',
-            'lowPrice' => number_format($lowPrice, 2, '.', ''),
-            'highPrice' => number_format($highPrice, 2, '.', ''),
-            'offerCount' => count($priceList),
-            'availability' => 'https://schema.org/InStock',
-            'url' => $exam->plans_url,
-        ] : null,
+        'provider' => ['@type' => 'Organization', 'name' => $brand, 'url' => url('/')],
     ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
     </script>
+    @endif
 @endsection
 
 @section('content')

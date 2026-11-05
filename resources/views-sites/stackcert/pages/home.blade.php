@@ -29,31 +29,6 @@
 
 @section('seo_tags')
 <script type="application/ld+json">
-{!! json_encode(array_filter([
-    '@context' => 'https://schema.org',
-    '@type' => 'Organization',
-    '@id' => url('/') . '#organization',
-    'name' => $brand,
-    'url' => url('/'),
-    'description' => "Independent {$vendorName} exam preparation: practice questions, study guides and a timed test engine. Not affiliated with {$vendorName}.",
-    'logo' => $orgLogo,
-    'email' => $currentSite->contact_email ?? null,
-]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-</script>
-<script type="application/ld+json">
-{!! json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'WebSite',
-    'name' => $brand,
-    'url' => url('/'),
-    'potentialAction' => [
-        '@type' => 'SearchAction',
-        'target' => url('/search') . '?q={search_term_string}',
-        'query-input' => 'required name=search_term_string',
-    ],
-], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-</script>
-<script type="application/ld+json">
 {!! json_encode([
     '@context' => 'https://schema.org',
     '@type' => 'FAQPage',
