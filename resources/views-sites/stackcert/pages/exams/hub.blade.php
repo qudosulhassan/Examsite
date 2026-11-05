@@ -133,7 +133,15 @@
                     Skills, weightings and the pass mark come from Microsoft's
                     @if(!empty($g['guideUrl']))<a href="{{ $g['guideUrl'] }}" class="underline" rel="noopener" target="_blank">official {{ $code }} study guide</a>@else official study guide @endif.
                     Microsoft can change an exam, so confirm the current outline, languages and price on its exam page before you book.
+                    @if(!empty($g['checkedAt']))We last checked this guide against the official study guide on {{ $g['checkedAt'] }}.@endif
                 </p>
+                @if(!empty(config('site.editorial.name')))
+                    {{-- Hidden until SITE_EDITOR_NAME is set --}}
+                    <p class="mt-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                        <strong class="font-extrabold">Reviewed by</strong> {{ config('site.editorial.name') }}@if(config('site.editorial.role')), {{ config('site.editorial.role') }}@endif.
+                        @if(config('site.editorial.bio')) {{ config('site.editorial.bio') }} @endif
+                    </p>
+                @endif
             </section>
 
             @if($g)
@@ -214,6 +222,33 @@
             </section>
             @endif
 
+            {{-- Where this exam sits in the usual order --}}
+            @php
+                $pathSlugs = \App\Support\ExamGuideContent::path((string) $exam->slug);
+                $pathExams = \App\Models\Exam::whereIn('slug', array_merge($pathSlugs['previous'], $pathSlugs['next']))->get()->keyBy('slug');
+                $pathLabel = function ($slug) use ($pathExams) {
+                    $e = $pathExams[$slug] ?? null;
+                    if (!$e) { return null; }
+                    $name = \App\Support\ExamGuideContent::load($slug)['official'] ?? $e->exam_name;
+                    return ['url' => $e->url, 'text' => strtoupper($slug) . ' ' . $name . ' exam guide'];
+                };
+                $before = array_filter(array_map($pathLabel, $pathSlugs['previous']));
+                $after = array_filter(array_map($pathLabel, $pathSlugs['next']));
+            @endphp
+            @if($g && ($before || $after))
+            <section aria-labelledby="path">
+                <h2 id="path" class="text-2xl font-extrabold text-slate-900">Where {{ $code }} fits in the usual order</h2>
+                <div class="mt-4 space-y-3 text-sm leading-relaxed text-slate-700">
+                    @if($before)
+                        <p>People often take {{ collect($before)->map(fn ($l) => $l['text'])->implode(' or ') }} before this exam: @foreach($before as $l)<a href="{{ $l['url'] }}" class="font-bold underline" style="color: var(--brand);">{{ $l['text'] }}</a>@if(!$loop->last), @endif @endforeach.</p>
+                    @endif
+                    @if($after)
+                        <p>The usual next step after {{ $code }} is @foreach($after as $l)<a href="{{ $l['url'] }}" class="font-bold underline" style="color: var(--brand);">{{ $l['text'] }}</a>@if(!$loop->last) or @endif @endforeach.</p>
+                    @endif
+                    <p class="text-xs text-slate-500">This is a common order, not a requirement. Check Microsoft's certification pages for the exams a certification needs.</p>
+                </div>
+            </section>
+            @endif
             {{-- Reviews (only genuine, approved ones are ever shown) --}}
             @if($reviews->isNotEmpty())
             <section aria-labelledby="reviews">

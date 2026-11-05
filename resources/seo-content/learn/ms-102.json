@@ -163,5 +163,6 @@
   "status": "retiring",
   "date": "November 30, 2026"
  },
- "retiredNote": " Study guide for Exam MS-102: Microsoft 365 Administrator Feedback Summarize this article for me In this article Purpose of this document Warning This exam will retire on November 30, 2026, at 11:59 PM Central Standard Time."
+ "retiredNote": " Study guide for Exam MS-102: Microsoft 365 Administrator Feedback Summarize this article for me In this article Purpose of this document Warning This exam will retire on November 30, 2026, at 11:59 PM Central Standard Time.",
+ "fetchedAt": "2026-11-05"
 }

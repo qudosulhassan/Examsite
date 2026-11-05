@@ -16,6 +16,34 @@ use Illuminate\Support\Arr;
  */
 class ExamGuideContent
 {
+    /**
+     * The usual order of exams, used for the "before this" and "next step" links on guide pages: exam => the exams that
+     * commonly follow it. Only links between exams that exist on the site are shown.
+     */
+    public const NEXT = [
+        'az-900' => ['az-104'],
+        'az-104' => ['az-305'],
+        'sc-900' => ['sc-200', 'sc-300'],
+        'sc-200' => ['sc-100'],
+        'sc-300' => ['sc-100'],
+        'pl-900' => ['pl-300'],
+        'dp-900' => ['dp-600', 'dp-700', 'dp-300'],
+    ];
+
+    /** @return array{previous: array<string>, next: array<string>} exam slugs */
+    public static function path(string $slug): array
+    {
+        $slug = strtolower($slug);
+        $previous = [];
+        foreach (static::NEXT as $from => $to) {
+            if (in_array($slug, $to, true)) {
+                $previous[] = $from;
+            }
+        }
+
+        return ['previous' => $previous, 'next' => static::NEXT[$slug] ?? []];
+    }
+
     /** Microsoft's published pass mark for its exams. */
     public const PASSING = '700 on a scale of 1 to 1,000';
 
@@ -87,6 +115,7 @@ class ExamGuideContent
             'level'       => $level,
             'guideUrl'    => $data['url'] ?? null,
             'asOf'        => $data['asOf'] ?? null,
+            'checkedAt'   => !empty($data['fetchedAt']) ? \Carbon\Carbon::parse($data['fetchedAt'])->format('F j, Y') : null,
             'retire'      => $data['retire'] ?? null,
             'audience'    => $audience,
             'domains'     => $domains,

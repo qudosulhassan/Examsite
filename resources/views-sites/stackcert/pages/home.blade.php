@@ -8,6 +8,9 @@
     $trackTitles = collect($siteTracks)->reject(fn ($t) => $t['key'] === 'more')->pluck('title')->take(2)->all();
     $vendorUrl = $vendorSlug ? url('/vendors/' . $vendorSlug) : url('/vendors');
     $monthYear = now()->format('F Y');
+    // The ten exams most candidates look for, in a sensible order (fundamentals first). Retired exams are never listed.
+    $topExams = \App\Models\Exam::whereIn('slug', ['az-900', 'az-104', 'az-305', 'az-400', 'sc-900', 'sc-200', 'sc-300', 'pl-900', 'pl-300', 'dp-900'])->get()
+        ->sortBy(fn ($e) => array_search($e->slug, ['az-900', 'az-104', 'az-305', 'az-400', 'sc-900', 'sc-200', 'sc-300', 'pl-900', 'pl-300', 'dp-900']))->values();
     // Search engines want a raster logo for the Organization markup, so use the site's 512px app icon when it has one.
     $iconDir = ($currentSite && !empty($currentSite->favicon)) ? dirname($currentSite->favicon) : null;
     $orgLogo = ($iconDir && is_file(public_path($iconDir . '/android-chrome-512x512.png'))) ? asset($iconDir . '/android-chrome-512x512.png') : null;
@@ -67,10 +70,10 @@
                 <button type="submit" class="flex-none rounded-xl px-5 py-3 text-sm font-bold text-white transition hover:opacity-90" style="background: var(--brand);">Search</button>
             </form>
 
-            @if($latestExams->isNotEmpty())
+            @if($topExams->isNotEmpty())
                 <div class="mt-5 flex flex-wrap items-center gap-2 text-sm">
                     <span class="font-semibold text-slate-400">Popular:</span>
-                    @foreach($latestExams->take(6) as $chip)
+                    @foreach($topExams->take(6) as $chip)
                         <a href="{{ $chip->url }}" class="rounded-full bg-white/10 px-3 py-1 font-semibold text-slate-100 ring-1 ring-white/15 transition hover:bg-white/20">{{ $chip->exam_code }}</a>
                     @endforeach
                 </div>
@@ -292,6 +295,25 @@
         </div>
     </div>
 </section>
+{{-- ============ POPULAR EXAMS ============ --}}
+@if($topExams->isNotEmpty())
+<section class="border-t border-slate-200 bg-white py-14" aria-labelledby="popular-exams">
+    <div class="container-custom">
+        <h2 id="popular-exams" class="text-3xl font-extrabold text-slate-900 sm:text-4xl">Popular {{ $vendorName }} exams</h2>
+        <p class="mt-3 max-w-2xl text-base text-slate-600">Open an exam for its guide, free practice questions and plans.</p>
+        <ul class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            @foreach($topExams as $te)
+                <li>
+                    <a href="{{ $te->url }}" class="block h-full rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-300 hover:bg-white hover:shadow-md">
+                        <span class="text-xs font-extrabold" style="color: var(--brand-dark);">{{ $te->exam_code }}</span>
+                        <span class="mt-1 block text-sm font-bold leading-snug text-slate-900">{{ $te->exam_code }} exam guide and practice questions</span>
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+</section>
+@endif
 {{-- ============ HOW IT WORKS ============ --}}
 <section class="border-t border-slate-200 bg-white py-16 lg:py-20">
     <div class="container-custom">

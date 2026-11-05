@@ -222,5 +222,6 @@
   "status": "retired",
   "date": "October 30, 2026"
  },
- "retiredNote": " Study guide for Exam PL-400: Microsoft Power Platform Developer Feedback Summarize this article for me In this article Warning This exam was retired on October 30, 2026, at 11:59 PM Central Standard Time."
+ "retiredNote": " Study guide for Exam PL-400: Microsoft Power Platform Developer Feedback Summarize this article for me In this article Warning This exam was retired on October 30, 2026, at 11:59 PM Central Standard Time.",
+ "fetchedAt": "2026-11-05"
 }
