@@ -13,7 +13,7 @@
     $pageUrl = fn (int $n) => $n > 1 ? $baseUrl . '?page=' . $n : $baseUrl;
     $lastNumber = $firstNumber + $questions->count() - 1;
 
-    $title = "Free {$code} Practice Questions with Explanations | {$brand}";
+    $title = collect(["Free {$code} Practice Questions with Explanations | {$brand}", "Free {$code} Practice Questions and Answers | {$brand}"])->first(fn ($t) => mb_strlen($t) <= 60) ?? "Free {$code} Practice Questions | {$brand}";
     if ($page > 1) { $title = "Free {$code} Practice Questions, Page {$page} | {$brand}"; }
     $h1 = "Free {$code} practice questions";
     $description = \Illuminate\Support\Str::limit("Answer {$freeCount} free {$code} ({$examName}) practice questions and read an explanation for each one" . ($bankCount > $freeCount ? ". The full bank has {$bankCount} questions." : '.'), 158);
