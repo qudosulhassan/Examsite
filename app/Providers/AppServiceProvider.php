@@ -25,6 +25,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Anything an admin can change that shows on public pages must clear the guest page cache, so edits
+        // (a verification tag, an exam, a post, a setting) are visible at once instead of after the cache TTL.
+        foreach ([\App\Models\Setting::class, \App\Models\Site::class, \App\Models\Exam::class, \App\Models\Vendor::class, \App\Models\Question::class, \App\Models\BlogPost::class, \App\Models\Redirect::class, \App\Models\Review::class] as $model) {
+            foreach (['saved', 'deleted'] as $event) {
+                $model::registerModelEvent($event, function () {
+                    try {
+                        \Illuminate\Support\Facades\Cache::forever('page_cache_version', (int) \Illuminate\Support\Facades\Cache::get('page_cache_version', 1) + 1);
+                    } catch (\Throwable $e) {
+                        // a cache outage must never break saving
+                    }
+                });
+            }
+        }
+
         // Shared templates are written for the core site; rebrand them for any other site.
         \Illuminate\Support\Facades\Blade::prepareStringsForCompilationUsing(
             fn (string $template) => \App\Services\SiteContext::rebrandTemplate($template)
