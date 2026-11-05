@@ -382,7 +382,10 @@ TXT;
 
         $imageUrl = !empty($post->featured_image) 
             ? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/' . ltrim($post->featured_image, '/'))) 
-            : asset('images/og-default.png');
+            : ($site && !empty($site->og_image) ? asset($site->og_image) : asset('images/og-default.png'));
+        if (config('site.schema_logo')) {
+            $logoUrl = asset(config('site.schema_logo'));
+        }
 
         $authorName = $post->author->name ?? $post->user->name ?? 'ExamTopicsBase Editorial Team';
 
@@ -401,9 +404,10 @@ TXT;
             'image' => [$imageUrl],
             'datePublished' => $post->published_at ? $post->published_at->toIso8601String() : ($post->created_at ? $post->created_at->toIso8601String() : now()->toIso8601String()),
             'dateModified' => $post->updated_at ? $post->updated_at->toIso8601String() : now()->toIso8601String(),
+            // A team byline ("... Editorial Team") is an organization, not a person
             'author' => [
                 [
-                    '@type' => 'Person',
+                    '@type' => str_ends_with($authorName, 'Editorial Team') ? 'Organization' : 'Person',
                     'name' => $authorName,
                 ]
             ],

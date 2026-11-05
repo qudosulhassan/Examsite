@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', $post->meta_title ?? $post->title)
+@section('og_type', 'article')
 @section('meta_description', $post->meta_description ?? $post->excerpt)
 @section('meta_keywords', $post->meta_keywords)
 @if($post->canonical_url)

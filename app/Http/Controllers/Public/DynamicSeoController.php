@@ -128,6 +128,15 @@ class DynamicSeoController extends Controller
                 }
             }
 
+            // 4. Blog: published posts of this site (the index only when there is something on it)
+            $posts = \App\Models\BlogPost::where('status', 'published')->where('published_at', '<=', now())->orderByDesc('published_at')->get(['slug', 'published_at', 'updated_at']);
+            if ($posts->isNotEmpty()) {
+                $urls[] = ['loc' => rtrim($host, '/') . '/blog', 'priority' => '0.6', 'changefreq' => 'weekly', 'lastmod' => $posts->max('updated_at')?->format('Y-m-d')];
+                foreach ($posts as $post) {
+                    $urls[] = ['loc' => rtrim($host, '/') . '/blog/' . $post->slug, 'priority' => '0.7', 'changefreq' => 'monthly', 'lastmod' => ($post->updated_at ?: $post->published_at)?->format('Y-m-d')];
+                }
+            }
+
             // Generate XML
             $out = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
             $out .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";

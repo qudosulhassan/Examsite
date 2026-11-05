@@ -1,0 +1,100 @@
+<p>SC-200, the Microsoft Security Operations Analyst exam, is one of the most hands-on exams in the security track. Microsoft expects you to triage alerts, respond to incidents, hunt for threats and write detections. This post gives you a four-week study plan built directly on Microsoft's official skills outline, with the weightings used to decide where your time goes.</p>
+
+<p><em>The outline below comes from Microsoft's SC-200 study guide, last updated by Microsoft on October 21, 2026, and was checked on November 5, 2026. Microsoft revises outlines, so read the current study guide before you start. The week-by-week split is our suggestion, not Microsoft's.</em></p>
+
+<h2>Who SC-200 is for</h2>
+<p>Microsoft describes the candidate as a security operations analyst who reduces organizational risk by performing triage, responding to incidents, hunting for threats and engineering detections. You monitor, identify, investigate and respond to threats in multi-cloud and on-premises environments using Microsoft Defender XDR, Microsoft Sentinel, Microsoft Entra ID, Microsoft Purview and Microsoft Defender for Cloud workload protections, and you hunt with KQL and automate responses.</p>
+<p>The certification, Microsoft Certified: Security Operations Analyst Associate, is rated Intermediate on Microsoft Learn and is renewed every 12 months for free. Microsoft expects you to be familiar with Microsoft security, compliance and identity solutions, Microsoft 365, Azure cloud services, AI agents and Copilots, and Windows, Linux and mobile operating systems.</p>
+
+<h2>What the exam measures</h2>
+<p>The skills outline has three domains. Their weightings tell you how the exam is likely to spend its questions:</p>
+<ul>
+  <li><strong>Manage a security operations environment (40–45%).</strong> Configure automation for Microsoft Defender XDR and Microsoft Sentinel, configure the Sentinel SIEM and platform, ingest data into Sentinel, and configure detections.</li>
+  <li><strong>Respond to security incidents (35–40%).</strong> Respond to alerts and incidents in Defender XDR and in Defender for Endpoint, and investigate Microsoft 365 activities to identify threats.</li>
+  <li><strong>Perform threat hunting (20–25%).</strong> Detect threats by using Defender XDR and by using the Sentinel platform.</li>
+</ul>
+<p>The pass mark is 700 on a scale of 1 to 1,000. It is a scaled score, so it is not the same as answering 70% of questions correctly.</p>
+<p>Notice that the largest domain is about running the environment, not about the exciting part of chasing attackers. If you only practise incident response, you leave up to 45% of the exam to chance.</p>
+
+<h2>Before week one</h2>
+<ul>
+  <li>Open the <a href="/exams/sc-200">SC-200 guide</a> and the official study guide, and print or copy the skills list so you can tick items off.</li>
+  <li>Set up somewhere to practise: a trial or lab tenant, if your organisation allows it. Reading about Sentinel and Defender is not enough for an exam that asks you to configure them.</li>
+  <li>Take ten free questions from the <a href="/exams/sc-200/free-practice-questions">SC-200 practice questions</a> as a baseline. Write down which topics you missed. This is your map for the next four weeks, not a score to worry about.</li>
+</ul>
+
+<h2>Week 1: build the environment (Manage a security operations environment, part 1)</h2>
+<p>Spend this week on the foundations of the biggest domain: configuring the Microsoft Sentinel SIEM and platform, and configuring automation for Defender XDR and Sentinel.</p>
+<ul>
+  <li>Learn how a Sentinel workspace is organised and what the platform needs before it is useful.</li>
+  <li>Work through automation: what can run automatically when an incident fires, and what should stay manual.</li>
+  <li>Hands-on: create a workspace and an automation rule, then trigger it and read what happened.</li>
+</ul>
+<p>At the end of the week, answer practice questions on configuration and automation only, and read every explanation.</p>
+
+<h2>Week 2: data and detections (Manage a security operations environment, part 2)</h2>
+<p>Finish the heaviest domain by covering how data gets into Sentinel and how detections are created.</p>
+<ul>
+  <li>Learn the ways data is ingested and what each source gives you.</li>
+  <li>Learn how detections are built, tuned and why a noisy detection is a problem.</li>
+  <li>Start KQL now. It appears in detections and in hunting, so begin with simple queries: filter, project, summarise, join. Write a few every day rather than many on one day.</li>
+</ul>
+<p>Hands-on: connect a data source, write a small detection and look at the alert it creates.</p>
+
+<h2>Week 3: respond to incidents (35–40%)</h2>
+<p>This week is about what you do when an alert arrives. The outline covers three areas: alerts and incidents in Microsoft Defender XDR, alerts and incidents in Microsoft Defender for Endpoint, and investigating Microsoft 365 activities to identify threats.</p>
+<ul>
+  <li>Practise reading an incident from start to finish: what triggered it, which entities are involved, what the timeline shows.</li>
+  <li>Learn the response actions available for an endpoint, and when you would use each.</li>
+  <li>Learn how to investigate user and mailbox activity in Microsoft 365 when you suspect an account is compromised.</li>
+</ul>
+<p>Take a longer set of practice questions at the end of this week, about thirty, and compare the result with your baseline.</p>
+
+<h2>Week 4: threat hunting and exam rehearsal (20–25%)</h2>
+<p>Spend the first half of the week on threat hunting with Defender XDR and the Sentinel platform: hunting queries, saved queries, bookmarks and how a hunt turns into a detection. Your KQL from weeks 2 and 3 should now make this feel familiar.</p>
+<p>Spend the second half on rehearsal:</p>
+<ul>
+  <li>Do timed practice sessions that match the real exam length, in one sitting, without looking anything up.</li>
+  <li>Review each result by domain. If one domain is clearly weaker, spend an evening on it, not the whole week.</li>
+  <li>Mark the questions you guessed, even when you got them right. A lucky guess hides a gap.</li>
+</ul>
+
+<h2>A weekly rhythm that works</h2>
+<ul>
+  <li><strong>Three or four study evenings</strong> of reading and labs, each focused on one topic.</li>
+  <li><strong>One practice set</strong> on that week's topics, with all explanations read.</li>
+  <li><strong>One review session</strong> where you rewrite notes on what you got wrong.</li>
+</ul>
+<p>If you work in a security operations role already, you may need less time. If you are new to Sentinel or KQL, add a fifth week rather than rushing weeks 1 and 2.</p>
+
+<h2>Exam-day tips</h2>
+<ul>
+  <li>Read each scenario for what it asks you to do. Many wrong answers are real features that solve a different problem.</li>
+  <li>Do not spend ages on one question. Flag it and come back.</li>
+  <li>Remember that Microsoft updates the skills outline from time to time. A quick re-read of the study guide the night before shows you if anything changed.</li>
+</ul>
+
+<h2>After you pass</h2>
+<p>The Security Operations Analyst Associate certification expires after a year, and you renew it free through an online, unproctored, open-book assessment on Microsoft Learn. Our post on <a href="/blog/do-microsoft-certifications-expire-renewal">how renewal works</a> explains the steps. If you want to continue in security, browse the <a href="/tracks/security-identity">security and identity track</a> for the other exams.</p>
+<h2>How to use practice questions across the four weeks</h2>
+<p>Practice questions work best as a tool for finding gaps, not as a way to memorise answers. Use them in three ways:</p>
+<ul>
+  <li><strong>Baseline (before week 1):</strong> ten questions, untimed, to see which domain is weakest.</li>
+  <li><strong>Topic sets (end of weeks 1, 2 and 3):</strong> only questions on that week's topic, with every explanation read, including the ones you got right.</li>
+  <li><strong>Timed rehearsal (week 4):</strong> a full session in one sitting, then a review by domain.</li>
+</ul>
+<p>Keep a short list of "things I got wrong and why". Rewriting a mistake in your own words is one of the quickest ways to stop repeating it.</p>
+
+<h2>If you only have two weeks</h2>
+<p>A compressed plan is possible if you already work with Defender or Sentinel. Give one week to the largest domain, managing the security operations environment, because it carries 40–45%, and one week to incident response and threat hunting combined, with timed practice in the last three days. If much of the outline is new to you, a two-week plan is not realistic and you should keep the four weeks.</p>
+
+<h2>Frequently asked questions</h2>
+<h3>How hard is SC-200?</h3>
+<p>Microsoft rates the certification Intermediate. The difficulty depends on how much of Sentinel, Defender XDR and KQL you use already. People with daily security operations experience will find it far easier than people who have only read about the tools.</p>
+<h3>Do I need to know KQL?</h3>
+<p>Microsoft's role description says you perform hunting by using KQL, and detections and hunting are in the outline, so yes. Start early and write a few queries every day.</p>
+<h3>Is SC-900 required first?</h3>
+<p>No. SC-900 is the fundamentals exam for security, compliance and identity, and it is a good first step if the concepts are new, but it is not a prerequisite for SC-200. See the <a href="/exams/sc-900">SC-900 guide</a>.</p>
+<h3>What comes after SC-200?</h3>
+<p>Many people continue to the <a href="/exams/sc-100">SC-100 cybersecurity architect exam</a> after working in an analyst or administrator role, or look at <a href="/exams/sc-300">SC-300</a> for identity and access.</p>
+<p>Sources: <a href="https://learn.microsoft.com/en-us/credentials/certifications/security-operations-analyst/" rel="noopener" target="_blank">Microsoft Certified: Security Operations Analyst Associate</a> and the <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-200" rel="noopener" target="_blank">SC-200 study guide</a> on Microsoft Learn.</p>

@@ -1,0 +1,52 @@
+[
+  {
+    "slug": "az-900-vs-az-104-which-first",
+    "file": "az-900-vs-az-104-which-first.html",
+    "title": "AZ-900 vs AZ-104: Which Should You Take First?",
+    "meta_title": "AZ-900 vs AZ-104: Which to Take First? | AzureExamsHub",
+    "meta_description": "Not sure whether to start with AZ-900 or AZ-104? Compare what each Azure exam covers, who it suits and how to choose in five minutes, with Microsoft's facts.",
+    "excerpt": "Take AZ-900 if you are new to the cloud and AZ-104 if you already administer Azure. Here is how to decide, with the skills and weightings of both exams.",
+    "category": "Azure certifications",
+    "related_exam": "az-104"
+  },
+  {
+    "slug": "microsoft-azure-certification-path-2026",
+    "file": "microsoft-azure-certification-path-2026.html",
+    "title": "Microsoft Azure Certification Path in 2026: Fundamentals to Expert",
+    "meta_title": "Azure Certification Path 2026: Step by Step | AzureExamsHub",
+    "meta_description": "The Azure certification path from AZ-900 to expert level in 2026, with prerequisites, the exams Microsoft has retired and the ones it recommends instead.",
+    "excerpt": "From Azure Fundamentals to the expert certifications: the order, the prerequisites, and which exams Microsoft retired or replaced in 2026.",
+    "category": "Azure certifications",
+    "related_exam": "az-305"
+  },
+  {
+    "slug": "how-to-prepare-for-sc-200-4-week-plan",
+    "file": "how-to-prepare-for-sc-200-4-week-plan.html",
+    "title": "How to Prepare for SC-200: A 4-Week Study Plan",
+    "meta_title": "SC-200 Study Plan: Prepare in 4 Weeks | AzureExamsHub",
+    "meta_description": "A four-week SC-200 study plan built on Microsoft's official skills outline and weightings, with weekly tasks, practice advice and exam-day tips.",
+    "excerpt": "A week-by-week plan for the Microsoft Security Operations Analyst exam, built on the official domains and their weightings.",
+    "category": "Security certifications",
+    "related_exam": "sc-200"
+  },
+  {
+    "slug": "do-microsoft-certifications-expire-renewal",
+    "file": "do-microsoft-certifications-expire-renewal.html",
+    "title": "Do Microsoft Certifications Expire? How Free Online Renewal Works",
+    "meta_title": "Do Microsoft Certifications Expire? | AzureExamsHub",
+    "meta_description": "Associate, expert and specialty certifications expire yearly; Fundamentals do not. Learn how Microsoft's free online renewal works and when to do it.",
+    "excerpt": "Most Microsoft certifications expire after a year, but renewal is free, online and open book. Here is exactly how it works.",
+    "category": "Certification basics",
+    "related_exam": "az-104"
+  },
+  {
+    "slug": "ms-102-retirement-what-to-take-instead",
+    "file": "ms-102-retirement-what-to-take-instead.html",
+    "title": "MS-102 Retirement: What It Means for Candidates and What to Take Instead",
+    "meta_title": "MS-102 Retirement: What to Take Instead | AzureExamsHub",
+    "meta_description": "MS-102 retires on November 30, 2026. See what Microsoft has announced, what it means if you are studying or certified, and the recommended newer exam.",
+    "excerpt": "Microsoft is retiring MS-102 on November 30, 2026. What that means for you, and the exam Microsoft recommends instead.",
+    "category": "Microsoft 365 certifications",
+    "related_exam": "ms-102"
+  }
+]

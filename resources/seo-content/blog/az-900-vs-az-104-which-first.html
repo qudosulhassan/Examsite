@@ -1,0 +1,85 @@
+<p>If you are planning your first Microsoft Azure certification, the first question is usually whether to start with AZ-900 or go straight to AZ-104. The short answer is simple: take <a href="/exams/az-900">AZ-900</a> if you are new to the cloud, and take <a href="/exams/az-104">AZ-104</a> if you already administer Azure resources and want the credential that proves it. This post explains how to decide, what each exam really covers, and how to avoid wasting weeks on the wrong one.</p>
+
+<p><em>Facts in this post come from Microsoft Learn and were checked on November 5, 2026. Microsoft changes exams from time to time, so read the current study guides before you book.</em></p>
+
+<h2>The short answer</h2>
+<ul>
+  <li><strong>New to cloud or to Azure?</strong> Start with AZ-900. Microsoft describes Azure Fundamentals as a common starting point in a journey towards a career in Azure.</li>
+  <li><strong>Already running virtual machines, storage and networks in Azure?</strong> Go to AZ-104. You will meet most of the AZ-900 ideas again inside it, in more depth.</li>
+  <li><strong>Somewhere in between?</strong> Take the free practice questions for both exams and see which one you can answer without guessing.</li>
+</ul>
+<p>Neither exam is a formal prerequisite of the other. On the Azure Administrator Associate page I did not see AZ-900 listed as a requirement when I checked. The certification needs AZ-104 only, so skipping AZ-900 is allowed.</p>
+
+<h2>AZ-900 and AZ-104 side by side</h2>
+<table>
+  <thead><tr><th>&nbsp;</th><th>AZ-900: Azure Fundamentals</th><th>AZ-104: Azure Administrator</th></tr></thead>
+  <tbody>
+    <tr><td>Level on Microsoft Learn</td><td>Beginner</td><td>Intermediate</td></tr>
+    <tr><td>Who it is for</td><td>Anyone who wants foundational knowledge of cloud concepts and Azure, including people in infrastructure, database or software roles</td><td>People with subject matter expertise in implementing, managing and monitoring an Azure environment</td></tr>
+    <tr><td>Expires?</td><td>No. Microsoft says Fundamentals certifications do not expire</td><td>Yes, every 12 months, renewed free online</td></tr>
+    <tr><td>Pass mark</td><td colspan="2">700 on a scale of 1 to 1,000 (a scaled score, not a percentage)</td></tr>
+  </tbody>
+</table>
+
+<h2>What AZ-900 covers</h2>
+<p>AZ-900 is about knowing what things are and why they exist, not about building them. Microsoft's study guide has three domains:</p>
+<ul>
+  <li><strong>Describe cloud concepts (25–30%)</strong>: cloud computing, the benefits of cloud services, and service types such as IaaS, PaaS and SaaS.</li>
+  <li><strong>Describe Azure architecture and services (35–40%)</strong>: regions and availability zones, compute and networking, storage, and identity, access and security.</li>
+  <li><strong>Describe Azure management and governance (30–35%)</strong>: cost management, governance and compliance tools, tools for managing and deploying resources, and monitoring tools.</li>
+</ul>
+<p>Almost every skill in the list begins with the word "describe". You are expected to recognise the right service for a situation, explain a concept, and know which tool does what. You are not expected to deploy anything.</p>
+
+<h2>What AZ-104 covers</h2>
+<p>AZ-104 is the hands-on exam. Microsoft expects you to have worked with PowerShell, the Azure CLI, the Azure portal, Azure Resource Manager templates or Bicep files, and Microsoft Entra ID. The study guide has five domains:</p>
+<ul>
+  <li><strong>Manage Azure identities and governance (20–25%)</strong>: Microsoft Entra users and groups, access to Azure resources, and subscriptions and governance.</li>
+  <li><strong>Implement and manage storage (15–20%)</strong>: access to storage, storage accounts, and Azure Files and Blob Storage.</li>
+  <li><strong>Deploy and manage Azure compute resources (20–25%)</strong>: ARM templates and Bicep, virtual machines, containers, and Azure App Service.</li>
+  <li><strong>Implement and manage virtual networking (15–20%)</strong>: virtual networks, secure access to them, and name resolution and load balancing.</li>
+  <li><strong>Monitor and maintain Azure resources (10–15%)</strong>: monitoring, and backup and recovery.</li>
+</ul>
+<p>The verbs change here: configure, create, deploy, implement, manage. The questions describe a situation and ask what you would do, so reading alone will not be enough.</p>
+
+<h2>Where the two exams overlap</h2>
+<p>Both exams touch identity, governance, storage, compute, networking and monitoring. The difference is depth. AZ-900 asks what Azure role-based access control is for; AZ-104 asks you to assign a role at the right scope so a user can do one job and nothing else. AZ-900 asks what a virtual network is; AZ-104 asks how to connect two of them securely and load balance traffic across machines.</p>
+<p>That overlap is useful if you take AZ-900 first. Everything you learn there is the vocabulary AZ-104 assumes, so your AZ-104 study starts from a better place.</p>
+
+<h2>How to decide in five minutes</h2>
+<ol>
+  <li><strong>Open the AZ-104 study guide</strong> and read the "skills measured". If most lines are things you already do at work, AZ-104 is your exam.</li>
+  <li><strong>If most lines are unfamiliar words</strong>, start with AZ-900. It will take less time and make AZ-104 far less painful.</li>
+  <li><strong>Try ten questions from each.</strong> The <a href="/exams/az-900/free-practice-questions">free AZ-900 practice questions</a> and the <a href="/exams/az-104/free-practice-questions">free AZ-104 practice questions</a> show you where you stand before you invest weeks.</li>
+  <li><strong>Think about your goal.</strong> If you want a credential that proves hands-on ability to an employer, the Azure Administrator Associate certification is the stronger one. If you want to show you understand the cloud, or you work with people who build on it, AZ-900 is enough.</li>
+</ol>
+
+<h2>How long to allow</h2>
+<p>Microsoft does not publish a study time for either exam, so these are our suggestions, not Microsoft's. The study plans on our guide pages use <a href="/exams/az-900">two weeks for AZ-900</a> and <a href="/exams/az-104">three weeks for AZ-104</a>, with the heaviest domains first and a final week of timed practice. Add time if the topics are new to you, and remove some if you work with them every day.</p>
+<p>For AZ-104, the best use of your time is hands-on. Create a virtual network, deploy a machine into it, attach storage, break something and fix it. The exam rewards people who have done these things, because the wrong answers often sound reasonable to someone who has only read about them.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Skipping AZ-900 to save time, then struggling with terms in AZ-104.</strong> If the words are new, the shortest route is usually fundamentals first.</li>
+  <li><strong>Taking AZ-900 when you already have two years of Azure experience.</strong> You may pass it easily, but you will have spent time that could have gone to AZ-104.</li>
+  <li><strong>Only reading.</strong> For AZ-104 especially, practise the tasks in a lab or trial subscription, then use practice questions to find the topics your lab did not cover.</li>
+  <li><strong>Forgetting renewal.</strong> AZ-900 never expires. The Azure Administrator Associate certification does, and you renew it free online each year. Our post on <a href="/blog/do-microsoft-certifications-expire-renewal">how free renewal works</a> explains the process.</li>
+</ul>
+
+<h2>What to do next</h2>
+<p>If you chose AZ-900, read the <a href="/exams/az-900">AZ-900 exam guide</a> for the skills and weightings and then try the free questions. If you chose AZ-104, start with the <a href="/exams/az-104">AZ-104 exam guide</a>. When you finish AZ-104, the usual next step is the architect path: see our <a href="/blog/microsoft-azure-certification-path-2026">Azure certification path for 2026</a> for how the exams fit together.</p>
+<h2>A closer look at how the questions differ</h2>
+<p>Because the two exams measure different verbs, the questions feel different. An AZ-900 question usually gives you a short situation and asks you to pick the service or concept that fits: which cloud model, which kind of service, which tool for cost or governance. There is rarely any ambiguity about what you are being asked to do, and the wrong answers are usually the wrong category of thing.</p>
+<p>An AZ-104 question is more likely to describe a setup with several moving parts and ask what to change. The wrong answers are often real settings that would work in a different situation. That is why people who have built the thing do better than people who have read about it, and why we suggest labs for AZ-104 in a way we do not for AZ-900.</p>
+
+<h2>Frequently asked questions</h2>
+<h3>Do I need AZ-900 before AZ-104?</h3>
+<p>No. Microsoft does not list it as a requirement for the Azure Administrator Associate certification. It is a good first step if the vocabulary is new to you.</p>
+<h3>Does AZ-900 expire?</h3>
+<p>No. Microsoft says Fundamentals certifications do not expire. The Azure Administrator Associate certification does, and it is renewed for free each year.</p>
+<h3>Do I need to know PowerShell or the Azure CLI for AZ-104?</h3>
+<p>Microsoft lists PowerShell, the Azure CLI, the Azure portal, ARM templates or Bicep files and Microsoft Entra ID as experience you should have, so plan to practise at least the common tasks in each.</p>
+<h3>Can I prepare for both at the same time?</h3>
+<p>You can, because the topics overlap, but it is usually less confusing to finish AZ-900 first. Fundamentals give you a map, and AZ-104 then fills in the detail.</p>
+<h3>Which one will employers care about more?</h3>
+<p>Employers hiring Azure administrators generally look for the Associate-level certification because it reflects hands-on skills. AZ-900 shows you understand the platform, which helps in roles around cloud rather than inside it. Your own role should decide.</p>
+<p>Sources: <a href="https://learn.microsoft.com/en-us/credentials/certifications/azure-fundamentals/" rel="noopener" target="_blank">Microsoft Certified: Azure Fundamentals</a>, <a href="https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/" rel="noopener" target="_blank">Microsoft Certified: Azure Administrator Associate</a>, and the official study guides for <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900" rel="noopener" target="_blank">AZ-900</a> and <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104" rel="noopener" target="_blank">AZ-104</a>.</p>

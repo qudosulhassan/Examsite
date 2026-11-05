@@ -176,6 +176,40 @@ class HubExamPagesTest extends TestCase
         session()->regenerateToken();
     }
 
+    public function test_launch_blog_posts_publish_with_a_team_byline_markup_and_sitemap_entries(): void
+    {
+        $this->exam('AZ-104', 1);
+
+        $this->artisan('blog:publish-site-posts')->assertSuccessful();
+        $this->artisan('blog:publish-site-posts')->assertSuccessful();   // second run updates, never duplicates
+
+        $posts = \App\Models\BlogPost::where('status', 'published')->get();
+        $this->assertCount(5, $posts);
+        foreach ($posts as $post) {
+            $this->assertGreaterThanOrEqual(1200, str_word_count(strip_tags($post->content)), $post->slug);
+            $this->assertLessThanOrEqual(60, mb_strlen($post->meta_title), $post->slug);
+            $this->assertLessThanOrEqual(158, mb_strlen($post->meta_description), $post->slug);
+            $this->assertGreaterThanOrEqual(130, mb_strlen($post->meta_description), $post->slug);
+        }
+
+        $html = $this->get('/blog/az-900-vs-az-104-which-first')->assertOk()->getContent();
+        preg_match_all('#<script type="application/ld\+json">(.*?)</script>#s', $html, $m);
+        $blocks = array_map(fn ($j) => json_decode($j, true), $m[1]);
+        $article = collect($blocks)->firstWhere('@type', 'BlogPosting');
+        $this->assertNotNull($article, 'BlogPosting markup');
+        $this->assertSame('Organization', $article['author'][0]['@type']);
+        $this->assertSame('AzureExamsHub Editorial Team', $article['author'][0]['name']);
+        $this->assertArrayHasKey('datePublished', $article);
+        $this->assertArrayHasKey('dateModified', $article);
+        $this->assertNotEmpty($article['image']);
+        $this->assertStringContainsString('<meta property="og:type" content="article">', $html);
+
+        \Illuminate\Support\Facades\Cache::flush();
+        $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
+        $this->assertStringContainsString('/blog/az-900-vs-az-104-which-first', $xml);
+        $this->assertStringContainsString('<loc>' . url('/blog') . '</loc>', $xml);
+    }
+
     public function test_each_page_has_its_own_title_h1_and_self_canonical(): void
     {
         $exam = $this->exam();
