@@ -56,7 +56,17 @@ class ExamGuideContent
 
         if (!array_key_exists($slug, static::$cache)) {
             $path = resource_path("seo-content/learn/{$slug}.json");
-            static::$cache[$slug] = is_file($path) ? json_decode((string) file_get_contents($path), true) : null;
+            $data = is_file($path) ? json_decode((string) file_get_contents($path), true) : null;
+            if (is_array($data) && ($data['retire']['status'] ?? null) === 'retiring' && !empty($data['retire']['date'])) {
+                try {
+                    if (\Carbon\Carbon::parse($data['retire']['date'], 'America/Chicago')->endOfDay()->isPast()) {
+                        $data['retire']['status'] = 'retired';
+                    }
+                } catch (\Throwable $e) {
+                    // unreadable date: leave it as retiring
+                }
+            }
+            static::$cache[$slug] = $data;
         }
 
         return static::$cache[$slug];
