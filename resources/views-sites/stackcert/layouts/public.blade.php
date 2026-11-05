@@ -122,10 +122,10 @@
         </script>
     @endif
 
-    <!-- Fonts -->
+    <!-- Fonts: one request, text swaps in as soon as the font arrives (display=swap) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 
     <!-- CSS / JS (Tailwind + Alpine) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -134,9 +134,6 @@
         $brandPrimary = ($currentSite && !empty($currentSite->primary_color)) ? $currentSite->primary_color : '#0F6CBD';
         $brandDark = ($currentSite && !empty($currentSite->secondary_color)) ? $currentSite->secondary_color : '#0B3A66';
     @endphp
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --brand: {{ $brandPrimary }};
