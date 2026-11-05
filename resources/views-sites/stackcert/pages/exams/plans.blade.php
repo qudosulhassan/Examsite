@@ -18,10 +18,11 @@
     $offerPrices = array_filter([$hasPdf ? $prices['pdf'] : null, $hasEngine ? $prices['engine_single'] : null, $hasBundle ? $prices['combo'] : null]);
     $lowPrice = $offerPrices ? min($offerPrices) : null;
 
-    $title = collect(["{$code} Practice Test: PDF and Test Engine Plans | {$brand}", "{$code} Practice Test: PDF and Engine Plans | {$brand}"])->first(fn ($t) => mb_strlen($t) <= 60) ?? "{$code} Practice Test Plans | {$brand}";
+    $meta = \App\Support\SeoMeta::plans($code, $examName, $lowPrice ? $money($lowPrice) : null, $brand);
+    $title = $meta['title'];
     $h1 = "{$code} practice test plans";
     $lede = "Choose a PDF study guide, an online test engine, or both for the {$examName} exam. Every price is shown, and nothing is added at checkout.";
-    $description = \Illuminate\Support\Str::limit("{$code} practice test plans: PDF study guide, online test engine or bundle" . ($lowPrice ? ' from ' . $money($lowPrice) : '') . '. Explanations for every answer and 3 months of updates included.', 158);
+    $description = $meta['description'];
 
     $faqs = [
         ['q' => 'What do I receive after I pay?', 'a' => 'Access is added to your account straight away. Open your dashboard to download the PDF or start the test engine. You will also receive an email confirmation.'],

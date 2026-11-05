@@ -1,0 +1,187 @@
+{
+ "code": "AI-300",
+ "slug": "ai-300",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-300",
+ "official": "Operationalizing Machine Learning and Generative AI Solutions",
+ "asOf": null,
+ "audience": [
+  "As a candidate for this Microsoft Certification, you should have subject matter expertise in setting up infrastructure for machine learning operations (MLOps) and generative AI operations (GenAIOps) solutions on Azure, together referred to as AI operations (AIOps). You need experience training, optimizing, deploying, and maintaining traditional machine learning models by using Azure Machine Learning, in addition to experience deploying, evaluating, monitoring, and optimizing generative AI applications and agents by using Microsoft Foundry.",
+  "You should have a data science background with experience in Python programming and an entry-level understanding of DevOps practices, including using tools like GitHub Actions and working with command-line interfaces (CLIs).",
+  "Additionally, you need knowledge and experience in MLOps by using:",
+  "Machine Learning.",
+  "Foundry.",
+  "GitHub Actions.",
+  "Infrastructure as code (IaC) practices with Bicep and Azure CLI.",
+  "Your responsibilities for this role include:",
+  "Designing and implementing MLOps infrastructure.",
+  "Implementing machine learning model lifecycle and operations.",
+  "Designing and implementing GenAIOps infrastructure.",
+  "Implementing generative AI quality assurance and observability.",
+  "Optimizing generative AI systems and model performance.",
+  "You work with data scientists, DevOps teams, and stakeholders to deliver scalable AI solutions with comprehensive automation and monitoring."
+ ],
+ "domains": [
+  {
+   "name": "Design and implement an MLOps infrastructure",
+   "weight": "15–20%",
+   "sections": [
+    {
+     "title": "Create and manage resources in a Machine Learning workspace",
+     "skills": [
+      "Create and manage a workspace",
+      "Create and manage datastores",
+      "Create and manage compute targets",
+      "Configure identity and access management for workspaces"
+     ]
+    },
+    {
+     "title": "Create and manage assets in a Machine Learning workspace",
+     "skills": [
+      "Create and manage data assets",
+      "Create and manage environments",
+      "Create and manage components",
+      "Share assets across workspaces by using registries"
+     ]
+    },
+    {
+     "title": "Implement IaC for Machine Learning",
+     "skills": [
+      "Configure GitHub integration with Machine Learning to enable secure access",
+      "Deploy Machine Learning workspaces and resources by using Bicep and Azure CLI",
+      "Automate resource provisioning by using GitHub Actions workflows",
+      "Restrict network access to Machine Learning workspaces",
+      "Manage source control for machine learning projects by using Git"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Implement machine learning model lifecycle and operations",
+   "weight": "25–30%",
+   "sections": [
+    {
+     "title": "Orchestrate model training",
+     "skills": [
+      "Configure experiment tracking with MLflow",
+      "Use automated machine learning to explore optimal models",
+      "Use notebooks for experimentation and exploration",
+      "Automate hyperparameter tuning",
+      "Run model training scripts",
+      "Manage distributed training for large and deep learning models",
+      "Implement training pipelines",
+      "Compare model performance across jobs"
+     ]
+    },
+    {
+     "title": "Implement model registration and versioning",
+     "skills": [
+      "Package a feature retrieval specification with the model artifact",
+      "Register an MLflow model",
+      "Evaluate a model by using responsible AI principles",
+      "Manage model lifecycle, including archiving models"
+     ]
+    },
+    {
+     "title": "Deploy machine learning models for production environments",
+     "skills": [
+      "Deploy models as real-time or batch endpoints with managed inference options",
+      "Test and troubleshoot model endpoints",
+      "Implement progressive rollout and safe rollback strategies"
+     ]
+    },
+    {
+     "title": "Monitor and maintain machine learning models in production",
+     "skills": [
+      "Detect and analyze data drift",
+      "Monitor performance metrics of models deployed to production",
+      "Configure retraining or alert triggers when thresholds are exceeded"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Design and implement a GenAIOps infrastructure",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Implement Foundry environments and platform configuration",
+     "skills": [
+      "Create and configure Foundry resources and project environments",
+      "Configure identity and access management with managed identities and role-based access control (RBAC)",
+      "Implement network security and private networking configurations",
+      "Deploy infrastructure using Bicep templates and Azure CLI"
+     ]
+    },
+    {
+     "title": "Deploy and manage foundation models for production workloads",
+     "skills": [
+      "Deploy foundation models by using serverless API endpoints and managed compute options",
+      "Select appropriate models for specific use cases",
+      "Implement model versioning and production deployment strategies",
+      "Configure provisioned throughput units for high-volume workloads"
+     ]
+    },
+    {
+     "title": "Implement prompt versioning and management with source control",
+     "skills": [
+      "Design and develop prompts",
+      "Create prompt variants and compare performance across different prompts",
+      "Implement version control for prompts by using Git repositories"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Implement generative AI quality assurance and observability",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Configure evaluation and validation for generative AI applications and agents",
+     "skills": [
+      "Create test datasets and data mapping for comprehensive model evaluation",
+      "Implement AI quality metrics, including groundedness, relevance, coherence, and fluency",
+      "Configure risk and safety evaluations for harmful content detection",
+      "Set up automated evaluation workflows by using built-in and custom evaluation metrics"
+     ]
+    },
+    {
+     "title": "Implement observability for generative AI applications and agents",
+     "skills": [
+      "Examine continuous monitoring in Foundry",
+      "Monitor performance metrics, including latency, throughput, and response times",
+      "Track and optimize cost metrics, including token consumption and resource usage",
+      "Configure detailed logging, tracing, and debugging capabilities for production troubleshooting"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Optimize generative AI systems and model performance",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Optimize retrieval-augmented generation (RAG) performance and accuracy",
+     "skills": [
+      "Optimize retrieval performance by tuning similarity thresholds, chunk sizes, and retrieval strategies",
+      "Select and fine-tune embedding models for domain-specific use cases and accuracy improvements",
+      "Implement and optimize hybrid search approaches combining semantic and keyword-based retrieval",
+      "Evaluate and improve RAG system performance by using relevance metrics and A/B testing frameworks"
+     ]
+    },
+    {
+     "title": "Implement advanced fine-tuning and model customization",
+     "skills": [
+      "Design and implement advanced fine-tuning methods",
+      "Create and manage synthetic data for fine-tuning",
+      "Monitor and optimize fine-tuned model performance",
+      "Manage a fine-tuned model from development through production deployment"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

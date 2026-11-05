@@ -13,12 +13,19 @@
     $pageUrl = fn (int $n) => $n > 1 ? $baseUrl . '?page=' . $n : $baseUrl;
     $lastNumber = $firstNumber + $questions->count() - 1;
 
-    $title = collect(["Free {$code} Practice Questions with Explanations | {$brand}", "Free {$code} Practice Questions and Answers | {$brand}"])->first(fn ($t) => mb_strlen($t) <= 60) ?? "Free {$code} Practice Questions | {$brand}";
-    if ($page > 1) { $title = "Free {$code} Practice Questions, Page {$page} | {$brand}"; }
-    $h1 = "Free {$code} practice questions";
-    $description = \Illuminate\Support\Str::limit("Answer {$freeCount} free {$code} ({$examName}) practice questions and read an explanation for each one" . ($bankCount > $freeCount ? ". The full bank has {$bankCount} questions." : '.'), 158);
-    $lede = "{$freeCount} free questions for the {$examName} exam. Choose an answer, check it, and read why it is right. No account needed.";
+    $g = \App\Support\ExamGuideContent::for($exam, (int) $freeCount, (int) $bankCount);
+    $official = $g['official'] ?? $examName;
+    $meta = \App\Support\SeoMeta::questions($code, $official, (int) $freeCount, $brand, (int) $page);
+    $title = $meta['title'];
+    $description = $meta['description'];
+    $h1 = "{$code} practice questions with explanations";
+    $lede = "{$freeCount} free questions for the {$official} exam. Choose an answer, check it, and read why it is right. No account needed.";
 
+    // A short intro written from the exam's own outline, so each exam's page says something different.
+    $domainList = $g ? collect($g['domains'])->take(3)->map(fn ($d) => "{$d['name']} ({$d['weight']})")->implode(', ') : null;
+    $intro = "These {$freeCount} free {$code} practice questions show you where you stand on the {$official} exam. Each one has the correct answer and an explanation of why it is right, so you learn the reasoning and not only the answer."
+        . ($g ? " The {$code} outline has " . count($g['domains']) . " domains, led by {$domainList}. Use your results to decide which domain to study next, then read the <a href=\"{$exam->url}\" class=\"font-bold underline\" style=\"color: var(--brand);\">{$code} exam guide</a> for the skills Microsoft lists and a {$g['weeks']}-week study plan." : '')
+        . ($bankCount > $freeCount ? " When you want more, the <a href=\"{$exam->plans_url}\" class=\"font-bold underline\" style=\"color: var(--brand);\">{$code} practice test plans</a> add the full bank of {$bankCount} questions and a timed exam mode." : '');
     $topicTags = $questions->pluck('topic')->filter()->unique()->values();
 
     $crumbs = [['name' => 'Home', 'url' => url('/')]];
@@ -54,6 +61,7 @@
                     <a href="{{ $exam->url }}" class="mt-5 inline-block rounded-xl px-5 py-3 text-sm font-bold text-white" style="background: var(--brand);">Read the {{ $code }} guide</a>
                 </div>
             @else
+                <p class="mb-6 text-sm leading-relaxed text-slate-600">{!! $intro !!}</p>
                 <div class="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500">
                     <p>Showing questions <strong class="text-slate-800">{{ $firstNumber }}-{{ $lastNumber }}</strong> of <strong class="text-slate-800">{{ $freeCount }}</strong> free questions</p>
                     @if($topicTags->isNotEmpty())

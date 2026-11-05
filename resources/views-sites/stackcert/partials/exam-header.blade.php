@@ -59,7 +59,7 @@
                 @foreach(array_filter([
                     ['v' => $hBank ? number_format($hBank) : null, 'l' => 'questions in the bank'],
                     ['v' => $hFree ?: null, 'l' => 'free with explanations'],
-                    ['v' => $exam->passing_score ? $exam->passing_score . '%' : null, 'l' => 'passing score'],
+                    ['v' => '700 / 1000', 'l' => 'pass mark (Microsoft)'],
                     ['v' => $realUpdated ? $realUpdated->format('M Y') : null, 'l' => 'last updated'],
                 ], fn ($s) => $s['v']) as $stat)
                     <div class="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 backdrop-blur">

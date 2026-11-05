@@ -1,0 +1,225 @@
+{
+ "code": "MB-820",
+ "slug": "mb-820",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/mb-820",
+ "official": "Microsoft Dynamics 365 Business Central Developer",
+ "asOf": "June 10, 2025",
+ "audience": [
+  "As a Microsoft Dynamics 365 Business Central developer, you’re responsible for designing, developing, testing, and maintaining solutions based on Dynamics 365 Business Central. In this role, you develop apps that extend Business Central, including customizing or adding extra functionality. You also integrate Business Central with other applications, such as Microsoft Power Platform products. Plus, you need to ensure that data remains current during an upgrade process.",
+  "As a Business Central developer, you’re responsible for troubleshooting and debugging issues in the system. This may involve:",
+  "Identifying the root cause of a problem.",
+  "Fixing bugs.",
+  "Testing the solution to ensure that it works as expected.",
+  "You may be required to optimize the performance of the system by:",
+  "Identifying bottlenecks.",
+  "Improving code quality.",
+  "You must have applied knowledge of Business Central and the application language (AL), the development environment, and other tools to develop extensions for it. You need some knowledge of how to install and upgrade the system. You should also understand:",
+  "Industry terminology.",
+  "The Business Central role in relationship to Microsoft 365 and Dynamics 365.",
+  "As a developer, you should have knowledge of:",
+  "AppSource, Business Central–related technologies, frameworks, and services to build solutions.",
+  "Technologies for application lifecycle management (ALM), including source control management (SCM) and continuous integration and continuous delivery (CI/CD)."
+ ],
+ "domains": [
+  {
+   "name": "Describe Business Central",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Describe the Business Central architecture",
+     "skills": [
+      "Describe the components and capabilities of Business Central",
+      "Describe the core solution and extensions approach for Business Central",
+      "Describe the update lifecycle for customizations of Business Central",
+      "Differentiate Business Central online and Business Central on-premises features"
+     ]
+    },
+    {
+     "title": "Describe Business Central apps",
+     "skills": [
+      "Differentiate between the base app and the system app",
+      "Describe the functionality of apps",
+      "Describe the process of bringing an app to AppSource"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Install, develop, and deploy for Business Central",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Install and configure a Business Central development environment",
+     "skills": [
+      "Describe the development environment for Business Central",
+      "Install and configure the development environment",
+      "Manage configuration files for an AL extension",
+      "Manage multiple AL extensions in one workspace"
+     ]
+    },
+    {
+     "title": "Create, debug, and deploy an extension in Business Central",
+     "skills": [
+      "Debug an extension with Visual Studio Code",
+      "Deploy an extension",
+      "Create or modify a Business Central extension in Visual Studio Code",
+      "Manage multilanguage development",
+      "Maintain extensions"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Develop by using AL objects",
+   "weight": "35–40%",
+   "sections": [
+    {
+     "title": "Build and extend tables and pages in Business Central",
+     "skills": [
+      "Develop Role Center pages",
+      "Identify different page types",
+      "Build and extend page objects",
+      "Build and extend tables",
+      "Build and extend enums"
+     ]
+    },
+    {
+     "title": "Build and extend reports",
+     "skills": [
+      "Substitute a report",
+      "Create a report layout",
+      "Create document reports",
+      "Design the data model of a report",
+      "Implement multilanguage in reports",
+      "Use report triggers, functions, and processing-only reports",
+      "Develop the report request page"
+     ]
+    },
+    {
+     "title": "Design and create an XMLport",
+     "skills": [
+      "Configure different XMLport properties",
+      "Configure nodes and their properties",
+      "Use XMLports in AL code"
+     ]
+    },
+    {
+     "title": "Develop codeunits",
+     "skills": [
+      "Create and access codeunits",
+      "Use events and triggers",
+      "Implement interfaces",
+      "Create installation and upgrade codeunits"
+     ]
+    },
+    {
+     "title": "Create entitlement and permission set objects",
+     "skills": [
+      "Create and extend permission sets",
+      "Override entitlements with inherent permissions",
+      "Troubleshoot permission sets"
+     ]
+    },
+    {
+     "title": "Create queries in Business Central",
+     "skills": [
+      "Link and join data items",
+      "Apply filters in query objects",
+      "Use queries instead of record variables",
+      "Aggregate data in query objects",
+      "Use a query to create a report"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Develop by using AL",
+   "weight": "15–20%",
+   "sections": [
+    {
+     "title": "Customize the UI experience, and implement onboarding techniques",
+     "skills": [
+      "Create profiles in AL",
+      "Use and create views in AL",
+      "Develop the UI by using the user assistance model",
+      "Integrate assisted setup",
+      "Create teaching tips and in-app tours to onboard users",
+      "Create an onboarding checklist"
+     ]
+    },
+    {
+     "title": "Describe the essential development standards",
+     "skills": [
+      "Implement the data process model in Business Central",
+      "Define the different functional table types and characteristics",
+      "Use document standards in Business Central",
+      "Implement master data standards and design patterns"
+     ]
+    },
+    {
+     "title": "Use AL to extend Business Central",
+     "skills": [
+      "Create custom procedures",
+      "Use data types in code",
+      "Manage files",
+      "Manipulate data by using code",
+      "Describe the basics of the AL",
+      "Use the different types of expressions",
+      "Use AL built-in functions and AL statements",
+      "Work with variables and define them in AL code",
+      "Manage errors",
+      "Use access modifiers to limit access"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Work with development tools",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Implement semiautomated test processes, and run standard Business Central tests",
+     "skills": [
+      "Test applications in Business Central",
+      "Install and run the Test Toolkit",
+      "Develop test codeunits and procedures"
+     ]
+    },
+    {
+     "title": "Manage and analyze telemetry",
+     "skills": [
+      "Monitor and analyze telemetry",
+      "Configure telemetry",
+      "Create custom telemetry signals"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Integrate Business Central with other applications",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Access Representational State Transfer (REST) services from within Business Central",
+     "skills": [
+      "Use the different HTTP classes and their functions",
+      "Get data from and send data to an external REST service",
+      "Use and read JSON"
+     ]
+    },
+    {
+     "title": "Implement APIs",
+     "skills": [
+      "Create and work with APIs",
+      "Create and manage OData bound and unbound actions",
+      "Use Read Scale-Out to improve performance"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

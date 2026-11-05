@@ -1,0 +1,145 @@
+{
+ "code": "GH-100",
+ "slug": "gh-100",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/gh-100",
+ "official": "GitHub Enterprise Administrator",
+ "asOf": null,
+ "audience": [
+  "Candidates for this exam should have experience administering GitHub Enterprise environments, including user identity and access management, GitHub Actions, enterprise-level governance, and the administration of features that support secure software development (such as GitHub Advanced Security). Administrators in this role support both GitHub Enterprise Cloud and Server deployments and collaborate with development, security, and operations teams to ensure effective use of GitHub tools and services."
+ ],
+ "domains": [
+  {
+   "name": "Manage GitHub identities and access",
+   "weight": "15–20%",
+   "sections": [
+    {
+     "title": "Manage user identities and authentication",
+     "skills": [
+      "Describe differences between managed users and personal accounts",
+      "Configure and enforce SAML SSO and 2FA",
+      "Understand SCIM and team synchronization: implementation and key differences",
+      "Choose and configure identity providers",
+      "Explain GitHub’s authentication and authorization model"
+     ]
+    },
+    {
+     "title": "Manage access and permissions",
+     "skills": [
+      "Configure organization and repository roles",
+      "Define and manage enterprise teams",
+      "Audit access and permissions",
+      "Manage settings, policies, rulesets, and roles"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Administer GitHub Enterprise environment",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Support GitHub Enterprise users and stakeholders",
+     "skills": [
+      "Identify issues resolvable by admins vs GitHub Support",
+      "Generate support bundles and diagnostics",
+      "Recommend standards for developer processes",
+      "Define standards for workflows, branching, reviews, and releases"
+     ]
+    },
+    {
+     "title": "Manage deployment and licensing",
+     "skills": [
+      "Describe GitHub Enterprise deployment scenarios (GHEC with EMU, GHEC with Data Residency + EMU, GHEC with personal accounts, GHES)",
+      "Explain licensing and billing models",
+      "Monitor license usage and consumption"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Implement secure software development and compliance",
+   "weight": "25–30%",
+   "sections": [
+    {
+     "title": "Configure security policies and rulesets",
+     "skills": [
+      "Define organization and enterprise policies",
+      "Strengthen enterprise security posture and data protection",
+      "Implement audit logging and reporting"
+     ]
+    },
+    {
+     "title": "Enable repository security features",
+     "skills": [
+      "Configure vulnerability alerts, secret scanning, and CodeQL",
+      "Manage Dependabot and security advisories",
+      "Define and implement a security response plan"
+     ]
+    },
+    {
+     "title": "Manage API access and integrations",
+     "skills": [
+      "Configure personal access tokens",
+      "Understand rate limits for PATs and GitHub Apps",
+      "Describe GitHub Apps and OAuth Apps",
+      "Approve or deny app usage based on policy"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Manage GitHub Actions",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Configure workflows and reusable components",
+     "skills": [
+      "Configure and manage reuse of actions and workflows to the enterprise repository",
+      "Apply organizational policies for GitHub Actions"
+     ]
+    },
+    {
+     "title": "Manage runners",
+     "skills": [
+      "Manage runner groups and administer GitHub-hosted vs. self-hosted runner options",
+      "Apply IP allow lists and configure networking (including Azure private networking)",
+      "Monitor and troubleshoot runner performance"
+     ]
+    },
+    {
+     "title": "Manage encrypted secrets",
+     "skills": [
+      "Define scope and access for secrets",
+      "Configure secrets at organization and repository levels",
+      "Integrate third-party vaults"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Monitor and optimize GitHub usage",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Monitor enterprise usage and activity",
+     "skills": [
+      "Analyze audit logs and API usage",
+      "Distinguish admin responsibilities vs. GitHub Support and generate diagnostics",
+      "Evaluate enterprise usage patterns to identify adoption, activity, and underutilized features"
+     ]
+    },
+    {
+     "title": "Optimize cost and performance",
+     "skills": [
+      "Interpret usage reports for metered products",
+      "Recommend strategies for license and resource optimization"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

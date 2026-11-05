@@ -1,0 +1,160 @@
+{
+ "code": "DP-420",
+ "slug": "dp-420",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-420",
+ "official": "Building AI Applications with Azure Cosmos DB",
+ "asOf": "October 6, 2026",
+ "audience": [
+  "As an Azure Cosmos DB Developer Associate, you design, build, and optimize cost effective high-performance scalable applications that use Azure Cosmos DB including system of record for agent memory, conversation state, retrieval indexes, grounding data, and application data.",
+  "Your responsibilities include:",
+  "Designing and implementing data models and data distribution",
+  "Ingesting and querying data with Azure Cosmos DB database",
+  "Optimizing application performance, scalability, and cost",
+  "Implementing secure and production-ready applications",
+  "Building AI retrieval and RAG solutions",
+  "Designing and implementing agent memory systems",
+  "Integration of Azure Cosmos DB with Microsoft Fabric for analytical querying and operational insights",
+  "In this role, you collaborate with AI engineers, application developers, solution architects, data engineers, and security professionals to design and implement cost effective high-performance scalable applications.",
+  "You should have experience developing applications by using C# or Python. You should be familiar with Azure services, generative AI concepts, retrieval-based systems, and application development practices."
+ ],
+ "domains": [
+  {
+   "name": "Design and develop database solutions",
+   "weight": "40–45%",
+   "sections": [
+    {
+     "title": "Evaluate resource models and SDK solutions",
+     "skills": [
+      "Evaluate consistency levels",
+      "Evaluate Request Unit (RU) consumption requirements",
+      "Evaluating and configuring appropriate throughput",
+      "Configure account-level and container-level settings",
+      "Create and manage database and containers",
+      "Initialize SDK clients and connections"
+     ]
+    },
+    {
+     "title": "Implement database operations",
+     "skills": [
+      "Implement queries, parameterized queries, paging, and continuation tokens",
+      "Implement point read operations",
+      "Implement create, replace, update, patch and delete operations",
+      "Implement bulk, batch, and transactional operations",
+      "Configure Time to Live (TTL)",
+      "Implement concurrency control mechanisms"
+     ]
+    },
+    {
+     "title": "Design and implement data models and partitioning strategies",
+     "skills": [
+      "Design data models for access patterns and operational requirements",
+      "Design and select partition keys based on cardinality, access patterns, and write distribution requirements",
+      "Determine when to embed or reference related data",
+      "Evaluate the impact of partition key selection on scalability and performance",
+      "Implement hierarchical partition keys (HPKs) and multi-tenant partitioning strategies",
+      "Implement synthetic partition keys",
+      "Identify partitioning anti-patterns and partitioning issues during solution reviews",
+      "Estimate workload cost requirements"
+     ]
+    },
+    {
+     "title": "Implement change feed",
+     "skills": [
+      "Implement change feed operations",
+      "Differentiate between change feed processor and pull mode models",
+      "Configure lease containers",
+      "Implement change feed processing using latest mode or all versions and delete",
+      "Implement copy container jobs"
+     ]
+    },
+    {
+     "title": "Design and implement Azure Cosmos DB solutions by using AI-assisted tools",
+     "skills": [
+      "Implement Agent Kit to follow Azure Cosmos DB development recommended solutions",
+      "Implement Agent Kit to accelerate AI application development"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Secure, optimize, and deploy database solutions",
+   "weight": "30–35%",
+   "sections": [
+    {
+     "title": "Implement database security controls",
+     "skills": [
+      "Configure authentication mechanisms",
+      "Configure authorization controls",
+      "Configure network security",
+      "Configure dynamic data masking"
+     ]
+    },
+    {
+     "title": "Implement availability and recovery solutions",
+     "skills": [
+      "Configure backup and restore solutions",
+      "Implement multi-region read and write configurations",
+      "Configure partition failover solutions"
+     ]
+    },
+    {
+     "title": "Optimize and remediate database performance",
+     "skills": [
+      "Optimize query performance",
+      "Analyze query performance metrics",
+      "Analyze index performance metrics",
+      "Monitor end-to-end latency against service objectives",
+      "Configure Azure Monitor alerts",
+      "Analyze diagnostic logs in Log Analytics"
+     ]
+    },
+    {
+     "title": "Implement Fleet management and monitoring across multiple accounts and subscriptions",
+     "skills": [
+      "Configure Fleet level throughput management",
+      "Configure Fleet monitoring with fleet analytics"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Implement AI and analytics capabilities in database solutions",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Design and implement AI retrieval",
+     "skills": [
+      "Design and implement full-text search",
+      "Design for vector data, including vector data type, vector indexes, and size",
+      "Design and implement vector partitioning and sharded DiskANN implementations",
+      "Implement vector search",
+      "Design and implement hybrid search",
+      "Optimize full-text and vector performance",
+      "Design and implement Retrieval-Augmented Generation (RAG)"
+     ]
+    },
+    {
+     "title": "Design and implement agent memory stores",
+     "skills": [
+      "Design durable memory stores",
+      "Implement conversation state",
+      "Implement semantic memory"
+     ]
+    },
+    {
+     "title": "Design and implement operational analytics on Azure Cosmos DB",
+     "skills": [
+      "Choose between Azure Cosmos DB and Cosmos DB in Microsoft Fabric",
+      "Configure and monitor data mirroring into Microsoft Fabric",
+      "Query Azure Cosmos DB mirrored JSON data in Microsoft Fabric with T-SQL and Spark",
+      "Read and write data into Azure Cosmos DB from Microsoft Fabric with Cosmos DB Spark connector"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

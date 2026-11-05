@@ -1,0 +1,140 @@
+{
+ "code": "AB-620",
+ "slug": "ab-620",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-620",
+ "official": "Designing and Building Integrated AI Solutions in Copilot Studio",
+ "asOf": null,
+ "audience": [
+  "As a candidate for this Microsoft Certification, you’re a professional developer or advanced builder who builds, extends, and integrates custom agents for enterprise-grade solutions. You typically work as an IT application developer, consultant, or independent software vendor (ISV) partner focused on creating scalable AI solutions for organizations or customers.",
+  "For this exam, you should be familiar with Power Fx, Microsoft Dataverse, Microsoft Power Platform environments and components, Microsoft 365 Copilot, Microsoft Foundry, and adaptive cards.",
+  "You need intermediate knowledge of generative AI concepts, including models, orchestration, retrieval-augmented generation (RAG), Model Context Protocol (MCP), Agent2Agent (A2A) protocol, and more. You should also have experience with prompt engineering and with REST APIs and integration patterns. Additionally, you need experience configuring agents with basic knowledge sources, instructions, tools, and topics in Microsoft Copilot Studio.",
+  "As a developer who works in Copilot Studio, you:",
+  "Integrate agents with Microsoft Foundry.",
+  "Integrate agents with Model Context Protocol (MCP) servers.",
+  "Integrate agents with custom connectors.",
+  "Integrate agents with APIs.",
+  "Integrate agents with Microsoft Fabric.",
+  "Automate tasks with computer use.",
+  "Integrate agents with connectors.",
+  "You create:",
+  "Multi-agent solutions.",
+  "Agents with enterprise knowledge sources (such as ServiceNow, SAP, and others).",
+  "Advanced agent topics and tools.",
+  "Computer-using agents.",
+  "Agents that perform advanced actions via APIs.",
+  "You collaborate with Microsoft 365 administrators, Microsoft Power Platform administrators, Microsoft Copilot administrators, Copilot Studio agent builders, Copilot Studio administrators, Foundry administrators, agentic AI business solutions architects, and Copilot Studio architects."
+ ],
+ "domains": [
+  {
+   "name": "Plan and configure agent solutions",
+   "weight": "30–35%",
+   "sections": [
+    {
+     "title": "Plan an agent solution",
+     "skills": [
+      "Plan integration with enterprise systems",
+      "Plan identity strategy",
+      "Plan channels and deployment",
+      "Plan responsible AI strategy",
+      "Evaluate security and governance considerations",
+      "Plan reuseable agent components",
+      "Design agents for internal or external audiences"
+     ]
+    },
+    {
+     "title": "Create and monitor agent flows in Copilot Studio",
+     "skills": [
+      "Create an agent flow",
+      "Create a human-in-the-loop agent flow",
+      "Configure actions and connectors",
+      "Monitor agent flows",
+      "Add input and output parameters",
+      "Implement error handling in agent flows"
+     ]
+    },
+    {
+     "title": "Configure topics",
+     "skills": [
+      "Add agent flows to a topic",
+      "Configure agent response formatting",
+      "Add tools to a topic",
+      "Configure advanced agent responses with custom prompts",
+      "Configure advanced agent responses with custom knowledge sources",
+      "Configure advanced agent responses with API and Send HTTP requests",
+      "Configure generative answers node",
+      "Configure adaptive cards",
+      "Manage variables"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Integrate and extend agents in Copilot Studio",
+   "weight": "40–45%",
+   "sections": [
+    {
+     "title": "Connect to enterprise knowledge sources",
+     "skills": [
+      "Connect to Copilot connectors",
+      "Connect to Microsoft Power Platform connectors",
+      "Connect to Azure AI Search"
+     ]
+    },
+    {
+     "title": "Add tools to agents",
+     "skills": [
+      "Configure and monitor computer use for an agent",
+      "Configure MCP tools",
+      "Add a tool by using an existing custom connector",
+      "Add REST APIs to an agent"
+     ]
+    },
+    {
+     "title": "Configure multi-agent collaboration from Copilot Studio",
+     "skills": [
+      "Design multi-agent solutions in Copilot Studio",
+      "Integrate a Foundry agent",
+      "Integrate an existing agent in Copilot Studio",
+      "Integrate a Fabric data agent",
+      "Create a multi-agent solution by using A2A protocol"
+     ]
+    },
+    {
+     "title": "Integrate agents with Azure",
+     "skills": [
+      "Configure generative answers by using Azure AI Search with Foundry",
+      "Configure custom prompts to use the Foundry model catalog",
+      "Monitor agents by using Application Insights"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Test and manage agents",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Evaluate agent performance",
+     "skills": [
+      "Create a test set",
+      "Choose an evaluation method",
+      "Review test results"
+     ]
+    },
+    {
+     "title": "Implement application lifecycle management (ALM) for agents in Copilot Studio",
+     "skills": [
+      "Create a solution",
+      "Add existing agents to a solution",
+      "Create and use environment variables",
+      "Implement and extend Microsoft Power Platform Pipelines"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

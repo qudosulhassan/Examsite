@@ -22,8 +22,9 @@
     ];
 @endphp
 
-@section('title', "{$vendorName} Practice Exams & Study Guides | {$brand}")
-@section('meta_description', \Illuminate\Support\Str::limit("Practice for {$vendorName} exams with study guides, free practice questions and a timed test engine. {$examCount} exams across " . (count($trackTitles) ? implode(', ', $trackTitles) : 'every track') . '.', 158))
+@php $homeMeta = \App\Support\SeoMeta::home($vendorName, $brand, $examCount); @endphp
+@section('title', $homeMeta['title'])
+@section('meta_description', $homeMeta['description'])
 
 @section('seo_tags')
 <script type="application/ld+json">

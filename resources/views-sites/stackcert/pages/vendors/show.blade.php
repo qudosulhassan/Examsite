@@ -14,8 +14,9 @@
     $isFundamentals = fn ($e) => (bool) preg_match('/-900$/', (string) $e->exam_code);
     $starters = $exams->filter($isFundamentals)->values()->take(6);
 
-    $title = collect(["{$vendorName} Certification Practice Exams: {$examCount} Exams | {$brand}", "{$vendorName} Practice Exams: {$examCount} Exams | {$brand}"])->first(fn ($t) => mb_strlen($t) <= 60) ?? "{$vendorName} Practice Exams | {$brand}";
-    $description = \Illuminate\Support\Str::limit("Find your {$vendorName} exam, try free practice questions with explanations, and see plans. {$examCount} exams across " . count($groups) . " tracks, updated regularly.", 158);
+    $meta = \App\Support\SeoMeta::vendor($vendorName, $examCount, $brand);
+    $title = $meta['title'];
+    $description = $meta['description'];
     $crumbs = [['name' => 'Home', 'url' => url('/')], ['name' => $vendorName . ' exams', 'url' => route('vendors.show', $vendor->slug)]];
 
     $items = $exams->map(fn ($e) => [

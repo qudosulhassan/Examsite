@@ -1,0 +1,174 @@
+{
+ "code": "DP-600",
+ "slug": "dp-600",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-600",
+ "official": "Implementing Analytics Solutions Using Microsoft Fabric",
+ "asOf": null,
+ "audience": [
+  "As a candidate for this exam, you should have subject matter expertise in designing, creating, and deploying enterprise-scale data analytics solutions.",
+  "Your responsibilities for this role include transforming data into reusable analytics assets by using Microsoft Fabric components, such as:",
+  "Lakehouses",
+  "Data warehouses",
+  "Notebooks",
+  "Dataflows",
+  "Data pipelines",
+  "Semantic models",
+  "Reports",
+  "You implement analytics best practices in Fabric, including version control and deployment.",
+  "To implement solutions as a Fabric analytics engineer, you partner with other roles, such as:",
+  "Solution architects",
+  "Data engineers",
+  "Data scientists",
+  "AI engineers",
+  "Database administrators",
+  "Power BI data analysts",
+  "In addition to in-depth work with the Fabric platform, you need experience with:",
+  "Data modeling",
+  "Data transformation",
+  "Git-based source control",
+  "Exploratory analytics",
+  "Languages, including Structured Query Language (SQL), Data Analysis Expressions (DAX), and PySpark"
+ ],
+ "domains": [
+  {
+   "name": "Plan, implement, and manage a solution for data analytics",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Plan a data analytics environment",
+     "skills": [
+      "Identify requirements for a solution, including components, features, performance, and capacity stock-keeping units (SKUs)",
+      "Recommend settings in the Fabric admin portal",
+      "Choose a data gateway type",
+      "Create a custom Power BI report theme"
+     ]
+    },
+    {
+     "title": "Implement and manage a data analytics environment",
+     "skills": [
+      "Implement workspace and item-level access controls for Fabric items",
+      "Implement data sharing for workspaces, warehouses, and lakehouses",
+      "Manage sensitivity labels in semantic models and lakehouses",
+      "Configure Fabric-enabled workspace settings",
+      "Manage Fabric capacity"
+     ]
+    },
+    {
+     "title": "Manage the analytics development lifecycle",
+     "skills": [
+      "Implement version control for a workspace",
+      "Create and manage a Power BI Desktop project (.pbip)",
+      "Plan and implement deployment solutions",
+      "Perform impact analysis of downstream dependencies from lakehouses, data warehouses, dataflows, and semantic models",
+      "Deploy and manage semantic models by using the XMLA endpoint",
+      "Create and update reusable assets, including Power BI template (.pbit) files, Power BI data source (.pbids) files, and shared semantic models"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Prepare and serve data",
+   "weight": "40–45%",
+   "sections": [
+    {
+     "title": "Create objects in a lakehouse or warehouse",
+     "skills": [
+      "Ingest data by using a data pipeline, dataflow, or notebook",
+      "Create and manage shortcuts",
+      "Implement file partitioning for analytics workloads in a lakehouse",
+      "Create views, functions, and stored procedures",
+      "Enrich data by adding new columns or tables"
+     ]
+    },
+    {
+     "title": "Copy data",
+     "skills": [
+      "Choose an appropriate method for copying data from a Fabric data source to a lakehouse or warehouse",
+      "Copy data by using a data pipeline, dataflow, or notebook",
+      "Add stored procedures, notebooks, and dataflows to a data pipeline",
+      "Schedule data pipelines",
+      "Schedule dataflows and notebooks"
+     ]
+    },
+    {
+     "title": "Transform data",
+     "skills": [
+      "Implement a data cleansing process",
+      "Implement a star schema for a lakehouse or warehouse, including Type 1 and Type 2 slowly changing dimensions",
+      "Implement bridge tables for a lakehouse or a warehouse",
+      "Denormalize data",
+      "Aggregate or de-aggregate data",
+      "Merge or join data",
+      "Identify and resolve duplicate data, missing data, or null values",
+      "Convert data types by using SQL or PySpark",
+      "Filter data"
+     ]
+    },
+    {
+     "title": "Optimize performance",
+     "skills": [
+      "Identify and resolve data loading performance bottlenecks in dataflows, notebooks, and SQL queries",
+      "Implement performance improvements in dataflows, notebooks, and SQL queries",
+      "Identify and resolve issues with Delta table file sizes"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Implement and manage semantic models",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Design and build semantic models",
+     "skills": [
+      "Choose a storage mode, including Direct Lake",
+      "Identify use cases for DAX Studio and Tabular Editor 2",
+      "Implement a star schema for a semantic model",
+      "Implement relationships, such as bridge tables and many-to-many relationships",
+      "Write calculations that use DAX variables and functions, such as iterators, table filtering, windowing, and information functions",
+      "Implement calculation groups, dynamic strings, and field parameters",
+      "Design and build a large format dataset",
+      "Design and build composite models that include aggregations",
+      "Implement dynamic row-level security and object-level security",
+      "Validate row-level security and object-level security"
+     ]
+    },
+    {
+     "title": "Optimize enterprise-scale semantic models",
+     "skills": [
+      "Implement performance improvements in queries and report visuals",
+      "Improve DAX performance by using DAX Studio",
+      "Optimize a semantic model by using Tabular Editor 2",
+      "Implement incremental refresh"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Explore and analyze data",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Perform exploratory analytics",
+     "skills": [
+      "Implement descriptive and diagnostic analytics",
+      "Integrate prescriptive and predictive analytics into a visual or report",
+      "Profile data"
+     ]
+    },
+    {
+     "title": "Query data by using SQL",
+     "skills": [
+      "Query a lakehouse in Fabric by using SQL queries or the visual query editor",
+      "Query a warehouse in Fabric by using SQL queries or the visual query editor",
+      "Connect to and query datasets by using the XMLA endpoint"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

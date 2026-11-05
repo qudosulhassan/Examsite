@@ -1,0 +1,254 @@
+{
+ "code": "AB-250",
+ "slug": "ab-250",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-250",
+ "official": "Transforming Contact Center Experiences with AI in Dynamics 365",
+ "asOf": null,
+ "audience": [
+  "As a candidate for this Microsoft Certification, you’re a contact center engineer or solutions pro who designs, implements, and supports AI-powered contact center solutions by using Microsoft Dynamics 365 Contact Center and service-oriented autonomous agents. Your role involves translating business and service requirements into scalable, well-governed contact center solutions that include human representatives and AI-driven capabilities.",
+  "In this role, you’re responsible for:",
+  "Configuring workstreams and engagement channels.",
+  "Designing, managing, and implementing routing strategies.",
+  "Configuring service representative profiles and experiences.",
+  "Enabling productivity tools, including Microsoft Copilot–assisted guidance.",
+  "Implementing and managing agents for customer self-service.",
+  "Identifying implementation opportunities for and managing service-oriented autonomous agents.",
+  "Working with Dynamics 365 Contact Center tools for continuous improvement.",
+  "Monitoring and resolving operational issues identified in the contact center.",
+  "Configuring proactive engagement capabilities, including outbound dial modes and journey orchestration.",
+  "Configuring workforce management capabilities, including demand forecasting, scheduling, and skills alignment.",
+  "You typically collaborate with customer service leaders, contact center managers, IT teams, and legal and compliance stakeholders to help ensure that solutions align with operational goals, organizational policies, and responsible AI principles, including security, data protection, transparency, and accountability.",
+  "For this exam, you should have:",
+  "Experience implementing or planning to implement contact center as a service (CCaaS) solutions.",
+  "An understanding of how voice, social, and digital channels are used and orchestrated in a contact center.",
+  "Familiarity with contact center personas, such as representatives, supervisors, and administrators.",
+  "A fundamental understanding of agents, along with AI self-service and AI-assisted experiences.",
+  "Experience working in or supporting business environments that focus on agent productivity, routing, service performance.",
+  "Familiarity with the supervisor role and related activities.",
+  "Additionally, you should have experience with Microsoft Power Platform, Microsoft Copilot Studio, Power BI, Microsoft Teams, and Microsoft Foundry. You should know how to use automation, integrations, and AI capabilities to extend and optimize service workflows. You also need to understand how to design modern contact centers, where human representatives, AI agents, and autonomous AI agents work together within secure, compliant, and well-governed systems."
+ ],
+ "domains": [
+  {
+   "name": "Deploy Dynamics 365 Contact Center",
+   "weight": "15–20%",
+   "sections": [
+    {
+     "title": "Implement Dynamics 365 Contact Center",
+     "skills": [
+      "Configure the Copilot Service workspace",
+      "Configure and extend connectors for Dynamics 365 Contact Center",
+      "Configure embedded Dynamics 365 Contact Center mode",
+      "Configure Copilot for third-party CCaaS solutions",
+      "Enable agent simulation to evaluate journeys",
+      "Enable the Health Agent to proactively investigate issues",
+      "Enable agents to perform transformation, environment migration, and configuration"
+     ]
+    },
+    {
+     "title": "Deploy Dynamics 365 Contact Center",
+     "skills": [
+      "Manage and roll out agents by using the Agent hub",
+      "Create solutions for Dynamics 365 Contact Center deployments",
+      "Configure application lifecycle management (ALM) for Dynamics 365 Contact Center deployments",
+      "Manage an omnichannel environment"
+     ]
+    },
+    {
+     "title": "Manage users",
+     "skills": [
+      "Configure user settings",
+      "Create user accounts",
+      "Manage security roles, including custom security roles and personas",
+      "Manage capacity profiles"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Implement channels",
+   "weight": "30–35%",
+   "sections": [
+    {
+     "title": "Configure chat and digital channels",
+     "skills": [
+      "Configure the chat channel",
+      "Configure the record-based channel",
+      "Configure digital channels",
+      "Configure and embed a chat widget",
+      "Configure proactive chat",
+      "Configure pre-chat surveys",
+      "Manage quick replies",
+      "Extend the chat experience using the live chat SDK",
+      "Configure authentication settings for chat",
+      "Manage chat in native mobile apps by using the Messaging SDK for Dynamics 365 Contact Center",
+      "Configure a custom messaging channel by using messaging APIs",
+      "Enable real-time translation of conversations",
+      "Configure customer settings, including location and self-service settings"
+     ]
+    },
+    {
+     "title": "Provision and manage the voice channel",
+     "skills": [
+      "Configure the voice channel",
+      "Integrate a non-Microsoft interactive voice response (IVR) system with voice channel",
+      "Manage phone numbers",
+      "Configure inbound and outbound calling profiles",
+      "Configure call recording, transcription, and real-time translation",
+      "Configure agent feedback",
+      "Manage voice calls via the CCaaS SDK API"
+     ]
+    },
+    {
+     "title": "Configure channel features",
+     "skills": [
+      "Manage context variables",
+      "Configure automatic customer identification",
+      "Close conversations automatically",
+      "Enable consult with representatives and transfer of conversations",
+      "Configure sensitive data masking",
+      "Configure custom presences",
+      "Configure messages, including templates, formatting, automated messages, and outbound messages",
+      "Manage active conversation settings",
+      "Configure the timeline",
+      "Use custom connectors with the timeline control",
+      "Configure the channel integration framework",
+      "Manage conversations",
+      "Configure feedback by using Copilot Studio",
+      "Manage file attachments"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Configure agents and AI capabilities",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Configure agent assist capabilities in Dynamics 365 Contact Center",
+     "skills": [
+      "Configure Copilot summaries",
+      "Configure the Ask a question feature",
+      "Configure knowledge sources for Copilot in Dynamics 365 Customer Service",
+      "Extend Copilot capabilities with prompt plugins and tools",
+      "Interpret the Copilot analytics report",
+      "Create a smart assist bot"
+     ]
+    },
+    {
+     "title": "Configure voice agents",
+     "skills": [
+      "Configure IVR with voice agents by using generative AI or classic orchestration",
+      "Manage variables in Copilot Studio",
+      "Secure the Dynamics 365 Contact Center voice channel",
+      "Configure compliant call recording in Copilot Studio",
+      "Configure SIP header transfers",
+      "Configure the Real-time Speech agent",
+      "Configure dual-tone multi-frequency (DTMF), natural language understanding (NLU), and speech-based IVR",
+      "Configure Copilot Studio voice triggers",
+      "Implement best practices for configuring voice agents",
+      "Configure multilingual voice agents"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Configure work distribution",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Configure queues",
+     "skills": [
+      "Create and manage queues",
+      "Configure queue prioritization",
+      "Configure overflow and fallback",
+      "Configure work assignment methods",
+      "Set up operating hours"
+     ]
+    },
+    {
+     "title": "Configure basic and unified routing",
+     "skills": [
+      "Configure workstreams, including configuring context variables and associating agents in Copilot Studio",
+      "Configure work classification rules",
+      "Configure the engagement agent",
+      "Configure skills-based routing",
+      "Configure AI-enabled skills-based routing",
+      "Configure intent-based routing",
+      "Configure preferred representative routing",
+      "Configure routing for records",
+      "Configure basic routing rule sets",
+      "Diagnose unified routing by using conversation diagnostics"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Configure the Dynamics 365 Contact Center representative experience",
+   "weight": "15–20%",
+   "sections": [
+    {
+     "title": "Configure experience profiles",
+     "skills": [
+      "Create experience profiles",
+      "Configure application tab templates",
+      "Configure the agent inbox, including creating custom views",
+      "Configure session templates",
+      "Configure notification template"
+     ]
+    },
+    {
+     "title": "Configure productivity tools",
+     "skills": [
+      "Enable custom productivity panels",
+      "Configure scripts, including slugs",
+      "Create macros",
+      "Enable Teams collaboration",
+      "Extend the productivity panel by using the app profile manager JavaScript API reference",
+      "Extend the customer service representative experience by using the Omnichannel JavaScript API"
+     ]
+    },
+    {
+     "title": "Create and administer knowledge management",
+     "skills": [
+      "Configure internal knowledge search capabilities",
+      "Integrate and search external knowledge sources",
+      "Configure tables for knowledge management",
+      "Configure the Customer Knowledge Management agent",
+      "Integrate knowledge into portals"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Manage analytics for the Dynamics 365 Contact Center",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Configure the Dynamics 365 Contact Center supervisor experience",
+     "skills": [
+      "Configure supervisor settings",
+      "Configure the Quality Evaluation agent",
+      "Configure access to analytics and dashboards",
+      "Perform supervisor actions for conversations",
+      "Configure the supervisor app"
+     ]
+    },
+    {
+     "title": "Customize analytics and reporting",
+     "skills": [
+      "Customize the key performance indicators (KPIs) in the analytics reports by using the embedded Power BI editor",
+      "Embed out-of-the-box reports in the Copilot Service workspace app",
+      "Customize historical and real-time analytics reports by using Power BI",
+      "Extend historical and real-time analytics reports by using Power BI Desktop",
+      "Configure conversation diagnostics in Application Insights",
+      "Configure and embed telemetry and analytics from Application Insights"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

@@ -1,0 +1,120 @@
+{
+ "code": "AI-200",
+ "slug": "ai-200",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-200",
+ "official": "Developing AI Cloud Solutions on Azure",
+ "asOf": null,
+ "audience": [
+  "As a candidate for this Microsoft Certification, you’re responsible for contributing to all phases of implementing AI solutions on Azure, with an emphasis on back-end services and components. You’re also responsible for supporting all phases of the development lifecycle, including requirements gathering, design, development, deployment, security, and monitoring.",
+  "You should be proficient in:",
+  "Azure SDKs and third-party SDKs used in Azure.",
+  "Azure data management services.",
+  "Azure monitoring and troubleshooting.",
+  "Azure messaging and eventing.",
+  "Vector databases.",
+  "Python programming.",
+  "Implementing containerized applications on Azure."
+ ],
+ "domains": [
+  {
+   "name": "Develop containerized solutions on Azure",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Implement container application hosting",
+     "skills": [
+      "Build, store, version, and manage container images by using Azure Container Registry",
+      "Build and run images by using Azure Container Registry Tasks",
+      "Deploy containers to Azure App Service, including configuring App Service to supply environment variables and secrets"
+     ]
+    },
+    {
+     "title": "Implement container-orchestrated solutions",
+     "skills": [
+      "Deploy applications to Azure Container Apps, including environment configuration and revision management",
+      "Implement event-driven scaling by using Kubernetes Event‑driven Autoscaling (KEDA) in Container Apps",
+      "Deploy and manage applications to Azure Kubernetes Service (AKS) by using manifest files",
+      "Monitor and troubleshoot solutions on AKS and Container Apps by inspecting logs, events, and end-to-end connectivity"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Develop AI solutions by using Azure data management services",
+   "weight": "25–30%",
+   "sections": [
+    {
+     "title": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+     "skills": [
+      "Connect to Azure Cosmos DB for NoSQL by using the SDK and run queries",
+      "Optimize query performance and Request Units (RUs) consumption by using indexing policies and consistency levels",
+      "Store and retrieve embeddings and execute vector similarity search for semantic retrieval",
+      "Implement a change feed processor to detect and handle new or updated items"
+     ]
+    },
+    {
+     "title": "Develop AI solutions by using Azure Database for PostgreSQL",
+     "skills": [
+      "Connect and query Azure Database for PostgreSQL by using SDKs",
+      "Model schemas and implement indexing strategies, including designing tables and choosing appropriate data types",
+      "Implement indexing strategies, including optimizing query latency and reducing pgvector compute overhead",
+      "Configure compute, memory, and storage resources to support vector workloads",
+      "Run vector similarity search, including storing embeddings, semantic retrieval, and implementing retrieval-augmented generation (RAG) patterns by using metadata filter",
+      "Implement connection optimization to improve throughput and minimize latency"
+     ]
+    },
+    {
+     "title": "Integrate Azure Managed Redis in AI solutions",
+     "skills": [
+      "Implement Azure Managed Redis data operations, including caching, expiration, and invalidation",
+      "Implement vector indexing to enable similarity search"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Connect to and consume Azure services",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Develop event- and message-based AI solutions",
+     "skills": [
+      "Queue and process back-end operations by using Azure Service Bus, including dead-letter queue handling, messages, topics, and subscriptions",
+      "Implement event-driven workflows by using Azure Event Grid, including filters, custom events, and retries"
+     ]
+    },
+    {
+     "title": "Develop and implement Azure Functions",
+     "skills": [
+      "Build serverless APIs, including implementing triggers and bindings",
+      "Configure and deploy function apps"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Secure, monitor, and troubleshoot Azure solutions",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Implement secure Azure solutions",
+     "skills": [
+      "Secure secrets by using Azure Key Vault, including rotation and retrieval",
+      "Store and retrieve app configuration information by using Azure App Configuration"
+     ]
+    },
+    {
+     "title": "Monitor and troubleshoot Azure solutions",
+     "skills": [
+      "Trace distributed systems by using OpenTelemetry SDKs",
+      "Write KQL queries to analyze logs and metrics"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

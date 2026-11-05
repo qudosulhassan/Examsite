@@ -1,0 +1,130 @@
+{
+ "code": "DP-900",
+ "slug": "dp-900",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-900",
+ "official": "Microsoft Azure Data Fundamentals",
+ "asOf": "July 21, 2026",
+ "audience": [
+  "This exam is an opportunity to demonstrate your knowledge of core data concepts and related Microsoft Azure data services. As a candidate for this exam, you should have familiarity with Exam DP-900’s self-paced or instructor-led learning material.",
+  "This exam is intended for you, if you’re a candidate beginning to work with data in the cloud.",
+  "You should be familiar with:",
+  "The concepts of relational and non-relational data.",
+  "Different types of data workloads such as transactional or analytical.",
+  "You can use Azure Data Fundamentals to prepare for other Azure role-based certifications like Azure Database Administrator Associate or Azure Data Engineer Associate, but it is not a prerequisite for any of them."
+ ],
+ "domains": [
+  {
+   "name": "Describe core data concepts",
+   "weight": "25–30%",
+   "sections": [
+    {
+     "title": "Describe ways to represent data",
+     "skills": [
+      "Describe the features of structured data",
+      "Describe the features of semi-structured data",
+      "Describe the features of unstructured data"
+     ]
+    },
+    {
+     "title": "Identify options for data storage",
+     "skills": [
+      "Describe common formats for data files",
+      "Describe features of common data stores including databases",
+      "Identify Azure datastores for common use cases"
+     ]
+    },
+    {
+     "title": "Describe common data workloads",
+     "skills": [
+      "Describe features of transactional workloads",
+      "Describe features of analytical workloads"
+     ]
+    },
+    {
+     "title": "Identify roles and responsibilities for data workloads",
+     "skills": [
+      "Describe responsibilities for database administrators",
+      "Describe responsibilities for data engineers",
+      "Describe responsibilities for data analysts"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Identify considerations for relational data on Azure",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Describe relational concepts",
+     "skills": [
+      "Identify features of relational data",
+      "Describe normalization and why it is used",
+      "Identify common structured query language (SQL) statements",
+      "Identify common database objects"
+     ]
+    },
+    {
+     "title": "Describe relational Azure data services",
+     "skills": [
+      "Describe the Azure SQL family of products, including Azure SQL Database, Azure SQL Managed Instance, and SQL Server on Azure Virtual Machines",
+      "Identify Azure database services for open-source database systems"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Describe considerations for working with non-relational data on Azure",
+   "weight": "15–20%",
+   "sections": [
+    {
+     "title": "Describe the capabilities of Azure storage",
+     "skills": [
+      "Describe features of Azure Blob storage",
+      "Describe features of Azure Files",
+      "Describe features of Azure Table storage"
+     ]
+    },
+    {
+     "title": "Describe the capabilities and features of Azure Cosmos DB",
+     "skills": [
+      "Identify use cases for Azure Cosmos DB",
+      "Describe Azure Cosmos DB APIs"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Describe an analytics workload",
+   "weight": "25–30%",
+   "sections": [
+    {
+     "title": "Describe common elements of large-scale analytics",
+     "skills": [
+      "Describe considerations for data ingestion and processing",
+      "Describe options for analytical data stores",
+      "Describe Microsoft cloud services for large-scale analytics, including Azure Databricks and Microsoft Fabric"
+     ]
+    },
+    {
+     "title": "Describe considerations for real-time data analytics",
+     "skills": [
+      "Describe the difference between batch and streaming data",
+      "Identify Microsoft cloud services for real-time analytics"
+     ]
+    },
+    {
+     "title": "Describe data visualization in Microsoft Power BI",
+     "skills": [
+      "Identify the capabilities of Power BI",
+      "Describe features of data models in Power BI",
+      "Identify appropriate visualizations for data"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

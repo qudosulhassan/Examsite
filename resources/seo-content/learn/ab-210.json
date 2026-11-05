@@ -1,0 +1,162 @@
+{
+ "code": "AB-210",
+ "slug": "ab-210",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-210",
+ "official": "Accelerating Sales Pipelines with AI in Dynamics 365",
+ "asOf": null,
+ "audience": [
+  "As a candidate for this Microsoft Certification, you design and configure AI-enhanced sales solutions by using Dynamics 365 Sales, Copilot in Dynamics 365 Sales, and agent capabilities to help sellers work more efficiently throughout the lead-to-cash process. You translate business requirements into practical seller workflows enhanced with conversational intelligence, predictive insights, guided automation, and secure data access.",
+  "In this role, you work closely with sales, operations, and IT stakeholders to help ensure that solutions align with revenue goals and process optimization.",
+  "You perform the following design and implementation tasks:",
+  "Configure Dynamics 365 Sales core features.",
+  "Deploy, manage, and monitor agents in Sales.",
+  "Implement collaboration features.",
+  "Tailor AI-powered intelligence features.",
+  "It is highly recommended that candidates complete training in intermediate-level Microsoft Power Platform configuration before taking this certification exam. Additionally, you must have functional knowledge of:",
+  "Interpreting an organization’s sales processes and seller experience.",
+  "Building and extending model-driven apps.",
+  "Building Power Automate cloud flows."
+ ],
+ "domains": [
+  {
+   "name": "Configure Dynamics 365 Sales core features for AI",
+   "weight": "15–20%",
+   "sections": [
+    {
+     "title": "Configure Sales",
+     "skills": [
+      "Evaluate prerequisites for deploying Sales",
+      "Configure mailboxes",
+      "Set up and configure business process flows",
+      "Configure the timeline",
+      "Evaluate options for importing and exporting data",
+      "Examine the Sales security model",
+      "Configure Microsoft 365 functionality, including Microsoft Teams, SharePoint, Outlook, and OneDrive"
+     ]
+    },
+    {
+     "title": "Create and manage the product catalog",
+     "skills": [
+      "Configure products and product families",
+      "Create and manage price lists, including currencies"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Optimize AI-driven sales",
+   "weight": "20–25%",
+   "sections": [
+    {
+     "title": "Design an AI-first sales strategy",
+     "skills": [
+      "Augment seller workflows by using Copilot and agents",
+      "Design the sales data model in Dataverse",
+      "Evaluate options for reporting and visualization",
+      "Differentiate features in Sales plans"
+     ]
+    },
+    {
+     "title": "Prepare to deploy agents",
+     "skills": [
+      "Configure prerequisites for deploying agents",
+      "Configure capacity, billing, and credits"
+     ]
+    },
+    {
+     "title": "Configure AI-powered intelligence and insights features",
+     "skills": [
+      "Configure the Sales accelerator",
+      "Configure work assignment and distribution",
+      "Set up conversational intelligence",
+      "Configure predictive scoring",
+      "Set up relationship intelligence",
+      "Configure Copilot features, including record summarization",
+      "Configure and use forecasts to help improve sales performance",
+      "Set up goals and goal metrics"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Qualify and prioritize leads by using AI",
+   "weight": "15–20%",
+   "sections": [
+    {
+     "title": "Generate and nurture leads",
+     "skills": [
+      "Configure the lead and opportunity experience",
+      "Fine-tune the predictive scoring model"
+     ]
+    },
+    {
+     "title": "Automate lead qualification by using the Sales Qualification Agent",
+     "skills": [
+      "Evaluate use cases for Research-only mode configuration versus Research and engage mode configuration",
+      "Configure the Sales Qualification Agent",
+      "Interpret the actions of the Sales Qualification Agent",
+      "Monitor the Sales Qualification Agent"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Develop deals by using intelligent opportunity research",
+   "weight": "25–30%",
+   "sections": [
+    {
+     "title": "Optimize opportunity management",
+     "skills": [
+      "Coordinate opportunity management with the Sales Close Agent",
+      "Add Opportunity Products, and configure pricing",
+      "Configure the opportunity pipeline view",
+      "Set up and configure the Sales Opportunity Agent"
+     ]
+    },
+    {
+     "title": "Automate deal closing by using the Sales Close Agent",
+     "skills": [
+      "Set up and configure the Sales Close Agent",
+      "Interpret the actions of the Sales Close Agent",
+      "Monitor the Sales Close Agent",
+      "Collaborate with the Sales Close Agent"
+     ]
+    },
+    {
+     "title": "Gather intelligence on sales deals by using the Sales Research Agent",
+     "skills": [
+      "Evaluate use cases for the Sales Research Agent",
+      "Configure the Sales Research Agent",
+      "Analyze sales performance by using research canvas"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Extend and enhance Sales",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Configure supporting apps and services",
+     "skills": [
+      "Deploy and configure the Sales mobile app",
+      "Set up Teams calling",
+      "Configure an SMS channel"
+     ]
+    },
+    {
+     "title": "Expand the sales footprint by using Microsoft Power Platform",
+     "skills": [
+      "Create Power Automate flows",
+      "Embed Power Apps components and controls",
+      "Embed Power BI reports"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

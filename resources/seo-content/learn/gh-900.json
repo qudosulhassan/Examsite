@@ -1,0 +1,98 @@
+{
+ "code": "GH-900",
+ "slug": "gh-900",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/gh-900",
+ "official": "GitHub Foundations",
+ "asOf": null,
+ "audience": [],
+ "domains": [
+  {
+   "name": "Understand Git and GitHub basics",
+   "weight": "25–30%",
+   "sections": [
+    {
+     "title": "Version control fundamentals",
+     "skills": [
+      "Describe the purpose and benefits of version control",
+      "Explain the difference between Git and GitHub",
+      "Identify key Git concepts such as repositories, commits, and branches"
+     ]
+    },
+    {
+     "title": "Working with GitHub",
+     "skills": [
+      "Describe GitHub accounts, organizations, and enterprise options",
+      "Explain the GitHub Flow for collaboration",
+      "Identify uses of Markdown for clear communication in issues and pull requests",
+      "Recognize when to use GitHub Desktop and GitHub Mobile"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Work with GitHub repositories",
+   "weight": "10–15%",
+   "sections": []
+  },
+  {
+   "name": "Collaborate using GitHub",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Collaboration tools",
+     "skills": [
+      "Describe how to use issues, pull requests, and discussions for collaboration",
+      "Explain how to link pull requests to issues and manage templates, filters, and assignments",
+      "Identify the purpose of notifications and how to configure them for workflow management",
+      "Describe how to use Gists, Wikis, and GitHub Pages to document and share information"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Apply modern development practices",
+   "weight": "10–15%",
+   "sections": [
+    {
+     "title": "Automation and AI tools",
+     "skills": [
+      "Describe the purpose and capabilities of GitHub Actions",
+      "Identify how GitHub Copilot assists with AI-powered code suggestions, including Copilot agents, Agent Mode, and multi‑model support",
+      "Explain the differences between GitHub Copilot for Individuals, Business, and Enterprise",
+      "Describe GitHub Codespaces and how to set up, customize, and use dev containers",
+      "Explain when to use the github.dev editor and how it differs from Codespaces"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Manage projects with GitHub",
+   "weight": "5–10%",
+   "sections": [
+    {
+     "title": "Project Tracking and organization",
+     "skills": [
+      "Describe GitHub Projects and layout options",
+      "Explain how to configure projects, labels, milestones, and workflows",
+      "Identify how to use saved replies and assignees to streamline communication",
+      "Describe how project insights can be used to track progress and productivity",
+      "Describe how to secure accounts with two-factor authentication (2FA) and passkeys",
+      "Identify access permissions and roles for repositories and organizations",
+      "Explain the purpose of Enterprise Managed Users (EMUs) and organization-wide Copilot policy management",
+      "Describe repository privacy options, visibility settings, and branch protection rules",
+      "Recognize how to manage organization settings, teams, and roles"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Explore the GitHub community",
+   "weight": "5–10%",
+   "sections": []
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

@@ -1,0 +1,138 @@
+{
+ "code": "DP-700",
+ "slug": "dp-700",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700",
+ "official": "Implementing Data Engineering Solutions Using Microsoft Fabric",
+ "asOf": null,
+ "audience": [
+  "As a candidate for this exam, you should have subject matter expertise with data loading patterns, data architectures, and orchestration processes. Your responsibilities for this role include:",
+  "Ingesting and transforming data.",
+  "Securing and managing an analytics solution.",
+  "Monitoring and optimizing an analytics solution.",
+  "You work closely with analytics engineers, architects, analysts, and administrators to design and deploy data engineering solutions for analytics.",
+  "You should be skilled at manipulating and transforming data by using Structured Query Language (SQL), PySpark, and Kusto Query Language (KQL)."
+ ],
+ "domains": [
+  {
+   "name": "Implement and manage an analytics solution",
+   "weight": "30–35%",
+   "sections": [
+    {
+     "title": "Configure Microsoft Fabric workspace settings",
+     "skills": [
+      "Configure Spark workspace settings",
+      "Configure domain workspace settings",
+      "Configure OneLake workspace settings",
+      "Configure data workflow workspace settings"
+     ]
+    },
+    {
+     "title": "Implement lifecycle management in Fabric",
+     "skills": [
+      "Configure version control",
+      "Implement database projects",
+      "Create and configure deployment pipelines"
+     ]
+    },
+    {
+     "title": "Configure security and governance",
+     "skills": [
+      "Implement workspace-level access controls",
+      "Implement item-level access controls",
+      "Implement row-level, column-level, object-level, and file-level access controls",
+      "Implement dynamic data masking",
+      "Apply sensitivity labels to items",
+      "Endorse items"
+     ]
+    },
+    {
+     "title": "Orchestrate processes",
+     "skills": [
+      "Choose between a pipeline and a notebook",
+      "Design and implement schedules and event-based triggers",
+      "Implement orchestration patterns with notebooks and pipelines, including parameters and dynamic expressions"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Ingest and transform data",
+   "weight": "30–35%",
+   "sections": [
+    {
+     "title": "Design and implement loading patterns",
+     "skills": [
+      "Design and implement full and incremental data loads",
+      "Prepare data for loading into a dimensional model",
+      "Design and implement a loading pattern for streaming data"
+     ]
+    },
+    {
+     "title": "Ingest and transform batch data",
+     "skills": [
+      "Choose an appropriate data store",
+      "Choose between dataflows, notebooks, and T-SQL for data transformation",
+      "Create and manage shortcuts to data",
+      "Implement mirroring",
+      "Ingest data by using pipelines",
+      "Transform data by using PySpark, SQL, and KQL",
+      "Denormalize data",
+      "Group and aggregate data",
+      "Handle duplicate, missing, and late-arriving data"
+     ]
+    },
+    {
+     "title": "Ingest and transform streaming data",
+     "skills": [
+      "Choose an appropriate streaming engine",
+      "Process data by using eventstreams",
+      "Process data by using Spark structured streaming",
+      "Process data by using KQL",
+      "Create windowing functions"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Monitor and optimize an analytics solution",
+   "weight": "30–35%",
+   "sections": [
+    {
+     "title": "Monitor Fabric items",
+     "skills": [
+      "Monitor data ingestion",
+      "Monitor data transformation",
+      "Monitor semantic model refresh",
+      "Configure alerts"
+     ]
+    },
+    {
+     "title": "Identify and resolve errors",
+     "skills": [
+      "Identify and resolve pipeline errors",
+      "Identify and resolve dataflow errors",
+      "Identify and resolve notebook errors",
+      "Identify and resolve eventhouse errors",
+      "Identify and resolve eventstream errors",
+      "Identify and resolve T-SQL errors"
+     ]
+    },
+    {
+     "title": "Optimize performance",
+     "skills": [
+      "Optimize a lakehouse table",
+      "Optimize a pipeline",
+      "Optimize a data warehouse",
+      "Optimize eventstreams and eventhouses",
+      "Optimize Spark performance",
+      "Optimize query performance"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}

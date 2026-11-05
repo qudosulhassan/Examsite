@@ -121,10 +121,10 @@ class HubExamPagesTest extends TestCase
 
         $titles = collect([$guide, $questions, $plans])->map(fn ($r) => preg_match('#<title>(.*?)</title>#s', $r->getContent(), $m) ? html_entity_decode($m[1]) : '')->all();
         $this->assertCount(3, array_unique($titles), 'three pages, three different titles');
-        $this->assertStringContainsString('Free DP-800 Practice Questions', $titles[1]);
+        $this->assertStringContainsString('DP-800 Practice Questions', $titles[1]);
         $this->assertStringContainsString('DP-800 Practice Test', $titles[2]);
 
-        $questions->assertSee('Free DP-800 practice questions');
+        $questions->assertSee('DP-800 practice questions with explanations');
         $plans->assertSee('DP-800 practice test plans');
     }
 

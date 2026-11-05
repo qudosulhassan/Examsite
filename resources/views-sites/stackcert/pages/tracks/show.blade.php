@@ -12,10 +12,11 @@
     $trackUrl = route('tracks.show', $track['slug']);
     $others = collect($allTracks)->reject(fn ($t) => $t['slug'] === $track['slug'])->values();
 
-    $title = "{$trackTitle} Certification Practice Exams | {$brand}";
+    $meta = \App\Support\SeoMeta::track($trackTitle, $count, $exams->pluck('exam_code')->all(), $vendorName, $brand);
+    $title = $meta['title'];
     $h1 = "{$trackTitle} certification practice exams";
     $codes = $exams->take(5)->pluck('exam_code')->implode(', ');
-    $description = \Illuminate\Support\Str::limit("Practice questions and study guides for {$count} {$vendorName} {$trackTitle} " . \Illuminate\Support\Str::plural('exam', $count) . " ({$codes}). Try the free questions first.", 158);
+    $description = $meta['description'];
 
     $crumbs = [['name' => 'Home', 'url' => url('/')], ['name' => $trackTitle, 'url' => $trackUrl]];
 @endphp

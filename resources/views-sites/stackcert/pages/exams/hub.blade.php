@@ -4,7 +4,6 @@
     $brand = $currentSite ? $currentSite->name : ($globalSettings['site_name'] ?? config('app.name'));
     $vendorName = $exam->vendor->name ?? '';
     $code = $exam->exam_code;
-    $examName = trim((string) $exam->exam_name);
     $money = fn ($v) => '$' . number_format((float) $v, ((float) $v == floor((float) $v)) ? 0 : 2);
     $fmtDate = fn ($d) => $d ? $d->format('F j, Y') : null;
     $realUpdated = $exam->last_updated_at ?: $exam->updated_at;
@@ -16,51 +15,39 @@
     $lowPrice = $priceList ? min($priceList) : null;
     $highPrice = $priceList ? max($priceList) : null;
 
-    // Title: code + descriptive name when it fits in ~60 characters, else the code alone.
-    $shortName = trim(preg_replace('/^' . preg_quote($vendorName, '/') . '\s+/i', '', $examName));
-    $title = collect([
-        "{$code} {$shortName} Exam Guide and Prep | {$brand}",
-        "{$code} Exam Guide: Skills, Format and Prep | {$brand}",
-    ])->first(fn ($t) => mb_strlen($t) <= 60) ?? "{$code} Exam Guide | {$brand}";
-    $h1 = "{$code}: {$examName} exam guide";
+    // The guide is built from Microsoft's official study guide for the exam (see ExamGuideContent).
+    // $g is null for an exam Microsoft Learn no longer lists; that page stays minimal and out of the index.
+    $g = \App\Support\ExamGuideContent::for($exam, (int) $freeCount, (int) $bankCount);
+    $examName = $g['official'] ?? trim((string) $exam->exam_name);
+
+    $meta = \App\Support\SeoMeta::guide($code, $examName, $brand);
+    $title = $meta['title'];
+    $description = $meta['description'];
+    $h1 = "{$code} Exam Guide: {$examName}";
+
     // Opens with a plain definition so search and AI answers can quote it directly.
-    $lede = "{$code} is " . ($vendorName ? "{$vendorName}'s " : 'the ') . "{$examName} exam. This guide shows what it covers, how to prepare, and where to practise with " . ($freeCount ? "{$freeCount} free questions with explanations" : 'practice questions') . ($bankCount > $freeCount ? " and a bank of {$bankCount}." : '.');
-    $description = "{$code} {$examName} exam guide: skills covered, how to prepare" . ($freeCount ? ", and {$freeCount} free practice questions with explanations" : ', and practice options') . '. Start free.';
-    if (mb_strlen($description) > 158) {   // long exam names: drop the extra clause instead of cutting mid-sentence
-        $description = "{$code} {$examName} exam guide: skills covered, how to prepare" . ($freeCount ? ", and {$freeCount} free practice questions" : ', and practice options') . '. Start free.';
+    if ($g) {
+        $areas = collect($g['domains'])->pluck('name')->take(3)->implode(', ');
+        $lede = \App\Support\ExamGuideContent::describe($code, $examName, $vendorName ?: 'Microsoft') . " It tests " . count($g['domains']) . " skill areas ({$areas}" . (count($g['domains']) > 3 ? ' and more' : '') . ") and you need {$g['passing']} to pass. This guide covers the skills measured, a {$g['weeks']}-week study plan and FAQs"
+            . ($freeCount ? ", with {$freeCount} free practice questions to test yourself." : '.');
+    } else {
+        $lede = "{$code}: {$examName}. Microsoft Learn does not list a current study guide for this exam, so check Microsoft's official certification pages before you book it.";
     }
-    $description = \Illuminate\Support\Str::limit($description, 158);
 
-    // Topics: strings (plain list) or arrays with name/description/percentage (weights)
-    $rawTopics = $exam->resolved_topics;
-    $topics = collect($rawTopics)->map(function ($t) {
-        return is_array($t)
-            ? ['name' => (string) ($t['name'] ?? ''), 'description' => (string) ($t['description'] ?? ''), 'percentage' => trim((string) ($t['percentage'] ?? ''))]
-            : ['name' => (string) $t, 'description' => '', 'percentage' => ''];
-    })->filter(fn ($t) => $t['name'] !== '')->values();
-    $hasWeights = $topics->contains(fn ($t) => $t['percentage'] !== '');
-
-    $faqs = collect($exam->resolved_faqs)->filter(fn ($f) => is_array($f) && !empty($f['question']) && !empty($f['answer']))
-        ->map(fn ($f) => ['q' => strip_tags((string) $f['question']), 'a' => strip_tags((string) $f['answer'])])->values()->all();
-    $standardFaqs = [
-        ['q' => "Are the free {$code} questions really free?", 'a' => "Yes. You can answer the free questions on the free practice questions page without an account, check each answer, and read the explanation."],
-        ['q' => "How is this different from Microsoft's own practice assessment?", 'a' => "Microsoft offers free practice assessments for many exams on Microsoft Learn, and you should use them. We add a larger question bank, a timed exam mode, per-topic review and a printable PDF. We are independent of {$vendorName} and our materials are not official exam content."],
-        ['q' => "How should I use these materials for {$code}?", 'a' => "Start with the free questions to find your weak areas, study those topics from the official skills outline, then take timed practice sessions and review every explanation."],
-    ];
-    $faqs = array_slice(array_merge($faqs, $standardFaqs), 0, 8);
+    $faqs = $g['faqs'] ?? [];
 
     $crumbs = [['name' => 'Home', 'url' => url('/')]];
     if (!empty($track)) { $crumbs[] = ['name' => $track['title'], 'url' => route('tracks.show', $track['slug'])]; }
     $crumbs[] = ['name' => $code, 'url' => $exam->url];
-
-    // The long exam article is shared with the core site, so this site does not publish it
-    // (the same text on two domains is duplicate content). The page is built from the exam's own data.
 @endphp
 
 @section('title', $title)
 @section('meta_description', $description)
 @section('canonical_url', $exam->url)
 @section('og_type', 'product')
+@unless($g)
+    @section('robots', 'noindex, follow')
+@endunless
 
 @section('seo_tags')
     @include('partials.schema-breadcrumbs', ['crumbs' => $crumbs])
@@ -76,8 +63,18 @@
         'dateModified' => $realUpdated ? $realUpdated->toAtomString() : null,
         'isPartOf' => ['@type' => 'WebSite', 'name' => $brand, 'url' => url('/')],
         'about' => ['@type' => 'Thing', 'name' => "{$code} {$examName}"],
+        'isBasedOn' => $g['guideUrl'] ?? null,
     ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
     </script>
+    @if($faqs)
+    <script type="application/ld+json">
+    {!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => array_map(fn ($f) => ['@type' => 'Question', 'name' => $f['q'], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['a']]], $faqs),
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
+    @endif
     <script type="application/ld+json">
     {!! json_encode(array_filter([
         '@context' => 'https://schema.org',
@@ -109,21 +106,30 @@
         {{-- ================= MAIN ================= --}}
         <div class="min-w-0 space-y-12 lg:col-span-8">
 
+            {{-- Retirement notice (from Microsoft's own study guide) --}}
+            @if(!empty($g['retire']))
+                <div class="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm leading-relaxed text-amber-900" role="note">
+                    <strong class="font-extrabold">{{ $g['retire']['status'] === 'retired' ? 'This exam has been retired.' : 'This exam is retiring.' }}</strong>
+                    Microsoft {{ $g['retire']['status'] === 'retired' ? 'retired' : 'retires' }} {{ $code }} on {{ $g['retire']['date'] }}.
+                    Check the <a href="{{ $g['guideUrl'] }}" class="font-bold underline" rel="noopener" target="_blank">official study guide</a> for its replacement before you start studying.
+                </div>
+            @endif
+
             {{-- At a glance --}}
             <section aria-labelledby="glance">
                 <h2 id="glance" class="text-2xl font-extrabold text-slate-900">What is the {{ $code }} exam? At a glance</h2>
                 <dl class="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                     @foreach(array_filter([
                         'Exam code' => $code,
-                        'Exam title' => $examName,
+                        'Official title' => $examName,
                         'Provider' => $vendorName,
-                        'Certification' => $exam->certifications->first()->name ?? null,
-                        'Level' => $exam->difficulty,
-                        'Passing score' => $exam->passing_score ? $exam->passing_score . '%' : null,
+                        'Level' => $g['level'] ?? null,
+                        'Passing score' => $g['passing'] ?? null,
+                        'Skill areas' => $g ? count($g['domains']) . ' domains, ' . $g['skillTotal'] . ' listed skills' : null,
+                        'Skills outline updated' => $g['asOf'] ?? null,
                         'Our question bank' => $bankCount ? number_format($bankCount) . ' questions' : null,
                         'Free questions' => $freeCount ? $freeCount . ' with explanations' : null,
                         'Formats' => implode(' and ', array_filter([$exam->is_pdf_available ? 'PDF study guide' : null, $exam->is_engine_available ? 'online test engine' : null])),
-                        'Last updated' => $fmtDate($realUpdated),
                     ]) as $label => $value)
                         <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
                             <dt class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $label }}</dt>
@@ -131,52 +137,87 @@
                         </div>
                     @endforeach
                 </dl>
-                <p class="mt-3 text-xs text-slate-500">Always confirm the current skills outline, languages and price on the provider's official exam page before you book.</p>
+                <p class="mt-3 text-xs text-slate-500">
+                    Skills, weightings and the pass mark come from Microsoft's
+                    @if(!empty($g['guideUrl']))<a href="{{ $g['guideUrl'] }}" class="underline" rel="noopener" target="_blank">official {{ $code }} study guide</a>@else official study guide @endif.
+                    Microsoft can change an exam, so confirm the current outline, languages and price on its exam page before you book.
+                </p>
             </section>
 
-            {{-- Topics / skills --}}
-            @if($topics->isNotEmpty())
-            <section aria-labelledby="topics">
-                <h2 id="topics" class="text-2xl font-extrabold text-slate-900">{{ $hasWeights ? 'What skills does the ' . $code . ' exam measure?' : 'What topics does the ' . $code . ' exam cover?' }}</h2>
-                <ul class="mt-5 space-y-3">
-                    @foreach($topics as $topic)
-                        <li class="rounded-2xl border border-slate-200 bg-white p-5">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <h3 class="text-base font-extrabold text-slate-900">{{ $topic['name'] }}</h3>
-                                @if($topic['percentage'] !== '')
-                                    <span class="rounded-full px-3 py-1 text-xs font-extrabold" style="background: var(--brand-soft); color: var(--brand-dark);">{{ $topic['percentage'] }}</span>
-                                @endif
-                            </div>
-                            @if($topic['description'] !== '')
-                                <p class="mt-2 text-sm leading-relaxed text-slate-600">{{ $topic['description'] }}</p>
-                            @endif
-                        </li>
+            @if($g)
+            {{-- Who it is for --}}
+            @if(!empty($g['audience']))
+            <section aria-labelledby="audience">
+                <h2 id="audience" class="text-2xl font-extrabold text-slate-900">Who should take the {{ $code }} exam?</h2>
+                <div class="mt-5 space-y-3 rounded-2xl border border-slate-200 bg-white p-6 text-sm leading-relaxed text-slate-700">
+                    <p>Microsoft describes the candidate for {{ $code }} like this:</p>
+                    <blockquote class="border-l-4 pl-4 italic text-slate-600" style="border-color: var(--brand);">{{ \Illuminate\Support\Arr::first($g['audience']) }}</blockquote>
+                    @foreach(array_slice($g['audience'], 1, 2) as $p)
+                        <p>{{ $p }}</p>
                     @endforeach
-                </ul>
+                    @if(!empty($track))
+                        <p>It sits in our <a href="{{ route('tracks.show', $track['slug']) }}" class="font-bold underline" style="color: var(--brand);">{{ $track['title'] }} exams</a> track, where you can compare it with the other exams in the same area.</p>
+                    @endif
+                </div>
             </section>
             @endif
 
-            {{-- How to prepare --}}
-            <section aria-labelledby="prepare">
-                <h2 id="prepare" class="text-2xl font-extrabold text-slate-900">How do you prepare for {{ $code }}?</h2>
-                <ol class="mt-5 grid gap-4 sm:grid-cols-3">
-                    <li class="rounded-2xl border border-slate-200 bg-white p-5">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-extrabold text-white" style="background: var(--brand);">1</span>
-                        <h3 class="mt-3 font-extrabold text-slate-900">Find your gaps</h3>
-                        <p class="mt-1.5 text-sm leading-relaxed text-slate-600">Answer the <a href="{{ $exam->questions_url }}" class="font-bold underline" style="color: var(--brand);">free {{ $code }} practice questions</a> and note the topics you miss.</p>
-                    </li>
-                    <li class="rounded-2xl border border-slate-200 bg-white p-5">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-extrabold text-white" style="background: var(--brand);">2</span>
-                        <h3 class="mt-3 font-extrabold text-slate-900">Study the outline</h3>
-                        <p class="mt-1.5 text-sm leading-relaxed text-slate-600">Work through the official skills outline and try the tasks hands-on. Microsoft also provides <a href="https://learn.microsoft.com/en-us/credentials/certifications/practice-assessments-for-microsoft-certifications" class="font-bold underline" style="color: var(--brand);" rel="noopener" target="_blank">free practice assessments</a> for many exams.</p>
-                    </li>
-                    <li class="rounded-2xl border border-slate-200 bg-white p-5">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-extrabold text-white" style="background: var(--brand);">3</span>
-                        <h3 class="mt-3 font-extrabold text-slate-900">Practise under time</h3>
-                        <p class="mt-1.5 text-sm leading-relaxed text-slate-600">Take timed sessions and review every explanation. See the <a href="{{ $exam->plans_url }}" class="font-bold underline" style="color: var(--brand);">{{ $code }} plans</a> for the full bank.</p>
-                    </li>
+            {{-- Skills measured --}}
+            <section aria-labelledby="skills">
+                <h2 id="skills" class="text-2xl font-extrabold text-slate-900">What skills does the {{ $code }} exam measure?</h2>
+                <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                    The {{ $code }} outline has {{ count($g['domains']) }} domains. Each one is weighted, and the weights tell you where the exam spends its questions.
+                    The tasks below are taken from Microsoft's official list{{ !empty($g['asOf']) ? ' (last updated ' . $g['asOf'] . ')' : '' }}.
+                </p>
+                <div class="mt-5 space-y-4">
+                    @foreach($g['domains'] as $domain)
+                        <article class="rounded-2xl border border-slate-200 bg-white p-6">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <h3 class="text-lg font-extrabold text-slate-900">{{ $domain['name'] }}</h3>
+                                <span class="rounded-full px-3 py-1 text-xs font-extrabold" style="background: var(--brand-soft); color: var(--brand-dark);">{{ $domain['weight'] }} of the exam</span>
+                            </div>
+                            <p class="mt-3 text-sm leading-relaxed text-slate-600">{{ $domain['explanation'] }}</p>
+                            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                                @foreach($domain['sections'] as $section)
+                                    <div>
+                                        <h4 class="text-sm font-extrabold text-slate-800">{{ $section['title'] }}</h4>
+                                        <ul class="mt-1.5 list-disc space-y-1 pl-5 text-sm text-slate-600">
+                                            @foreach(array_slice($section['skills'], 0, 4) as $skill)
+                                                <li>{{ $skill }}</li>
+                                            @endforeach
+                                        </ul>
+                                        @if(count($section['skills']) > 4)
+                                            <p class="mt-1 pl-5 text-xs text-slate-500">and {{ count($section['skills']) - 4 }} more in the official guide</p>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+
+            {{-- Study plan --}}
+            <section aria-labelledby="plan">
+                <h2 id="plan" class="text-2xl font-extrabold text-slate-900">{{ $code }} study plan: {{ $g['weeks'] }} weeks</h2>
+                <p class="mt-3 text-sm leading-relaxed text-slate-600">
+                    This plan splits the {{ count($g['domains']) }} domains across the weeks by weighting, and ends with timed practice. Stretch it if you are new to the topics, or shorten it if you work with them every day.
+                </p>
+                <ol class="mt-5 space-y-3">
+                    @foreach($g['plan'] as $step)
+                        <li class="flex gap-4 rounded-2xl border border-slate-200 bg-white p-5">
+                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg text-sm font-extrabold text-white" style="background: var(--brand);">{{ $step['week'] }}</span>
+                            <div>
+                                <h3 class="font-extrabold text-slate-900">Week {{ $step['week'] }}: {{ $step['title'] }}</h3>
+                                <p class="mt-1 text-sm leading-relaxed text-slate-600">{{ $step['text'] }}
+                                    @if($loop->last) Start with the <a href="{{ $exam->questions_url }}" class="font-bold underline" style="color: var(--brand);">free {{ $code }} practice questions</a>, then see the <a href="{{ $exam->plans_url }}" class="font-bold underline" style="color: var(--brand);">{{ $code }} practice test plans</a> for the full bank. @endif
+                                </p>
+                            </div>
+                        </li>
+                    @endforeach
                 </ol>
             </section>
+            @endif
 
             {{-- Reviews (only genuine, approved ones are ever shown) --}}
             @if($reviews->isNotEmpty())
@@ -195,8 +236,9 @@
             @endif
 
             {{-- FAQ --}}
+            @if($faqs)
             <section aria-labelledby="faq">
-                <h2 id="faq" class="text-2xl font-extrabold text-slate-900">{{ $code }} questions answered</h2>
+                <h2 id="faq" class="text-2xl font-extrabold text-slate-900">{{ $code }} exam FAQs</h2>
                 <div class="mt-5 space-y-3" x-data="{ open: 0 }">
                     @foreach($faqs as $i => $faq)
                         <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
@@ -211,6 +253,7 @@
                     @endforeach
                 </div>
             </section>
+            @endif
 
             {{-- Related --}}
             @if($related->isNotEmpty())

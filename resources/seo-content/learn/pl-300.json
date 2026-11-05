@@ -1,0 +1,175 @@
+{
+ "code": "PL-300",
+ "slug": "pl-300",
+ "ok": true,
+ "why": "",
+ "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/pl-300",
+ "official": "Microsoft Power BI Data Analyst",
+ "asOf": "April 20, 2026",
+ "audience": [
+  "As a candidate for this exam, you should deliver actionable insights by working with available data and applying domain expertise. You should:",
+  "Provide meaningful business value through easy-to-comprehend data visualizations.",
+  "Enable others to perform self-service analytics.",
+  "As a Power BI data analyst, you work closely with business stakeholders to identify business requirements. You collaborate with analytics engineers and data engineers to identify and acquire data. You use Power BI to:",
+  "Prepare the data",
+  "Model the data",
+  "Visualize and analyze data",
+  "Manage and secure Power BI",
+  "You should be proficient at using Power Query and Data Analysis Expressions (DAX)."
+ ],
+ "domains": [
+  {
+   "name": "Prepare the data",
+   "weight": "25–30%",
+   "sections": [
+    {
+     "title": "Get or connect to data",
+     "skills": [
+      "Identify and connect to data sources or a shared semantic model",
+      "Change data source settings, including credentials and privacy levels",
+      "Choose between DirectLake, DirectQuery, and Import",
+      "Create and modify parameters"
+     ]
+    },
+    {
+     "title": "Profile and clean the data",
+     "skills": [
+      "Evaluate data, including data statistics and column properties",
+      "Resolve inconsistencies, unexpected or null values, and data quality issues",
+      "Resolve data import errors"
+     ]
+    },
+    {
+     "title": "Transform and load the data",
+     "skills": [
+      "Select appropriate column data types",
+      "Create and transform columns",
+      "Group and aggregate rows",
+      "Pivot, unpivot, and transpose data",
+      "Convert semi-structured data to a table",
+      "Create fact tables and dimension tables",
+      "Identify when to use reference or duplicate queries and the resulting impact",
+      "Merge and append queries",
+      "Identify and create appropriate keys for relationships",
+      "Configure data loading for queries"
+     ]
+    },
+    {
+     "title": "Design and implement a data model",
+     "skills": [
+      "Configure table and column properties",
+      "Implement role-playing dimensions",
+      "Define a relationship's cardinality and cross-filter direction",
+      "Create a common date table",
+      "Identify use cases for calculated columns and calculated tables"
+     ]
+    },
+    {
+     "title": "Create model calculations by using DAX",
+     "skills": [
+      "Create single aggregation measures",
+      "Use the CALCULATE function",
+      "Implement time intelligence measures",
+      "Use basic statistical functions",
+      "Create semi-additive measures",
+      "Create a measure by using quick measures",
+      "Create calculated tables or columns",
+      "Create calculation groups"
+     ]
+    },
+    {
+     "title": "Optimize model performance",
+     "skills": [
+      "Improve performance by identifying and removing unnecessary rows and columns",
+      "Identify poorly performing measures, relationships, and visuals by using Performance Analyzer and DAX query view",
+      "Improve performance by reducing granularity"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Visualize and analyze the data",
+   "weight": "25–30%",
+   "sections": [
+    {
+     "title": "Create reports",
+     "skills": [
+      "Select an appropriate visual",
+      "Format and configure visuals",
+      "Create a narrative visual with Copilot",
+      "Apply and customize a theme",
+      "Apply conditional formatting",
+      "Apply slicing and filtering",
+      "Use Copilot to create a new report page",
+      "Use Copilot to suggest content for a new report page",
+      "Configure the report page",
+      "Choose when to use a paginated report",
+      "Create visual calculations by using DAX"
+     ]
+    },
+    {
+     "title": "Enhance reports for usability and storytelling",
+     "skills": [
+      "Configure bookmarks",
+      "Create custom tooltips",
+      "Edit and configure interactions between visuals",
+      "Configure navigation for a report",
+      "Apply sorting to visuals",
+      "Configure sync slicers",
+      "Group and layer visuals by using the Selection pane",
+      "Configure drillthrough navigation, including pages, filters, and buttons",
+      "Configure export settings",
+      "Design reports for mobile devices",
+      "Enable personalization in a report, including personalized visuals",
+      "Design and configure Power BI reports for accessibility",
+      "Configure automatic page refresh"
+     ]
+    },
+    {
+     "title": "Identify patterns and trends",
+     "skills": [
+      "Use the Analyze feature in Power BI",
+      "Use grouping, binning, and clustering",
+      "Use AI visuals",
+      "Use reference lines, error bars, and forecasting",
+      "Detect outliers and anomalies",
+      "Use Copilot to summarize the underlying semantic model"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Manage and secure Power BI",
+   "weight": "15–20%",
+   "sections": [
+    {
+     "title": "Create and manage workspaces and assets",
+     "skills": [
+      "Create and configure a workspace",
+      "Configure and update an app",
+      "Publish, import, or update items in a workspace",
+      "Create dashboards",
+      "Choose a distribution method",
+      "Configure subscriptions and data alerts",
+      "Promote or certify Power BI content",
+      "Identify when a gateway is required",
+      "Configure a semantic model scheduled refresh"
+     ]
+    },
+    {
+     "title": "Secure and govern Power BI items",
+     "skills": [
+      "Assign workspace roles",
+      "Configure item-level access",
+      "Configure access to semantic models",
+      "Implement row-level security roles",
+      "Configure row-level security group membership",
+      "Apply sensitivity labels"
+     ]
+    }
+   ]
+  }
+ ],
+ "retire": null,
+ "retiredNote": null
+}
