@@ -95,6 +95,11 @@ class DynamicSeoController extends Controller
                     continue;
                 }
 
+                // Hub-style sites keep exams without a current official guide (retired or unlisted) out of the sitemap
+                if (\App\Models\Exam::usesHubUrls() && !\App\Support\ExamGuideContent::isIndexable((string) $e->slug)) {
+                    continue;
+                }
+
                 $vendorSlug = $e->vendor ? $e->vendor->slug : 'vendor';
                 $slug = ($overlay && !empty($overlay->custom_slug)) ? $overlay->custom_slug : $e->slug;
 

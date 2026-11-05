@@ -45,7 +45,7 @@
 @section('meta_description', $description)
 @section('canonical_url', $exam->url)
 @section('og_type', 'product')
-@unless($g)
+@unless(\App\Support\ExamGuideContent::isIndexable((string) $exam->slug))
     @section('robots', 'noindex, follow')
 @endunless
 

@@ -1,6 +1,9 @@
 @extends('layouts.public')
 
 @section('title', 'Exam Topics Base Blog - IT Certification News & Tips')
+@if(isset($posts) && method_exists($posts, 'total') && $posts->total() === 0)
+    @section('robots', 'noindex, follow')
+@endif
 @section('meta_description', 'Latest news, tips, and study guides for IT certifications. Stay updated with Exam Topics Base blog.')
 
 @section('content')

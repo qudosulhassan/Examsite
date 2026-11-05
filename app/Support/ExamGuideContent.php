@@ -35,6 +35,17 @@ class ExamGuideContent
     }
 
     /**
+     * Whether search engines should see this exam's pages: it needs a current Microsoft Learn study guide and must not
+     * be retired. Retired or unlisted exams keep their pages for existing visitors but stay out of the index and sitemap.
+     */
+    public static function isIndexable(string $slug): bool
+    {
+        $data = static::load($slug);
+
+        return $data !== null && !empty($data['domains']) && ($data['retire']['status'] ?? null) !== 'retired';
+    }
+
+    /**
      * @param  int  $freeCount  free questions published for this exam
      * @param  int  $bankCount  questions in the whole bank
      * @return array|null  null when Microsoft Learn has no study guide for the exam

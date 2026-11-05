@@ -51,6 +51,9 @@
 @section('title', $title)
 @section('meta_description', $description)
 @section('canonical_url', $exam->plans_url)
+@unless(\App\Support\ExamGuideContent::isIndexable((string) $exam->slug))
+    @section('robots', 'noindex, follow')
+@endunless
 @section('og_type', 'product')
 @section('seo_tags')
     @include('partials.schema-breadcrumbs', ['crumbs' => $crumbs])

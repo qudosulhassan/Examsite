@@ -39,7 +39,7 @@
 @section('title', $title)
 @section('meta_description', $description)
 @section('canonical_url', $pageUrl($page))
-@if(!$freeCount)
+@if(!$freeCount || !\App\Support\ExamGuideContent::isIndexable((string) $exam->slug))
     {{-- Nothing to show yet: keep the page out of search results until free questions are added --}}
     @section('robots', 'noindex, follow')
 @endif
