@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Package extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\RestrictedToSiteVendors;
 
     protected $fillable = [
         'vendor_id',

@@ -73,6 +73,7 @@ class SharedCodebaseSiteTwoTest extends TestCase
     public function test_site_two_branding_replaces_site_one_branding(): void
     {
         $this->actAsSiteTwo();
+        config(['app.url' => 'https://www.proexamtopics.com']);
         $settings = app(SiteContext::class)->getAllSettings();
 
         $this->assertSame('ProExamTopics', $settings['site_name']);

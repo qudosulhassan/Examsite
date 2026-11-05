@@ -23,9 +23,12 @@ class SiteTwoPublicPagesTest extends TestCase
     {
         parent::setUp();
 
+        // Compiled Blade is cached on disk and is rebranded at compile time for non-core sites, so
+        // never reuse pages another test compiled for the core site (or leave ours behind).
+        $this->artisan('view:clear');
         Cache::flush();
-        foreach ([1 => 'examtopicsbase', 2 => 'proexamtopics'] as $id => $code) {
-            Site::query()->firstOrCreate(['id' => $id], ['name' => $code, 'code' => $code, 'default_theme' => 'default', 'default_locale' => 'en', 'is_active' => true]);
+        foreach ([1 => ['ExamTopicsBase', 'examtopicsbase'], 2 => ['ProExamTopics', 'proexamtopics']] as $id => [$name, $code]) {
+            Site::query()->firstOrCreate(['id' => $id], ['name' => $name, 'code' => $code, 'default_theme' => 'default', 'default_locale' => 'en', 'is_active' => true]);
         }
 
         config([
@@ -34,6 +37,13 @@ class SiteTwoPublicPagesTest extends TestCase
         ]);
         // Same effect as SITE_VIEW_OVERRIDE=proexamtopics at boot.
         app('view')->getFinder()->prependLocation(resource_path('views-sites/proexamtopics'));
+    }
+
+    protected function tearDown(): void
+    {
+        $this->artisan('view:clear');
+
+        parent::tearDown();
     }
 
     public function test_vendor_page_without_a_bundle_renders_the_proexamtopics_design(): void

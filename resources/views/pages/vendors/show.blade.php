@@ -201,7 +201,7 @@
                         <p class="text-base text-gray-400 leading-relaxed mb-10 max-w-xl">{{ $package->description }}</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            @foreach($package->features as $feature)
+                            @foreach(($package->features ?? []) as $feature)
                                 <div class="flex items-center space-x-3 bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/5 hover:bg-white/10 transition-colors">
                                     <div class="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-cyan to-blue-500 flex items-center justify-center shadow-[0_0_15px_rgba(0,212,170,0.3)]">
                                         <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
@@ -340,7 +340,7 @@
                                     <span class="text-gray-400 ml-2 font-bold uppercase tracking-widest text-xs">{{ $package->type === 'subscription' ? '/ month' : ($package->access_days ? 'for '.$package->access_days.' days' : 'Lifetime Access') }}</span>
                                 </div>
                                 <ul class="relative space-y-4 mb-4">
-                                    @foreach($package->features as $feature)
+                                    @foreach(($package->features ?? []) as $feature)
                                         <li class="flex items-start">
                                             <div class="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-cyan to-blue-500 flex items-center justify-center mr-4 mt-0.5 shadow-[0_0_10px_rgba(0,212,170,0.4)]">
                                                 <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>

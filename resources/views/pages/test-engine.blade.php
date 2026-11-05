@@ -410,7 +410,11 @@ function testEngineManager() {
                     </svg>
                 </button>
                 <div x-show="active === 2" class="p-5 border-t border-gray-200 text-sm text-gray-600 leading-relaxed bg-white">
-                    Our database is continuously updated based on actual candidate feedback, vendor syllabus changes, and question updates. When a vendor updates their exam format (e.g., from CLF-C01 to CLF-C02), we sync our question database within 48 hours to ensure compatibility.
+                    Our database is continuously updated based on actual candidate feedback, vendor syllabus changes, and question updates. @if(count((array) config('site.vendors', [])) > 0)
+                    When a vendor retires an exam and replaces it with a new version, we update our question database to match.
+                    @else
+                    When a vendor updates their exam format (e.g., from CLF-C01 to CLF-C02), we sync our question database within 48 hours to ensure compatibility.
+                    @endif
                 </div>
             </div>
 

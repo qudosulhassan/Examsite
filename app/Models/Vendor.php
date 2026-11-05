@@ -9,7 +9,12 @@ use App\Models\Redirect;
 
 class Vendor extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Models\Concerns\RestrictedToSiteVendors;
+
+    protected static function siteVendorColumn(): string
+    {
+        return 'id';
+    }
 
     protected static function booted()
     {

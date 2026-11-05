@@ -66,11 +66,23 @@ class TechnicalSeoService
         $examUrls = [];
         foreach ($exams as $e) {
             $examUrls[] = [
-                'loc' => route('exams.show', ['vendor' => $e->vendor->slug, 'slug' => $e->slug]),
+                'loc' => \App\Models\Exam::urlFor($e->vendor->slug, $e->slug),
                 'priority' => '0.9',
                 'changefreq' => 'weekly',
                 'lastmod' => $e->last_updated_at ? $e->last_updated_at->format('Y-m-d') : ($e->updated_at ? $e->updated_at->format('Y-m-d') : now()->format('Y-m-d')),
             ];
+
+            if (\App\Models\Exam::usesHubUrls()) {
+                // The free-questions and plans pages are indexable pages of their own.
+                foreach ([[$e->questions_url, '0.8'], [$e->plans_url, '0.6']] as [$loc, $priority]) {
+                    $examUrls[] = [
+                        'loc' => $loc,
+                        'priority' => $priority,
+                        'changefreq' => 'weekly',
+                        'lastmod' => $e->last_updated_at ? $e->last_updated_at->format('Y-m-d') : ($e->updated_at ? $e->updated_at->format('Y-m-d') : now()->format('Y-m-d')),
+                    ];
+                }
+            }
         }
 
         // Certifications
@@ -406,7 +418,7 @@ TXT;
         $vendorName = $exam->vendor ? $exam->vendor->name : 'IT Certification';
         $examCode = $exam->exam_code ?: $exam->code ?: '';
         $examName = $exam->exam_name ?: $exam->title ?: '';
-        $title = trim(($examCode ? $examCode . ' - ' : '') . ($examName ?: 'Certification Practice Exam') . ' Practice Questions & Dumps');
+        $title = trim(($examCode ? $examCode . ' - ' : '') . ($examName ?: 'Certification Practice Exam') . (config('site.avoid_dumps') ? ' Practice Questions & Study Guide' : ' Practice Questions & Dumps'));
 
         $rawDesc = '';
         if (!empty(trim(strip_tags($exam->description ?? '')))) {
@@ -422,7 +434,9 @@ TXT;
                 $rawDesc = $exam->meta_description;
             }
             if (empty($rawDesc)) {
-                $rawDesc = "Pass your {$examCode} {$examName} certification exam with our verified practice test questions and dumps.";
+                $rawDesc = config('site.avoid_dumps')
+                    ? "Prepare for your {$examCode} {$examName} certification exam with practice questions, a study guide and a timed test engine."
+                    : "Pass your {$examCode} {$examName} certification exam with our verified practice test questions and dumps.";
             }
         }
 
@@ -499,7 +513,9 @@ TXT;
                 $rawDesc = $exam->meta_description;
             }
             if (empty($rawDesc)) {
-                $rawDesc = "Comprehensive {$examCode} {$examName} certification course, verified exam dumps, and real practice questions.";
+                $rawDesc = config('site.avoid_dumps')
+                    ? "Comprehensive {$examCode} {$examName} certification study guide and practice questions."
+                    : "Comprehensive {$examCode} {$examName} certification course, verified exam dumps, and real practice questions.";
             }
         }
 
@@ -684,7 +700,16 @@ TXT;
             $path = rtrim($path, '/');
         }
 
-        return $scheme . '://' . $host . $port . $path;
+        // Paginated pages (?page=N, N > 1) are separate documents and canonicalise to themselves.
+        $query = '';
+        if (!empty($parts['query'])) {
+            parse_str($parts['query'], $params);
+            if (isset($params['page']) && ctype_digit((string) $params['page']) && (int) $params['page'] > 1) {
+                $query = '?page=' . (int) $params['page'];
+            }
+        }
+
+        return $scheme . '://' . $host . $port . $path . $query;
     }
 
     public function getRobotsMetaDirective(): string
@@ -736,7 +761,9 @@ TXT;
         $siteBrand = $site ? $site->name : 'Exam Topics Base';
         $code = trim((string)($exam->exam_code ?? ''));
         if ($code !== '') {
-            return "{$code} Exam Dumps & Study Guide | {$siteBrand}";
+            return config('site.avoid_dumps')
+                ? "{$code} Practice Exam & Study Guide | {$siteBrand}"
+                : "{$code} Exam Dumps & Study Guide | {$siteBrand}";
         }
 
         $name = trim((string)($exam->exam_name ?? ''));
@@ -810,7 +837,7 @@ TXT;
                     'vendor_name' => $exam->vendor ? $exam->vendor->name : 'Unknown Vendor',
                     'vendor_slug' => $vendorSlug,
                     'current_title' => $cleanTitle,
-                    'url' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $exam->slug ?: $exam->id]),
+                    'url' => \App\Models\Exam::urlFor($vendorSlug, (string) ($exam->slug ?: $exam->id)),
                     'issue' => $issueReason,
                     'exam' => $exam,
                 ];
@@ -855,7 +882,7 @@ TXT;
                     'vendor_name' => $exam->vendor ? $exam->vendor->name : 'Unknown Vendor',
                     'vendor_slug' => $vendorSlug,
                     'current_description' => $cleanDesc,
-                    'url' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $exam->slug ?: $exam->id]),
+                    'url' => \App\Models\Exam::urlFor($vendorSlug, (string) ($exam->slug ?: $exam->id)),
                     'issue' => $issueReason,
                     'exam' => $exam,
                 ];
@@ -892,7 +919,7 @@ TXT;
                 'exam_name' => $exam->exam_name ?: 'Untitled Exam',
                 'vendor_name' => $exam->vendor ? $exam->vendor->name : 'Unknown Vendor',
                 'vendor_slug' => $vendorSlug,
-                'url' => route('exams.show', ['vendor' => $vendorSlug, 'slug' => $exam->slug ?: $exam->id]),
+                'url' => \App\Models\Exam::urlFor($vendorSlug, (string) ($exam->slug ?: $exam->id)),
                 'exam' => $exam,
             ];
         }

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Certification extends Model
 {
+    use \App\Models\Concerns\RestrictedToSiteVendors;
+
     protected $fillable = [
         'vendor_id',
         'name',
