@@ -94,7 +94,7 @@ class ExamGuideContent
             'plan'        => $plan,
             'weeks'       => $weeks,
             'passing'     => static::PASSING,
-            'faqs'        => static::faqs($code, $official, $domains, $data, $weeks, $freeCount, $bankCount),
+            'faqs'        => static::faqs($code, $official, $domains, $data, $weeks, $freeCount, $bankCount, $plan),
         ];
     }
 
@@ -192,41 +192,117 @@ class ExamGuideContent
         return $plan;
     }
 
-    protected static function faqs(string $code, string $official, array $domains, array $data, int $weeks, int $freeCount, int $bankCount): array
+    /**
+     * Six questions per exam, each built from that exam's own outline (audience, domain weights, section names, example
+     * tasks, plan, skill counts). Question wording and answers therefore differ between exams in substance, not only in the
+     * exam code; ExamGuideContentTest checks that across every exam we have data for.
+     */
+    protected static function faqs(string $code, string $official, array $domains, array $data, int $weeks, int $freeCount, int $bankCount, array $plan = []): array
     {
+        $n = count($domains);
+        $byWeight = $domains;
+        usort($byWeight, fn ($a, $b) => $b['weightMax'] <=> $a['weightMax']);
+        $top = $byWeight[0];
+        $low = end($byWeight);
+        $topSections = static::joinList(array_slice(array_column($top['sections'], 'title'), 0, 3));
         $domainList = implode('; ', array_map(fn ($d) => "{$d['name']} ({$d['weight']})", $domains));
-        $audience = trim((string) Arr::first($data['audience'] ?? []));
-        $firstSentence = $audience !== '' ? trim(strtok($audience, '.')) . '.' : null;
 
-        $faqs = [
-            ['q' => "What is the {$code} exam?",
-             'a' => static::describe($code, $official) . ($firstSentence ? " Microsoft describes the candidate this way: “{$firstSentence}”" : '')],
-            ['q' => "What topics does {$code} cover and how are they weighted?",
-             'a' => 'Microsoft groups the skills into ' . count($domains) . ' domains: ' . $domainList . '.'
-                 . (!empty($data['asOf']) ? " The skills outline was last updated on {$data['asOf']}." : '')],
-            ['q' => "What is the passing score for {$code}?",
-             'a' => 'Microsoft sets the passing score at ' . static::PASSING . '. It is a scaled score, not a percentage of questions answered correctly, so you cannot work out your result by simply counting right answers.'],
-            ['q' => "How long should I study for {$code}?",
-             'a' => "Plan on about {$weeks} weeks of steady study for {$code}, then adjust for your experience. Someone who already works with these tools daily may need less time; someone new to them will need more. The study plan on this page splits the weeks by domain weighting."],
+        // 1. Who it is for, in Microsoft's words
+        $audience = array_values(array_filter($data['audience'] ?? []));
+        $aud = '';
+        if ($audience) {
+            $sentences = preg_split('/(?<=[.!?])\s+/', $audience[0]);
+            $aud = trim(implode(' ', array_slice($sentences, 0, 2)));
+        }
+        $faqs = [[
+            'q' => "Who is the {$official} exam ({$code}) designed for?",
+            'a' => $aud !== '' ? "Microsoft's audience profile for {$code} reads: “{$aud}”" : "{$code} tests the skills listed in Microsoft's study guide for {$official}; read the audience profile there to see whether it matches your role.",
+        ]];
+
+        // 2. The split, plus the pass mark
+        $faqs[] = [
+            'q' => "How does Microsoft split the {$code} outline across its {$n} " . ($n === 1 ? 'domain' : 'domains') . '?',
+            'a' => "The {$code} outline is weighted as follows: {$domainList}. " . ucfirst(static::PASSING) . ' is the passing score; it is scaled, so it is not a simple percentage of correct answers.',
         ];
 
-        if (!empty($data['retire'])) {
-            $r = $data['retire'];
-            $faqs[] = ['q' => "Is {$code} being retired?",
-                       'a' => $r['status'] === 'retired'
-                           ? "Microsoft retired {$code} on {$r['date']}. Check the official exam page for the replacement exam before you start studying."
-                           : "Microsoft has announced that {$code} retires on {$r['date']}. If you plan to take it, book it before then and check the official exam page for its replacement."];
+        // 3. Where to spend the time
+        if ($n > 1 && $top['name'] !== $low['name']) {
+            $faqs[] = [
+                'q' => "Should most of my {$code} study time go to “{$top['name']}”?",
+                'a' => "It is the heaviest domain at {$top['weight']}, and Microsoft covers {$topSections} in it, so it deserves the biggest share of your time. “{$low['name']}” is the lightest at {$low['weight']}; it still counts towards your score, so give it a short, focused block rather than skipping it.",
+            ];
         } else {
-            $faqs[] = ['q' => "Is {$code} still current?",
-                       'a' => 'Microsoft publishes the skills outline for each exam on Microsoft Learn and updates it from time to time.'
-                           . (!empty($data['asOf']) ? " The outline for {$code} was last updated on {$data['asOf']}." : '')
-                           . ' Always read the current study guide before you book.'];
+            $faqs[] = [
+                'q' => "Which part of {$code} should I study first?",
+                'a' => "Start with {$top['name']}" . ($topSections !== '' ? ", which Microsoft breaks into {$topSections}" : '') . ', then use practice questions to find the topics that need more time.',
+            ];
         }
 
-        $faqs[] = ['q' => "How can I practise {$code} questions for free?",
-                   'a' => $freeCount > 0
-                       ? "Answer the {$freeCount} free {$code} practice questions on our free practice questions page. You can check each answer and read the explanation without creating an account." . ($bankCount > $freeCount ? " The full bank has {$bankCount} questions." : '')
-                       : "Free {$code} practice questions are being added. In the meantime, Microsoft offers free practice assessments for many exams on Microsoft Learn."];
+        // 4. Example tasks quoted from the official list
+        $pick = $domains[min(1, $n - 1)];
+        $examples = [];
+        foreach (array_slice($pick['sections'], 0, 3) as $s) {
+            if (!empty($s['skills'])) {
+                $examples[] = '“' . rtrim($s['skills'][0], '.') . '”';
+            }
+        }
+        $faqs[] = [
+            'q' => "What kind of tasks does {$code} ask about under “{$pick['name']}”?",
+            'a' => $examples
+                ? "Microsoft's list for that domain ({$pick['weight']}) includes " . static::joinList($examples) . '. Practise each as a hands-on task where you can, not only as a definition.'
+                : "Microsoft lists the tasks for that domain ({$pick['weight']}) in the official study guide; try each hands-on.",
+        ];
+
+        // 5. The study plan, by week
+        $byName = array_column($domains, null, 'name');
+        $lines = [];
+        foreach ($plan as $step) {
+            if (!$step['focus']) {
+                $lines[] = 'week ' . $step['week'] . ' is timed practice and review';
+                continue;
+            }
+            $starts = [];
+            foreach ($step['focus'] as $name) {
+                $first = $byName[$name]['sections'][0]['title'] ?? null;
+                if ($first) {
+                    $starts[] = "“{$first}” for {$name}";
+                }
+            }
+            $lines[] = 'week ' . $step['week'] . ' covers ' . static::joinList($step['focus']) . ($starts ? ', beginning with ' . static::joinList($starts) : '');
+        }
+        $faqs[] = [
+            'q' => "Is a {$weeks}-week plan enough to prepare for {$code}?",
+            'a' => $lines
+                ? "It can be, if you already know the basics. In the plan on this page, " . static::joinList($lines) . '. Stretch each block if the topics are new to you.'
+                : "Plan on about {$weeks} weeks of steady study, then adjust for your experience.",
+        ];
+
+        // 6. Retirement, or how big the outline is
+        if (!empty($data['retire'])) {
+            $r = $data['retire'];
+            $faqs[] = [
+                'q' => $r['status'] === 'retired' ? "Can I still take {$code}, or has it been retired?" : "When does {$code} retire, and what should I do before then?",
+                'a' => $r['status'] === 'retired'
+                    ? "Microsoft retired {$code} on {$r['date']}. Open the official study guide to find the exam that replaces it before you start studying."
+                    : "Microsoft has announced that {$code} retires on {$r['date']}. If you plan to take it, book it before then and check the official study guide for the exam that replaces it.",
+            ];
+        } else {
+            $skills = array_sum(array_column($domains, 'skillCount'));
+            $biggest = null;
+            foreach ($domains as $d) {
+                foreach ($d['sections'] as $s) {
+                    if (!$biggest || count($s['skills']) > count($biggest['skills'])) {
+                        $biggest = $s;
+                    }
+                }
+            }
+            $faqs[] = [
+                'q' => "How many skills does Microsoft list for {$code}?",
+                'a' => "The official outline lists {$skills} skills across {$n} " . ($n === 1 ? 'domain' : 'domains') . '.'
+                    . ($biggest ? " The longest area is “{$biggest['title']}” with " . count($biggest['skills']) . ' of them.' : '')
+                    . (!empty($data['asOf']) ? " Microsoft last updated this outline on {$data['asOf']}, so read the current study guide before you book." : ' Read the current study guide before you book.'),
+            ];
+        }
 
         return $faqs;
     }

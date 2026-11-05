@@ -28,8 +28,8 @@ class ExamGuideContentTest extends TestCase
         $this->assertSame($g['weeks'], count($g['plan']));
         $this->assertStringContainsString('timed', $g['plan'][array_key_last($g['plan'])]['text']);
         $this->assertCount(6, $g['faqs']);
-        $this->assertStringContainsString('700 on a scale of 1 to 1,000', $g['faqs'][2]['a']);
-        $this->assertStringContainsString('10 free AZ-900 practice questions', $g['faqs'][5]['a']);
+        $this->assertStringContainsString('700 on a scale of 1 to 1,000', $g['faqs'][1]['a']);
+        $this->assertStringContainsString('Describe Azure architecture and services', $g['faqs'][2]['q'] . $g['faqs'][2]['a']);
     }
 
     public function test_every_domain_of_the_outline_appears_in_the_study_plan(): void
@@ -77,6 +77,57 @@ class ExamGuideContentTest extends TestCase
             SeoMeta::guide('AZ-900', 'Microsoft Azure Fundamentals', 'AzureExamsHub')['title'],
             SeoMeta::plans('AZ-900', 'Microsoft Azure Fundamentals', null, 'AzureExamsHub')['title']
         );
+    }
+
+    /** Words of an answer with the exam code, digits and punctuation removed, as 3-word shingles. */
+    private function shingles(string $text, string $code): array
+    {
+        $text = mb_strtolower(str_ireplace($code, '', $text));
+        $words = preg_split('/\W+/u', preg_replace('/\d+/', '', $text), -1, PREG_SPLIT_NO_EMPTY);
+        $out = [];
+        for ($i = 0; $i + 2 < count($words); $i++) {
+            $out[$words[$i] . ' ' . $words[$i + 1] . ' ' . $words[$i + 2]] = true;
+        }
+
+        return array_keys($out);
+    }
+
+    public function test_faqs_are_different_on_every_exam_page(): void
+    {
+        $questions = [];
+        $answers = [];
+        foreach (glob(resource_path('seo-content/learn/*.json')) as $file) {
+            $slug = basename($file, '.json');
+            $code = strtoupper($slug);
+            $g = ExamGuideContent::for($this->exam($slug), 10, 100);
+            $this->assertCount(6, $g['faqs'], $code);
+            foreach ($g['faqs'] as $i => $faq) {
+                $q = mb_strtolower($faq['q']);
+                $this->assertArrayNotHasKey($q, $questions, "{$code} repeats the question of " . ($questions[$q] ?? '?'));
+                $questions[$q] = $code;
+                $answers[$code][$i] = $this->shingles($faq['a'], $code);
+            }
+        }
+
+        // Compare answers slot by slot across exams: after removing the exam code and numbers they must not be near-copies.
+        $codes = array_keys($answers);
+        $worst = 0.0;
+        $worstPair = '';
+        foreach ($codes as $x => $a) {
+            foreach (array_slice($codes, $x + 1) as $b) {
+                foreach ([0, 2, 3, 4] as $slot) {   // the slots that are free text rather than the weight list
+                    $sa = $answers[$a][$slot];
+                    $sb = $answers[$b][$slot];
+                    $union = count(array_unique(array_merge($sa, $sb)));
+                    $sim = $union ? count(array_intersect($sa, $sb)) / $union : 0;
+                    if ($sim > $worst) {
+                        $worst = $sim;
+                        $worstPair = "{$a} vs {$b} (slot {$slot})";
+                    }
+                }
+            }
+        }
+        $this->assertLessThan(0.6, $worst, "Answers too similar: {$worstPair} = " . round($worst, 2));
     }
 
     public function test_every_fixed_page_has_a_unique_title_and_description(): void

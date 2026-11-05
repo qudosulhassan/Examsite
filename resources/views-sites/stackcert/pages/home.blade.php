@@ -12,13 +12,14 @@
     $iconDir = ($currentSite && !empty($currentSite->favicon)) ? dirname($currentSite->favicon) : null;
     $orgLogo = ($iconDir && is_file(public_path($iconDir . '/android-chrome-512x512.png'))) ? asset($iconDir . '/android-chrome-512x512.png') : null;
 
+    // The same array prints the visible FAQ and feeds the FAQPage markup below. Wording differs from the /faq page.
     $faqs = [
-        ['q' => "What is {$brand}?", 'a' => "{$brand} provides practice questions, PDF study guides and a timed test engine for {$vendorName} certification exams. It is an independent exam-preparation site and is not affiliated with {$vendorName}."],
-        ['q' => "Which {$vendorName} exams are covered?", 'a' => "The catalog currently has {$examCount} {$vendorName} exams" . (count($trackTitles) ? ', including ' . implode(', ', $trackTitles) : '') . '. New exams are added to their track automatically as they are published.'],
-        ['q' => 'What is the difference between the PDF guide and the test engine?', 'a' => 'The PDF guide is a printable study guide you can read on any device. The test engine lets you practise online in timed exam mode or untimed practice mode, with instant scoring and a review of every answer. Many people buy both as a bundle.'],
-        ['q' => 'How do I get my material after I buy?', 'a' => 'Access is added to your account straight after payment. Sign in and open your dashboard to download your PDF guides or start the test engine.'],
-        ['q' => 'Can I try before I buy?', 'a' => 'Yes. Every exam page includes free practice questions you can answer straight away, and many exams also offer a free PDF sample and a demo of the test engine.'],
-        ['q' => "Are these official {$vendorName} materials?", 'a' => "No. {$brand} is not produced, endorsed or approved by {$vendorName}. The practice materials are not official exam content, so always use the vendor's own exam guide to confirm the skills measured."],
+        ['q' => "Where should I start if I am new to {$vendorName} certifications?", 'a' => "Begin with a fundamentals exam in the area you want to work in, such as AZ-900 for Azure, SC-900 for security, DP-900 for data or PL-900 for the Power Platform. They need no hands-on experience and teach the vocabulary the role-based exams assume."],
+        ['q' => "Which {$vendorName} exams can I practise for on {$brand}?", 'a' => "The catalog currently has {$examCount} {$vendorName} exams" . (count($trackTitles) ? ', including ' . implode(', ', $trackTitles) : '') . '. Browse by track or search for an exam code to open its guide, free questions and plans.'],
+        ['q' => 'Can I try an exam before I pay for anything?', 'a' => 'Yes. Every exam page links to free practice questions with explanations that you can answer straight away without an account, and many exams also have a demo of the test engine.'],
+        ['q' => 'How do the guide, the free questions and the paid plans fit together?', 'a' => "Read the exam guide first to see the skills and weightings. Answer the free questions to find your weak topics, then use a plan for the larger question bank, the timed test engine and the PDF study guide."],
+        ['q' => 'Will practice questions alone be enough to pass?', 'a' => "Practice questions show you what you know and what you do not, but they work best next to {$vendorName} Learn and hands-on time with the tools. Nothing can guarantee a pass, so use the questions to direct your study rather than to replace it."],
+        ['q' => "Is {$brand} an official {$vendorName} site?", 'a' => "No. {$brand} is an independent study site. It is not produced, endorsed or approved by {$vendorName}, and its practice material is not official exam content."],
     ];
 @endphp
 
