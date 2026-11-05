@@ -164,8 +164,8 @@
                 <div class="bg-white p-6 rounded-xl shadow border border-gray-100">
                     <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Search Articles</h3>
                     <form action="{{ route('blog.search') }}" method="GET" class="relative">
-                        <input type="text" name="q" value="{{ request('q') }}" placeholder="What are you looking for?" class="w-full pl-4 pr-10 py-3 rounded-lg border-gray-300 focus:ring-cyan focus:border-cyan text-sm" required>
-                        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-cyan">
+                        <input type="text" aria-label="Search the blog" name="q" value="{{ request('q') }}" placeholder="What are you looking for?" class="w-full pl-4 pr-10 py-3 rounded-lg border-gray-300 focus:ring-cyan focus:border-cyan text-sm" required>
+                        <button type="submit" aria-label="Search" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-cyan">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </button>
                     </form>
@@ -190,10 +190,10 @@
                             @csrf
                             <input type="hidden" name="source" value="blog_sidebar">
                             <div>
-                                <input type="text" name="first_name" placeholder="First Name" required class="w-full px-4 py-2.5 rounded-lg bg-gray-800 border-gray-700 text-white focus:ring-orange focus:border-orange placeholder-gray-500 text-sm">
+                                <input type="text" aria-label="First name" name="first_name" placeholder="First Name" required class="w-full px-4 py-2.5 rounded-lg bg-gray-800 border-gray-700 text-white focus:ring-orange focus:border-orange placeholder-gray-500 text-sm">
                             </div>
                             <div>
-                                <input type="email" name="email" placeholder="Email Address" required class="w-full px-4 py-2.5 rounded-lg bg-gray-800 border-gray-700 text-white focus:ring-orange focus:border-orange placeholder-gray-500 text-sm">
+                                <input type="email" aria-label="Email address" name="email" placeholder="Email Address" required class="w-full px-4 py-2.5 rounded-lg bg-gray-800 border-gray-700 text-white focus:ring-orange focus:border-orange placeholder-gray-500 text-sm">
                             </div>
                             <button type="submit" class="w-full bg-orange hover:bg-opacity-90 text-navy font-bold py-2.5 rounded-lg transition text-sm">
                                 Subscribe Now

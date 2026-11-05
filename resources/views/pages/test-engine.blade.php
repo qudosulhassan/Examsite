@@ -182,7 +182,7 @@
 
                     <input 
                         type="text" 
-                        name="q" 
+                        name="q" aria-label="Search exams" 
                         x-model="query"
                         @input.debounce.250ms="liveSearch()"
                         @focus="if(results.length) showDropdown = true"
