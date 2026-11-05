@@ -16,13 +16,16 @@
     $lowPrice = $priceList ? min($priceList) : null;
     $highPrice = $priceList ? max($priceList) : null;
 
-    $title = "{$code} {$examName} Exam Guide and Practice | {$brand}";
-    if (mb_strlen($title) > 62) {
-        $title = "{$code} Exam Guide: Skills, Format and Practice | {$brand}";
-    }
+    // Title: code + descriptive name when it fits in ~60 characters, else the code alone.
+    $shortName = trim(preg_replace('/^' . preg_quote($vendorName, '/') . '\s+/i', '', $examName));
+    $title = collect([
+        "{$code} {$shortName} Exam Guide and Prep | {$brand}",
+        "{$code} Exam Guide: Skills, Format and Prep | {$brand}",
+    ])->first(fn ($t) => mb_strlen($t) <= 60) ?? "{$code} Exam Guide | {$brand}";
     $h1 = "{$code}: {$examName} exam guide";
-    $lede = "What the {$code} exam covers, how to prepare, and where to practise with " . ($freeCount ? "{$freeCount} free questions with explanations" : 'practice questions') . ($bankCount > $freeCount ? " and a bank of {$bankCount}." : '.');
-    $description = \Illuminate\Support\Str::limit("{$code} {$examName}: exam overview, topics covered, how to prepare, and practice options" . ($freeCount ? " including {$freeCount} free questions with explanations" : '') . '.', 158);
+    // Opens with a plain definition so search and AI answers can quote it directly.
+    $lede = "{$code} is " . ($vendorName ? "{$vendorName}'s " : 'the ') . "{$examName} exam. This guide shows what it covers, how to prepare, and where to practise with " . ($freeCount ? "{$freeCount} free questions with explanations" : 'practice questions') . ($bankCount > $freeCount ? " and a bank of {$bankCount}." : '.');
+    $description = \Illuminate\Support\Str::limit("{$code} {$examName} exam guide: skills covered, how to prepare" . ($freeCount ? ", and {$freeCount} free practice questions with explanations" : ', and practice options') . '. Start free.', 158);
 
     // Topics: strings (plain list) or arrays with name/description/percentage (weights)
     $rawTopics = $exam->resolved_topics;
@@ -46,19 +49,31 @@
     if (!empty($track)) { $crumbs[] = ['name' => $track['title'], 'url' => route('tracks.show', $track['slug'])]; }
     $crumbs[] = ['name' => $code, 'url' => $exam->url];
 
-    $contentHtml = $exam->resolved_article_content;
+    // The long exam article is shared with the core site, so this site does not publish it
+    // (the same text on two domains is duplicate content). The page is built from the exam's own data.
 @endphp
 
 @section('title', $title)
 @section('meta_description', $description)
 @section('canonical_url', $exam->url)
 @section('og_type', 'product')
-@section('styles')
-    @include('partials.rich-content-styles')
-@endsection
 
 @section('seo_tags')
     @include('partials.schema-breadcrumbs', ['crumbs' => $crumbs])
+    <script type="application/ld+json">
+    {!! json_encode(array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'WebPage',
+        '@id' => $exam->url . '#webpage',
+        'name' => $title,
+        'url' => $exam->url,
+        'description' => $description,
+        'inLanguage' => 'en',
+        'dateModified' => $realUpdated ? $realUpdated->toAtomString() : null,
+        'isPartOf' => ['@type' => 'WebSite', 'name' => $brand, 'url' => url('/')],
+        'about' => ['@type' => 'Thing', 'name' => "{$code} {$examName}"],
+    ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
     <script type="application/ld+json">
     {!! json_encode(array_filter([
         '@context' => 'https://schema.org',
@@ -92,7 +107,7 @@
 
             {{-- At a glance --}}
             <section aria-labelledby="glance">
-                <h2 id="glance" class="text-2xl font-extrabold text-slate-900">{{ $code }} at a glance</h2>
+                <h2 id="glance" class="text-2xl font-extrabold text-slate-900">What is the {{ $code }} exam? At a glance</h2>
                 <dl class="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                     @foreach(array_filter([
                         'Exam code' => $code,
@@ -118,7 +133,7 @@
             {{-- Topics / skills --}}
             @if($topics->isNotEmpty())
             <section aria-labelledby="topics">
-                <h2 id="topics" class="text-2xl font-extrabold text-slate-900">{{ $hasWeights ? 'Skills measured' : 'Topics covered in our practice questions' }}</h2>
+                <h2 id="topics" class="text-2xl font-extrabold text-slate-900">{{ $hasWeights ? 'What skills does the ' . $code . ' exam measure?' : 'What topics does the ' . $code . ' exam cover?' }}</h2>
                 <ul class="mt-5 space-y-3">
                     @foreach($topics as $topic)
                         <li class="rounded-2xl border border-slate-200 bg-white p-5">
@@ -137,17 +152,9 @@
             </section>
             @endif
 
-            {{-- Study guide text written for this exam --}}
-            @if(!empty($contentHtml))
-            <section aria-labelledby="study-guide">
-                <h2 id="study-guide" class="text-2xl font-extrabold text-slate-900">{{ $code }} study guide</h2>
-                <div class="blog-content-body prose prose-slate mt-5 max-w-none rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">{!! $contentHtml !!}</div>
-            </section>
-            @endif
-
             {{-- How to prepare --}}
             <section aria-labelledby="prepare">
-                <h2 id="prepare" class="text-2xl font-extrabold text-slate-900">How to prepare for {{ $code }}</h2>
+                <h2 id="prepare" class="text-2xl font-extrabold text-slate-900">How do you prepare for {{ $code }}?</h2>
                 <ol class="mt-5 grid gap-4 sm:grid-cols-3">
                     <li class="rounded-2xl border border-slate-200 bg-white p-5">
                         <span class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-extrabold text-white" style="background: var(--brand);">1</span>
