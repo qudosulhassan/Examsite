@@ -19,6 +19,11 @@ class AdminMiddleware
             return $next($request);
         }
 
+        // SEO Manager: only the Technical SEO Center (its pages and its save/regenerate buttons)
+        if (auth()->check() && auth()->user()->isActive() && auth()->user()->can('manage-seo') && $request->is('admin/settings/seo', 'admin/settings/seo/*', 'admin/seo')) {
+            return $next($request);
+        }
+
         return redirect('/')->with('error', 'Access denied. You do not have administrator privileges.');
     }
 }
