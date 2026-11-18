@@ -442,8 +442,10 @@ class Exam extends Model
     public function getResolvedFaqsAttribute(): array
     {
         $faqs = $this->resolvedFaqsFromData();
+        $faqs = !empty($faqs) ? $faqs : \App\Support\ExamFaqFallback::for($this);
 
-        return !empty($faqs) ? $faqs : \App\Support\ExamFaqFallback::for($this);
+        // add the questions people search for (passing score, cost, objectives, free practice test, study) if missing
+        return \App\Support\ExamSectionOptimizer::mergeFaqs($this, $faqs);
     }
 
     private function resolvedFaqsFromData(): array

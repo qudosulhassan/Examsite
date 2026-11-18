@@ -540,7 +540,7 @@
                 <!-- Comprehensive Exam Article & Study Guide -->
                 <div id="exam-details" class="scroll-mt-32 bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
                     <div class="blog-content-body prose prose-base sm:prose-lg prose-cyan max-w-none text-gray-700 leading-relaxed">
-                        {!! \App\Support\InternalLinker::linkHtml((string) $renderedArticleContent, $exam) !!}
+                        {!! \App\Support\InternalLinker::linkHtml(\App\Support\ExamSectionOptimizer::optimizeArticle((string) $renderedArticleContent, $exam), $exam) !!}
                     </div>
                 </div>
                 @endif
@@ -554,7 +554,7 @@
                             <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-cyan/10 transition-colors">
                                 <svg class="w-5 h-5 text-gray-400 group-hover:text-cyan transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                             </div>
-                            <span>Blueprinted Exam Topics Covered</span>
+                            <span>{{ \App\Support\ExamSectionOptimizer::topicsHeading($exam) }}</span>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-gray-50 group-hover:bg-cyan/10 flex items-center justify-center transition-colors">
                             <svg class="h-6 w-6 text-gray-400 group-hover:text-cyan transition duration-300" :class="open ? 'transform rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -570,7 +570,7 @@
                         
                         <div class="absolute top-0 right-0 w-32 h-32 bg-cyan/5 rounded-bl-full pointer-events-none"></div>
 
-                        <p class="text-base font-normal text-gray-600 mb-8 relative z-10">The study guide addresses all core domains defined in the official vendor certification syllabus:</p>
+                        <p class="text-base font-normal text-gray-600 mb-8 relative z-10">{{ \App\Support\ExamSectionOptimizer::topicsIntro($exam) }}</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 text-base font-normal text-gray-700 relative z-10">
                             @if(is_array($examTopics))
                                 @foreach($examTopics as $topic)
@@ -607,8 +607,8 @@
                 <div id="exam-faq" class="scroll-mt-32 space-y-6 pt-4" x-data="{ activeFaq: null }">
                     <div class="text-center mb-8">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-3 inline-block">Got Questions?</span>
-                        <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Frequently Asked Questions</h2>
-                        <p class="text-base sm:text-lg text-gray-600 font-normal max-w-2xl mx-auto mt-2">Everything you need to know about the {{ $exam->exam_code }} certification exam, preparation materials, and practice resources.</p>
+                        <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">{{ $exam->exam_code }} FAQs: Passing Score, Cost, Exam Objectives and Practice Tests</h2>
+                        <p class="text-base sm:text-lg text-gray-600 font-normal max-w-2xl mx-auto mt-2">Answers about the {{ $exam->exam_code }} passing score, exam cost, objectives, study guide and free practice test.</p>
                     </div>
 
                     <div class="space-y-4 max-w-4xl mx-auto">

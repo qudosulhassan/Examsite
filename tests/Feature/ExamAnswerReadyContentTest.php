@@ -64,6 +64,8 @@ class ExamAnswerReadyContentTest extends TestCase
         $schema = $this->faqSchema($html);
         $this->assertNotNull($schema);
         $this->assertContains('What is the 200-301 exam?', array_column($schema['mainEntity'], 'name'));
-        $this->assertNotContains('What is the passing score for 200-301?', array_column($schema['mainEntity'], 'name'));
+        // the passing-score question is answered for every exam, but Microsoft's 700 figure never appears on a Cisco page
+        $this->assertContains('What is the passing score for 200-301?', array_column($schema['mainEntity'], 'name'));
+        $this->assertStringNotContainsString('700', json_encode($schema));
     }
 }
