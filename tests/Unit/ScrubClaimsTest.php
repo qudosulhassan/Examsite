@@ -22,6 +22,12 @@ class ScrubClaimsTest extends TestCase
         $this->assertStringContainsString('under exam conditions', $out);
     }
 
+    public function test_exam_code_between_the_words_is_handled(): void
+    {
+        $out = ScrubClaims::clean('<p>How closely do these real AZ-900 exam questions match? Actual 300-435 exams vary.</p>');
+        $this->assertSame('<p>How closely do these AZ-900 exam questions match? 300-435 exams vary.</p>', $out);
+    }
+
     public function test_technical_terms_in_practice_questions_are_left_alone(): void
     {
         $in = '<p>Which tool analyses core dumps and database dumps? Take a memory dump, then review crash dumps.</p>';

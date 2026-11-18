@@ -49,6 +49,8 @@ class ScrubClaims
         $html = preg_replace('/\bbraindumps?\b/i', 'practice questions', $html);
         // "AZ-900 dumps" -> "AZ-900 practice questions"
         $html = preg_replace('/\b([A-Za-z]{0,4}-?\d{2,4}(?:-[A-Za-z0-9]+)?)\s+dumps\b/', '$1 practice questions', $html);
+        // "real AZ-900 exam questions" -> "AZ-900 exam questions"
+        $html = preg_replace('/\b(?:real|actual)\s+([A-Za-z]{0,4}-?\d{2,4}[A-Za-z0-9_-]*\s+exams?)\b/i', '$1', $html);
         // "real exam", "actual exams" -> "exam", "exams"
         $html = preg_replace_callback('/\b(?:real|actual)\s+(exams?)\b/i', function ($m) {
             return static::keepCase($m[1], $m[0]);
