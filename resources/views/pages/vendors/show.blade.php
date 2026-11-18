@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', $vendor->meta_title ?? \App\Support\ExamKeywordPlan::forVendor((string) $vendor->name, 'ExamTopicsBase', (int) ($vendor->exam_count ?? 0))['title'])
-@section('meta_description', $vendor->meta_description ?? \App\Support\ExamKeywordPlan::forVendor((string) $vendor->name, 'ExamTopicsBase', (int) ($vendor->exam_count ?? 0))['description'])
+@section('title', \App\Services\SiteContext::rebrandTemplate((string) ($vendor->meta_title ?? \App\Support\ExamKeywordPlan::forVendor((string) $vendor->name, 'ExamTopicsBase', (int) ($vendor->exam_count ?? 0))['title'])))
+@section('meta_description', \App\Services\SiteContext::rebrandTemplate((string) ($vendor->meta_description ?? \App\Support\ExamKeywordPlan::forVendor((string) $vendor->name, 'ExamTopicsBase', (int) ($vendor->exam_count ?? 0))['description'])))
 @section('canonical_url', route('vendors.show', $vendor->slug))
 @section('og_type', 'website')
 
