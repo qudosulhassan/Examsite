@@ -38,7 +38,7 @@ class ApplyExamKeywordSeo extends Command
         $auto = $this->autocomplete();
         $only = array_filter(array_map('trim', explode(',', (string) $this->option('only'))));
 
-        $query = Exam::withoutGlobalScopes()->with('vendor')->withCount('questions')->where('is_active', true);
+        $query = Exam::withoutGlobalScopes()->with('vendor')->withCount(['questions as questions_count' => fn ($q) => $q->where('is_active', true)])->where('is_active', true);
         if ($only) {
             $query->whereIn('slug', $only);
         }
@@ -83,7 +83,8 @@ class ApplyExamKeywordSeo extends Command
             $vendors = \App\Models\Vendor::withoutGlobalScopes()->where('is_active', true)
                 ->withCount(['exams' => fn ($q) => $q->where('is_active', true)])->get();
             foreach ($vendors as $vendor) {
-                $plan = ExamKeywordPlan::forVendor((string) $vendor->name, $brand, (int) $vendor->exams_count);
+                $withQ = \App\Models\Exam::withoutGlobalScopes()->where('vendor_id', $vendor->id)->where('is_active', true)->whereHas('questions', fn ($q) => $q->where('is_active', true))->count();
+                $plan = ExamKeywordPlan::forVendor((string) $vendor->name, $brand, (int) $vendor->exams_count, $withQ);
                 $old = ['meta_title' => $vendor->meta_title, 'meta_description' => $vendor->meta_description];
                 $new = ['meta_title' => $plan['title'], 'meta_description' => $plan['description']];
                 if ($old !== $new) {
@@ -102,7 +103,7 @@ class ApplyExamKeywordSeo extends Command
 
                 return -(int) $v->exams_count;
             })->take(3)->pluck('name')->all();
-            $home = ExamKeywordPlan::forHome($brand, $exams->count(), $top);
+            $home = ExamKeywordPlan::forHome($brand, $exams->count(), $top, $exams->where('questions_count', '>', 0)->count());
             $homeBackup = [
                 'default_seo_title' => \App\Models\Setting::get('default_seo_title'),
                 'default_meta_description' => \App\Models\Setting::get('default_meta_description'),

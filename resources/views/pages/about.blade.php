@@ -28,7 +28,7 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-b border-gray-150 py-8">
             <div class="text-center">
                 <span class="block text-3xl font-extrabold text-cyan">{{ number_format(floor(\App\Models\Exam::where('is_active', true)->count() / 100) * 100) }}+</span>
-                <span class="text-xs font-semibold text-gray-400 uppercase">Exams</span>
+                <span class="text-xs font-semibold text-gray-400 uppercase">Exam Guides</span>
             </div>
             <div class="text-center">
                 <span class="block text-3xl font-extrabold text-cyan">Free</span>

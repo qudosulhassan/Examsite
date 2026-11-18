@@ -16,7 +16,9 @@ class LlmsTxtTest extends TestCase
     {
         Cache::flush();
         $vendor = Vendor::create(['name' => 'Microsoft', 'slug' => 'microsoft', 'is_active' => true]);
-        Exam::factory()->create(['vendor_id' => $vendor->id, 'exam_code' => 'AZ-900', 'exam_name' => 'Microsoft Azure Fundamentals', 'slug' => 'az-900', 'is_active' => true]);
+        $exam = Exam::factory()->create(['vendor_id' => $vendor->id, 'exam_code' => 'AZ-900', 'exam_name' => 'Microsoft Azure Fundamentals', 'slug' => 'az-900', 'is_active' => true]);
+        \App\Models\Question::create(['exam_id' => $exam->id, 'question_type' => 'single_choice', 'question_text' => 'Q?', 'is_active' => true, 'status' => 'published']);
+        Exam::factory()->create(['vendor_id' => $vendor->id, 'exam_code' => 'ZZ-100', 'exam_name' => 'No Questions Yet', 'slug' => 'zz-100', 'is_active' => true]);
 
         $res = $this->get('/llms.txt')->assertOk();
         $this->assertStringStartsWith('text/plain', $res->headers->get('Content-Type'));
@@ -25,6 +27,7 @@ class LlmsTxtTest extends TestCase
         $this->assertStringContainsString('not affiliated with', $body);
         $this->assertStringContainsString('AZ-900 Microsoft Azure Fundamentals', $body);
         $this->assertStringContainsString('/vendors/microsoft', $body);
+        $this->assertStringNotContainsString('ZZ-100', $body, 'exams with no practice questions are not listed as popular exams');
         $this->assertStringNotContainsStringIgnoringCase('dumps', $body);
     }
 }

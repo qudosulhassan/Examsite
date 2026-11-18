@@ -174,7 +174,7 @@
         <div class="flex flex-wrap justify-center gap-4 text-xs sm:text-sm font-semibold tracking-wide text-gray-200">
             <div class="bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full flex items-center space-x-2 shadow-lg">
                 <span class="text-cyan text-lg">✦</span>
-                <span>{{ $examLabel }} Exams</span>
+                <span>{{ $examLabel }} Exam Guides</span>
             </div>
             <div class="bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full flex items-center space-x-2 shadow-lg">
                 <span class="text-cyan text-lg">✦</span>
@@ -202,7 +202,7 @@
             </div>
             <div class="px-4">
                 <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">{{ $examLabel }}</div>
-                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">Certification Exams</div>
+                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">Exam Guides</div>
             </div>
             <div class="px-4">
                 <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">Free</div>
@@ -345,7 +345,7 @@
                     </svg>
                 </div>
                 <h3 class="text-2xl font-black text-white tracking-tight">1. Locate Your Exam</h3>
-                <p class="text-gray-400 text-sm leading-relaxed max-w-xs mx-auto">Search our library of {{ $examLabel }} IT certification exams from vendors such as Microsoft, Cisco and Amazon.</p>
+                <p class="text-gray-400 text-sm leading-relaxed max-w-xs mx-auto">Search our library of {{ $examLabel }} IT certification exam guides from vendors such as Microsoft, Cisco and Amazon.</p>
             </div>
 
             <div class="text-center space-y-5 relative group">

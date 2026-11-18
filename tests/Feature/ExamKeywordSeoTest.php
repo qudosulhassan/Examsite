@@ -72,6 +72,8 @@ class ExamKeywordSeoTest extends TestCase
             'meta_title' => 'Latest Microsoft AZ-900 Actual Practice Questions | ExamTopicsBase', 'meta_description' => 'old description with real exam questions', 'header_title' => 'Old H1',
         ]);
 
+        \App\Models\Question::create(['exam_id' => $exam->id, 'question_type' => 'single_choice', 'question_text' => 'Q?', 'is_active' => true, 'status' => 'published']);
+
         Artisan::call('exams:apply-keyword-seo', ['--dry-run' => true]);
         $this->assertSame('Old H1', $exam->fresh()->header_title);
 
@@ -89,6 +91,27 @@ class ExamKeywordSeoTest extends TestCase
         $this->assertSame('old description with real exam questions', $exam->fresh()->meta_description);
 
         @unlink($backup);
+    }
+
+    public function test_an_exam_without_questions_is_never_described_as_a_practice_test(): void
+    {
+        $p = ExamKeywordPlan::forExam(['code' => 'ADM-201', 'name' => 'Administration Essentials for New Admins', 'vendor' => 'Salesforce'], 'ExamTopicsBase', 0);
+        foreach ([$p['title'], $p['description'], $p['h1']] as $text) {
+            $this->assertDoesNotMatchRegularExpression('/practice test|practice questions and answers|free sample|test engine|questions and answers/i', $text, $text);
+            $this->assertStringContainsString('ADM-201', $text);
+        }
+        $this->assertLessThanOrEqual(60, mb_strlen($p['title']));
+        $this->assertLessThanOrEqual(158, mb_strlen($p['description']));
+        $this->assertStringContainsString('not available', $p['description']);
+
+        $with = ExamKeywordPlan::forExam(['code' => 'ADM-201', 'name' => 'Administration Essentials for New Admins', 'vendor' => 'Salesforce'], 'ExamTopicsBase', 120);
+        $this->assertStringContainsString('Practice Test', $with['title']);
+
+        $v = ExamKeywordPlan::forVendor('Salesforce', 'ExamTopicsBase', 100, 0);
+        $this->assertDoesNotMatchRegularExpression('/practice test|free sample/i', $v['title'] . $v['description']);
+        $h = ExamKeywordPlan::forHome('ExamTopicsBase', 834, ['Microsoft', 'Cisco'], 102);
+        $this->assertStringContainsString('100+', $h['description']);
+        $this->assertStringContainsString('800+', $h['description']);
     }
 
     public function test_exam_structured_data_has_no_dumps_wording_and_no_vendor_as_provider(): void

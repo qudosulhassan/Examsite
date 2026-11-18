@@ -37,10 +37,17 @@ class ExamFaqFallback
             ];
         }
 
-        $faqs[] = [
-            'question' => "Is there a free {$code} practice test?",
-            'answer' => "Yes. Request a free PDF sample of {$code} practice questions on the free sample page, or try the timed test engine. The full question set for {$label} comes with the plans shown on this page.",
-        ];
+        if ($questions > 0) {
+            $faqs[] = [
+                'question' => "Is there a free {$code} practice test?",
+                'answer' => "Yes. Request a free PDF sample of {$code} practice questions on the free sample page, or try the timed test engine. The full question set for {$label} comes with the plans shown on this page.",
+            ];
+        } else {
+            $faqs[] = [
+                'question' => "Are {$code} practice questions available?",
+                'answer' => "Not yet. {$site} does not have practice questions for {$label} at the moment. This page has the exam details we hold and links to the official exam pages.",
+            ];
+        }
 
         $faqs[] = [
             'question' => "Are these official {$code} exam questions?",
@@ -49,7 +56,7 @@ class ExamFaqFallback
 
         $faqs[] = [
             'question' => "How should I prepare for {$code}?",
-            'answer' => "Read the official study guide for {$code}, practise with the questions in timed sessions, review every answer you miss, and repeat until you score consistently well. Our blog has study guides for many exams.",
+            'answer' => "Read the official study guide for {$code}, practise with exam-style questions in timed sessions when you have them, review every answer you miss, and repeat until you score consistently well. Our blog has study guides for some exams.",
         ];
 
         // Microsoft publishes one passing score for its exams (checked against Microsoft Learn).

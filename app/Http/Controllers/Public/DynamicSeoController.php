@@ -157,15 +157,16 @@ class DynamicSeoController extends Controller
         $cacheKey = 'llms_txt_' . (int) config('site.id', 1) . '_' . md5($host);
 
         $text = Cache::remember($cacheKey, 3600, function () use ($host, $brand) {
-            $exams = \App\Models\Exam::where('is_active', true)->with('vendor')->withCount('questions')
-                ->orderByDesc('questions_count')->limit(30)->get();
+            $exams = \App\Models\Exam::where('is_active', true)->whereHas('questions', fn ($q) => $q->where('is_active', true))
+                ->with('vendor')->withCount('questions')->orderByDesc('questions_count')->limit(30)->get();
             $vendors = \App\Models\Vendor::where('is_active', true)->orderByDesc('exam_count')->limit(12)->get();
             $examTotal = \App\Models\Exam::where('is_active', true)->count();
+            $withQuestions = \App\Models\Exam::where('is_active', true)->whereHas('questions', fn ($q) => $q->where('is_active', true))->count();
 
             $lines = [
                 "# {$brand}",
                 '',
-                "> {$brand} offers practice tests, practice questions and study guides for {$examTotal} IT certification exams. It also has a free sample for each exam and an online timed test engine. It is independent study material: it is not affiliated with, endorsed by or sponsored by any certification vendor, and it is not official exam content.",
+                "> {$brand} has exam guides for {$examTotal} IT certification exams and practice questions for {$withQuestions} of them, with free samples and an online timed test engine where questions exist. It is independent study material: it is not affiliated with, endorsed by or sponsored by any certification vendor, and it is not official exam content.",
                 '',
                 '## Main pages',
                 "- [Home]({$host}/): overview of the practice tests and certification vendors",

@@ -187,6 +187,8 @@ class ExamArticleContentTest extends TestCase
 
         $response = $this->get('/exams/comptia/sk0-005');
         $response->assertStatus(200);
-        $response->assertSee('Standard overview only.');
+        $response->assertDontSee('id="exam-details"', false);   // no article, so no details block
+        // an exam with no practice questions gets no "InStock" product markup
+        $this->assertStringNotContainsString('"@type": "Product"', $response->getContent());
     }
 }
