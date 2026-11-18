@@ -41,7 +41,9 @@ class AuditExamContent extends Command
         $backup = [];
         $found = 0;
         foreach (Exam::withoutGlobalScopes()->where('is_active', true)->whereNotNull('article_content')->get() as $exam) {
-            if (!preg_match('/Exam Duration\s*<\/t[dh]>\s*<t[dh][^>]*>\s*(\d{2,3})\s*min/i', (string) $exam->article_content, $m)) {
+            // cells hold nested tags (<p><span><strong>), so compare on the text with a separator between cells
+            $cells = strip_tags(str_replace(['</td>', '</th>'], ' | ', (string) $exam->article_content));
+            if (!preg_match('/Exam Duration\s*\|\s*(\d{2,3})\s*min/i', $cells, $m)) {
                 continue;
             }
             $table = $m[1];
