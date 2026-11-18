@@ -11,10 +11,10 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Are these real exam questions?",
+      "name": "Are these questions copied from the vendors' exams?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Our practice test materials are compiled by certified IT professionals who collect and verify real questions from actual exams. We review and update our databases monthly to ensure maximum accuracy."
+        "text": "No. Our practice questions are study material that follows the skills each vendor lists for the exam. They are not official exam content, and we do not copy or publish questions from the vendors' exams. We review and update them when vendors change their exam outlines."
       }
     },
     {
@@ -93,7 +93,7 @@
             Frequently Asked Questions
         </h1>
         <p class="text-lg text-gray-300 max-w-2xl mx-auto">
-            Got questions about our exam dumps, PDF guides, or the test engine? Find answers below.
+            Got questions about our practice tests, PDF guides, or the test engine? Find answers below.
         </p>
     </div>
 </section>
@@ -106,13 +106,13 @@
         <div class="border border-gray-200 rounded-lg overflow-hidden">
             <button @click="activeIndex = activeIndex === 1 ? null : 1" 
                     class="w-full flex justify-between items-center p-5 text-left font-bold text-navy bg-gray-50 focus:outline-none">
-                <span>Are these real exam questions?</span>
+                <span>Are these questions copied from the vendors' exams?</span>
                 <svg class="h-5 w-5 transition duration-200" :class="activeIndex === 1 ? 'transform rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
             <div x-show="activeIndex === 1" class="p-5 text-sm text-gray-600 leading-relaxed border-t border-gray-250" style="display: none;">
-                Yes. Our practice test materials are compiled by certified IT professionals who collect and verify real questions from actual exams. We review and update our databases monthly to ensure maximum accuracy.
+                No. Our practice questions are study material that follows the skills each vendor lists for the exam. They are not official exam content, and we do not copy or publish questions from the vendors' exams. We review and update them when vendors change their exam outlines.
             </div>
         </div>
 

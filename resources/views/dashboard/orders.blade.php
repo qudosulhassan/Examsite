@@ -40,7 +40,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 p-4 bg-gray-50 dark:bg-gray-750 border border-gray-200 dark:border-gray-700 rounded-lg">
                 <div>
                     <h4 class="text-sm font-bold text-navy dark:text-white">No active subscription plan found.</h4>
-                    <p class="text-xs text-gray-500 mt-1">Unlock browser-based exam simulator access for all 3,500+ certification guides.</p>
+                    <p class="text-xs text-gray-500 mt-1">Unlock browser-based exam simulator access for every certification guide.</p>
                 </div>
                 <a href="{{ url('/pricing') }}" class="bg-orange hover:bg-opacity-95 text-white text-xs font-bold py-2.5 px-6 rounded shadow transition">
                     View Pricing Plans

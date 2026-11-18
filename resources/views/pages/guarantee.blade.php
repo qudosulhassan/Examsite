@@ -27,7 +27,7 @@
         <div class="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm font-semibold text-gray-300" style="color: #cbd5e1 !important;">
             <span class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                99.6% First-Attempt Pass Rate
+                Written refund policy
             </span>
             <span class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-cyan"></span>

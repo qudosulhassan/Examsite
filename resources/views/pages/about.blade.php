@@ -27,20 +27,20 @@
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-b border-gray-150 py-8">
             <div class="text-center">
-                <span class="block text-3xl font-extrabold text-cyan">3,500+</span>
-                <span class="text-xs font-semibold text-gray-400 uppercase">Active Exams</span>
+                <span class="block text-3xl font-extrabold text-cyan">{{ number_format(floor(\App\Models\Exam::where('is_active', true)->count() / 100) * 100) }}+</span>
+                <span class="text-xs font-semibold text-gray-400 uppercase">Exams</span>
             </div>
             <div class="text-center">
-                <span class="block text-3xl font-extrabold text-cyan">200K+</span>
-                <span class="text-xs font-semibold text-gray-400 uppercase">Students Passed</span>
+                <span class="block text-3xl font-extrabold text-cyan">Free</span>
+                <span class="text-xs font-semibold text-gray-400 uppercase">Sample Questions</span>
             </div>
             <div class="text-center">
-                <span class="block text-3xl font-extrabold text-cyan">99.6%</span>
-                <span class="text-xs font-semibold text-gray-400 uppercase">Success Rate</span>
+                <span class="block text-3xl font-extrabold text-cyan">PDF + Online</span>
+                <span class="text-xs font-semibold text-gray-400 uppercase">Study Formats</span>
             </div>
             <div class="text-center">
-                <span class="block text-3xl font-extrabold text-cyan">17+</span>
-                <span class="text-xs font-semibold text-gray-400 uppercase">Core Vendors</span>
+                <span class="block text-3xl font-extrabold text-cyan">{{ \App\Models\Vendor::where('is_active', true)->count() }}</span>
+                <span class="text-xs font-semibold text-gray-400 uppercase">Vendors</span>
             </div>
         </div>
 

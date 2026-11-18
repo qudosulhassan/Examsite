@@ -7,16 +7,20 @@
 @endphp
 
 @php
+    // Numbers shown on the page come from the catalogue itself (this site's exams and vendors), rounded down.
+    $examTotal = (int) \Illuminate\Support\Facades\Cache::remember('home_exam_total_' . config('site.id', 1), 3600, fn () => \App\Models\Exam::where('is_active', true)->count());
+    $examLabel = $examTotal >= 100 ? number_format(floor($examTotal / 100) * 100) . '+' : (string) $examTotal;
+    $vendorTotal = (int) \Illuminate\Support\Facades\Cache::remember('home_vendor_total_' . config('site.id', 1), 3600, fn () => \App\Models\Vendor::where('is_active', true)->count());
     $homeFaqs = [
         ['q' => 'What is ExamTopicsBase?', 'a' => 'ExamTopicsBase provides up-to-date study guides and practice test software to help you master essential exam topics and pass your IT certification on the first try.'],
         ['q' => 'Are free practice questions available before buying?', 'a' => 'Yes, we offer free practice questions on selected certification pages so you can test our content quality before making a purchase.'],
-        ['q' => 'Does ExamTopicsBase offer real exam questions?', 'a' => 'Yes, our preparation materials feature real exam questions sourced directly from updated IT vendor certification pools.'],
-        ['q' => 'How does the web-based practice test engine work?', 'a' => 'Our online test engine simulates the real exam environment with timed modes, instant scoring, and clear explanations across all core exam topics.'],
+        ['q' => 'Does ExamTopicsBase offer exam questions?', 'a' => 'We offer practice questions that follow the skills each vendor lists for the exam, with answers. They are study material and not official exam content.'],
+        ['q' => 'How does the web-based practice test engine work?', 'a' => 'Our online test engine mirrors the exam format with timed modes, instant scoring and answers across the core exam topics.'],
         ['q' => 'What payment methods do you accept?', 'a' => 'We accept major credit cards, including Visa, MasterCard, and American Express, as well as PayPal and encrypted online payments.'],
         ['q' => 'Do you offer a 100% pass guarantee?', 'a' => 'Yes, we offer a 100% pass guarantee on our premium practice materials covering all official exam topics.'],
         ['q' => 'What is your refund policy?', 'a' => 'If you study our guides and do not pass your official exam, send us your score report within 30 days of purchase for a 100% refund.'],
         ['q' => 'How fast do I get access to my purchase?', 'a' => 'You get instant access to your downloadable PDF study guides and free practice questions right after completing payment.'],
-        ['q' => 'Can I access ExamTopicsBase on my phone or tablet?', 'a' => 'Yes, you can read PDF study materials and solve real exam questions on any smartphone, tablet, or web browser.'],
+        ['q' => 'Can I access ExamTopicsBase on my phone or tablet?', 'a' => 'Yes, you can read PDF study materials and solve practice questions on any smartphone, tablet, or web browser.'],
         ['q' => 'How often are exam topics and questions updated?', 'a' => 'We update our question banks continuously whenever vendor blueprints change so you always practice with current exam topics.'],
     ];
     $homeFaqSchema = [
@@ -170,15 +174,15 @@
         <div class="flex flex-wrap justify-center gap-4 text-xs sm:text-sm font-semibold tracking-wide text-gray-200">
             <div class="bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full flex items-center space-x-2 shadow-lg">
                 <span class="text-cyan text-lg">✦</span>
-                <span>3,500+ Exams</span>
+                <span>{{ $examLabel }} Exams</span>
             </div>
             <div class="bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full flex items-center space-x-2 shadow-lg">
                 <span class="text-cyan text-lg">✦</span>
-                <span>200,000+ Students</span>
+                <span>Free Sample Questions</span>
             </div>
             <div class="bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full flex items-center space-x-2 shadow-lg">
                 <span class="text-cyan text-lg">✦</span>
-                <span>99.6% Pass Rate</span>
+                <span>Timed Test Engine</span>
             </div>
             <div class="bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full flex items-center space-x-2 shadow-lg">
                 <span class="text-cyan text-lg">✦</span>
@@ -193,20 +197,20 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/10">
             <div class="px-4">
-                <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">99.8%</div>
-                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">First-Attempt Pass Rate</div>
+                <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">{{ $vendorTotal }}</div>
+                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">Certification Vendors</div>
             </div>
             <div class="px-4">
-                <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">3,500+</div>
-                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">Active Certification Exams</div>
+                <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">{{ $examLabel }}</div>
+                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">Certification Exams</div>
             </div>
             <div class="px-4">
-                <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">250k+</div>
-                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">Successful Students</div>
+                <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">Free</div>
+                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">Sample Questions</div>
             </div>
             <div class="px-4">
-                <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">24/7</div>
-                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">Expert Technical Support</div>
+                <div class="text-4xl font-black text-cyan mb-2 drop-shadow-[0_0_15px_rgba(0,212,170,0.3)]">PDF + Online</div>
+                <div class="text-xs font-bold tracking-widest text-gray-400 uppercase">Study Formats</div>
             </div>
         </div>
     </div>
@@ -341,7 +345,7 @@
                     </svg>
                 </div>
                 <h3 class="text-2xl font-black text-white tracking-tight">1. Locate Your Exam</h3>
-                <p class="text-gray-400 text-sm leading-relaxed max-w-xs mx-auto">Search from our library of 3,500+ IT certification exams covering AWS, Microsoft, Cisco, CompTIA, and more.</p>
+                <p class="text-gray-400 text-sm leading-relaxed max-w-xs mx-auto">Search our library of {{ $examLabel }} IT certification exams from vendors such as Microsoft, Cisco and Amazon.</p>
             </div>
 
             <div class="text-center space-y-5 relative group">
@@ -486,7 +490,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-20">
             <h2 class="text-3xl font-black text-white sm:text-4xl mb-4 tracking-tight">What Our Students Say</h2>
-            <p class="text-lg text-gray-400 max-w-2xl mx-auto">Over 200,000 students successfully certified using our study materials.</p>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">Read what candidates say about our study materials.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">

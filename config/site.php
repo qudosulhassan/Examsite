@@ -77,4 +77,7 @@ return [
 
     'exam_url_style' => env('EXAM_URL_STYLE', 'prefixed'),
 
+
+    // Rewrite "exam dumps" / "real exam" wording that comes from the database (SITE_CLEAN_CLAIMS=true)
+    'clean_claims' => (bool) env('SITE_CLEAN_CLAIMS', false),
 ];

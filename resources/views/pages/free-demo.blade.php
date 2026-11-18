@@ -36,7 +36,7 @@
             <ul class="space-y-6 text-[13px] text-navy font-bold mb-8 flex-1">
                 <li class="flex items-start">
                     <div class="mt-0.5 bg-cyan/10 p-1 rounded-md text-cyan mr-4"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
-                    <span class="leading-relaxed">10 real exam questions with multiple-choice options</span>
+                    <span class="leading-relaxed">10 practice questions with multiple-choice options</span>
                 </li>
                 <li class="flex items-start">
                     <div class="mt-0.5 bg-cyan/10 p-1 rounded-md text-cyan mr-4"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>

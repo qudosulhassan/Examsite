@@ -17,7 +17,7 @@ class HomepageFaqTest extends TestCase
         foreach ([
             'What is ExamTopicsBase?',
             'Are free practice questions available before buying?',
-            'Does ExamTopicsBase offer real exam questions?',
+            'Does ExamTopicsBase offer exam questions?',
             'How does the web-based practice test engine work?',
             'What payment methods do you accept?',
             'Do you offer a 100% pass guarantee?',

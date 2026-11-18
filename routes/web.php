@@ -66,6 +66,7 @@ Route::post('/free-demo', [DemoController::class, 'request'])->name('free-demo.r
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/api/search', [SearchController::class, 'liveSearch']);
 Route::get('/sitemap.xml', [App\Http\Controllers\Public\DynamicSeoController::class, 'sitemap'])->name('sitemap');
+Route::get('/llms.txt', [App\Http\Controllers\Public\DynamicSeoController::class, 'llms'])->name('llms.txt');
 Route::get('/robots.txt', [App\Http\Controllers\Public\DynamicSeoController::class, 'robots'])->name('robots.txt');
 
 // --- Blog ---

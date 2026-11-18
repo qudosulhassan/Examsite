@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-6 text-center">
         <h1 class="text-2xl font-black text-gray-900 dark:text-white">Create Your Account</h1>
-        <p class="text-xs text-gray-500 mt-1">Start practicing with 3,500+ verified certification exams</p>
+        <p class="text-xs text-gray-500 mt-1">Start practicing with hundreds of certification exams</p>
     </div>
 
     <form method="POST" action="{{ route('register') }}">

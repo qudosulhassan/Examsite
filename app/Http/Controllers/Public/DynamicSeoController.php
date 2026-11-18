@@ -146,6 +146,59 @@ class DynamicSeoController extends Controller
     }
 
     /**
+     * /llms.txt: a plain-text guide for AI assistants (what the site is, its main pages, its best exam pages).
+     * Built per site from the catalogue, so every site describes itself and only lists pages it really has.
+     */
+    public function llms(Request $request): Response
+    {
+        $host = rtrim($request->getSchemeAndHttpHost(), '/');
+        $site = app()->bound('current_site') ? app('current_site') : null;
+        $brand = $site ? $site->name : config('app.name');
+        $cacheKey = 'llms_txt_' . (int) config('site.id', 1) . '_' . md5($host);
+
+        $text = Cache::remember($cacheKey, 3600, function () use ($host, $brand) {
+            $exams = \App\Models\Exam::where('is_active', true)->with('vendor')->withCount('questions')
+                ->orderByDesc('questions_count')->limit(30)->get();
+            $vendors = \App\Models\Vendor::where('is_active', true)->orderByDesc('exam_count')->limit(12)->get();
+            $examTotal = \App\Models\Exam::where('is_active', true)->count();
+
+            $lines = [
+                "# {$brand}",
+                '',
+                "> {$brand} offers practice tests, practice questions and study guides for {$examTotal} IT certification exams. It also has a free sample for each exam and an online timed test engine. It is independent study material: it is not affiliated with, endorsed by or sponsored by any certification vendor, and it is not official exam content.",
+                '',
+                '## Main pages',
+                "- [Home]({$host}/): overview of the practice tests and certification vendors",
+                "- [Vendors]({$host}/vendors): every certification vendor and its exams",
+                "- [Free sample]({$host}/free-demo): request a free sample of practice questions",
+                "- [Test engine]({$host}/test-engine): timed practice sessions in the browser",
+                "- [Blog]({$host}/blog): study guides, certification news and exam preparation tips",
+                "- [FAQ]({$host}/faq): answers about the material, access and refunds",
+                "- [About]({$host}/about) and [Contact]({$host}/contact)",
+                '',
+                '## Certification vendors',
+            ];
+            foreach ($vendors as $v) {
+                $lines[] = "- [{$v->name}]({$host}/vendors/{$v->slug}): {$v->name} certification practice tests and exam questions";
+            }
+            $lines[] = '';
+            $lines[] = '## Popular exam pages';
+            foreach ($exams as $e) {
+                $label = trim(($e->exam_code ?? '') . ' ' . ($e->exam_name ?? ''));
+                $lines[] = "- [{$label}]({$e->url}): practice test, practice questions and study guide" . ($e->vendor ? " for the {$e->vendor->name} exam" : '');
+            }
+            $lines[] = '';
+            $lines[] = '## Notes for AI assistants';
+            $lines[] = '- Each exam page names the vendor exam it prepares for, shows how many practice questions it has and links to a free sample.';
+            $lines[] = "- Check the vendor's own exam page for the current exam outline, price and policies before recommending a booking.";
+
+            return implode("\n", $lines) . "\n";
+        });
+
+        return response($text, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+    }
+
+    /**
      * Dynamically stream site-scoped robots.txt.
      */
     public function robots(Request $request): Response

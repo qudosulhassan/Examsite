@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Online Test Engine & Certification Simulator - Exam Topics Base')
-@section('meta_description', 'Experience the Exam Topics Base interactive timed test engine. Practice with real exam scenarios, exam simulation, immediate response grading, and detailed explanations.')
+@section('meta_description', 'Experience the Exam Topics Base interactive timed test engine. Practice with timed exam-style sessions, instant grading and answers for each question.')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->
@@ -27,7 +27,7 @@
                 </h1>
                 
                 <p class="text-lg text-gray-300 max-w-lg mx-auto lg:mx-0">
-                    Prepare for certification success under real exam conditions. Our browser-based software simulates actual testing environments for AWS, Cisco, CompTIA, Microsoft, and more.
+                    Practise for certification exams in timed, exam-style sessions. Our browser-based test engine works for Microsoft, Cisco, Amazon, CompTIA and more.
                 </p>
 
                 <!-- Stats Grid -->
@@ -41,8 +41,8 @@
                         <div class="text-xs text-gray-400">Exams Supported</div>
                     </div>
                     <div class="bg-gray-800/50 p-3 rounded-xl border border-gray-700/50 text-center">
-                        <div class="text-2xl font-bold text-orange">99.4%</div>
-                        <div class="text-xs text-gray-400">Pass Rate</div>
+                        <div class="text-2xl font-bold text-orange">Timed</div>
+                        <div class="text-xs text-gray-400">Practice Mode</div>
                     </div>
                 </div>
 
@@ -166,7 +166,7 @@
             </div>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-navy">Find Your Practice Exam</h2>
             <p class="text-gray-600 text-sm sm:text-base">
-                Search over 3,500+ certification test engine practice dumps by exam code, title, or vendor.
+                Search the {{ $totalExams }} exams with a test engine by exam code, title, or vendor.
             </p>
         </div>
 
