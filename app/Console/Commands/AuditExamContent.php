@@ -52,6 +52,10 @@ class AuditExamContent extends Command
             $conflict = [];
             foreach ($faqs as $faq) {
                 $text = ($faq['question'] ?? '') . ' ' . ($faq['answer'] ?? '');
+                if (preg_match('/\bhours?\b/i', $text)) {
+                    $keep[] = $faq;   // "5 hours 18 minutes" is not comparable with a plain minutes figure
+                    continue;
+                }
                 preg_match_all('/(\d{2,3})\s*(?:-|to)?\s*(?:minutes|min)\b/i', $text, $nums);
                 if ($nums[1] && !in_array($table, $nums[1], true)) {
                     $conflict[] = $faq;
