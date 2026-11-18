@@ -172,7 +172,7 @@ class ExamKeywordPlan
 
     public static function h1(string $code, string $name, string $vendor, int $questionCount = 1): string
     {
-        $core = $questionCount > 0 ? 'Practice Test & Exam Questions' : 'Exam Guide';
+        $core = $questionCount > 0 ? 'Practice Test & Exam Questions' : (preg_match('/\bexam$/i', trim($name)) ? 'Guide' : 'Exam Guide');
         // the vendor is left out when the exam name already starts with it ("Microsoft Azure Fundamentals")
         $vendor = ($vendor !== '' && stripos($name, $vendor) === 0) ? '' : $vendor;
         $full = trim(($vendor !== '' ? "{$vendor} " : '') . "{$code} " . ($name !== '' ? "{$name} " : '') . $core);
