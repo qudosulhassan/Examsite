@@ -119,12 +119,12 @@ class ExamKeywordPlan
     public static function description(string $code, string $name, int $questionCount = 0): string
     {
         $label = $name !== '' ? "{$code} {$name}" : $code;
-        $count = $questionCount >= 10 ? ' with ' . (floor($questionCount / 10) * 10) . '+ practice questions' : ' with practice questions';
+        $count = $questionCount >= 10 ? ' with ' . (floor($questionCount / 10) * 10) . '+ practice questions and answers' : ' with questions and answers';
 
         $variants = [
-            "{$label} practice test{$count} and answers. Try a free sample, review the exam objectives and practise in a timed test engine.",
-            "{$label} practice test{$count} and answers. Free sample, study guide and timed test engine.",
-            "{$code} practice test{$count} and answers. Free sample, exam objectives and a timed test engine.",
+            "{$label} practice test{$count}. Try a free sample, review the exam objectives and practise in a timed test engine.",
+            "{$label} practice test{$count}. Free sample, study guide and timed test engine.",
+            "{$code} practice test{$count}. Free sample, exam objectives and a timed test engine.",
             "{$code} practice test and questions. Free sample, study guide and timed test engine.",
         ];
         foreach ($variants as $v) {
