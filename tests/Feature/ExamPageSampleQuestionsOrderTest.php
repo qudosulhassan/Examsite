@@ -49,7 +49,7 @@ class ExamPageSampleQuestionsOrderTest extends TestCase
 
         $html = $this->get($exam->url)->assertOk()->getContent();
 
-        $questions = strpos($html, 'Actual Free Microsoft AZ-900 Practice Questions');
+        $questions = strpos($html, 'Free Microsoft AZ-900 Practice Questions');
         $details = strpos($html, 'Microsoft AZ-900 Exam Details');
         $hero = strpos($html, 'Hero Section');
 
@@ -57,7 +57,7 @@ class ExamPageSampleQuestionsOrderTest extends TestCase
         $this->assertNotFalse($details);
         $this->assertLessThan($details, $questions, 'free questions must come before the exam details');
         $this->assertGreaterThan($hero, $questions, 'free questions must come after the hero');
-        $this->assertSame(1, substr_count($html, 'Actual Free Microsoft AZ-900 Practice Questions'), 'section must appear once');
+        $this->assertSame(1, substr_count($html, 'Free Microsoft AZ-900 Practice Questions'), 'section must appear once');
         $this->assertStringContainsString('Which cloud model is SaaS?', $html);
     }
 
@@ -67,7 +67,7 @@ class ExamPageSampleQuestionsOrderTest extends TestCase
 
         $html = $this->get($exam->url)->assertOk()->getContent();
 
-        $questions = strpos($html, 'Actual Free Microsoft AZ-900 Practice Questions');
+        $questions = strpos($html, 'Free Microsoft AZ-900 Practice Questions');
         $details = strpos($html, 'Microsoft AZ-900 Exam Details');
 
         // no empty "Actual Free ... Practice Questions" heading when there is nothing to show

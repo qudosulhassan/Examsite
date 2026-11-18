@@ -4,7 +4,7 @@
                     @if($sampleQuestions->isNotEmpty())
                     <div class="text-center mb-12">
                         <span class="text-[11px] font-black text-cyan uppercase tracking-widest bg-cyan/10 px-3 py-1.5 rounded-full border border-cyan/20 mb-4 inline-block">Free Trial</span>
-                        <h2 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Actual Free {{ $exam->vendor->name }} {{ $exam->exam_code }} Practice Questions</h2>
+                        <h2 class="text-3xl sm:text-4xl font-black text-navy mb-4 tracking-tight">Free {{ $exam->vendor->name }} {{ $exam->exam_code }} Practice Questions</h2>
                     </div>
                     @endif
                     

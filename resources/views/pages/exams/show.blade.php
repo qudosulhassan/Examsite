@@ -400,7 +400,7 @@
                                     <div class="w-5 h-5 rounded-full bg-cyan/20 flex items-center justify-center mr-3 shadow-[0_0_10px_rgba(0,212,170,0.2)]">
                                         <svg class="h-3 w-3 text-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
                                     </div>
-                                    100% Verified Accurate Answers
+                                    Answers for every question
                                 </li>
                                 <li class="flex items-center">
                                     <div class="w-5 h-5 rounded-full bg-cyan/20 flex items-center justify-center mr-3 shadow-[0_0_10px_rgba(0,212,170,0.2)]">
@@ -539,7 +539,7 @@
                 <!-- Comprehensive Exam Article & Study Guide -->
                 <div id="exam-details" class="scroll-mt-32 bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] space-y-6">
                     <div class="blog-content-body prose prose-base sm:prose-lg prose-cyan max-w-none text-gray-700 leading-relaxed">
-                        {!! $renderedArticleContent !!}
+                        {!! \App\Support\InternalLinker::linkHtml((string) $renderedArticleContent, $exam) !!}
                     </div>
                 </div>
                 @endif
@@ -595,6 +595,8 @@
                 @endif
 
                 @include('partials.exam-official-facts', ['exam' => $exam])
+                @include('partials.exam-bank-facts', ['exam' => $exam])
+                @include('partials.exam-official-sources', ['exam' => $exam])
 
                 @php
                     $renderedFaqs = $exam->resolved_faqs;
@@ -633,7 +635,7 @@
                                      x-transition:enter-end="opacity-100 translate-y-0"
                                      class="p-6 pt-2 text-sm sm:text-base text-gray-600 leading-relaxed border-t border-gray-100/80 bg-white"
                                      style="display: none;">
-                                    <p class="whitespace-pre-line">{!! nl2br(e($faq['answer'] ?? '')) !!}</p>
+                                    <p class="whitespace-pre-line">{!! nl2br(\App\Support\InternalLinker::linkText((string) ($faq['answer'] ?? ''), $exam)) !!}</p>
                                 </div>
                             </div>
                         @endforeach
@@ -692,19 +694,14 @@
 
 <!-- Related Exams Section -->
 @php
-    $relatedExams = App\Models\Exam::where('vendor_id', $exam->vendor_id)
-        ->where('id', '!=', $exam->id)
-        ->where('is_active', true)
-        ->inRandomOrder()
-        ->take(6)
-        ->get();
+    $relatedExams = \App\Support\RelatedExams::exams($exam, 6);
 @endphp
 
 @if($relatedExams->count() > 0)
 <section class="py-24 bg-white border-t border-gray-100 overflow-hidden relative">
     <div class="container-custom relative z-10">
         <div class="text-center mb-16">
-            <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Frequently Bought Together</h2>
+            <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Related {{ $exam->vendor->name }} Exams</h2>
             <div class="w-24 h-1.5 bg-gradient-to-r from-cyan to-blue-500 mx-auto mt-6 rounded-full"></div>
         </div>
         
@@ -717,6 +714,8 @@
                 <div class="text-[10px] text-gray-400 font-black mb-3 uppercase tracking-widest bg-white inline-block self-start px-2 py-1 rounded shadow-sm border border-gray-100">{{ $exam->vendor->name }}</div>
                 <h3 class="text-lg font-black text-navy mb-4 leading-tight flex-grow group-hover:text-cyan transition-colors">
                     {{ $related->exam_code }}
+                    <span class="block text-sm font-semibold text-gray-500 mt-1">{{ \Illuminate\Support\Str::limit($related->exam_name, 60) }}</span>
+                    <span class="block text-xs font-bold text-gray-400 mt-2">Practice test</span>
                 </h3>
                 <div class="flex items-center justify-between mt-auto pt-5 border-t border-gray-200/60">
                     <span class="font-black text-gray-900 text-lg">${{ $related->price_pdf }}</span>
@@ -733,12 +732,7 @@
 
 <!-- Related Blog Posts Section -->
 @php
-    $relatedBlogPosts = \App\Models\BlogPost::with('category', 'user')
-        ->where('status', 'published')
-        ->where('related_exam_id', $exam->id)
-        ->latest('published_at')
-        ->limit(3)
-        ->get();
+    $relatedBlogPosts = \App\Support\RelatedExams::posts($exam, 3);
 @endphp
 
 @if($relatedBlogPosts->count() > 0)
