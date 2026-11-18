@@ -126,7 +126,7 @@
                     @endif
                 </div>
                 <div>
-                    <h1 class="text-3xl font-extrabold tracking-tight mb-2">{{ $vendor->name }} Certification Study Guides</h1>
+                    <h1 class="text-3xl font-extrabold tracking-tight mb-2">{{ $vendor->name }} Certification Practice Tests &amp; Exam Questions</h1>
                     <p class="text-sm text-gray-300 max-w-xl">{{ $vendor->description }}</p>
                 </div>
             </div>
