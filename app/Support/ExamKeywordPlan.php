@@ -52,9 +52,9 @@ class ExamKeywordPlan
         return [
             'code'      => $code,
             'name'      => $name,
-            'title'     => static::title($code, $name, $brand, $questionCount),
+            'title'     => static::title($code, $name, $brand),
             'description' => static::description($code, $name, $questionCount),
-            'h1'        => static::h1($code, $name, $vendor, $questionCount),
+            'h1'        => static::h1($code, $name, $vendor),
             'primary'   => $groups['primary'][0],
             'groups'    => $groups,
             'confirmed' => $confirmed,
@@ -62,15 +62,8 @@ class ExamKeywordPlan
     }
 
     /** @return array{title:string,description:string,h1:string} for a vendor page, e.g. "Cisco". */
-    public static function forVendor(string $vendor, string $brand, int $examCount = 0, ?int $withQuestions = null): array
+    public static function forVendor(string $vendor, string $brand, int $examCount = 0): array
     {
-        $withQuestions ??= $examCount;
-        if ($withQuestions <= 0) {
-            $t = "{$vendor} Certification Exam Guides | {$brand}";
-            $t = mb_strlen($t) <= self::TITLE_MAX ? $t : "{$vendor} Exam Guides | {$brand}";
-
-            return ['title' => mb_substr($t, 0, self::TITLE_MAX), 'description' => "{$vendor} certification exam guides with exam details, related exams and links to the official exam pages.", 'h1' => "{$vendor} Certification Exam Guides"];
-        }
         $suffix = " | {$brand}";
         $titles = ["{$vendor} Certification Practice Tests & Questions{$suffix}", "{$vendor} Certification Practice Tests{$suffix}", "{$vendor} Practice Tests{$suffix}"];
         $title = mb_substr($titles[count($titles) - 1], 0, self::TITLE_MAX);
@@ -80,46 +73,33 @@ class ExamKeywordPlan
                 break;
             }
         }
-        $exams = $withQuestions >= 10 ? (floor($withQuestions / 10) * 10) . '+ ' : '';
-        $desc = "{$vendor} certification practice tests and exam questions for {$exams}{$vendor} exams, plus exam guides for {$examCount} exams.";
+        $exams = $examCount >= 10 ? (floor($examCount / 10) * 10) . '+ ' : '';
+        $desc = "{$vendor} certification practice tests and exam questions for {$exams}{$vendor} exams. Free samples, study guides and a timed test engine.";
         if (mb_strlen($desc) > self::DESC_MAX) {
-            $desc = "{$vendor} certification practice tests and exam questions, plus exam guides for {$examCount} exams.";
+            $desc = "{$vendor} certification practice tests and exam questions. Free samples, study guides and a timed test engine.";
         }
 
         return ['title' => $title, 'description' => $desc, 'h1' => "{$vendor} Certification Practice Tests & Exam Questions"];
     }
 
     /** @param array<string> $vendors the biggest vendors by exam count */
-    public static function forHome(string $brand, int $examCount, array $vendors, ?int $withQuestions = null): array
+    public static function forHome(string $brand, int $examCount, array $vendors): array
     {
-        $withQuestions ??= $examCount;
-        $practice = $withQuestions >= 100 ? (floor($withQuestions / 100) * 100) . '+' : ($withQuestions >= 10 ? (floor($withQuestions / 10) * 10) . '+' : (string) $withQuestions);
-        $guides = $examCount >= 100 ? (floor($examCount / 100) * 100) . '+' : (string) $examCount;
+        $exams = $examCount >= 100 ? (floor($examCount / 100) * 100) . '+' : (string) $examCount;
         $names = implode(', ', array_slice($vendors, 0, 3));
-        $desc = "Practice tests and exam questions for {$practice} IT certification exams, plus exam guides for {$guides} exams from {$names} and more.";
+        $desc = "Practice tests and exam questions for {$exams} IT certification exams from {$names} and more. Free samples, study guides and a timed test engine.";
         if (mb_strlen($desc) > self::DESC_MAX) {
-            $desc = "Practice tests and exam questions for {$practice} IT certification exams, plus exam guides for {$guides} exams.";
+            $desc = "Practice tests and exam questions for {$exams} IT certification exams. Free samples, study guides and a timed test engine.";
         }
 
         return ['title' => "IT Certification Practice Tests & Questions | {$brand}", 'description' => $desc];
     }
 
     /** First candidate that fits in 60 characters; the exam code always comes first. */
-    public static function title(string $code, string $name, string $brand, int $questionCount = 1): string
+    public static function title(string $code, string $name, string $brand): string
     {
         $suffix = " | {$brand}";
         $candidates = [];
-        if ($questionCount <= 0) {
-            // No practice questions exist for this exam yet, so the title must not promise a practice test.
-            $candidates = ["{$code} Exam Guide & Study Resources{$suffix}", "{$code} Exam Guide{$suffix}"];
-            foreach ($candidates as $c) {
-                if (mb_strlen($c) <= self::TITLE_MAX) {
-                    return $c;
-                }
-            }
-
-            return mb_substr($candidates[count($candidates) - 1], 0, self::TITLE_MAX);
-        }
         if ($name !== '') {
             $candidates[] = "{$code} {$name} Practice Test & Questions{$suffix}";
         }
@@ -139,21 +119,7 @@ class ExamKeywordPlan
     public static function description(string $code, string $name, int $questionCount = 0): string
     {
         $label = $name !== '' ? "{$code} {$name}" : $code;
-        if ($questionCount <= 0) {
-            $variants = [
-                "{$label} exam guide with exam details, related exams and links to the official exam pages. Practice questions are not available for this exam yet.",
-                "{$code} exam guide with exam details, related exams and links to the official exam pages. Practice questions are not available yet.",
-                "{$code} exam guide with exam details and links to the official exam pages. No practice questions yet.",
-            ];
-            foreach ($variants as $v) {
-                if (mb_strlen($v) <= self::DESC_MAX) {
-                    return $v;
-                }
-            }
-
-            return $variants[count($variants) - 1];
-        }
-        $count = $questionCount >= 10 ? ' with ' . (floor($questionCount / 10) * 10) . '+ practice questions and answers' : ' with questions and answers';
+        $count =$questionCount >= 10 ? ' with ' . (floor($questionCount / 10) * 10) . '+ practice questions and answers' : ' with questions and answers';
 
         $variants = [
             "{$label} practice test{$count}. Try a free sample, review the exam objectives and practise in a timed test engine.",
@@ -170,9 +136,9 @@ class ExamKeywordPlan
         return rtrim(mb_substr($variants[count($variants) - 1], 0, self::DESC_MAX - 1), ' ,.') . '.';
     }
 
-    public static function h1(string $code, string $name, string $vendor, int $questionCount = 1): string
+    public static function h1(string $code, string $name, string $vendor): string
     {
-        $core = $questionCount > 0 ? 'Practice Test & Exam Questions' : (preg_match('/\bexam$/i', trim($name)) ? 'Guide' : 'Exam Guide');
+        $core = 'Practice Test & Exam Questions';
         // the vendor is left out when the exam name already starts with it ("Microsoft Azure Fundamentals")
         $vendor = ($vendor !== '' && stripos($name, $vendor) === 0) ? '' : $vendor;
         $full = trim(($vendor !== '' ? "{$vendor} " : '') . "{$code} " . ($name !== '' ? "{$name} " : '') . $core);

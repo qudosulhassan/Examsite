@@ -37,17 +37,10 @@ class ExamFaqFallback
             ];
         }
 
-        if ($questions > 0) {
-            $faqs[] = [
-                'question' => "Is there a free {$code} practice test?",
-                'answer' => "Yes. Request a free PDF sample of {$code} practice questions on the free sample page, or try the timed test engine. The full question set for {$label} comes with the plans shown on this page.",
-            ];
-        } else {
-            $faqs[] = [
-                'question' => "Are {$code} practice questions available?",
-                'answer' => "Not yet. {$site} does not have practice questions for {$label} at the moment. This page has the exam details we hold and links to the official exam pages.",
-            ];
-        }
+        $faqs[] = [
+            'question' => "Is there a free {$code} practice test?",
+            'answer' => "Yes. Request a free PDF sample of {$code} practice questions on the free sample page, or try the timed test engine. The full question set for {$label} comes with the plans shown on this page.",
+        ];
 
         $faqs[] = [
             'question' => "Are these official {$code} exam questions?",

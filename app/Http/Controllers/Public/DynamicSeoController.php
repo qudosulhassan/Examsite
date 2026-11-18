@@ -166,7 +166,7 @@ class DynamicSeoController extends Controller
             $lines = [
                 "# {$brand}",
                 '',
-                "> {$brand} has exam guides for {$examTotal} IT certification exams and practice questions for {$withQuestions} of them, with free samples and an online timed test engine where questions exist. It is independent study material: it is not affiliated with, endorsed by or sponsored by any certification vendor, and it is not official exam content.",
+                "> {$brand} offers practice tests, practice questions and study guides for {$examTotal} IT certification exams, with free samples and an online timed test engine. It is independent study material: it is not affiliated with, endorsed by or sponsored by any certification vendor, and it is not official exam content.",
                 '',
                 '## Main pages',
                 "- [Home]({$host}/): overview of the practice tests and certification vendors",

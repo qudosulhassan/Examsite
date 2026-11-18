@@ -93,27 +93,22 @@ class ExamKeywordSeoTest extends TestCase
         @unlink($backup);
     }
 
-    public function test_an_exam_without_questions_is_never_described_as_a_practice_test(): void
+    public function test_an_exam_without_uploaded_questions_still_gets_the_practice_test_wording(): void
     {
+        // question files are uploaded later; the page text is written for the finished page
         $p = ExamKeywordPlan::forExam(['code' => 'ADM-201', 'name' => 'Administration Essentials for New Admins', 'vendor' => 'Salesforce'], 'ExamTopicsBase', 0);
-        foreach ([$p['title'], $p['description'], $p['h1']] as $text) {
-            $this->assertDoesNotMatchRegularExpression('/practice test|practice questions and answers|free sample|test engine|questions and answers/i', $text, $text);
-            $this->assertStringContainsString('ADM-201', $text);
-        }
+        $this->assertStringContainsString('Practice Test', $p['title']);
+        $this->assertStringContainsString('practice test', $p['description']);
+        $this->assertStringContainsString('Practice Test', $p['h1']);
+        $this->assertDoesNotMatchRegularExpression('/not available|no practice questions|not yet/i', $p['title'] . $p['description'] . $p['h1']);
         $this->assertLessThanOrEqual(60, mb_strlen($p['title']));
         $this->assertLessThanOrEqual(158, mb_strlen($p['description']));
-        $this->assertStringContainsString('not available', $p['description']);
 
-        $with = ExamKeywordPlan::forExam(['code' => 'ADM-201', 'name' => 'Administration Essentials for New Admins', 'vendor' => 'Salesforce'], 'ExamTopicsBase', 120);
-        $this->assertStringContainsString('Practice Test', $with['title']);
-
-        $v = ExamKeywordPlan::forVendor('Salesforce', 'ExamTopicsBase', 100, 0);
-        $this->assertDoesNotMatchRegularExpression('/practice test|free sample/i', $v['title'] . $v['description']);
-        $h = ExamKeywordPlan::forHome('ExamTopicsBase', 834, ['Microsoft', 'Cisco'], 102);
-        $this->assertStringContainsString('100+', $h['description']);
+        $v = ExamKeywordPlan::forVendor('Salesforce', 'ExamTopicsBase', 100);
+        $this->assertStringContainsString('Practice Tests', $v['title']);
+        $h = ExamKeywordPlan::forHome('ExamTopicsBase', 834, ['Microsoft', 'Cisco']);
         $this->assertStringContainsString('800+', $h['description']);
     }
-
     public function test_exam_structured_data_has_no_dumps_wording_and_no_vendor_as_provider(): void
     {
         $vendor = Vendor::create(['name' => 'Microsoft', 'slug' => 'microsoft', 'is_active' => true]);
