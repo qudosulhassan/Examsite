@@ -441,6 +441,13 @@ class Exam extends Model
      */
     public function getResolvedFaqsAttribute(): array
     {
+        $faqs = $this->resolvedFaqsFromData();
+
+        return !empty($faqs) ? $faqs : \App\Support\ExamFaqFallback::for($this);
+    }
+
+    private function resolvedFaqsFromData(): array
+    {
         if (app()->bound(\App\Services\SiteContext::class)) {
             return app(\App\Services\SiteContext::class)->resolveExamFaqs($this);
         }

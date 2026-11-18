@@ -594,6 +594,8 @@
 
                 @endif
 
+                @include('partials.exam-official-facts', ['exam' => $exam])
+
                 @php
                     $renderedFaqs = $exam->resolved_faqs;
                 @endphp
