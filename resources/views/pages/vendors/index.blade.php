@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'IT Certification Vendors & Practice Tests | ExamTopicsBase')
+@section('meta_description', 'Choose a certification vendor, such as Microsoft, Cisco or Amazon, and open its exam list with practice tests, exam questions and study guides.')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->

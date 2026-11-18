@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Download Free Exam PDF Sample - Exam Topics Base')
+@section('title', 'Free Practice Questions PDF Sample | ExamTopicsBase')
+@section('meta_description', 'Pick an exam and get a free PDF sample of practice questions with answers by email. No payment needed. Try it before you choose a plan.')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->
