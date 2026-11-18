@@ -29,8 +29,8 @@
     @endif
 
     {{-- Product & Offer Schema --}}
-    {{-- Only when the exam really has practice questions: an "InStock" product with none behind it is misleading. --}}
-    @if(($globalSettings['seo_schema_product_enabled'] ?? '1') === '1' && \App\Support\ExamBankFacts::for($exam))
+    {{-- Price and offer markup for every exam (owner decision: question files are uploaded later). --}}
+    @if(($globalSettings['seo_schema_product_enabled'] ?? '1') === '1')
     <script type="application/ld+json">
     {!! json_encode($seoService->generateExamProductSchema($exam), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
