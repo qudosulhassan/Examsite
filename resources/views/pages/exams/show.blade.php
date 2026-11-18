@@ -701,7 +701,7 @@
 <section class="py-24 bg-white border-t border-gray-100 overflow-hidden relative">
     <div class="container-custom relative z-10">
         <div class="text-center mb-16">
-            <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">Related {{ $exam->vendor->name }} Exams</h2>
+            <h2 class="text-3xl sm:text-4xl font-black text-navy tracking-tight">{{ $relatedExams->contains('is_family', true) ? 'Related' : 'Popular' }} {{ $exam->vendor->name }} Exams</h2>
             <div class="w-24 h-1.5 bg-gradient-to-r from-cyan to-blue-500 mx-auto mt-6 rounded-full"></div>
         </div>
         

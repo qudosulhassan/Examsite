@@ -41,6 +41,9 @@ class RelatedExams
             $score += min(6, 1.5 * count(array_intersect($mine, static::tokens((string) $c->exam_name))));
             $score += min(2, $c->questions_count / 100);
 
+            // a real family connection (same prefix, next/previous exam or a similar name), not just a popular exam
+            $c->setAttribute('is_family', $score > 2);   // popularity alone never scores above 2
+
             return [$score, $c];
         })->sort(function ($a, $b) {
             return [$b[0], $a[1]->exam_code] <=> [$a[0], $b[1]->exam_code];

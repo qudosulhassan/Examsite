@@ -119,13 +119,13 @@ class ExamLinkingTest extends TestCase
         $html = $this->get($exam->url)->assertOk()->getContent();
         $this->assertStringContainsString('AZ-104 practice question bank at a glance', $html);
         $this->assertStringContainsString('Confirm the official AZ-104 requirements', $html);
-        $this->assertStringContainsString('Related Microsoft Exams', $html);
+        $this->assertMatchesRegularExpression('/(Related|Popular) Microsoft Exams/', $html);
         $this->assertStringNotContainsString('Frequently Bought Together', $html);
         $this->assertStringContainsString('rel="noopener"', $html);
 
         $again = $this->get($exam->url)->getContent();
-        preg_match('#Related Microsoft Exams.*?</section>#s', $html, $a);
-        preg_match('#Related Microsoft Exams.*?</section>#s', $again, $b);
+        preg_match('#(?:Related|Popular) Microsoft Exams.*?</section>#s', $html, $a);
+        preg_match('#(?:Related|Popular) Microsoft Exams.*?</section>#s', $again, $b);
         $this->assertSame($a[0] ?? null, $b[0] ?? '', 'related block is identical between requests');
     }
 }
