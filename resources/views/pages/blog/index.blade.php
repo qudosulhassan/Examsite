@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Exam Topics Base Blog - IT Certification News & Tips')
-@section('meta_description', 'Latest news, tips, and study guides for IT certifications. Stay updated with Exam Topics Base blog.')
+@section('title', 'IT Certification Study Tips & Exam News | ExamTopicsBase')
+@section('meta_description', 'Study tips, exam news and certification guides for IT exams from Microsoft, Cisco and more. Read the ExamTopicsBase blog before you book your exam.')
 
 @section('content')
 <!-- Blog Header -->

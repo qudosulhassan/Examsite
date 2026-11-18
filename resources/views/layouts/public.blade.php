@@ -56,7 +56,6 @@
 
     <title>@yield('title', $defaultSiteTitle)</title>
     <meta name="description" content="@yield('meta_description', $defaultSiteDesc)">
-    <meta name="keywords" content="@yield('meta_keywords', $defaultSiteKeywords)">
     <link rel="canonical" href="{{ $computedCanonical }}">
     <link rel="alternate" hreflang="en" href="{{ $computedCanonical }}">
     <link rel="alternate" hreflang="x-default" href="{{ $computedCanonical }}">

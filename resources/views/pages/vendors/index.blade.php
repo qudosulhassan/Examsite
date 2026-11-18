@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Browse IT Certification Providers — Exam Topics Base')
+@section('title', 'IT Certification Vendors & Practice Tests | ExamTopicsBase')
 
 @section('content')
 <!-- Hero Section (Premium Deep Space) -->

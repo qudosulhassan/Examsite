@@ -418,7 +418,7 @@ TXT;
         $vendorName = $exam->vendor ? $exam->vendor->name : 'IT Certification';
         $examCode = $exam->exam_code ?: $exam->code ?: '';
         $examName = $exam->exam_name ?: $exam->title ?: '';
-        $title = trim(($examCode ? $examCode . ' - ' : '') . ($examName ?: 'Certification Practice Exam') . (config('site.avoid_dumps') ? ' Practice Questions & Study Guide' : ' Practice Questions & Dumps'));
+        $title = trim(($examCode ? $examCode . ' - ' : '') . ($examName ?: 'Certification Practice Exam') . ' Practice Questions & Study Guide');
 
         $rawDesc = '';
         if (!empty(trim(strip_tags($exam->description ?? '')))) {
@@ -513,9 +513,7 @@ TXT;
                 $rawDesc = $exam->meta_description;
             }
             if (empty($rawDesc)) {
-                $rawDesc = config('site.avoid_dumps')
-                    ? "Comprehensive {$examCode} {$examName} certification study guide and practice questions."
-                    : "Comprehensive {$examCode} {$examName} certification course, verified exam dumps, and real practice questions.";
+                $rawDesc = "Practice test, exam questions and study guide for the {$examCode} {$examName} certification exam.";
             }
         }
 
@@ -526,10 +524,16 @@ TXT;
             '@type' => 'Course',
             'name' => $title,
             'description' => substr($rawDesc, 0, 300),
+            // The course is this site's study material, not the vendor's: the vendor is not the provider.
             'provider' => [
                 '@type' => 'Organization',
-                'name' => $vendorName,
-                'sameAs' => $vendorUrl,
+                'name' => $siteName,
+                'url' => url('/'),
+            ],
+            'about' => [
+                '@type' => 'Thing',
+                'name' => $vendorName . ' ' . $examCode . ' certification exam',
+                'url' => $vendorUrl,
             ],
             'educationalCredentialAwarded' => $examCode ? "{$examCode} Certification" : 'Professional IT Certification',
             'hasCourseInstance' => [

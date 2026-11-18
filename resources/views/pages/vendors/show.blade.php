@@ -1,8 +1,7 @@
 @extends('layouts.public')
 
-@section('title', $vendor->meta_title ?? "{$vendor->name} Certification Exam Study Guides — Exam Topics Base")
-@section('meta_description', $vendor->meta_description ?? "Browse our extensive catalog of updated {$vendor->name} certification exams, study guides, and verified question banks.")
-@section('meta_keywords', $vendor->meta_keywords ?? "{$vendor->name} exams, {$vendor->name} certification, {$vendor->name} practice test, {$vendor->name} dumps")
+@section('title', $vendor->meta_title ?? \App\Support\ExamKeywordPlan::forVendor((string) $vendor->name, 'ExamTopicsBase', (int) ($vendor->exam_count ?? 0))['title'])
+@section('meta_description', $vendor->meta_description ?? \App\Support\ExamKeywordPlan::forVendor((string) $vendor->name, 'ExamTopicsBase', (int) ($vendor->exam_count ?? 0))['description'])
 @section('canonical_url', route('vendors.show', $vendor->slug))
 @section('og_type', 'website')
 

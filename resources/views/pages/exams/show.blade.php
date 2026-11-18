@@ -4,7 +4,7 @@
 @section('meta_description', $exam->resolved_meta_description)
 @section('meta_keywords', $exam->meta_keywords ?? "{$exam->exam_code}, {$exam->exam_code} " . (config('site.avoid_dumps') ? 'exam questions' : 'exam dumps') . ", {$exam->exam_code} practice test, {$exam->vendor->name} certification")
 @section('canonical_url', $exam->url)
-@section('og_type', 'product')
+@section('og_type', 'website')
 
 @section('styles')
 @include('partials.rich-content-styles')

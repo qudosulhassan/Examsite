@@ -2,7 +2,7 @@
 
 @php
     $siteBrand = ($currentSite && !empty($currentSite->name)) ? $currentSite->name : config('app.name', 'ExamTopicsBase');
-    $homeTitle = ($currentSite && !empty($currentSite->default_seo_title)) ? $currentSite->default_seo_title : "{$siteBrand} - Pass Your IT Certification Exam First Attempt";
+    $homeTitle = ($currentSite && !empty($currentSite->default_seo_title)) ? $currentSite->default_seo_title : "IT Certification Practice Tests & Questions | {$siteBrand}";
     $homeDesc = ($currentSite && !empty($currentSite->default_meta_description)) ? $currentSite->default_meta_description : (!empty($globalSettings['default_meta_description']) ? $globalSettings['default_meta_description'] : "Pass your IT certification exams on first attempt with {$siteBrand}. Verified PDF study guides, interactive web test engines, and real practice exam questions.");
 @endphp
 
