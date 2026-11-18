@@ -91,7 +91,17 @@ class ApplyExamKeywordSeo extends Command
                     $vendorChanges[$vendor->id] = $new;
                 }
             }
-            $top = $vendors->sortByDesc('exams_count')->take(3)->pluck('name')->all();
+            // the best-known vendors first, then the rest by number of exams
+            $priority = ['microsoft', 'cisco', 'amazon', 'comptia', 'google'];
+            $top = $vendors->sortBy(function ($v) use ($priority) {
+                foreach ($priority as $i => $p) {
+                    if (stripos((string) $v->name, $p) === 0) {
+                        return $i - 1000;
+                    }
+                }
+
+                return -(int) $v->exams_count;
+            })->take(3)->pluck('name')->all();
             $home = ExamKeywordPlan::forHome($brand, $exams->count(), $top);
             $homeBackup = [
                 'default_seo_title' => \App\Models\Setting::get('default_seo_title'),
